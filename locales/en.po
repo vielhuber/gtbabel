@@ -1,0 +1,116 @@
+msgid ""
+msgstr ""
+"Content-Transfer-Encoding: 8bit\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: EN\n"
+"MIME-Version: 1.0\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+msgid "Vielhuber David"
+msgstr "%|%Vielhuber David%|%"
+
+msgid "ABOUT"
+msgstr "%|%ABOUT%|%"
+
+msgid "BLOG"
+msgstr "%|%BLOG%|%"
+
+msgid "Entwickler aus Leidenschaft"
+msgstr "%|%Entwickler aus Leidenschaft%|%"
+
+msgid "Mein Name ist David Vielhuber. Ich bin Full-Stack Developer, zweifacher Papa und habe eine Schwäche für guten Kaffee und Code. Ich habe ein Faible für schönes Design, eine Prise Perfektionismus und Augen für klare Konturen. Vor 20 Jahren begann ich eine Liebesbeziehung mit meinem Computer – und kurz darauf mit dem Internet."
+msgstr "%|%Mein Name ist David Vielhuber. Ich bin Full-Stack Developer, zweifacher Papa und habe eine Schwäche für guten Kaffee und Code. Ich habe ein Faible für schönes Design, eine Prise Perfektionismus und Augen für klare Konturen. Vor 20 Jahren begann ich eine Liebesbeziehung mit meinem Computer – und kurz darauf mit dem Internet.%|%"
+
+msgid "Im Laufe der Jahre wandelte sich meine Leidenschaft vom Hobby zum Beruf. Eine Vielzahl spannender Kundenprojekte aus den letzten Jahren führten mich dazu, neben Privatpersonen auch kleinen und mittelständischen Unternehmen ein großes Leistungsspektrum – von Web bis Print – anzubieten. Inzwischen bin ich ein Teil der <a>close2 new media GmbH</a> in München."
+msgstr "%|%Im Laufe der Jahre wandelte sich meine Leidenschaft vom Hobby zum Beruf. Eine Vielzahl spannender Kundenprojekte aus den letzten Jahren führten mich dazu, neben Privatpersonen auch kleinen und mittelständischen Unternehmen ein großes Leistungsspektrum – von Web bis Print – anzubieten. Inzwischen bin ich ein Teil der <a>close2 new media GmbH</a> in München.%|%"
+
+msgid "Büroanschrift"
+msgstr "%|%Büroanschrift%|%"
+
+msgid "close2 new media GmbH<br>Auenstrasse 6<br>80469 München"
+msgstr "%|%close2 new media GmbH<br>Auenstrasse 6<br>80469 München%|%"
+
+msgid "Kontaktdaten"
+msgstr "%|%Kontaktdaten%|%"
+
+msgid "Tel"
+msgstr "%|%Tel%|%"
+
+msgid "+49 89 21 540 01 42"
+msgstr "%|%+49 89 21 540 01 42%|%"
+
+msgid "Fax"
+msgstr "%|%Fax%|%"
+
+msgid "+49 89 21 544 59 1"
+msgstr "%|%+49 89 21 544 59 1%|%"
+
+msgid "Mail"
+msgstr "%|%Mail%|%"
+
+msgid "david@vielhuber.de"
+msgstr "%|%david@vielhuber.de%|%"
+
+msgid "GitHub"
+msgstr "%|%GitHub%|%"
+
+msgid "Twitter"
+msgstr "%|%Twitter%|%"
+
+msgid "Pinboard"
+msgstr "%|%Pinboard%|%"
+
+msgid "Pinterest"
+msgstr "%|%Pinterest%|%"
+
+msgid "YouTube"
+msgstr "%|%YouTube%|%"
+
+msgid "Shopware"
+msgstr "%|%Shopware%|%"
+
+msgid "Spotify"
+msgstr "%|%Spotify%|%"
+
+msgid "Dribbble"
+msgstr "%|%Dribbble%|%"
+
+msgid "Xing"
+msgstr "%|%Xing%|%"
+
+msgid "Google+"
+msgstr "%|%Google+%|%"
+
+msgid "PGP"
+msgstr "%|%PGP%|%"
+
+msgid "W3C Markup Validation"
+msgstr "%|%W3C Markup Validation%|%"
+
+msgid "Google Lighthouse"
+msgstr "%|%Google Lighthouse%|%"
+
+msgid "Impressum"
+msgstr "%|%Impressum%|%"
+
+msgid "Datenschutz"
+msgstr "%|%Datenschutz%|%"
+
+msgid "Disclaimer"
+msgstr "%|%Disclaimer%|%"
+
+# link
+msgid "blog"
+msgstr "%|%blog%|%"
+
+# link
+msgid "impressum"
+msgstr "%|%impressum%|%"
+
+# link
+msgid "datenschutz"
+msgstr "%|%datenschutz%|%"
+
+# link
+msgid "disclaimer"
+msgstr "%|%disclaimer%|%"

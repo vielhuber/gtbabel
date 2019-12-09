@@ -9,7 +9,8 @@ use Dotenv\Dotenv;
 
 class gtbabel
 {
-    public $debug = true;
+    public $reset = true;
+    public $auto_translation = false;
 
     public $html = null;
     public $translations = null;
@@ -20,21 +21,37 @@ class gtbabel
     function translate($html)
     {
         $this->html = $html;
-        if ($this->debug === true) {
-            $this->resetPoFiles();
+        if ($this->reset === true) {
+            $this->deletePoFiles();
         }
+        $this->createPoFilesIfNotExists();
         $this->preloadTranslationsInCache();
         $this->modifyHtml();
         return $this->html;
     }
 
-    function resetPoFiles()
+    function getLngFilename($type)
     {
-        @unlink('locales/gtbabel.po');
-        @touch('locales/gtbabel.po');
-        file_put_contents(
-            'locales/gtbabel.po',
-            '# gpbabel
+        return LNG_FOLDER . '/' . mb_strtolower(LNG_TARGET) . '.' . $type;
+    }
+
+    function deletePoFiles()
+    {
+        @unlink($this->getLngFilename('po'));
+        @unlink($this->getLngFilename('po'));
+    }
+
+    function createPoFilesIfNotExists()
+    {
+        if (!is_dir(LNG_FOLDER)) {
+            mkdir(LNG_FOLDER, 0777, true);
+        }
+        $filename = $this->getLngFilename('po');
+        if (!file_exists($filename)) {
+            touch($filename);
+            file_put_contents(
+                $filename,
+                '# gtbabel
 msgid ""
 msgstr ""
 "MIME-Version: 1.0\n"
@@ -42,9 +59,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "Language: ' .
-                LNG_TARGET .
-                '\n"'
-        );
+                    LNG_TARGET .
+                    '\n"'
+            );
+        }
     }
 
     function preloadTranslationsInCache()
@@ -52,7 +70,7 @@ msgstr ""
         $this->translations = Translations::create('gtbabel');
         $this->translations_cache = [];
         $poLoader = new PoLoader();
-        $this->translations = $poLoader->loadFile('locales/gtbabel.po');
+        $this->translations = $poLoader->loadFile($this->getLngFilename('po'));
         foreach ($this->translations->getTranslations() as $translations__value) {
             $this->translations_cache[
                 $translations__value->getOriginal()
@@ -64,6 +82,7 @@ msgstr ""
     {
         $this->setupDomDocument();
         $this->modifyTextNodes();
+        $this->modifyLinks();
         $this->generatePoAndMoFilesFromNewTranslations();
         $this->html = $this->DOMDocument->saveHTML();
     }
@@ -88,6 +107,9 @@ msgstr ""
             if (trim($textnodes__value->nodeValue) == '') {
                 continue;
             }
+            if (@$textnodes__value->parentNode->tagName === 'script') {
+                continue;
+            }
             $group = $this->getNearestLogicalGroup($textnodes__value);
             $groups[] = $group;
         }
@@ -101,18 +123,21 @@ msgstr ""
             } else {
                 $originalText = $this->getInnerHtml($groups__value);
             }
-            $originalText = $this->trimEachLine($originalText);
-            //$originalText = trim($originalText);
 
-            $translatedText = $this->getExistingTranslationFromCache($originalText);
-            if ($translatedText === false) {
-                if ($this->debug === true) {
-                    $translatedText = $this->translateStringMock($originalText);
-                } else {
-                    $translatedText = $this->translateStringWithGoogle($originalText);
-                }
-                $this->createNewTranslation($originalText, $translatedText);
-            }
+            $originalText = $this->formatText($originalText);
+
+            [$originalTextWithPlaceholders, $mappingTable] = $this->placeholderConversionIn(
+                $originalText
+            );
+
+            $translatedTextWithPlaceholders = $this->getTranslationAndAddDynamically(
+                $originalTextWithPlaceholders
+            );
+
+            $translatedText = $this->placeholderConversionOut(
+                $translatedTextWithPlaceholders,
+                $mappingTable
+            );
 
             if ($this->isTextNode($groups__value)) {
                 $groups__value->nodeValue = $translatedText;
@@ -122,15 +147,85 @@ msgstr ""
         }
     }
 
-    function trimEachLine($str)
+    function getTranslationAndAddDynamically($orig, $comment = null)
+    {
+        $trans = $this->getExistingTranslationFromCache($orig);
+        if ($trans === false) {
+            if ($this->auto_translation === false) {
+                $trans = $this->translateStringMock($orig);
+            } else {
+                $trans = $this->translateStringWithGoogle($orig);
+            }
+            $this->createNewTranslation($orig, $trans, $comment);
+        }
+        return $trans;
+    }
+
+    function placeholderConversionIn($str)
+    {
+        $mappingTable = [];
+        preg_match_all('/<[a-zA-Z](.*?[^?])?>|<\/[^<>]*>/', $str, $matches);
+        if (!empty($matches[0])) {
+            foreach ($matches[0] as $matches__value) {
+                $pos_begin = 1;
+                $pos_end = strrpos($matches__value, '>');
+                foreach (['/', ' '] as $alt__value) {
+                    $pos_end_ = strpos($matches__value, $alt__value, $pos_begin + 1);
+                    if ($pos_end_ !== false && $pos_end_ < $pos_end) {
+                        $pos_end = $pos_end_;
+                    }
+                }
+                $placeholder =
+                    '<' . substr($matches__value, $pos_begin, $pos_end - $pos_begin) . '>';
+                $str = $this->str_replace_first($matches__value, $placeholder, $str);
+                $mappingTable[] = [$placeholder, $matches__value];
+            }
+        }
+        return [$str, $mappingTable];
+    }
+
+    function placeholderConversionOut($str, $mappingTable)
+    {
+        foreach ($mappingTable as $mappingTable__value) {
+            $str = $this->str_replace_first($mappingTable__value[0], $mappingTable__value[1], $str);
+        }
+        return $str;
+    }
+
+    function str_replace_first($search, $replace, $str)
+    {
+        $newstring = $str;
+        $pos = strpos($str, $search);
+        if ($pos !== false) {
+            $newstring = substr_replace($str, $replace, $pos, strlen($search));
+        }
+        return $newstring;
+    }
+
+    function findAllOccurences($haystack, $needle)
+    {
+        $positions = [];
+        $pos_last = 0;
+        while (($pos_last = strpos($haystack, $needle, $pos_last)) !== false) {
+            $positions[] = $pos_last;
+            $pos_last = $pos_last + strlen($needle);
+        }
+        return $positions;
+    }
+
+    function formatText($str)
     {
         $str = trim($str);
         $str = str_replace('&#13;', '', $str); // replace nasty carriage returns \r
         $parts = explode(PHP_EOL, $str);
         foreach ($parts as $parts__key => $parts__value) {
-            $parts[$parts__key] = trim($parts__value);
+            if (trim($parts__value) == '') {
+                unset($parts[$parts__key]);
+            } else {
+                $parts[$parts__key] = trim($parts__value);
+            }
         }
-        $str = implode(PHP_EOL, $parts);
+        $str = implode(' ', $parts);
         return $str;
     }
 
@@ -275,23 +370,24 @@ msgstr ""
     function generatePoAndMoFilesFromNewTranslations()
     {
         $poGenerator = new PoGenerator();
-        $poGenerator->generateFile($this->translations, 'locales/gtbabel.po');
+        $poGenerator->generateFile($this->translations, $this->getLngFilename('po'));
         $moGenerator = new MoGenerator();
-        $moGenerator->generateFile($this->translations, 'locales/gtbabel.mo');
+        $moGenerator->generateFile($this->translations, $this->getLngFilename('mo'));
     }
 
-    function createNewTranslation($orig, $translated)
+    function createNewTranslation($orig, $translated, $comment = null)
     {
         $translation = Translation::create(null, $orig);
         $translation->translate($translated);
+        if ($comment !== null) {
+            $translation->getComments()->add($comment);
+        }
         $this->translations->add($translation);
     }
 
     function getExistingTranslationFromCache($str)
     {
         if (!array_key_exists($str, $this->translations_cache)) {
-            var_dump($str);
-            var_dump($this->translations_cache);
             return false;
         }
         return $this->translations_cache[$str];
@@ -304,7 +400,6 @@ msgstr ""
 
     function translateStringWithGoogle($str)
     {
-        return mt_rand(100, 200);
         $apiKey = GOOGLE_API_KEY;
         $url =
             'https://www.googleapis.com/language/translate/v2?key=' .
@@ -327,8 +422,52 @@ msgstr ""
         } else {
             $return = $str;
         }
-        $return .= mt_rand(100, 999);
         return $return;
+    }
+
+    function modifyLinks()
+    {
+        $links = $this->DOMXpath->query('/html/body//a');
+        foreach ($links as $links__value) {
+            $link = $links__value->getAttribute('href');
+            if ($link === null || trim($link) === '') {
+                continue;
+            }
+            if (strpos($link, '#') === 0) {
+                continue;
+            }
+            $is_absolute_link = strpos($link, $this->getCurrentHost()) === 0;
+            if (strpos($link, 'http') !== false && $is_absolute_link === false) {
+                continue;
+            }
+            if (strpos($link, 'http') === false && strpos($link, ':') !== false) {
+                continue;
+            }
+            $link = str_replace($this->getCurrentHost(), '', $link);
+            $url_parts = explode('/', $link);
+            foreach ($url_parts as $url_parts__key => $url_parts__value) {
+                if (trim($url_parts__value) == '') {
+                    continue;
+                }
+                $url_parts[$url_parts__key] = $this->getTranslationAndAddDynamically(
+                    $url_parts__value,
+                    'link'
+                );
+            }
+            $link = implode('/', $url_parts);
+            if ($is_absolute_link === true) {
+                $link = $this->getCurrentHost() . $link;
+            }
+            $links__value->setAttribute('href', $link);
+        }
+    }
+
+    function getCurrentHost()
+    {
+        return 'http' .
+            (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 's' : '') .
+            '://' .
+            $_SERVER['HTTP_HOST'];
     }
 }
 
@@ -336,11 +475,14 @@ msgstr ""
 $dotenv = Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 define('GOOGLE_API_KEY', getenv('GOOGLE_API_KEY'));
+define('LNG_FOLDER', 'locales');
 define('LNG_SOURCE', 'DE');
 define('LNG_TARGET', 'EN');
+define('PREFIX_DEFAULT_LANG', false);
+define('LANGUAGES', ['DE', 'EN', 'FR']);
 ob_start();
 /* main app */
-require_once 'tpl/simple5.html';
+require_once 'tpl/complex/1.html';
 /* end */
 $html = ob_get_contents();
 $gtbabel = new gtbabel();
