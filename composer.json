@@ -1,4 +1,12 @@
 {
+    "name": "vielhuber/gtbabel",
+    "description": "Instant server-side translation of any page.",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "vielhuber\\gtbabel\\": "src/"
+        }
+    },
     "require": {
         "gettext/gettext": "^5.2",
         "vlucas/phpdotenv": "^4.0"

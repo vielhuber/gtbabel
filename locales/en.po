@@ -6,111 +6,256 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
-msgid "Vielhuber David"
-msgstr "%|%Vielhuber David%|%"
+msgid "Direkt zum Inhalt wechseln"
+msgstr "%|%Direkt zum Inhalt wechseln%|%"
 
-msgid "ABOUT"
-msgstr "%|%ABOUT%|%"
+msgid "Suche"
+msgstr "%|%Suche%|%"
 
-msgid "BLOG"
-msgstr "%|%BLOG%|%"
+msgid "WPBABEL"
+msgstr "%|%WPBABEL%|%"
 
-msgid "Entwickler aus Leidenschaft"
-msgstr "%|%Entwickler aus Leidenschaft%|%"
+msgid "Just another WordPress site"
+msgstr "%|%Just another WordPress site%|%"
 
-msgid "Mein Name ist David Vielhuber. Ich bin Full-Stack Developer, zweifacher Papa und habe eine Schwäche für guten Kaffee und Code. Ich habe ein Faible für schönes Design, eine Prise Perfektionismus und Augen für klare Konturen. Vor 20 Jahren begann ich eine Liebesbeziehung mit meinem Computer – und kurz darauf mit dem Internet."
-msgstr "%|%Mein Name ist David Vielhuber. Ich bin Full-Stack Developer, zweifacher Papa und habe eine Schwäche für guten Kaffee und Code. Ich habe ein Faible für schönes Design, eine Prise Perfektionismus und Augen für klare Konturen. Vor 20 Jahren begann ich eine Liebesbeziehung mit meinem Computer – und kurz darauf mit dem Internet.%|%"
+msgid "Menü"
+msgstr "%|%Menü%|%"
 
-msgid "Im Laufe der Jahre wandelte sich meine Leidenschaft vom Hobby zum Beruf. Eine Vielzahl spannender Kundenprojekte aus den letzten Jahren führten mich dazu, neben Privatpersonen auch kleinen und mittelständischen Unternehmen ein großes Leistungsspektrum – von Web bis Print – anzubieten. Inzwischen bin ich ein Teil der <a>close2 new media GmbH</a> in München."
-msgstr "%|%Im Laufe der Jahre wandelte sich meine Leidenschaft vom Hobby zum Beruf. Eine Vielzahl spannender Kundenprojekte aus den letzten Jahren führten mich dazu, neben Privatpersonen auch kleinen und mittelständischen Unternehmen ein großes Leistungsspektrum – von Web bis Print – anzubieten. Inzwischen bin ich ein Teil der <a>close2 new media GmbH</a> in München.%|%"
-
-msgid "Büroanschrift"
-msgstr "%|%Büroanschrift%|%"
-
-msgid "close2 new media GmbH<br>Auenstrasse 6<br>80469 München"
-msgstr "%|%close2 new media GmbH<br>Auenstrasse 6<br>80469 München%|%"
-
-msgid "Kontaktdaten"
-msgstr "%|%Kontaktdaten%|%"
-
-msgid "Tel"
-msgstr "%|%Tel%|%"
-
-msgid "+49 89 21 540 01 42"
-msgstr "%|%+49 89 21 540 01 42%|%"
-
-msgid "Fax"
-msgstr "%|%Fax%|%"
-
-msgid "+49 89 21 544 59 1"
-msgstr "%|%+49 89 21 544 59 1%|%"
-
-msgid "Mail"
-msgstr "%|%Mail%|%"
-
-msgid "david@vielhuber.de"
-msgstr "%|%david@vielhuber.de%|%"
-
-msgid "GitHub"
-msgstr "%|%GitHub%|%"
-
-msgid "Twitter"
-msgstr "%|%Twitter%|%"
-
-msgid "Pinboard"
-msgstr "%|%Pinboard%|%"
-
-msgid "Pinterest"
-msgstr "%|%Pinterest%|%"
-
-msgid "YouTube"
-msgstr "%|%YouTube%|%"
-
-msgid "Shopware"
-msgstr "%|%Shopware%|%"
-
-msgid "Spotify"
-msgstr "%|%Spotify%|%"
-
-msgid "Dribbble"
-msgstr "%|%Dribbble%|%"
-
-msgid "Xing"
-msgstr "%|%Xing%|%"
-
-msgid "Google+"
-msgstr "%|%Google+%|%"
-
-msgid "PGP"
-msgstr "%|%PGP%|%"
-
-msgid "W3C Markup Validation"
-msgstr "%|%W3C Markup Validation%|%"
-
-msgid "Google Lighthouse"
-msgstr "%|%Google Lighthouse%|%"
-
-msgid "Impressum"
-msgstr "%|%Impressum%|%"
-
-msgid "Datenschutz"
-msgstr "%|%Datenschutz%|%"
-
-msgid "Disclaimer"
-msgstr "%|%Disclaimer%|%"
+msgid "Sample Page"
+msgstr "%|%Sample Page%|%"
 
 # link
-msgid "blog"
-msgstr "%|%blog%|%"
+msgid "steffen"
+msgstr "%|%steffen%|%"
+
+msgid "Suche nach:"
+msgstr "%|%Suche nach:%|%"
+
+msgid "Suche schließen"
+msgstr "%|%Suche schließen%|%"
+
+msgid "Menü schließen"
+msgstr "%|%Menü schließen%|%"
+
+msgid "This is an example page. It’s different from a blog post because it will stay in one place and will show up in your site navigation (in most themes). Most people start with an About page that introduces them to potential site visitors. It might say something like this:"
+msgstr "%|%This is an example page. It’s different from a blog post because it will stay in one place and will show up in your site navigation (in most themes). Most people start with an About page that introduces them to potential site visitors. It might say something like this:%|%"
+
+msgid "Hi there! I’m a bike messenger by day, aspiring actor by night, and this is my website. I live in Los Angeles, have a great dog named Jack, and I like piña coladas. (And gettin‘ caught in the rain.)"
+msgstr "%|%Hi there! I’m a bike messenger by day, aspiring actor by night, and this is my website. I live in Los Angeles, have a great dog named Jack, and I like piña coladas. (And gettin‘ caught in the rain.)%|%"
+
+msgid "…or something like this:"
+msgstr "%|%…or something like this:%|%"
+
+msgid "The XYZ Doohickey Company was founded in 1971, and has been providing quality doohickeys to the public ever since. Located in Gotham City, XYZ employs over 2,000 people and does all kinds of awesome things for the Gotham community."
+msgstr "%|%The XYZ Doohickey Company was founded in 1971, and has been providing quality doohickeys to the public ever since. Located in Gotham City, XYZ employs over 2,000 people and does all kinds of awesome things for the Gotham community.%|%"
+
+msgid "As a new WordPress user, you should go to <a>your dashboard</a> to delete this page and create new pages for your content. Have fun!"
+msgstr "%|%As a new WordPress user, you should go to <a>your dashboard</a> to delete this page and create new pages for your content. Have fun!%|%"
+
+msgid "<span>Sample Page</span> bearbeiten"
+msgstr "%|%<span>Sample Page</span> bearbeiten%|%"
+
+msgid "Neueste Beiträge"
+msgstr "%|%Neueste Beiträge%|%"
+
+msgid "Hello world!"
+msgstr "%|%Hello world!%|%"
+
+msgid "Neueste Kommentare"
+msgstr "%|%Neueste Kommentare%|%"
+
+msgid "<span><a>A WordPress Commenter</a></span> bei <a>Hello world!</a>"
+msgstr "%|%<span><a>A WordPress Commenter</a></span> bei <a>Hello world!</a>%|%"
+
+msgid "Archive"
+msgstr "%|%Archive%|%"
+
+msgid "November 2019"
+msgstr "%|%November 2019%|%"
+
+msgid "Kategorien"
+msgstr "%|%Kategorien%|%"
+
+msgid "Uncategorized"
+msgstr "%|%Uncategorized%|%"
+
+msgid "Meta"
+msgstr "%|%Meta%|%"
+
+msgid "Website-Administration"
+msgstr "%|%Website-Administration%|%"
+
+msgid "Abmelden"
+msgstr "%|%Abmelden%|%"
+
+msgid "Feed der Einträge"
+msgstr "%|%Feed der Einträge%|%"
+
+msgid "Kommentare-Feed"
+msgstr "%|%Kommentare-Feed%|%"
+
+msgid "WordPress.org"
+msgstr "%|%WordPress.org%|%"
+
+msgid "© 2019\t\t\t\t<a>WPBABEL</a>"
+msgstr "%|%© 2019\t\t\t\t<a>WPBABEL</a>%|%"
+
+msgid "Powered by WordPress"
+msgstr "%|%Powered by WordPress%|%"
+
+msgid "Nach oben"
+msgstr "%|%Nach oben%|%"
+
+msgid "↑"
+msgstr "%|%↑%|%"
+
+msgid "Hoch"
+msgstr "%|%Hoch%|%"
+
+msgid "Zur Werkzeugleiste springen"
+msgstr "%|%Zur Werkzeugleiste springen%|%"
+
+msgid "Über WordPress"
+msgstr "%|%Über WordPress%|%"
+
+msgid "Dokumentation"
+msgstr "%|%Dokumentation%|%"
+
+msgid "Support"
+msgstr "%|%Support%|%"
+
+msgid "Feedback"
+msgstr "%|%Feedback%|%"
+
+msgid "Dashboard"
+msgstr "%|%Dashboard%|%"
+
+msgid "Themes"
+msgstr "%|%Themes%|%"
+
+msgid "Widgets"
+msgstr "%|%Widgets%|%"
+
+msgid "Menüs"
+msgstr "%|%Menüs%|%"
+
+msgid "Hintergrund"
+msgstr "%|%Hintergrund%|%"
+
+msgid "Customizer"
+msgstr "%|%Customizer%|%"
+
+msgid "0 Kommentare in Moderation"
+msgstr "%|%0 Kommentare in Moderation%|%"
+
+msgid "Neu"
+msgstr "%|%Neu%|%"
+
+msgid "Beitrag"
+msgstr "%|%Beitrag%|%"
+
+msgid "Medien"
+msgstr "%|%Medien%|%"
+
+msgid "Seite"
+msgstr "%|%Seite%|%"
+
+msgid "Benutzer"
+msgstr "%|%Benutzer%|%"
+
+msgid "Seite bearbeiten"
+msgstr "%|%Seite bearbeiten%|%"
+
+msgid "Suchen"
+msgstr "%|%Suchen%|%"
+
+msgid "<a>Willkommen, <span>root</span><img></a><div><ul><li><a><img><span>root</span></a></li><li><a>Profil bearbeiten</a></li><li><a>Abmelden</a></li></ul></div>"
+msgstr "%|%<a>Willkommen, <span>root</span><img></a><div><ul><li><a><img><span>root</span></a></li><li><a>Profil bearbeiten</a></li><li><a>Abmelden</a></li></ul></div>%|%"
 
 # link
-msgid "impressum"
-msgstr "%|%impressum%|%"
+msgid "sample-page"
+msgstr "%|%sample-page%|%"
 
 # link
-msgid "datenschutz"
-msgstr "%|%datenschutz%|%"
+msgid "wp-admin"
+msgstr "%|%wp-admin%|%"
 
 # link
-msgid "disclaimer"
-msgstr "%|%disclaimer%|%"
+msgid "post.php?post=2&action=edit"
+msgstr "%|%post.php?post=2&action=edit%|%"
+
+# link
+msgid "hello-world"
+msgstr "%|%hello-world%|%"
+
+# link
+msgid "#comment-1"
+msgstr "%|%#comment-1%|%"
+
+# link
+msgid "category"
+msgstr "%|%category%|%"
+
+# link
+msgid "uncategorized"
+msgstr "%|%uncategorized%|%"
+
+# link
+msgid "wp-login.php?action=logout&_wpnonce=e42a83a63f"
+msgstr "%|%wp-login.php?action=logout&_wpnonce=e42a83a63f%|%"
+
+# link
+msgid "feed"
+msgstr "%|%feed%|%"
+
+# link
+msgid "comments"
+msgstr "%|%comments%|%"
+
+# link
+msgid "about.php"
+msgstr "%|%about.php%|%"
+
+# link
+msgid "themes.php"
+msgstr "%|%themes.php%|%"
+
+# link
+msgid "widgets.php"
+msgstr "%|%widgets.php%|%"
+
+# link
+msgid "nav-menus.php"
+msgstr "%|%nav-menus.php%|%"
+
+# link
+msgid "themes.php?page=custom-background"
+msgstr "%|%themes.php?page=custom-background%|%"
+
+# link
+msgid "customize.php?url=http%3A%2F%2Fwpbabel.local.vielhuber.de%2Fsample-page%2F"
+msgstr "%|%customize.php?url=http%3A%2F%2Fwpbabel.local.vielhuber.de%2Fsample-page%2F%|%"
+
+# link
+msgid "edit-comments.php"
+msgstr "%|%edit-comments.php%|%"
+
+# link
+msgid "post-new.php"
+msgstr "%|%post-new.php%|%"
+
+# link
+msgid "media-new.php"
+msgstr "%|%media-new.php%|%"
+
+# link
+msgid "post-new.php?post_type=page"
+msgstr "%|%post-new.php?post_type=page%|%"
+
+# link
+msgid "user-new.php"
+msgstr "%|%user-new.php%|%"
+
+# link
+msgid "profile.php"
+msgstr "%|%profile.php%|%"
