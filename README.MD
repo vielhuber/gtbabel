@@ -1,15 +1,15 @@
-# 📗 gtbabel 📗
+# 🦜 gtbabel 🦜
 
 gtbabel offers a simple translation strategy for html/php page.
 
-...
+# WORK IN PROGRESS
 
 ## basic idea
 
 -   gtbabel extracts any page into logical paragraph tokens.
 -   static and dynamic content is deliberately treated the same.
--   these tokens are replaced (if available) by it's translation before rendered.
--   these tokens get dumped (if not available) into gettext, where they can be translated.
+-   all tokens are replaced (if available) by it's translation before rendered.
+-   the tokens get dumped (if not available) into gettext, where they can be translated.
 
 ## features
 
@@ -20,8 +20,8 @@ gtbabel offers a simple translation strategy for html/php page.
 -   auto translation: use the power of the [Google Translation API](https://cloud.google.com/translate/docs) to auto translate your pages into any language
 -   router included: spoof your request uri and let the magic happen, links are automatically converted
 -   helper functions for current language and all languages available
--   basic seo considered: html lang tag, hreflang tags, ... included
--   wordpress plugin included: configure your settings easily in your wp backend
+-   basic seo considered: html lang tag, hreflang tags included
+-   wordpress plugin available: configure your settings easily in your wp backend
 
 ## installation
 
@@ -64,5 +64,5 @@ $gtbabel->stop();
 
 ## javascript
 
-gtbabel itself is based on php and only works for static pages or pages rendered via php.
-but the idea can be relatively easy ported to js frameworks like Vue or React.
+gtbabel itself is based on php and only works for static pages or pages rendered via php.\
+the idea can be relatively easy implemented in js frameworks like Vue or React.
