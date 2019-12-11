@@ -9,16 +9,55 @@ use Gettext\Translations;
 
 class gtbabel
 {
-    public $reset = true;
-    public $auto_translation = false;
+    private $args = null;
 
-    public $html = null;
-    public $translations = null;
-    public $translations_cache = null;
-    public $DOMDocument = null;
-    public $DOMXpath = null;
+    private $original_request_uri = null;
 
-    function translate($html)
+    private $reset = true;
+    private $auto_translation = false;
+
+    private $html = null;
+    private $translations = null;
+    private $translations_cache = null;
+    private $DOMDocument = null;
+    private $DOMXpath = null;
+
+    public function start($args = [])
+    {
+        $this->initArgs($args);
+        if ($this->shouldNotBeActive()) {
+            return;
+        }
+        $this->initMagicRouter();
+        ob_start();
+    }
+
+    public function stop()
+    {
+        if ($this->shouldNotBeActive()) {
+            return;
+        }
+        $html = ob_get_contents();
+        $html = $this->translate($html);
+        ob_end_clean();
+        echo $html;
+    }
+
+    private function initArgs($args)
+    {
+        $this->args = (object) $args;
+        $this->original_request_uri = $_SERVER['REQUEST_URI'];
+    }
+
+    private function shouldNotBeActive()
+    {
+        if ($this->getTargetLng() === $this->getSourceLng()) {
+            return true;
+        }
+        return false;
+    }
+
+    private function translate($html)
     {
         $this->html = $html;
         if ($this->reset === true) {
@@ -30,23 +69,43 @@ class gtbabel
         return $this->html;
     }
 
-    function getLngFolder()
+    private function getSourceLng()
     {
-        return LNG_FOLDER;
+        return $this->args->LNG_SOURCE;
     }
 
-    function getLngFilename($type)
+    private function getTargetLng()
     {
-        return $this->getLngFolder() . '/' . mb_strtolower(LNG_TARGET) . '.' . $type;
+        if ($this->args->LNG_TARGET !== null) {
+            return $this->args->LNG_TARGET;
+        }
+        foreach ($this->args->LANGUAGES as $languages__value) {
+            if (
+                strpos($this->original_request_uri, '/' . strtolower($languages__value) . '/') === 0
+            ) {
+                return $languages__value;
+            }
+        }
+        return $this->args->LNG_SOURCE;
     }
 
-    function deletePoFiles()
+    private function getLngFolder()
+    {
+        return $_SERVER['DOCUMENT_ROOT'] . '/' . trim($this->args->LNG_FOLDER, '/');
+    }
+
+    private function getLngFilename($type)
+    {
+        return $this->getLngFolder() . '/' . mb_strtolower($this->getTargetLng()) . '.' . $type;
+    }
+
+    private function deletePoFiles()
     {
         @unlink($this->getLngFilename('po'));
         @unlink($this->getLngFilename('po'));
     }
 
-    function createPoFilesIfNotExists()
+    private function createPoFilesIfNotExists()
     {
         if (!is_dir($this->getLngFolder())) {
             mkdir($this->getLngFolder(), 0777, true);
@@ -64,13 +123,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "Language: ' .
-                    LNG_TARGET .
+                    $this->getTargetLng() .
                     '\n"'
             );
         }
     }
 
-    function preloadTranslationsInCache()
+    private function preloadTranslationsInCache()
     {
         $this->translations = Translations::create('gtbabel');
         $this->translations_cache = [];
@@ -83,7 +142,7 @@ msgstr ""
         }
     }
 
-    function modifyHtml()
+    private function modifyHtml()
     {
         $this->setupDomDocument();
         $this->modifyTextNodes();
@@ -92,7 +151,7 @@ msgstr ""
         $this->html = $this->DOMDocument->saveHTML();
     }
 
-    function setupDomDocument()
+    private function setupDomDocument()
     {
         $this->DOMDocument = new \DOMDocument();
 
@@ -103,7 +162,7 @@ msgstr ""
         $this->DOMXpath = new \DOMXpath($this->DOMDocument);
     }
 
-    function modifyTextNodes()
+    private function modifyTextNodes()
     {
         $groups = [];
 
@@ -155,7 +214,7 @@ msgstr ""
         }
     }
 
-    function getTranslationAndAddDynamically($orig, $comment = null)
+    private function getTranslationAndAddDynamically($orig, $comment = null)
     {
         $trans = $this->getExistingTranslationFromCache($orig);
         if ($trans === false) {
@@ -169,7 +228,7 @@ msgstr ""
         return $trans;
     }
 
-    function placeholderConversionIn($str)
+    private function placeholderConversionIn($str)
     {
         $mappingTable = [];
         preg_match_all('/<[a-zA-Z](.*?[^?])?>|<\/[^<>]*>/', $str, $matches);
@@ -192,7 +251,7 @@ msgstr ""
         return [$str, $mappingTable];
     }
 
-    function placeholderConversionOut($str, $mappingTable)
+    private function placeholderConversionOut($str, $mappingTable)
     {
         foreach ($mappingTable as $mappingTable__value) {
             $str = $this->str_replace_first($mappingTable__value[0], $mappingTable__value[1], $str);
@@ -200,7 +259,7 @@ msgstr ""
         return $str;
     }
 
-    function str_replace_first($search, $replace, $str)
+    private function str_replace_first($search, $replace, $str)
     {
         $newstring = $str;
         $pos = strpos($str, $search);
@@ -210,7 +269,7 @@ msgstr ""
         return $newstring;
     }
 
-    function findAllOccurences($haystack, $needle)
+    private function findAllOccurences($haystack, $needle)
     {
         $positions = [];
         $pos_last = 0;
@@ -221,7 +280,7 @@ msgstr ""
         return $positions;
     }
 
-    function formatText($str)
+    private function formatText($str)
     {
         $str = trim($str);
         $str = str_replace('&#13;', '', $str); // replace nasty carriage returns \r
@@ -237,12 +296,12 @@ msgstr ""
         return $str;
     }
 
-    function isTextNode($node)
+    private function isTextNode($node)
     {
         return @$node->nodeName === '#text';
     }
 
-    function isInnerTagNode($node)
+    private function isInnerTagNode($node)
     {
         if (@$node->tagName == '') {
             return false;
@@ -250,7 +309,7 @@ msgstr ""
         return in_array($node->tagName, ['a', 'br', 'strong', 'b']);
     }
 
-    function sortOutGroupsInGroups($groups)
+    private function sortOutGroupsInGroups($groups)
     {
         $to_delete = [];
         foreach ($groups as $groups__key1 => $groups__value1) {
@@ -279,7 +338,7 @@ msgstr ""
         return $groups;
     }
 
-    function getInnerHtml($node)
+    private function getInnerHtml($node)
     {
         $inner = '';
         foreach ($node->childNodes as $child) {
@@ -288,7 +347,7 @@ msgstr ""
         return $inner;
     }
 
-    function setInnerHtml($node, $value)
+    private function setInnerHtml($node, $value)
     {
         for ($x = $node->childNodes->length - 1; $x >= 0; $x--) {
             $node->removeChild($node->childNodes->item($x));
@@ -316,7 +375,7 @@ msgstr ""
         }
     }
 
-    function sortOutDuplicates($groups)
+    private function sortOutDuplicates($groups)
     {
         $unique = [];
         foreach ($groups as $groups__value) {
@@ -325,12 +384,12 @@ msgstr ""
         return array_values($unique);
     }
 
-    function nodesAreEqual($node1, $node2)
+    private function nodesAreEqual($node1, $node2)
     {
         return print_r($node1, true) === print_r($node2, true);
     }
 
-    function getNearestLogicalGroup($node)
+    private function getNearestLogicalGroup($node)
     {
         if (
             empty(
@@ -359,7 +418,7 @@ msgstr ""
         return $node;
     }
 
-    function getSiblingsAndOneSelf($node)
+    private function getSiblingsAndOneSelf($node)
     {
         $siblings = [];
         $cur = $node;
@@ -375,7 +434,7 @@ msgstr ""
         return $siblings;
     }
 
-    function generatePoAndMoFilesFromNewTranslations()
+    private function generatePoAndMoFilesFromNewTranslations()
     {
         $poGenerator = new PoGenerator();
         $poGenerator->generateFile($this->translations, $this->getLngFilename('po'));
@@ -383,7 +442,7 @@ msgstr ""
         $moGenerator->generateFile($this->translations, $this->getLngFilename('mo'));
     }
 
-    function createNewTranslation($orig, $translated, $comment = null)
+    private function createNewTranslation($orig, $translated, $comment = null)
     {
         $translation = Translation::create(null, $orig);
         $translation->translate($translated);
@@ -393,7 +452,7 @@ msgstr ""
         $this->translations->add($translation);
     }
 
-    function getExistingTranslationFromCache($str)
+    private function getExistingTranslationFromCache($str)
     {
         if (!array_key_exists($str, $this->translations_cache)) {
             return false;
@@ -401,23 +460,23 @@ msgstr ""
         return $this->translations_cache[$str];
     }
 
-    function translateStringMock($str)
+    private function translateStringMock($str)
     {
         return '%|%' . $str . '%|%';
     }
 
-    function translateStringWithGoogle($str)
+    private function translateStringWithGoogle($str)
     {
-        $apiKey = GOOGLE_API_KEY;
+        $apiKey = $this->args->GOOGLE_API_KEY;
         $url =
             'https://www.googleapis.com/language/translate/v2?key=' .
             $apiKey .
             '&q=' .
             rawurlencode($str) .
             '&source=' .
-            strtolower(LNG_SOURCE) .
+            strtolower($this->args->LNG_SOURCE) .
             '&target=' .
-            strtolower(LNG_TARGET);
+            strtolower($this->getTargetLng());
         $handle = curl_init($url);
         curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false);
@@ -433,7 +492,7 @@ msgstr ""
         return $return;
     }
 
-    function modifyLinks()
+    private function modifyLinks()
     {
         $links = $this->DOMXpath->query('/html/body//a');
         foreach ($links as $links__value) {
@@ -473,11 +532,18 @@ msgstr ""
         }
     }
 
-    function getCurrentHost()
+    private function getCurrentHost()
     {
         return 'http' .
             (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 's' : '') .
             '://' .
             $_SERVER['HTTP_HOST'];
+    }
+
+    private function initMagicRouter()
+    {
+        if ($_SERVER['REQUEST_URI'] === '/en/sample-page/') {
+            $_SERVER['REQUEST_URI'] = '/sample-page/';
+        }
     }
 }

@@ -12,33 +12,25 @@
 require_once __DIR__ . '/vendor/autoload.php';
 use vielhuber\gtbabel\gtbabel;
 use Dotenv\Dotenv;
+$dotenv = Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+$gtbabel = new gtbabel();
 
-add_action('after_setup_theme', function () {
-    /* router */
-    if ($_SERVER['REQUEST_URI'] === '/rotze/') {
-        $_SERVER['REQUEST_URI'] = '/sample-page/';
-    }
-    /* begin */
-    $dotenv = Dotenv::createImmutable(__DIR__);
-    $dotenv->load();
-    define('GOOGLE_API_KEY', getenv('GOOGLE_API_KEY'));
-    define('LNG_FOLDER', $_SERVER['DOCUMENT_ROOT'] . '/wp-content/plugins/gtbabel/locales');
-    define('LNG_SOURCE', 'DE');
-    define('LNG_TARGET', 'EN');
-    define('PREFIX_DEFAULT_LANG', false);
-    define('LANGUAGES', ['DE', 'EN', 'FR']);
-    ob_start();
+add_action('after_setup_theme', function () use ($gtbabel) {
+    $gtbabel->start([
+        'GOOGLE_API_KEY' => getenv('GOOGLE_API_KEY'),
+        'LNG_FOLDER' => 'wp-content/plugins/gtbabel/locales',
+        'LNG_SOURCE' => 'DE',
+        'LNG_TARGET' => null, // auto
+        'PREFIX_DEFAULT_LANG' => false,
+        'LANGUAGES' => ['DE', 'EN', 'FR']
+    ]);
 });
 
 add_action(
     'shutdown',
-    function () {
-        /* end */
-        $html = ob_get_contents();
-        $gtbabel = new gtbabel();
-        $html = $gtbabel->translate($html);
-        ob_end_clean();
-        echo $html;
+    function () use ($gtbabel) {
+        $gtbabel->stop();
     },
     0
 );

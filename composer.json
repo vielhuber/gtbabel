@@ -1,6 +1,6 @@
 {
     "name": "vielhuber/gtbabel",
-    "description": "Instant server-side translation of any page.",
+    "description": "Instant php server-side translation.",
     "license": "MIT",
     "autoload": {
         "psr-4": {
