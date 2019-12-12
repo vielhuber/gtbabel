@@ -1,12 +1,14 @@
 # 🦜 gtbabel 🦜
 
-gtbabel offers a simple translation strategy for html/php page.
+gtbabel automatically translates your html/php pages – server sided!
 
 # WORK IN PROGRESS
 
+# WARNING: this is experimental
+
 ## basic idea
 
--   gtbabel extracts any page into logical paragraph tokens.
+-   gtbabel extracts on every page load any page into logical paragraph tokens.
 -   static and dynamic content is deliberately treated the same.
 -   all tokens are replaced (if available) by it's translation before rendered.
 -   the tokens get dumped (if not available) into gettext, where they can be translated.
@@ -22,6 +24,7 @@ gtbabel offers a simple translation strategy for html/php page.
 -   helper functions for current language and all languages available
 -   basic seo considered: html lang tag, hreflang tags included
 -   wordpress plugin available: configure your settings easily in your wp backend
+-   works seamlessly with caching/preloading plugins
 
 ## installation
 
@@ -44,12 +47,13 @@ use vielhuber\gtbabel\gtbabel;
 $gtbabel = new gtbabel();
 
 $gtbabel->start([
-    'GOOGLE_API_KEY' => getenv('GOOGLE_API_KEY'),
-    'LNG_FOLDER' => 'locales',
-    'LNG_SOURCE' => 'DE',
-    'LNG_TARGET' => 'EN',
-    'PREFIX_DEFAULT_LANG' => false,
-    'LANGUAGES' => ['DE', 'EN', 'FR']
+    'google_api_key' => getenv('GOOGLE_API_KEY'),
+    'lng_folder' => '/locales',
+    'lng_source' => 'DE',
+    'lng_target' => 'EN',
+    'prefix_default_lang' => false,
+    'languages' => ['DE', 'EN', 'FR']
+    'exclude' => ['/backend']
 ]);
 
 // any static or dynamic content
@@ -66,3 +70,26 @@ $gtbabel->stop();
 
 gtbabel itself is based on php and only works for static pages or pages rendered via php.\
 the idea can be relatively easy implemented in js frameworks like Vue or React.
+
+# router
+
+the router automatically modifies the \$\_SERVER['REQUEST_URI'] variable to catch translated urls.\
+unknown translations of urls are picked up from the current url and from links that are on the page.
+
+# helper functions
+
+```php
+gtbabel_current_lng() // 'EN'
+gtbabel_languages() // ['DE','EN']
+gtbabel_languagepicker()
+/*
+[
+    ['lng' => 'DE', 'url' => 'https://tld.com/de/nudel', 'active' => true],
+    ['lng' => 'EN', 'url' => 'https://tld.com/en/noodle', 'active' => false]
+]
+*/
+```
+
+# credits
+
+shout out to [Steffen Wenzel](https://www.zeile1.com/) to make this work.\

@@ -25,9 +25,15 @@ class gtbabel
     public function start($args = [])
     {
         $this->initArgs($args);
+        $this->addCurrentUrlToTranslations();
         if ($this->shouldNotBeActive()) {
             return;
         }
+        if ($this->reset === true) {
+            $this->deletePoFiles();
+        }
+        $this->createPoFilesIfNotExists();
+        $this->preloadTranslationsInCache();
         $this->initMagicRouter();
         ob_start();
     }
@@ -43,6 +49,39 @@ class gtbabel
         echo $html;
     }
 
+    public function getLanguages()
+    {
+        return $this->args->languages;
+    }
+
+    public function getCurrentLng()
+    {
+        if ($this->args->lng_target !== null) {
+            return $this->args->lng_target;
+        }
+        foreach ($this->getLanguages() as $languages__value) {
+            if (
+                strpos($this->original_request_uri, '/' . strtolower($languages__value) . '/') === 0
+            ) {
+                return $languages__value;
+            }
+        }
+        return $this->args->lng_source;
+    }
+
+    public function getLanguagePickerData()
+    {
+        $data = [];
+        foreach ($this->getLanguages() as $languages__value) {
+            $data[] = [
+                'lng' => $languages__value,
+                'url' => $this->getCurrentUrlTranslationsInLanguage($languages__value),
+                'active' => false
+            ];
+        }
+        return $data;
+    }
+
     private function initArgs($args)
     {
         $this->args = (object) $args;
@@ -51,8 +90,17 @@ class gtbabel
 
     private function shouldNotBeActive()
     {
-        if ($this->getTargetLng() === $this->getSourceLng()) {
+        if ($this->getCurrentLng() === $this->getSourceLng()) {
             return true;
+        }
+        if ($this->exclude !== null && is_array($this->exclude)) {
+            foreach ($this->exclude as $exclude__value) {
+                if (
+                    strpos(trim($this->original_request_uri, '/'), trim($exclude__value, '/')) === 0
+                ) {
+                    return true;
+                }
+            }
         }
         return false;
     }
@@ -60,43 +108,23 @@ class gtbabel
     private function translate($html)
     {
         $this->html = $html;
-        if ($this->reset === true) {
-            $this->deletePoFiles();
-        }
-        $this->createPoFilesIfNotExists();
-        $this->preloadTranslationsInCache();
         $this->modifyHtml();
         return $this->html;
     }
 
     private function getSourceLng()
     {
-        return $this->args->LNG_SOURCE;
-    }
-
-    private function getTargetLng()
-    {
-        if ($this->args->LNG_TARGET !== null) {
-            return $this->args->LNG_TARGET;
-        }
-        foreach ($this->args->LANGUAGES as $languages__value) {
-            if (
-                strpos($this->original_request_uri, '/' . strtolower($languages__value) . '/') === 0
-            ) {
-                return $languages__value;
-            }
-        }
-        return $this->args->LNG_SOURCE;
+        return $this->args->lng_source;
     }
 
     private function getLngFolder()
     {
-        return $_SERVER['DOCUMENT_ROOT'] . '/' . trim($this->args->LNG_FOLDER, '/');
+        return $_SERVER['DOCUMENT_ROOT'] . '/' . trim($this->args->lng_folder, '/');
     }
 
     private function getLngFilename($type)
     {
-        return $this->getLngFolder() . '/' . mb_strtolower($this->getTargetLng()) . '.' . $type;
+        return $this->getLngFolder() . '/' . mb_strtolower($this->getCurrentLng()) . '.' . $type;
     }
 
     private function deletePoFiles()
@@ -123,7 +151,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "Language: ' .
-                    $this->getTargetLng() .
+                    $this->getCurrentLng() .
                     '\n"'
             );
         }
@@ -172,6 +200,9 @@ msgstr ""
                 continue;
             }
             if (is_numeric(trim($textnodes__value->nodeValue))) {
+                continue;
+            }
+            if ($this->stringShouldNotBeTranslated($textnodes__value->nodeValue)) {
                 continue;
             }
             if (@$textnodes__value->parentNode->tagName === 'script') {
@@ -467,16 +498,16 @@ msgstr ""
 
     private function translateStringWithGoogle($str)
     {
-        $apiKey = $this->args->GOOGLE_API_KEY;
+        $apiKey = $this->args->google_api_key;
         $url =
             'https://www.googleapis.com/language/translate/v2?key=' .
             $apiKey .
             '&q=' .
             rawurlencode($str) .
             '&source=' .
-            strtolower($this->args->LNG_SOURCE) .
+            strtolower($this->args->lng_source) .
             '&target=' .
-            strtolower($this->getTargetLng());
+            strtolower($this->getCurrentLng());
         $handle = curl_init($url);
         curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false);
@@ -519,9 +550,12 @@ msgstr ""
                 if (is_numeric(trim($url_parts__value))) {
                     continue;
                 }
+                if ($this->stringShouldNotBeTranslated($url_parts__value)) {
+                    continue;
+                }
                 $url_parts[$url_parts__key] = $this->getTranslationAndAddDynamically(
                     $url_parts__value,
-                    'link'
+                    'slug'
                 );
             }
             $link = implode('/', $url_parts);
@@ -540,10 +574,52 @@ msgstr ""
             $_SERVER['HTTP_HOST'];
     }
 
+    private function stringShouldNotBeTranslated($str)
+    {
+        if (trim($str) == '') {
+            return true;
+        }
+        if (is_numeric(trim($str))) {
+            return true;
+        }
+        if (mb_strlen($str) === 1 && preg_match('/[^a-zA-Z]/', $str)) {
+            return true;
+        }
+        foreach ($this->getLanguages() as $languages__value) {
+            if (strtolower($languages__value) === trim(strtolower($str))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private function initMagicRouter()
     {
+        $url_parts = $_SERVER['REQUEST_URI'];
+        $url_parts = explode('/', $url_parts);
+        foreach ($url_parts as $url_parts__key => $url_parts__value) {
+            if ($this->stringShouldNotBeTranslated($url_parts__value)) {
+                continue;
+            }
+            $url_parts[$url_parts__key] = $this->getTranslationAndAddDynamically(
+                $url_parts__value,
+                'slug'
+            );
+        }
         if ($_SERVER['REQUEST_URI'] === '/en/sample-page/') {
             $_SERVER['REQUEST_URI'] = '/sample-page/';
         }
+    }
+
+    private function addCurrentUrlToTranslations()
+    {
+        /* TODO */
+        return;
+    }
+
+    private function getCurrentUrlTranslationsInLanguage($lng)
+    {
+        /* TODO */
+        return 'TODO';
     }
 }

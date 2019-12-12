@@ -5,7 +5,10 @@
     "autoload": {
         "psr-4": {
             "vielhuber\\gtbabel\\": "src/"
-        }
+        },
+        "files": [
+            "helpers.php"
+        ]
     },
     "require": {
         "gettext/gettext": "^5.2",

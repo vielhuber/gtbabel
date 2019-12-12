@@ -6,111 +6,238 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
-msgid "Vielhuber David"
-msgstr "%|%Vielhuber David%|%"
+# slug
+msgid "this-is-a-test"
+msgstr "%|%this-is-a-test%|%"
 
-msgid "ABOUT"
-msgstr "%|%ABOUT%|%"
+msgid "Direkt zum Inhalt wechseln"
+msgstr "%|%Direkt zum Inhalt wechseln%|%"
 
-msgid "BLOG"
-msgstr "%|%BLOG%|%"
+msgid "Suche"
+msgstr "%|%Suche%|%"
 
-msgid "Entwickler aus Leidenschaft"
-msgstr "%|%Entwickler aus Leidenschaft%|%"
+msgid "WPBABEL"
+msgstr "%|%WPBABEL%|%"
 
-msgid "Mein Name ist David Vielhuber. Ich bin Full-Stack Developer, zweifacher Papa und habe eine Schwäche für guten Kaffee und Code. Ich habe ein Faible für schönes Design, eine Prise Perfektionismus und Augen für klare Konturen. Vor 20 Jahren begann ich eine Liebesbeziehung mit meinem Computer – und kurz darauf mit dem Internet."
-msgstr "%|%Mein Name ist David Vielhuber. Ich bin Full-Stack Developer, zweifacher Papa und habe eine Schwäche für guten Kaffee und Code. Ich habe ein Faible für schönes Design, eine Prise Perfektionismus und Augen für klare Konturen. Vor 20 Jahren begann ich eine Liebesbeziehung mit meinem Computer – und kurz darauf mit dem Internet.%|%"
+msgid "Just another WordPress site"
+msgstr "%|%Just another WordPress site%|%"
 
-msgid "Im Laufe der Jahre wandelte sich meine Leidenschaft vom Hobby zum Beruf. Eine Vielzahl spannender Kundenprojekte aus den letzten Jahren führten mich dazu, neben Privatpersonen auch kleinen und mittelständischen Unternehmen ein großes Leistungsspektrum – von Web bis Print – anzubieten. Inzwischen bin ich ein Teil der <a>close2 new media GmbH</a> in München."
-msgstr "%|%Im Laufe der Jahre wandelte sich meine Leidenschaft vom Hobby zum Beruf. Eine Vielzahl spannender Kundenprojekte aus den letzten Jahren führten mich dazu, neben Privatpersonen auch kleinen und mittelständischen Unternehmen ein großes Leistungsspektrum – von Web bis Print – anzubieten. Inzwischen bin ich ein Teil der <a>close2 new media GmbH</a> in München.%|%"
+msgid "Menü"
+msgstr "%|%Menü%|%"
 
-msgid "Büroanschrift"
-msgstr "%|%Büroanschrift%|%"
+msgid "Dies ist ein Test"
+msgstr "%|%Dies ist ein Test%|%"
 
-msgid "close2 new media GmbH<br>Auenstrasse 6<br>80469 München"
-msgstr "%|%close2 new media GmbH<br>Auenstrasse 6<br>80469 München%|%"
+# slug
+msgid "steffen"
+msgstr "%|%steffen%|%"
 
-msgid "Kontaktdaten"
-msgstr "%|%Kontaktdaten%|%"
+msgid "Suche nach:"
+msgstr "%|%Suche nach:%|%"
 
-msgid "Tel"
-msgstr "%|%Tel%|%"
+msgid "Suche schließen"
+msgstr "%|%Suche schließen%|%"
 
-msgid "+49 89 21 540 01 42"
-msgstr "%|%+49 89 21 540 01 42%|%"
+msgid "Menü schließen"
+msgstr "%|%Menü schließen%|%"
 
-msgid "Fax"
-msgstr "%|%Fax%|%"
+msgid "Die Seite konnte nicht gefunden werden"
+msgstr "%|%Die Seite konnte nicht gefunden werden%|%"
 
-msgid "+49 89 21 544 59 1"
-msgstr "%|%+49 89 21 544 59 1%|%"
+msgid "Die gesuchte Seite konnte nicht gefunden werden. Sie wurde möglicherweise entfernt, umbenannt oder existierte von vornherein nicht."
+msgstr "%|%Die gesuchte Seite konnte nicht gefunden werden. Sie wurde möglicherweise entfernt, umbenannt oder existierte von vornherein nicht.%|%"
 
-msgid "Mail"
-msgstr "%|%Mail%|%"
+msgid "Neueste Beiträge"
+msgstr "%|%Neueste Beiträge%|%"
 
-msgid "david@vielhuber.de"
-msgstr "%|%david@vielhuber.de%|%"
+msgid "Hello world!"
+msgstr "%|%Hello world!%|%"
 
-msgid "GitHub"
-msgstr "%|%GitHub%|%"
+msgid "Neueste Kommentare"
+msgstr "%|%Neueste Kommentare%|%"
 
-msgid "Twitter"
-msgstr "%|%Twitter%|%"
+msgid "<span><a>A WordPress Commenter</a></span> bei <a>Hello world!</a>"
+msgstr "%|%<span><a>A WordPress Commenter</a></span> bei <a>Hello world!</a>%|%"
 
-msgid "Pinboard"
-msgstr "%|%Pinboard%|%"
+msgid "Archive"
+msgstr "%|%Archive%|%"
 
-msgid "Pinterest"
-msgstr "%|%Pinterest%|%"
+msgid "November 2019"
+msgstr "%|%November 2019%|%"
 
-msgid "YouTube"
-msgstr "%|%YouTube%|%"
+msgid "Kategorien"
+msgstr "%|%Kategorien%|%"
 
-msgid "Shopware"
-msgstr "%|%Shopware%|%"
+msgid "Uncategorized"
+msgstr "%|%Uncategorized%|%"
 
-msgid "Spotify"
-msgstr "%|%Spotify%|%"
+msgid "Meta"
+msgstr "%|%Meta%|%"
 
-msgid "Dribbble"
-msgstr "%|%Dribbble%|%"
+msgid "Website-Administration"
+msgstr "%|%Website-Administration%|%"
 
-msgid "Xing"
-msgstr "%|%Xing%|%"
+msgid "Abmelden"
+msgstr "%|%Abmelden%|%"
 
-msgid "Google+"
-msgstr "%|%Google+%|%"
+msgid "Feed der Einträge"
+msgstr "%|%Feed der Einträge%|%"
 
-msgid "PGP"
-msgstr "%|%PGP%|%"
+msgid "Kommentare-Feed"
+msgstr "%|%Kommentare-Feed%|%"
 
-msgid "W3C Markup Validation"
-msgstr "%|%W3C Markup Validation%|%"
+msgid "WordPress.org"
+msgstr "%|%WordPress.org%|%"
 
-msgid "Google Lighthouse"
-msgstr "%|%Google Lighthouse%|%"
+msgid "© 2019\t\t\t\t<a>WPBABEL</a>"
+msgstr "%|%© 2019\t\t\t\t<a>WPBABEL</a>%|%"
 
-msgid "Impressum"
-msgstr "%|%Impressum%|%"
+msgid "Powered by WordPress"
+msgstr "%|%Powered by WordPress%|%"
 
-msgid "Datenschutz"
-msgstr "%|%Datenschutz%|%"
+msgid "Nach oben"
+msgstr "%|%Nach oben%|%"
 
-msgid "Disclaimer"
-msgstr "%|%Disclaimer%|%"
+msgid "Hoch"
+msgstr "%|%Hoch%|%"
 
-# link
-msgid "blog"
-msgstr "%|%blog%|%"
+msgid "Zur Werkzeugleiste springen"
+msgstr "%|%Zur Werkzeugleiste springen%|%"
 
-# link
-msgid "impressum"
-msgstr "%|%impressum%|%"
+msgid "Über WordPress"
+msgstr "%|%Über WordPress%|%"
 
-# link
-msgid "datenschutz"
-msgstr "%|%datenschutz%|%"
+msgid "Dokumentation"
+msgstr "%|%Dokumentation%|%"
 
-# link
-msgid "disclaimer"
-msgstr "%|%disclaimer%|%"
+msgid "Support"
+msgstr "%|%Support%|%"
+
+msgid "Feedback"
+msgstr "%|%Feedback%|%"
+
+msgid "Dashboard"
+msgstr "%|%Dashboard%|%"
+
+msgid "Themes"
+msgstr "%|%Themes%|%"
+
+msgid "Widgets"
+msgstr "%|%Widgets%|%"
+
+msgid "Menüs"
+msgstr "%|%Menüs%|%"
+
+msgid "Hintergrund"
+msgstr "%|%Hintergrund%|%"
+
+msgid "Customizer"
+msgstr "%|%Customizer%|%"
+
+msgid "0 Kommentare in Moderation"
+msgstr "%|%0 Kommentare in Moderation%|%"
+
+msgid "Neu"
+msgstr "%|%Neu%|%"
+
+msgid "Beitrag"
+msgstr "%|%Beitrag%|%"
+
+msgid "Medien"
+msgstr "%|%Medien%|%"
+
+msgid "Seite"
+msgstr "%|%Seite%|%"
+
+msgid "Benutzer"
+msgstr "%|%Benutzer%|%"
+
+msgid "Suchen"
+msgstr "%|%Suchen%|%"
+
+msgid "<a>Willkommen, <span>root</span><img></a><div><ul><li><a><img><span>root</span></a></li><li><a>Profil bearbeiten</a></li><li><a>Abmelden</a></li></ul></div>"
+msgstr "%|%<a>Willkommen, <span>root</span><img></a><div><ul><li><a><img><span>root</span></a></li><li><a>Profil bearbeiten</a></li><li><a>Abmelden</a></li></ul></div>%|%"
+
+# slug
+msgid "dies-ist-ein-test"
+msgstr "%|%dies-ist-ein-test%|%"
+
+# slug
+msgid "hello-world"
+msgstr "%|%hello-world%|%"
+
+# slug
+msgid "#comment-1"
+msgstr "%|%#comment-1%|%"
+
+# slug
+msgid "category"
+msgstr "%|%category%|%"
+
+# slug
+msgid "uncategorized"
+msgstr "%|%uncategorized%|%"
+
+# slug
+msgid "wp-admin"
+msgstr "%|%wp-admin%|%"
+
+# slug
+msgid "wp-login.php?action=logout&_wpnonce=da472fb678"
+msgstr "%|%wp-login.php?action=logout&_wpnonce=da472fb678%|%"
+
+# slug
+msgid "feed"
+msgstr "%|%feed%|%"
+
+# slug
+msgid "comments"
+msgstr "%|%comments%|%"
+
+# slug
+msgid "about.php"
+msgstr "%|%about.php%|%"
+
+# slug
+msgid "themes.php"
+msgstr "%|%themes.php%|%"
+
+# slug
+msgid "widgets.php"
+msgstr "%|%widgets.php%|%"
+
+# slug
+msgid "nav-menus.php"
+msgstr "%|%nav-menus.php%|%"
+
+# slug
+msgid "themes.php?page=custom-background"
+msgstr "%|%themes.php?page=custom-background%|%"
+
+# slug
+msgid "customize.php?url=http%3A%2F%2Fwpbabel.local.vielhuber.de%2Fen%2Fthis-is-a-test"
+msgstr "%|%customize.php?url=http%3A%2F%2Fwpbabel.local.vielhuber.de%2Fen%2Fthis-is-a-test%|%"
+
+# slug
+msgid "edit-comments.php"
+msgstr "%|%edit-comments.php%|%"
+
+# slug
+msgid "post-new.php"
+msgstr "%|%post-new.php%|%"
+
+# slug
+msgid "media-new.php"
+msgstr "%|%media-new.php%|%"
+
+# slug
+msgid "post-new.php?post_type=page"
+msgstr "%|%post-new.php?post_type=page%|%"
+
+# slug
+msgid "user-new.php"
+msgstr "%|%user-new.php%|%"
+
+# slug
+msgid "profile.php"
+msgstr "%|%profile.php%|%"

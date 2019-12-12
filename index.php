@@ -7,12 +7,13 @@ $dotenv->load();
 $gtbabel = new gtbabel();
 
 $gtbabel->start([
-    'GOOGLE_API_KEY' => getenv('GOOGLE_API_KEY'),
-    'LNG_FOLDER' => 'locales',
-    'LNG_SOURCE' => 'DE',
-    'LNG_TARGET' => 'EN',
-    'PREFIX_DEFAULT_LANG' => false,
-    'LANGUAGES' => ['DE', 'EN', 'FR']
+    'google_api_key' => getenv('GOOGLE_API_KEY'),
+    'lng_folder' => '/locales',
+    'lng_source' => 'DE',
+    'lng_target' => 'EN',
+    'prefix_default_lang' => false,
+    'languages' => ['DE', 'EN', 'FR'],
+    'exclude' => null
 ]);
 
 require_once 'tpl/complex/1.html';

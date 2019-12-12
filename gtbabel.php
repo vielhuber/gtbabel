@@ -18,12 +18,13 @@ $gtbabel = new gtbabel();
 
 add_action('after_setup_theme', function () use ($gtbabel) {
     $gtbabel->start([
-        'GOOGLE_API_KEY' => getenv('GOOGLE_API_KEY'),
-        'LNG_FOLDER' => 'wp-content/plugins/gtbabel/locales',
-        'LNG_SOURCE' => 'DE',
-        'LNG_TARGET' => null, // auto
-        'PREFIX_DEFAULT_LANG' => false,
-        'LANGUAGES' => ['DE', 'EN', 'FR']
+        'google_api_key' => getenv('GOOGLE_API_KEY'),
+        'lng_folder' => '/wp-content/plugins/gtbabel/locales',
+        'lng_source' => 'DE',
+        'lng_target' => null, // auto
+        'prefix_default_lang' => false,
+        'languages' => ['DE', 'EN', 'FR'],
+        'exclude' => ['/wp-admin']
     ]);
 });
 
