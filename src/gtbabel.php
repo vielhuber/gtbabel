@@ -13,7 +13,6 @@ class gtbabel
 
     private $original_request_uri = null;
 
-    private $reset = true;
     private $auto_translation = false;
 
     private $html = null;
@@ -25,33 +24,48 @@ class gtbabel
     public function start($args = [])
     {
         $this->initArgs($args);
-        $this->addCurrentUrlToTranslations();
-        if ($this->shouldNotBeActive()) {
+        if ($this->currentUrlIsExcluded()) {
             return;
         }
-        if ($this->reset === true) {
-            $this->deletePoFiles();
+        $this->createLngFolderIfNotExists();
+        if ($this->shouldBeResetted() === true) {
+            $this->deletePoMoFiles();
         }
         $this->createPoFilesIfNotExists();
         $this->preloadTranslationsInCache();
-        $this->initMagicRouter();
-        ob_start();
+        $this->addCurrentUrlToTranslations();
+        if (!$this->sourceLngIsCurrentLng() && !$this->currentUrlIsExcluded()) {
+            $this->initMagicRouter();
+            ob_start();
+        }
     }
 
     public function stop()
     {
-        if ($this->shouldNotBeActive()) {
-            return;
+        if (!$this->sourceLngIsCurrentLng() && !$this->currentUrlIsExcluded()) {
+            $html = ob_get_contents();
+            $html = $this->translate($html);
+            ob_end_clean();
+            echo $html;
         }
-        $html = ob_get_contents();
-        $html = $this->translate($html);
-        ob_end_clean();
-        echo $html;
+        $this->generatePoAndMoFilesFromNewTranslations();
     }
 
     public function getLanguages()
     {
         return $this->args->languages;
+    }
+
+    public function getLanguagesWithoutSource()
+    {
+        $lng = [];
+        foreach ($this->getLanguages() as $languages__value) {
+            if ($languages__value === $this->getSourceLng()) {
+                continue;
+            }
+            $lng[] = $languages__value;
+        }
+        return $lng;
     }
 
     public function getCurrentLng()
@@ -60,9 +74,7 @@ class gtbabel
             return $this->args->lng_target;
         }
         foreach ($this->getLanguages() as $languages__value) {
-            if (
-                strpos($this->original_request_uri, '/' . strtolower($languages__value) . '/') === 0
-            ) {
+            if (strpos($this->original_request_uri, '/' . $languages__value . '/') === 0) {
                 return $languages__value;
             }
         }
@@ -82,19 +94,31 @@ class gtbabel
         return $data;
     }
 
+    private function shouldBeResetted()
+    {
+        if (@$_GET['reset'] == 1) {
+            return true;
+        }
+        return false;
+    }
+
     private function initArgs($args)
     {
         $this->args = (object) $args;
-        $this->original_request_uri = $_SERVER['REQUEST_URI'];
+        $this->original_request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH); // store without get parameters
     }
 
-    private function shouldNotBeActive()
+    private function sourceLngIsCurrentLng()
     {
         if ($this->getCurrentLng() === $this->getSourceLng()) {
             return true;
         }
-        if ($this->exclude !== null && is_array($this->exclude)) {
-            foreach ($this->exclude as $exclude__value) {
+        return false;
+    }
+    private function currentUrlIsExcluded()
+    {
+        if ($this->args->exclude !== null && is_array($this->args->exclude)) {
+            foreach ($this->args->exclude as $exclude__value) {
                 if (
                     strpos(trim($this->original_request_uri, '/'), trim($exclude__value, '/')) === 0
                 ) {
@@ -122,28 +146,41 @@ class gtbabel
         return $_SERVER['DOCUMENT_ROOT'] . '/' . trim($this->args->lng_folder, '/');
     }
 
-    private function getLngFilename($type)
+    private function getLngFilename($type, $lng)
     {
-        return $this->getLngFolder() . '/' . mb_strtolower($this->getCurrentLng()) . '.' . $type;
+        return $this->getLngFolder() . '/' . $lng . '.' . $type;
     }
 
-    private function deletePoFiles()
+    private function deletePoMoFiles()
     {
-        @unlink($this->getLngFilename('po'));
-        @unlink($this->getLngFilename('po'));
+        $files = glob($this->getLngFolder() . '/*'); // get all file names
+        foreach ($files as $files__value) {
+            if (is_file($files__value)) {
+                if (
+                    strpos($files__value, '.po') !== false ||
+                    strpos($files__value, '.mo') !== false
+                ) {
+                    @unlink($files__value);
+                }
+            }
+        }
     }
 
-    private function createPoFilesIfNotExists()
+    private function createLngFolderIfNotExists()
     {
         if (!is_dir($this->getLngFolder())) {
             mkdir($this->getLngFolder(), 0777, true);
         }
-        $filename = $this->getLngFilename('po');
-        if (!file_exists($filename)) {
-            touch($filename);
-            file_put_contents(
-                $filename,
-                '# gtbabel
+    }
+
+    private function createPoFilesIfNotExists()
+    {
+        foreach ($this->getLanguagesWithoutSource() as $languages__value) {
+            $filename = $this->getLngFilename('po', $languages__value);
+            if (!file_exists($filename)) {
+                file_put_contents(
+                    $filename,
+                    '# gtbabel
 msgid ""
 msgstr ""
 "MIME-Version: 1.0\n"
@@ -151,22 +188,31 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "Language: ' .
-                    $this->getCurrentLng() .
-                    '\n"'
-            );
+                        $languages__value .
+                        '\n"'
+                );
+            }
         }
     }
 
     private function preloadTranslationsInCache()
     {
-        $this->translations = Translations::create('gtbabel');
+        $this->translations = [];
         $this->translations_cache = [];
         $poLoader = new PoLoader();
-        $this->translations = $poLoader->loadFile($this->getLngFilename('po'));
-        foreach ($this->translations->getTranslations() as $translations__value) {
-            $this->translations_cache[
-                $translations__value->getOriginal()
-            ] = $translations__value->getTranslation();
+        foreach ($this->getLanguagesWithoutSource() as $languages__value) {
+            $this->translations_cache[$languages__value] = [];
+            $this->translations[$languages__value] = $poLoader->loadFile(
+                $this->getLngFilename('po', $languages__value)
+            );
+            foreach (
+                $this->translations[$languages__value]->getTranslations()
+                as $translations__value
+            ) {
+                $this->translations_cache[$languages__value][
+                    $translations__value->getOriginal()
+                ] = $translations__value->getTranslation();
+            }
         }
     }
 
@@ -175,7 +221,6 @@ msgstr ""
         $this->setupDomDocument();
         $this->modifyTextNodes();
         $this->modifyLinks();
-        $this->generatePoAndMoFilesFromNewTranslations();
         $this->html = $this->DOMDocument->saveHTML();
     }
 
@@ -194,14 +239,17 @@ msgstr ""
     {
         $groups = [];
 
+        // index all nodes (for later sorting out duplicates)
+        $nodes = $this->DOMXpath->query('/html/body//node()');
+        $nodes_id = 1;
+
+        foreach ($nodes as $nodes__value) {
+            $nodes__value->id = $nodes_id;
+            $nodes_id++;
+        }
+
         $textnodes = $this->DOMXpath->query('/html/body//text()');
         foreach ($textnodes as $textnodes__value) {
-            if (trim($textnodes__value->nodeValue) == '') {
-                continue;
-            }
-            if (is_numeric(trim($textnodes__value->nodeValue))) {
-                continue;
-            }
             if ($this->stringShouldNotBeTranslated($textnodes__value->nodeValue)) {
                 continue;
             }
@@ -228,8 +276,9 @@ msgstr ""
                 $originalText
             );
 
-            $translatedTextWithPlaceholders = $this->getTranslationAndAddDynamically(
-                $originalTextWithPlaceholders
+            $translatedTextWithPlaceholders = $this->getTranslationAndAddDynamicallyIfNeeded(
+                $originalTextWithPlaceholders,
+                $this->getCurrentLng()
             );
 
             $translatedText = $this->placeholderConversionOut(
@@ -245,17 +294,23 @@ msgstr ""
         }
     }
 
-    private function getTranslationAndAddDynamically($orig, $comment = null)
+    private function getTranslationAndAddDynamicallyIfNeeded($orig, $lng, $comment = null)
     {
-        $trans = $this->getExistingTranslationFromCache($orig);
+        $trans = $this->getExistingTranslationFromCache($orig, $lng);
         if ($trans === false) {
-            if ($this->auto_translation === false) {
-                $trans = $this->translateStringMock($orig);
-            } else {
-                $trans = $this->translateStringWithGoogle($orig);
-            }
-            $this->createNewTranslation($orig, $trans, $comment);
+            $trans = $this->addTranslationToGettext($orig, $lng, $comment);
         }
+        return $trans;
+    }
+
+    private function addTranslationToGettext($orig, $lng, $comment = null)
+    {
+        if ($this->auto_translation === false) {
+            $trans = $this->translateStringMock($orig, $lng, $comment);
+        } else {
+            $trans = $this->translateStringWithGoogle($orig, $lng, $comment);
+        }
+        $this->createNewTranslation($orig, $trans, $lng, $comment);
         return $trans;
     }
 
@@ -342,10 +397,13 @@ msgstr ""
 
     private function sortOutGroupsInGroups($groups)
     {
+        //$this->lb();
+        $levels_max = 2;
         $to_delete = [];
         foreach ($groups as $groups__key1 => $groups__value1) {
             $is_inside_another_group = false;
             $cur = $groups__value1;
+            $level = 0;
             while ($cur->parentNode !== null) {
                 foreach ($groups as $groups__key2 => $groups__value2) {
                     if ($groups__key1 === $groups__key2) {
@@ -357,6 +415,10 @@ msgstr ""
                     }
                 }
                 $cur = $cur->parentNode;
+                $level++;
+                if ($level > $levels_max) {
+                    break;
+                }
             }
             if ($is_inside_another_group === true) {
                 $to_delete[] = $groups__key1;
@@ -366,6 +428,7 @@ msgstr ""
             unset($groups[$to_delete__value]);
         }
         $groups = array_values($groups);
+        //$this->le();
         return $groups;
     }
 
@@ -410,42 +473,65 @@ msgstr ""
     {
         $unique = [];
         foreach ($groups as $groups__value) {
-            $unique[print_r($groups__value, true)] = $groups__value;
+            $unique[$groups__value->id] = $groups__value;
         }
         return array_values($unique);
     }
 
     private function nodesAreEqual($node1, $node2)
     {
-        return print_r($node1, true) === print_r($node2, true);
+        return $node1->id === $node2->id;
+    }
+
+    private function getChildrenCountOfNode($node)
+    {
+        return $this->DOMXpath->evaluate('count(.//*)', $node);
     }
 
     private function getNearestLogicalGroup($node)
     {
+        /*
+        foo
+        <a href="#">bar</a>
+        */
         if (
             empty(
                 array_filter($this->getSiblingsAndOneSelf($node), function ($nodes__value) {
-                    return !$this->isInnerTagNode($nodes__value) &&
-                        !$this->isTextNode($nodes__value);
+                    return !(
+                        $this->isTextNode($nodes__value) ||
+                        ($this->isInnerTagNode($nodes__value) &&
+                            $this->getChildrenCountOfNode($nodes__value) <= 2)
+                    );
                 })
             )
         ) {
             return $node->parentNode;
         }
+        /*
+        <span>foo</span>
+        <a href="#">bar</a>
+        */
         if ($this->isInnerTagNode($node->parentNode)) {
             if (
                 empty(
                     array_filter($this->getSiblingsAndOneSelf($node->parentNode), function (
                         $nodes__value
                     ) {
-                        return !$this->isInnerTagNode($nodes__value) &&
-                            !$this->isTextNode($nodes__value);
+                        return !(
+                            $this->isTextNode($nodes__value) ||
+                            ($this->isInnerTagNode($nodes__value) &&
+                                $this->getChildrenCountOfNode($nodes__value) <= 2)
+                        );
                     })
                 )
             ) {
                 return $node->parentNode->parentNode;
             }
         }
+        /*
+        foo
+        bar
+        */
         return $node;
     }
 
@@ -468,35 +554,46 @@ msgstr ""
     private function generatePoAndMoFilesFromNewTranslations()
     {
         $poGenerator = new PoGenerator();
-        $poGenerator->generateFile($this->translations, $this->getLngFilename('po'));
         $moGenerator = new MoGenerator();
-        $moGenerator->generateFile($this->translations, $this->getLngFilename('mo'));
+        foreach ($this->getLanguagesWithoutSource() as $languages__value) {
+            $poGenerator->generateFile(
+                $this->translations[$languages__value],
+                $this->getLngFilename('po', $languages__value)
+            );
+            $moGenerator->generateFile(
+                $this->translations[$languages__value],
+                $this->getLngFilename('mo', $languages__value)
+            );
+        }
     }
 
-    private function createNewTranslation($orig, $translated, $comment = null)
+    private function createNewTranslation($orig, $translated, $lng, $comment = null)
     {
         $translation = Translation::create(null, $orig);
         $translation->translate($translated);
         if ($comment !== null) {
             $translation->getComments()->add($comment);
         }
-        $this->translations->add($translation);
+        $this->translations[$lng]->add($translation);
     }
 
-    private function getExistingTranslationFromCache($str)
+    private function getExistingTranslationFromCache($str, $lng)
     {
-        if (!array_key_exists($str, $this->translations_cache)) {
+        if (!array_key_exists($str, $this->translations_cache[$lng])) {
             return false;
         }
-        return $this->translations_cache[$str];
+        return $this->translations_cache[$lng][$str];
     }
 
-    private function translateStringMock($str)
+    private function translateStringMock($str, $lng, $comment = null)
     {
-        return '%|%' . $str . '%|%';
+        if ($comment === 'slug') {
+            return $str . '-' . $lng;
+        }
+        return '%|%' . $str . '%|%' . $lng . '%|%';
     }
 
-    private function translateStringWithGoogle($str)
+    private function translateStringWithGoogle($str, $lng, $comment = null)
     {
         $apiKey = $this->args->google_api_key;
         $url =
@@ -505,9 +602,9 @@ msgstr ""
             '&q=' .
             rawurlencode($str) .
             '&source=' .
-            strtolower($this->args->lng_source) .
+            $this->args->lng_source .
             '&target=' .
-            strtolower($this->getCurrentLng());
+            $lng;
         $handle = curl_init($url);
         curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false);
@@ -544,21 +641,17 @@ msgstr ""
             $link = str_replace($this->getCurrentHost(), '', $link);
             $url_parts = explode('/', $link);
             foreach ($url_parts as $url_parts__key => $url_parts__value) {
-                if (trim($url_parts__value) == '') {
-                    continue;
-                }
-                if (is_numeric(trim($url_parts__value))) {
-                    continue;
-                }
                 if ($this->stringShouldNotBeTranslated($url_parts__value)) {
                     continue;
                 }
-                $url_parts[$url_parts__key] = $this->getTranslationAndAddDynamically(
+                $url_parts[$url_parts__key] = $this->getTranslationAndAddDynamicallyIfNeeded(
                     $url_parts__value,
+                    $this->getCurrentLng(),
                     'slug'
                 );
             }
             $link = implode('/', $url_parts);
+            $link = '/' . $this->getCurrentLng() . '' . $link;
             if ($is_absolute_link === true) {
                 $link = $this->getCurrentHost() . $link;
             }
@@ -586,7 +679,7 @@ msgstr ""
             return true;
         }
         foreach ($this->getLanguages() as $languages__value) {
-            if (strtolower($languages__value) === trim(strtolower($str))) {
+            if ($languages__value === trim(strtolower($str))) {
                 return true;
             }
         }
@@ -595,31 +688,87 @@ msgstr ""
 
     private function initMagicRouter()
     {
-        $url_parts = $_SERVER['REQUEST_URI'];
+        /*
+        $url_parts = $this->original_request_uri;
         $url_parts = explode('/', $url_parts);
         foreach ($url_parts as $url_parts__key => $url_parts__value) {
             if ($this->stringShouldNotBeTranslated($url_parts__value)) {
                 continue;
             }
-            $url_parts[$url_parts__key] = $this->getTranslationAndAddDynamically(
+            $url_parts[$url_parts__key] = $this->getTranslationAndAddDynamicallyIfNeeded(
                 $url_parts__value,
+                $this->getCurrentLng(),
                 'slug'
             );
         }
-        if ($_SERVER['REQUEST_URI'] === '/en/sample-page/') {
-            $_SERVER['REQUEST_URI'] = '/sample-page/';
+        if ($this->original_request_uri === '/en/sample-page/') {
+            $this->original_request_uri = '/sample-page/';
         }
+        */
     }
 
     private function addCurrentUrlToTranslations()
     {
-        /* TODO */
-        return;
+        if ($this->getCurrentLng() !== $this->getSourceLng()) {
+            return;
+        }
+        $url_parts = $this->original_request_uri;
+        $url_parts = explode('/', $url_parts);
+        foreach ($url_parts as $url_parts__value) {
+            if ($this->stringShouldNotBeTranslated($url_parts__value)) {
+                continue;
+            }
+            foreach ($this->getLanguagesWithoutSource() as $languages__value) {
+                $this->getTranslationAndAddDynamicallyIfNeeded(
+                    $url_parts__value,
+                    $languages__value,
+                    'slug'
+                );
+            }
+        }
     }
 
     private function getCurrentUrlTranslationsInLanguage($lng)
     {
-        /* TODO */
-        return 'TODO';
+        $url = $this->original_request_uri;
+        // if root
+        // if prefixed root
+        // if subpath
+
+        return 'TODO3';
+    }
+
+    private function lb($message = '')
+    {
+        if (!isset($GLOBALS['performance'])) {
+            $GLOBALS['performance'] = [];
+        }
+        $GLOBALS['performance'][] = ['time' => microtime(true), 'message' => $message];
+    }
+
+    private function le()
+    {
+        $this->log(
+            'script ' .
+                $GLOBALS['performance'][count($GLOBALS['performance']) - 1]['message'] .
+                ' execution time: ' .
+                number_format(
+                    microtime(true) -
+                        $GLOBALS['performance'][count($GLOBALS['performance']) - 1]['time'],
+                    5
+                ) .
+                ' seconds'
+        );
+        unset($GLOBALS['performance'][count($GLOBALS['performance']) - 1]);
+        $GLOBALS['performance'] = array_values($GLOBALS['performance']);
+    }
+
+    private function log($msg)
+    {
+        $filename = $_SERVER['DOCUMENT_ROOT'] . '/log2.txt';
+        if (is_array($msg)) {
+            $msg = print_r($msg, true);
+        }
+        file_put_contents($filename, $msg . PHP_EOL . file_get_contents($filename));
     }
 }

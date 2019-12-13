@@ -9,13 +9,13 @@ $gtbabel = new gtbabel();
 $gtbabel->start([
     'google_api_key' => getenv('GOOGLE_API_KEY'),
     'lng_folder' => '/locales',
-    'lng_source' => 'DE',
-    'lng_target' => 'EN',
+    'lng_source' => 'de',
+    'lng_target' => 'en',
     'prefix_default_lang' => false,
-    'languages' => ['DE', 'EN', 'FR'],
+    'languages' => ['de', 'en', 'fr'],
     'exclude' => null
 ]);
 
-require_once 'tpl/complex/1.html';
+require_once 'demo/complex/2.php';
 
 $gtbabel->stop();

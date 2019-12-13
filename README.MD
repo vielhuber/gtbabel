@@ -49,10 +49,10 @@ $gtbabel = new gtbabel();
 $gtbabel->start([
     'google_api_key' => getenv('GOOGLE_API_KEY'),
     'lng_folder' => '/locales',
-    'lng_source' => 'DE',
-    'lng_target' => 'EN',
+    'lng_source' => 'de',
+    'lng_target' => 'en',
     'prefix_default_lang' => false,
-    'languages' => ['DE', 'EN', 'FR']
+    'languages' => ['de', 'en', 'fr']
     'exclude' => ['/backend']
 ]);
 
@@ -79,16 +79,22 @@ unknown translations of urls are picked up from the current url and from links t
 # helper functions
 
 ```php
-gtbabel_current_lng() // 'EN'
-gtbabel_languages() // ['DE','EN']
+gtbabel_current_lng() // 'en'
+gtbabel_languages() // ['de','en']
 gtbabel_languagepicker()
 /*
 [
-    ['lng' => 'DE', 'url' => 'https://tld.com/de/nudel', 'active' => true],
-    ['lng' => 'EN', 'url' => 'https://tld.com/en/noodle', 'active' => false]
+    ['lng' => 'de', 'url' => 'https://tld.com/de/nudel', 'active' => true],
+    ['lng' => 'en', 'url' => 'https://tld.com/en/noodle', 'active' => false]
 ]
 */
 ```
+
+# language codes
+
+it is recommended to use iso language codes in lowercase.
+but you can use any language code you want (even i-klingon).
+if you use the auto translation feature with the help of Google Transpation API, you must use iso language codes.
 
 # credits
 
