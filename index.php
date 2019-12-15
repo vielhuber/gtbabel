@@ -12,10 +12,10 @@ $gtbabel->start([
     'lng_source' => 'de',
     'lng_target' => 'en',
     'prefix_default_lang' => false,
-    'languages' => ['de', 'en', 'fr'],
-    'exclude' => null
+    'exclude' => null,
+    'languages' => ['de', 'en', 'fr']
 ]);
 
-require_once 'demo/complex/2.php';
+require_once 'demo/complex/6.php';
 
 $gtbabel->stop();

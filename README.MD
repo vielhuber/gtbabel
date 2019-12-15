@@ -52,8 +52,8 @@ $gtbabel->start([
     'lng_source' => 'de',
     'lng_target' => 'en',
     'prefix_default_lang' => false,
+    'exclude' => ['/backend'],
     'languages' => ['de', 'en', 'fr']
-    'exclude' => ['/backend']
 ]);
 
 // any static or dynamic content

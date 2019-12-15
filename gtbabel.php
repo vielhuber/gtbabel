@@ -23,6 +23,7 @@ add_action('after_setup_theme', function () use ($gtbabel) {
         'lng_source' => 'de',
         'lng_target' => null, // auto
         'prefix_default_lang' => false,
+        'exclude' => ['/wp-admin', 'wp-login.php', 'wp-cron.php'],
         'languages' => [
             'de',
             'en',
@@ -50,8 +51,7 @@ add_action('after_setup_theme', function () use ($gtbabel) {
             'fi',
             'fy',
             'ga',
-            'gd'
-            /*
+            'gd',
             'gl',
             'gu',
             'ha',
@@ -129,9 +129,7 @@ add_action('after_setup_theme', function () use ($gtbabel) {
             'zh-cn',
             'zh-tw',
             'zu'
-            */
-        ],
-        'exclude' => ['/wp-admin', 'wp-login.php']
+        ]
     ]);
 });
 

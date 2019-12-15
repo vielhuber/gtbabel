@@ -242,12 +242,12 @@ msgstr ""
         // index all nodes (for later sorting out duplicates)
         $nodes = $this->DOMXpath->query('/html/body//node()');
         $nodes_id = 1;
-
         foreach ($nodes as $nodes__value) {
             $nodes__value->id = $nodes_id;
             $nodes_id++;
         }
 
+        $to_delete = [];
         $textnodes = $this->DOMXpath->query('/html/body//text()');
         foreach ($textnodes as $textnodes__value) {
             if ($this->stringShouldNotBeTranslated($textnodes__value->nodeValue)) {
@@ -256,12 +256,25 @@ msgstr ""
             if (@$textnodes__value->parentNode->tagName === 'script') {
                 continue;
             }
+            if (array_key_exists($textnodes__value->id, $to_delete)) {
+                continue;
+            }
             $group = $this->getNearestLogicalGroup($textnodes__value);
+            if (array_key_exists($group->id, $to_delete)) {
+                continue;
+            }
             $groups[] = $group;
+            $children = $this->getChildrenOfNode($group);
+            foreach ($children as $children__value) {
+                $to_delete[$children__value->id] = true;
+            }
         }
-
-        $groups = $this->sortOutGroupsInGroups($groups);
-        $groups = $this->sortOutDuplicates($groups);
+        foreach ($groups as $groups__key => $groups__value) {
+            if (array_key_exists($groups__value->id, $to_delete)) {
+                unset($groups[$groups__key]);
+            }
+        }
+        $groups = array_values($groups);
 
         foreach ($groups as $groups__value) {
             if ($this->isTextNode($groups__value)) {
@@ -392,12 +405,11 @@ msgstr ""
         if (@$node->tagName == '') {
             return false;
         }
-        return in_array($node->tagName, ['a', 'br', 'strong', 'b']);
+        return in_array($node->tagName, ['a', 'br', 'strong', 'b', 'small']);
     }
 
     private function sortOutGroupsInGroups($groups)
     {
-        //$this->lb();
         $levels_max = 2;
         $to_delete = [];
         foreach ($groups as $groups__key1 => $groups__value1) {
@@ -428,7 +440,6 @@ msgstr ""
             unset($groups[$to_delete__value]);
         }
         $groups = array_values($groups);
-        //$this->le();
         return $groups;
     }
 
@@ -483,15 +494,25 @@ msgstr ""
         return $node1->id === $node2->id;
     }
 
-    private function getChildrenCountOfNode($node)
+    private function getChildrenCountOfNodeTagsOnly($node)
     {
         return $this->DOMXpath->evaluate('count(.//*)', $node);
     }
 
+    private function getChildrenOfNode($node)
+    {
+        return $this->DOMXpath->query('.//node()', $node);
+    }
+
     private function getNearestLogicalGroup($node)
     {
+        /* TODO: Make the empty(array_filter) much more effective */
+
+        //$this->lb();
+        $parent = $node->parentNode;
+
         /*
-        foo
+        foo <=
         <a href="#">bar</a>
         */
         if (
@@ -500,38 +521,38 @@ msgstr ""
                     return !(
                         $this->isTextNode($nodes__value) ||
                         ($this->isInnerTagNode($nodes__value) &&
-                            $this->getChildrenCountOfNode($nodes__value) <= 2)
+                            $this->getChildrenCountOfNodeTagsOnly($nodes__value) <= 2)
                     );
                 })
             )
         ) {
-            return $node->parentNode;
+            return $parent;
         }
         /*
-        <span>foo</span>
+        <span>foo</span> <=
         <a href="#">bar</a>
         */
-        if ($this->isInnerTagNode($node->parentNode)) {
+        if ($this->isInnerTagNode($parent)) {
             if (
                 empty(
-                    array_filter($this->getSiblingsAndOneSelf($node->parentNode), function (
-                        $nodes__value
-                    ) {
+                    array_filter($this->getSiblingsAndOneSelf($parent), function ($nodes__value) {
                         return !(
                             $this->isTextNode($nodes__value) ||
                             ($this->isInnerTagNode($nodes__value) &&
-                                $this->getChildrenCountOfNode($nodes__value) <= 2)
+                                $this->getChildrenCountOfNodeTagsOnly($nodes__value) <= 2)
                         );
                     })
                 )
             ) {
-                return $node->parentNode->parentNode;
+                return $parent->parentNode;
             }
         }
         /*
         foo
         bar
         */
+        //$this->le();
+        //die();
         return $node;
     }
 
@@ -765,10 +786,10 @@ msgstr ""
 
     private function log($msg)
     {
-        $filename = $_SERVER['DOCUMENT_ROOT'] . '/log2.txt';
+        $filename = $_SERVER['DOCUMENT_ROOT'] . '/log.txt';
         if (is_array($msg)) {
             $msg = print_r($msg, true);
         }
-        file_put_contents($filename, $msg . PHP_EOL . file_get_contents($filename));
+        file_put_contents($filename, $msg . PHP_EOL . @file_get_contents($filename));
     }
 }
