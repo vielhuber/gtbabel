@@ -51,7 +51,7 @@ $gtbabel->start([
     'lng_folder' => '/locales',
     'lng_source' => 'de',
     'lng_target' => 'en',
-    'prefix_default_lang' => false,
+    'prefix_source_lng' => false,
     'exclude' => ['/backend'],
     'languages' => ['de', 'en', 'fr']
 ]);
@@ -88,6 +88,7 @@ gtbabel_languagepicker()
     ['lng' => 'en', 'url' => 'https://tld.com/en/noodle', 'active' => false]
 ]
 */
+gtbabel_get_translation('hello', 'fr', 'en') // 'bonjour'
 ```
 
 # language codes

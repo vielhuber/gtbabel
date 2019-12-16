@@ -26,7 +26,7 @@
     <div>
     <?php for ($i = 0; $i < 1000; $i++) {
         echo '
-            ok            
+            ok
             <div>ok</div>
         ';
     } ?>

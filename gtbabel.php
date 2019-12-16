@@ -22,7 +22,7 @@ add_action('after_setup_theme', function () use ($gtbabel) {
         'lng_folder' => '/wp-content/plugins/gtbabel/locales',
         'lng_source' => 'de',
         'lng_target' => null, // auto
-        'prefix_default_lang' => false,
+        'prefix_source_lng' => false,
         'exclude' => ['/wp-admin', 'wp-login.php', 'wp-cron.php'],
         'languages' => [
             'de',

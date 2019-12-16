@@ -11,11 +11,11 @@ $gtbabel->start([
     'lng_folder' => '/locales',
     'lng_source' => 'de',
     'lng_target' => 'en',
-    'prefix_default_lang' => false,
+    'prefix_source_lng' => false,
     'exclude' => null,
     'languages' => ['de', 'en', 'fr']
 ]);
 
-require_once 'demo/complex/6.php';
+require_once 'demo/complex/7.php';
 
 $gtbabel->stop();

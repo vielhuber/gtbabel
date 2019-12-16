@@ -5,24 +5,29 @@ use Gettext\Loader\PoLoader;
 use Gettext\Generator\MoGenerator;
 use Gettext\Generator\PoGenerator;
 use Gettext\Translation;
-use Gettext\Translations;
 
 class gtbabel
 {
     private $args = null;
 
-    private $original_request_uri = null;
+    private $original_path = null;
+    private $original_url = null;
+    private $original_host = null;
 
     private $auto_translation = false;
 
     private $html = null;
     private $translations = null;
     private $translations_cache = null;
+    private $translations_cache_reverse = null;
     private $DOMDocument = null;
     private $DOMXpath = null;
 
+    private $group_cache = null;
+
     public function start($args = [])
     {
+        $this->lb();
         $this->initArgs($args);
         if ($this->currentUrlIsExcluded()) {
             return;
@@ -49,6 +54,7 @@ class gtbabel
             echo $html;
         }
         $this->generatePoAndMoFilesFromNewTranslations();
+        $this->le();
     }
 
     public function getLanguages()
@@ -74,7 +80,7 @@ class gtbabel
             return $this->args->lng_target;
         }
         foreach ($this->getLanguages() as $languages__value) {
-            if (strpos($this->original_request_uri, '/' . $languages__value . '/') === 0) {
+            if (strpos($this->getCurrentPath(), '/' . $languages__value . '/') === 0) {
                 return $languages__value;
             }
         }
@@ -85,10 +91,11 @@ class gtbabel
     {
         $data = [];
         foreach ($this->getLanguages() as $languages__value) {
+            $url = $this->getCurrentUrlTranslationsInLanguage($languages__value);
             $data[] = [
                 'lng' => $languages__value,
-                'url' => $this->getCurrentUrlTranslationsInLanguage($languages__value),
-                'active' => false
+                'url' => $url,
+                'active' => rtrim($url, '/') === rtrim($this->getCurrentUrl(), '/')
             ];
         }
         return $data;
@@ -105,7 +112,19 @@ class gtbabel
     private function initArgs($args)
     {
         $this->args = (object) $args;
-        $this->original_request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH); // store without get parameters
+        $this->original_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH); // store without get parameters
+        $this->original_url =
+            'http' .
+            (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 's' : '') .
+            '://' .
+            $_SERVER['HTTP_HOST'] .
+            parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $this->original_host =
+            'http' .
+            (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 's' : '') .
+            '://' .
+            $_SERVER['HTTP_HOST'];
+        $this->cache = [];
     }
 
     private function sourceLngIsCurrentLng()
@@ -119,9 +138,7 @@ class gtbabel
     {
         if ($this->args->exclude !== null && is_array($this->args->exclude)) {
             foreach ($this->args->exclude as $exclude__value) {
-                if (
-                    strpos(trim($this->original_request_uri, '/'), trim($exclude__value, '/')) === 0
-                ) {
+                if (strpos(trim($this->getCurrentPath(), '/'), trim($exclude__value, '/')) === 0) {
                     return true;
                 }
             }
@@ -199,9 +216,11 @@ msgstr ""
     {
         $this->translations = [];
         $this->translations_cache = [];
+        $this->translations_cache_reverse = [];
         $poLoader = new PoLoader();
         foreach ($this->getLanguagesWithoutSource() as $languages__value) {
             $this->translations_cache[$languages__value] = [];
+            $this->translations_cache_reverse[$languages__value] = [];
             $this->translations[$languages__value] = $poLoader->loadFile(
                 $this->getLngFilename('po', $languages__value)
             );
@@ -212,6 +231,9 @@ msgstr ""
                 $this->translations_cache[$languages__value][
                     $translations__value->getOriginal()
                 ] = $translations__value->getTranslation();
+                $this->translations_cache_reverse[$languages__value][
+                    $translations__value->getTranslation()
+                ] = $translations__value->getOriginal();
             }
         }
     }
@@ -311,12 +333,12 @@ msgstr ""
     {
         $trans = $this->getExistingTranslationFromCache($orig, $lng);
         if ($trans === false) {
-            $trans = $this->addTranslationToGettext($orig, $lng, $comment);
+            $trans = $this->addTranslationToGettextAndToCache($orig, $lng, $comment);
         }
         return $trans;
     }
 
-    private function addTranslationToGettext($orig, $lng, $comment = null)
+    private function addTranslationToGettextAndToCache($orig, $lng, $comment = null)
     {
         if ($this->auto_translation === false) {
             $trans = $this->translateStringMock($orig, $lng, $comment);
@@ -324,6 +346,8 @@ msgstr ""
             $trans = $this->translateStringWithGoogle($orig, $lng, $comment);
         }
         $this->createNewTranslation($orig, $trans, $lng, $comment);
+        $this->translations_cache[$lng][$orig] = $trans;
+        $this->translations_cache_reverse[$lng][$trans] = $orig;
         return $trans;
     }
 
@@ -368,17 +392,6 @@ msgstr ""
         return $newstring;
     }
 
-    private function findAllOccurences($haystack, $needle)
-    {
-        $positions = [];
-        $pos_last = 0;
-        while (($pos_last = strpos($haystack, $needle, $pos_last)) !== false) {
-            $positions[] = $pos_last;
-            $pos_last = $pos_last + strlen($needle);
-        }
-        return $positions;
-    }
-
     private function formatText($str)
     {
         $str = trim($str);
@@ -405,42 +418,7 @@ msgstr ""
         if (@$node->tagName == '') {
             return false;
         }
-        return in_array($node->tagName, ['a', 'br', 'strong', 'b', 'small']);
-    }
-
-    private function sortOutGroupsInGroups($groups)
-    {
-        $levels_max = 2;
-        $to_delete = [];
-        foreach ($groups as $groups__key1 => $groups__value1) {
-            $is_inside_another_group = false;
-            $cur = $groups__value1;
-            $level = 0;
-            while ($cur->parentNode !== null) {
-                foreach ($groups as $groups__key2 => $groups__value2) {
-                    if ($groups__key1 === $groups__key2) {
-                        continue;
-                    }
-                    if ($this->nodesAreEqual($groups__value2, $cur->parentNode)) {
-                        $is_inside_another_group = true;
-                        break 2;
-                    }
-                }
-                $cur = $cur->parentNode;
-                $level++;
-                if ($level > $levels_max) {
-                    break;
-                }
-            }
-            if ($is_inside_another_group === true) {
-                $to_delete[] = $groups__key1;
-            }
-        }
-        foreach ($to_delete as $to_delete__value) {
-            unset($groups[$to_delete__value]);
-        }
-        $groups = array_values($groups);
-        return $groups;
+        return in_array($node->tagName, ['a', 'br', 'strong', 'b', 'small', 'i']);
     }
 
     private function getInnerHtml($node)
@@ -480,23 +458,14 @@ msgstr ""
         }
     }
 
-    private function sortOutDuplicates($groups)
-    {
-        $unique = [];
-        foreach ($groups as $groups__value) {
-            $unique[$groups__value->id] = $groups__value;
-        }
-        return array_values($unique);
-    }
-
-    private function nodesAreEqual($node1, $node2)
-    {
-        return $node1->id === $node2->id;
-    }
-
-    private function getChildrenCountOfNodeTagsOnly($node)
+    private function getChildrenCountRecursivelyOfNodeTagsOnly($node)
     {
         return $this->DOMXpath->evaluate('count(.//*)', $node);
+    }
+
+    private function getChildrenCountOfNode($node)
+    {
+        return $this->DOMXpath->evaluate('count(./node())', $node);
     }
 
     private function getChildrenOfNode($node)
@@ -504,72 +473,46 @@ msgstr ""
         return $this->DOMXpath->query('.//node()', $node);
     }
 
-    private function getNearestLogicalGroup($node)
+    private function getParentNodeWithMoreThanOneChildren($node)
     {
-        /* TODO: Make the empty(array_filter) much more effective */
-
-        //$this->lb();
-        $parent = $node->parentNode;
-
-        /*
-        foo <=
-        <a href="#">bar</a>
-        */
-        if (
-            empty(
-                array_filter($this->getSiblingsAndOneSelf($node), function ($nodes__value) {
-                    return !(
-                        $this->isTextNode($nodes__value) ||
-                        ($this->isInnerTagNode($nodes__value) &&
-                            $this->getChildrenCountOfNodeTagsOnly($nodes__value) <= 2)
-                    );
-                })
-            )
-        ) {
-            return $parent;
-        }
-        /*
-        <span>foo</span> <=
-        <a href="#">bar</a>
-        */
-        if ($this->isInnerTagNode($parent)) {
-            if (
-                empty(
-                    array_filter($this->getSiblingsAndOneSelf($parent), function ($nodes__value) {
-                        return !(
-                            $this->isTextNode($nodes__value) ||
-                            ($this->isInnerTagNode($nodes__value) &&
-                                $this->getChildrenCountOfNodeTagsOnly($nodes__value) <= 2)
-                        );
-                    })
-                )
-            ) {
-                return $parent->parentNode;
+        $cur = $node;
+        $level = 0;
+        $max_level = 11;
+        while ($this->getChildrenCountOfNode($cur) <= 1) {
+            $cur = $cur->parentNode;
+            if ($cur === null) {
+                break;
+            }
+            $level++;
+            if ($level >= $max_level) {
+                break;
             }
         }
-        /*
-        foo
-        bar
-        */
-        //$this->le();
-        //die();
-        return $node;
+        return $cur;
     }
 
-    private function getSiblingsAndOneSelf($node)
+    private function getNearestLogicalGroup($node)
     {
-        $siblings = [];
-        $cur = $node;
-        while ($cur->previousSibling !== null) {
-            $siblings[] = $cur;
-            $cur = $cur->previousSibling;
+        $parent = $this->getParentNodeWithMoreThanOneChildren($node);
+        if (!array_key_exists($parent->id, $this->group_cache)) {
+            $this->group_cache[$parent->id] = false;
+            foreach ($this->getChildrenOfNode($parent) as $nodes__value) {
+                if (
+                    !(
+                        $this->isTextNode($nodes__value) ||
+                        ($this->isInnerTagNode($nodes__value) &&
+                            $this->getChildrenCountRecursivelyOfNodeTagsOnly($nodes__value) <= 2)
+                    )
+                ) {
+                    $this->group_cache[$parent->id] = true;
+                    break;
+                }
+            }
         }
-        $cur = $node;
-        while ($cur->nextSibling !== null) {
-            $siblings[] = $cur;
-            $cur = $cur->nextSibling;
+        if ($this->group_cache[$parent->id] === true) {
+            return $node;
         }
-        return $siblings;
+        return $parent;
     }
 
     private function generatePoAndMoFilesFromNewTranslations()
@@ -600,10 +543,28 @@ msgstr ""
 
     private function getExistingTranslationFromCache($str, $lng)
     {
-        if (!array_key_exists($str, $this->translations_cache[$lng])) {
+        if (
+            $str === '' ||
+            $str === null ||
+            $this->translations_cache[$lng] === null ||
+            !array_key_exists($str, $this->translations_cache[$lng])
+        ) {
             return false;
         }
         return $this->translations_cache[$lng][$str];
+    }
+
+    private function getExistingTranslationReverseFromCache($str, $lng)
+    {
+        if (
+            $str === '' ||
+            $str === null ||
+            $this->translations_cache_reverse[$lng] === null ||
+            !array_key_exists($str, $this->translations_cache_reverse[$lng])
+        ) {
+            return false;
+        }
+        return $this->translations_cache_reverse[$lng][$str];
     }
 
     private function translateStringMock($str, $lng, $comment = null)
@@ -680,20 +641,15 @@ msgstr ""
         }
     }
 
-    private function getCurrentHost()
-    {
-        return 'http' .
-            (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 's' : '') .
-            '://' .
-            $_SERVER['HTTP_HOST'];
-    }
-
     private function stringShouldNotBeTranslated($str)
     {
-        if (trim($str) == '') {
+        $str = trim($str);
+        $str = trim($str, '"');
+        $str = trim($str, '\'');
+        if ($str == '') {
             return true;
         }
-        if (is_numeric(trim($str))) {
+        if (is_numeric($str)) {
             return true;
         }
         if (mb_strlen($str) === 1 && preg_match('/[^a-zA-Z]/', $str)) {
@@ -707,10 +663,79 @@ msgstr ""
         return false;
     }
 
+    private function getCurrentHost()
+    {
+        return $this->original_host;
+    }
+
+    private function getCurrentUrl()
+    {
+        return $this->original_url;
+    }
+
+    private function getCurrentPath()
+    {
+        return $this->original_path;
+    }
+
+    private function getCurrentUrlTranslationsInLanguage($lng)
+    {
+        /* TODO: move this to getCurrentPathTranslationsInLanguage */
+        /* TODO: fix prefix for other languages */
+        $prefix = $lng;
+        if ($this->args->prefix_source_lng === false && $this->getSourceLng() === $lng) {
+            $prefix = null;
+        }
+        return trim($this->getCurrentHost(), '/') .
+            '/' .
+            ($prefix !== null ? $prefix . '/' : '') .
+            trim($this->getCurrentPathTranslationsInLanguage($lng), '/') .
+            '/';
+    }
+
+    private function getTranslationInForeignLng($str, $to_lng, $from_lng = null)
+    {
+        if ($from_lng === null) {
+            $from_lng = $this->getCurrentLng();
+        }
+        if ($from_lng === $this->getSourceLng()) {
+            $str_in_source_lng = $str;
+        } else {
+            $str_in_source_lng = $this->getExistingTranslationReverseFromCache($str, $from_lng); // str in source lng
+        }
+        if ($str_in_source_lng === false) {
+            return false;
+        }
+        return $this->getExistingTranslationFromCache($str_in_source_lng, $to_lng);
+    }
+
+    private function getCurrentPathTranslationsInLanguage($lng)
+    {
+        $url = $this->getCurrentPath();
+        if ($this->getCurrentLng() === $lng) {
+            return $url;
+        }
+        $url_parts = explode('/', $url);
+        foreach ($url_parts as $url_parts__key => $url_parts__value) {
+            $trans = $this->getTranslationInForeignLng($url_parts__value, $lng);
+            if ($trans !== false) {
+                $url_parts[$url_parts__key] = $trans;
+            }
+        }
+        $url = implode('/', $url_parts);
+        return $url;
+
+        // if root
+        // if prefixed root
+        // if subpath
+
+        return 'TODO3';
+    }
+
     private function initMagicRouter()
     {
         /*
-        $url_parts = $this->original_request_uri;
+        $url_parts = $this->getCurrentPath();
         $url_parts = explode('/', $url_parts);
         foreach ($url_parts as $url_parts__key => $url_parts__value) {
             if ($this->stringShouldNotBeTranslated($url_parts__value)) {
@@ -722,8 +747,8 @@ msgstr ""
                 'slug'
             );
         }
-        if ($this->original_request_uri === '/en/sample-page/') {
-            $this->original_request_uri = '/sample-page/';
+        if ($this->getCurrentPath() === '/en/sample-page/') {
+            $this->getCurrentPath() = '/sample-page/';
         }
         */
     }
@@ -733,7 +758,7 @@ msgstr ""
         if ($this->getCurrentLng() !== $this->getSourceLng()) {
             return;
         }
-        $url_parts = $this->original_request_uri;
+        $url_parts = $this->getCurrentPath();
         $url_parts = explode('/', $url_parts);
         foreach ($url_parts as $url_parts__value) {
             if ($this->stringShouldNotBeTranslated($url_parts__value)) {
@@ -747,16 +772,6 @@ msgstr ""
                 );
             }
         }
-    }
-
-    private function getCurrentUrlTranslationsInLanguage($lng)
-    {
-        $url = $this->original_request_uri;
-        // if root
-        // if prefixed root
-        // if subpath
-
-        return 'TODO3';
     }
 
     private function lb($message = '')

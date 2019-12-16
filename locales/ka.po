@@ -1,0 +1,11 @@
+msgid ""
+msgstr ""
+"Content-Transfer-Encoding: 8bit\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ka\n"
+"MIME-Version: 1.0\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+# slug
+msgid "dies-ist-ein-test"
+msgstr "dies-ist-ein-test-ka"
