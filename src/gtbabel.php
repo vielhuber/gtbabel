@@ -333,21 +333,26 @@ msgstr ""
     {
         $trans = $this->getExistingTranslationFromCache($orig, $lng);
         if ($trans === false) {
-            $trans = $this->addTranslationToGettextAndToCache($orig, $lng, $comment);
+            $trans = $this->autoTranslateString($orig, $lng, $comment);
+            $this->addTranslationToGettextAndToCache($orig, $trans, $lng, $comment);
         }
         return $trans;
     }
 
-    private function addTranslationToGettextAndToCache($orig, $lng, $comment = null)
+    private function addTranslationToGettextAndToCache($orig, $trans, $lng, $comment = null)
     {
-        if ($this->auto_translation === false) {
-            $trans = $this->translateStringMock($orig, $lng, $comment);
-        } else {
-            $trans = $this->translateStringWithGoogle($orig, $lng, $comment);
-        }
         $this->createNewTranslation($orig, $trans, $lng, $comment);
         $this->translations_cache[$lng][$orig] = $trans;
         $this->translations_cache_reverse[$lng][$trans] = $orig;
+    }
+
+    private function autoTranslateString($orig, $to_lng, $comment = null, $from_lng = null)
+    {
+        if ($this->auto_translation === false) {
+            $trans = $this->translateStringMock($orig, $to_lng, $comment, $from_lng);
+        } else {
+            $trans = $this->translateStringWithGoogle($orig, $to_lng, $comment, $from_lng);
+        }
         return $trans;
     }
 
@@ -567,15 +572,15 @@ msgstr ""
         return $this->translations_cache_reverse[$lng][$str];
     }
 
-    private function translateStringMock($str, $lng, $comment = null)
+    private function translateStringMock($str, $to_lng, $comment = null, $from_lng = null)
     {
         if ($comment === 'slug') {
-            return $str . '-' . $lng;
+            return $str . '-' . $to_lng;
         }
-        return '%|%' . $str . '%|%' . $lng . '%|%';
+        return '%|%' . $str . '%|%' . $to_lng . '%|%';
     }
 
-    private function translateStringWithGoogle($str, $lng, $comment = null)
+    private function translateStringWithGoogle($str, $to_lng, $comment = null, $from_lng = null)
     {
         $apiKey = $this->args->google_api_key;
         $url =
@@ -584,9 +589,9 @@ msgstr ""
             '&q=' .
             rawurlencode($str) .
             '&source=' .
-            $this->args->lng_source .
+            ($from_lng === null ? $this->getSourceLng() : $from_lng) .
             '&target=' .
-            $lng;
+            $to_lng;
         $handle = curl_init($url);
         curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false);
@@ -680,15 +685,8 @@ msgstr ""
 
     private function getCurrentUrlTranslationsInLanguage($lng)
     {
-        /* TODO: move this to getCurrentPathTranslationsInLanguage */
-        /* TODO: fix prefix for other languages */
-        $prefix = $lng;
-        if ($this->args->prefix_source_lng === false && $this->getSourceLng() === $lng) {
-            $prefix = null;
-        }
         return trim($this->getCurrentHost(), '/') .
             '/' .
-            ($prefix !== null ? $prefix . '/' : '') .
             trim($this->getCurrentPathTranslationsInLanguage($lng), '/') .
             '/';
     }
@@ -706,7 +704,30 @@ msgstr ""
         if ($str_in_source_lng === false) {
             return false;
         }
+        if ($to_lng === $this->getSourceLng()) {
+            return $str_in_source_lng;
+        }
         return $this->getExistingTranslationFromCache($str_in_source_lng, $to_lng);
+    }
+
+    public function getTranslationInForeignLngAndAddDynamicallyIfNeeded(
+        $str,
+        $to_lng,
+        $from_lng = null
+    ) {
+        $trans = $this->getTranslationInForeignLng($str, $to_lng, $from_lng);
+        if ($trans === false) {
+            $str_in_source = $this->autoTranslateString(
+                $str,
+                $this->getSourceLng(),
+                null,
+                $from_lng
+            );
+            $trans = $this->autoTranslateString($str, $to_lng, null);
+            $this->addTranslationToGettextAndToCache($str_in_source, $str, $from_lng, null);
+            $this->addTranslationToGettextAndToCache($str_in_source, $trans, $to_lng, null);
+        }
+        return $trans;
     }
 
     private function getCurrentPathTranslationsInLanguage($lng)
@@ -716,6 +737,26 @@ msgstr ""
             return $url;
         }
         $url_parts = explode('/', $url);
+        foreach ($url_parts as $url_parts__key => $url_parts__value) {
+            if ($url_parts[$url_parts__key] == '') {
+                unset($url_parts[$url_parts__key]);
+            }
+        }
+        $url_parts = array_values($url_parts);
+
+        // prefix
+        if ($this->getSourceLng() === $lng && $this->args->prefix_source_lng === false) {
+            if (@$url_parts[0] === $this->getCurrentLng()) {
+                unset($url_parts[0]);
+            }
+        } else {
+            if (@$url_parts[0] === $this->getCurrentLng()) {
+                $url_parts[0] = $lng;
+            } else {
+                array_unshift($url_parts, $lng);
+            }
+        }
+
         foreach ($url_parts as $url_parts__key => $url_parts__value) {
             $trans = $this->getTranslationInForeignLng($url_parts__value, $lng);
             if ($trans !== false) {

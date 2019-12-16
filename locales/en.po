@@ -9,3 +9,508 @@ msgstr ""
 # slug
 msgid "dies-ist-ein-test"
 msgstr "dies-ist-ein-test-en"
+
+msgid "%|%hello%|%de%|%"
+msgstr "hello"
+
+msgid "Direkt zum Inhalt wechseln"
+msgstr "%|%Direkt zum Inhalt wechseln%|%en%|%"
+
+msgid "Suche"
+msgstr "%|%Suche%|%en%|%"
+
+msgid "WPBABEL"
+msgstr "%|%WPBABEL%|%en%|%"
+
+msgid "Just another WordPress site"
+msgstr "%|%Just another WordPress site%|%en%|%"
+
+msgid "Menü"
+msgstr "%|%Menü%|%en%|%"
+
+msgid "Dies ist ein Test"
+msgstr "%|%Dies ist ein Test%|%en%|%"
+
+msgid "steffen"
+msgstr "%|%steffen%|%en%|%"
+
+msgid "Suche nach:"
+msgstr "%|%Suche nach:%|%en%|%"
+
+msgid "Suche schließen"
+msgstr "%|%Suche schließen%|%en%|%"
+
+msgid "Menü schließen"
+msgstr "%|%Menü schließen%|%en%|%"
+
+msgid "/mnt/c/htdocs/wpbabel/wp-content/themes/twentytwenty/header.php:191:"
+msgstr "%|%/mnt/c/htdocs/wpbabel/wp-content/themes/twentytwenty/header.php:191:%|%en%|%"
+
+msgid "string"
+msgstr "%|%string%|%en%|%"
+
+msgid "(length=2)"
+msgstr "%|%(length=2)%|%en%|%"
+
+msgid "/mnt/c/htdocs/wpbabel/wp-content/themes/twentytwenty/header.php:192:"
+msgstr "%|%/mnt/c/htdocs/wpbabel/wp-content/themes/twentytwenty/header.php:192:%|%en%|%"
+
+msgid "array"
+msgstr "%|%array%|%en%|%"
+
+msgid "(size=104)"
+msgstr "%|%(size=104)%|%en%|%"
+
+msgid "=>"
+msgstr "%|%=>%|%en%|%"
+
+msgid "(length=3)"
+msgstr "%|%(length=3)%|%en%|%"
+
+msgid "(length=5)"
+msgstr "%|%(length=5)%|%en%|%"
+
+msgid "/mnt/c/htdocs/wpbabel/wp-content/themes/twentytwenty/header.php:193:"
+msgstr "%|%/mnt/c/htdocs/wpbabel/wp-content/themes/twentytwenty/header.php:193:%|%en%|%"
+
+msgid "(size=3)"
+msgstr "%|%(size=3)%|%en%|%"
+
+msgid "'lng'"
+msgstr "%|%'lng'%|%en%|%"
+
+msgid "'url'"
+msgstr "%|%'url'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/dies-ist-ein-test/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/dies-ist-ein-test/'%|%en%|%"
+
+msgid "(length=52)"
+msgstr "%|%(length=52)%|%en%|%"
+
+msgid "'active'"
+msgstr "%|%'active'%|%en%|%"
+
+msgid "boolean"
+msgstr "%|%boolean%|%en%|%"
+
+msgid "false"
+msgstr "%|%false%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/en/dies-ist-ein-test-en/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/en/dies-ist-ein-test-en/'%|%en%|%"
+
+msgid "(length=58)"
+msgstr "%|%(length=58)%|%en%|%"
+
+msgid "true"
+msgstr "%|%true%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/fr/dies-ist-ein-test-fr/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/fr/dies-ist-ein-test-fr/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/af/dies-ist-ein-test-af/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/af/dies-ist-ein-test-af/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/am/dies-ist-ein-test-am/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/am/dies-ist-ein-test-am/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/ar/dies-ist-ein-test-ar/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/ar/dies-ist-ein-test-ar/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/az/dies-ist-ein-test-az/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/az/dies-ist-ein-test-az/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/be/dies-ist-ein-test-be/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/be/dies-ist-ein-test-be/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/bg/dies-ist-ein-test-bg/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/bg/dies-ist-ein-test-bg/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/bn/dies-ist-ein-test-bn/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/bn/dies-ist-ein-test-bn/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/bs/dies-ist-ein-test-bs/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/bs/dies-ist-ein-test-bs/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/ca/dies-ist-ein-test-ca/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/ca/dies-ist-ein-test-ca/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/ceb/dies-ist-ein-test-ceb/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/ceb/dies-ist-ein-test-ceb/'%|%en%|%"
+
+msgid "(length=60)"
+msgstr "%|%(length=60)%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/co/dies-ist-ein-test-co/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/co/dies-ist-ein-test-co/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/cs/dies-ist-ein-test-cs/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/cs/dies-ist-ein-test-cs/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/cy/dies-ist-ein-test-cy/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/cy/dies-ist-ein-test-cy/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/da/dies-ist-ein-test-da/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/da/dies-ist-ein-test-da/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/el/dies-ist-ein-test-el/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/el/dies-ist-ein-test-el/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/eo/dies-ist-ein-test-eo/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/eo/dies-ist-ein-test-eo/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/es/dies-ist-ein-test-es/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/es/dies-ist-ein-test-es/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/et/dies-ist-ein-test-et/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/et/dies-ist-ein-test-et/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/eu/dies-ist-ein-test-eu/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/eu/dies-ist-ein-test-eu/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/fa/dies-ist-ein-test-fa/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/fa/dies-ist-ein-test-fa/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/fi/dies-ist-ein-test-fi/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/fi/dies-ist-ein-test-fi/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/fy/dies-ist-ein-test-fy/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/fy/dies-ist-ein-test-fy/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/ga/dies-ist-ein-test-ga/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/ga/dies-ist-ein-test-ga/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/gd/dies-ist-ein-test-gd/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/gd/dies-ist-ein-test-gd/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/gl/dies-ist-ein-test-gl/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/gl/dies-ist-ein-test-gl/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/gu/dies-ist-ein-test-gu/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/gu/dies-ist-ein-test-gu/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/ha/dies-ist-ein-test-ha/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/ha/dies-ist-ein-test-ha/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/haw/dies-ist-ein-test-haw/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/haw/dies-ist-ein-test-haw/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/he/dies-ist-ein-test-he/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/he/dies-ist-ein-test-he/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/hi/dies-ist-ein-test-hi/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/hi/dies-ist-ein-test-hi/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/hmn/dies-ist-ein-test-hmn/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/hmn/dies-ist-ein-test-hmn/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/hr/dies-ist-ein-test-hr/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/hr/dies-ist-ein-test-hr/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/ht/dies-ist-ein-test-ht/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/ht/dies-ist-ein-test-ht/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/hu/dies-ist-ein-test-hu/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/hu/dies-ist-ein-test-hu/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/hy/dies-ist-ein-test-hy/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/hy/dies-ist-ein-test-hy/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/id/dies-ist-ein-test-id/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/id/dies-ist-ein-test-id/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/ig/dies-ist-ein-test-ig/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/ig/dies-ist-ein-test-ig/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/is/dies-ist-ein-test-is/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/is/dies-ist-ein-test-is/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/it/dies-ist-ein-test-it/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/it/dies-ist-ein-test-it/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/ja/dies-ist-ein-test-ja/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/ja/dies-ist-ein-test-ja/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/jw/dies-ist-ein-test-jw/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/jw/dies-ist-ein-test-jw/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/ka/dies-ist-ein-test-ka/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/ka/dies-ist-ein-test-ka/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/kk/dies-ist-ein-test-kk/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/kk/dies-ist-ein-test-kk/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/km/dies-ist-ein-test-km/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/km/dies-ist-ein-test-km/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/kn/dies-ist-ein-test-kn/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/kn/dies-ist-ein-test-kn/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/ko/dies-ist-ein-test-ko/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/ko/dies-ist-ein-test-ko/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/ku/dies-ist-ein-test-ku/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/ku/dies-ist-ein-test-ku/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/ky/dies-ist-ein-test-ky/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/ky/dies-ist-ein-test-ky/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/la/dies-ist-ein-test-la/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/la/dies-ist-ein-test-la/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/lb/dies-ist-ein-test-lb/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/lb/dies-ist-ein-test-lb/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/lo/dies-ist-ein-test-lo/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/lo/dies-ist-ein-test-lo/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/lt/dies-ist-ein-test-lt/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/lt/dies-ist-ein-test-lt/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/lv/dies-ist-ein-test-lv/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/lv/dies-ist-ein-test-lv/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/mg/dies-ist-ein-test-mg/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/mg/dies-ist-ein-test-mg/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/mi/dies-ist-ein-test-mi/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/mi/dies-ist-ein-test-mi/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/mk/dies-ist-ein-test-mk/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/mk/dies-ist-ein-test-mk/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/ml/dies-ist-ein-test-ml/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/ml/dies-ist-ein-test-ml/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/mn/dies-ist-ein-test-mn/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/mn/dies-ist-ein-test-mn/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/mr/dies-ist-ein-test-mr/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/mr/dies-ist-ein-test-mr/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/ms/dies-ist-ein-test-ms/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/ms/dies-ist-ein-test-ms/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/mt/dies-ist-ein-test-mt/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/mt/dies-ist-ein-test-mt/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/my/dies-ist-ein-test-my/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/my/dies-ist-ein-test-my/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/ne/dies-ist-ein-test-ne/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/ne/dies-ist-ein-test-ne/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/nl/dies-ist-ein-test-nl/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/nl/dies-ist-ein-test-nl/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/no/dies-ist-ein-test-no/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/no/dies-ist-ein-test-no/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/ny/dies-ist-ein-test-ny/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/ny/dies-ist-ein-test-ny/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/pa/dies-ist-ein-test-pa/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/pa/dies-ist-ein-test-pa/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/pl/dies-ist-ein-test-pl/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/pl/dies-ist-ein-test-pl/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/ps/dies-ist-ein-test-ps/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/ps/dies-ist-ein-test-ps/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/pt/dies-ist-ein-test-pt/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/pt/dies-ist-ein-test-pt/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/ro/dies-ist-ein-test-ro/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/ro/dies-ist-ein-test-ro/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/ru/dies-ist-ein-test-ru/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/ru/dies-ist-ein-test-ru/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/sd/dies-ist-ein-test-sd/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/sd/dies-ist-ein-test-sd/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/si/dies-ist-ein-test-si/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/si/dies-ist-ein-test-si/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/sk/dies-ist-ein-test-sk/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/sk/dies-ist-ein-test-sk/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/sl/dies-ist-ein-test-sl/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/sl/dies-ist-ein-test-sl/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/sm/dies-ist-ein-test-sm/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/sm/dies-ist-ein-test-sm/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/sn/dies-ist-ein-test-sn/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/sn/dies-ist-ein-test-sn/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/so/dies-ist-ein-test-so/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/so/dies-ist-ein-test-so/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/sq/dies-ist-ein-test-sq/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/sq/dies-ist-ein-test-sq/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/sr/dies-ist-ein-test-sr/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/sr/dies-ist-ein-test-sr/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/st/dies-ist-ein-test-st/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/st/dies-ist-ein-test-st/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/su/dies-ist-ein-test-su/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/su/dies-ist-ein-test-su/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/sv/dies-ist-ein-test-sv/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/sv/dies-ist-ein-test-sv/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/sw/dies-ist-ein-test-sw/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/sw/dies-ist-ein-test-sw/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/ta/dies-ist-ein-test-ta/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/ta/dies-ist-ein-test-ta/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/te/dies-ist-ein-test-te/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/te/dies-ist-ein-test-te/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/tg/dies-ist-ein-test-tg/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/tg/dies-ist-ein-test-tg/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/th/dies-ist-ein-test-th/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/th/dies-ist-ein-test-th/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/tl/dies-ist-ein-test-tl/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/tl/dies-ist-ein-test-tl/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/tr/dies-ist-ein-test-tr/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/tr/dies-ist-ein-test-tr/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/uk/dies-ist-ein-test-uk/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/uk/dies-ist-ein-test-uk/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/ur/dies-ist-ein-test-ur/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/ur/dies-ist-ein-test-ur/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/uz/dies-ist-ein-test-uz/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/uz/dies-ist-ein-test-uz/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/vi/dies-ist-ein-test-vi/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/vi/dies-ist-ein-test-vi/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/xh/dies-ist-ein-test-xh/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/xh/dies-ist-ein-test-xh/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/yi/dies-ist-ein-test-yi/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/yi/dies-ist-ein-test-yi/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/yo/dies-ist-ein-test-yo/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/yo/dies-ist-ein-test-yo/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/zh-cn/dies-ist-ein-test-zh-cn/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/zh-cn/dies-ist-ein-test-zh-cn/'%|%en%|%"
+
+msgid "(length=64)"
+msgstr "%|%(length=64)%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/zh-tw/dies-ist-ein-test-zh-tw/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/zh-tw/dies-ist-ein-test-zh-tw/'%|%en%|%"
+
+msgid "'http://wpbabel.local.vielhuber.de/zu/dies-ist-ein-test-zu/'"
+msgstr "%|%'http://wpbabel.local.vielhuber.de/zu/dies-ist-ein-test-zu/'%|%en%|%"
+
+msgid "/mnt/c/htdocs/wpbabel/wp-content/themes/twentytwenty/header.php:197:"
+msgstr "%|%/mnt/c/htdocs/wpbabel/wp-content/themes/twentytwenty/header.php:197:%|%en%|%"
+
+msgid "'BINGO'"
+msgstr "%|%'BINGO'%|%en%|%"
+
+msgid "Die Seite konnte nicht gefunden werden"
+msgstr "%|%Die Seite konnte nicht gefunden werden%|%en%|%"
+
+msgid "Die gesuchte Seite konnte nicht gefunden werden. Sie wurde möglicherweise entfernt, umbenannt oder existierte von vornherein nicht."
+msgstr "%|%Die gesuchte Seite konnte nicht gefunden werden. Sie wurde möglicherweise entfernt, umbenannt oder existierte von vornherein nicht.%|%en%|%"
+
+msgid "Neueste Beiträge"
+msgstr "%|%Neueste Beiträge%|%en%|%"
+
+msgid "<a>Hello world!</a>"
+msgstr "%|%<a>Hello world!</a>%|%en%|%"
+
+msgid "Neueste Kommentare"
+msgstr "%|%Neueste Kommentare%|%en%|%"
+
+msgid "A WordPress Commenter"
+msgstr "%|%A WordPress Commenter%|%en%|%"
+
+msgid "bei"
+msgstr "%|%bei%|%en%|%"
+
+msgid "Hello world!"
+msgstr "%|%Hello world!%|%en%|%"
+
+msgid "Archive"
+msgstr "%|%Archive%|%en%|%"
+
+msgid "November 2019"
+msgstr "%|%November 2019%|%en%|%"
+
+msgid "Kategorien"
+msgstr "%|%Kategorien%|%en%|%"
+
+msgid "<a>Uncategorized</a>"
+msgstr "%|%<a>Uncategorized</a>%|%en%|%"
+
+msgid "Meta"
+msgstr "%|%Meta%|%en%|%"
+
+msgid "Anmelden"
+msgstr "%|%Anmelden%|%en%|%"
+
+msgid "Feed der Einträge"
+msgstr "%|%Feed der Einträge%|%en%|%"
+
+msgid "Kommentare-Feed"
+msgstr "%|%Kommentare-Feed%|%en%|%"
+
+msgid "WordPress.org"
+msgstr "%|%WordPress.org%|%en%|%"
+
+msgid "© 2019\t\t\t\t<a>WPBABEL</a>"
+msgstr "%|%© 2019\t\t\t\t<a>WPBABEL</a>%|%en%|%"
+
+msgid "<a> Powered by WordPress\t\t\t\t</a>"
+msgstr "%|%<a> Powered by WordPress\t\t\t\t</a>%|%en%|%"
+
+msgid "Nach oben"
+msgstr "%|%Nach oben%|%en%|%"
+
+msgid "Hoch"
+msgstr "%|%Hoch%|%en%|%"
+
+# slug
+msgid "hello-world"
+msgstr "hello-world-en"
+
+# slug
+msgid "#comment-1"
+msgstr "#comment-1-en"
+
+# slug
+msgid "category"
+msgstr "category-en"
+
+# slug
+msgid "uncategorized"
+msgstr "uncategorized-en"
+
+# slug
+msgid "wp-login.php"
+msgstr "wp-login.php-en"
+
+# slug
+msgid "feed"
+msgstr "feed-en"
+
+# slug
+msgid "comments"
+msgstr "comments-en"

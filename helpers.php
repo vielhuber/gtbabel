@@ -20,5 +20,5 @@ function gtbabel_languagepicker()
 function gtbabel_get_translation($str, $to_lng, $from_lng = null)
 {
     global $gtbabel;
-    return $gtbabel->getTranslationInForeignLng($str, $to_lng, $from_lng);
+    return $gtbabel->getTranslationInForeignLngAndAddDynamicallyIfNeeded($str, $to_lng, $from_lng);
 }
