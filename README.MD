@@ -49,11 +49,13 @@ $gtbabel = new gtbabel();
 
 $gtbabel->start([
     'google_api_key' => getenv('GOOGLE_API_KEY'),
+    'auto_translation' => false,
     'lng_folder' => '/locales',
     'lng_source' => 'de',
     'lng_target' => 'en',
     'prefix_source_lng' => false,
-    'exclude' => ['/backend'],
+    'exclude_urls' => ['/backend'],
+    'exclude_dom' => ['.lngpicker'],
     'languages' => ['de', 'en', 'fr']
 ]);
 

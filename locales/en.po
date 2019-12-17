@@ -8,509 +8,318 @@ msgstr ""
 
 # slug
 msgid "dies-ist-ein-test"
-msgstr "dies-ist-ein-test-en"
+msgstr "this-is-a-test"
 
-msgid "%|%hello%|%de%|%"
+msgid "Hallo"
 msgstr "hello"
 
 msgid "Direkt zum Inhalt wechseln"
-msgstr "%|%Direkt zum Inhalt wechseln%|%en%|%"
+msgstr "Switch directly to the content"
 
 msgid "Suche"
-msgstr "%|%Suche%|%en%|%"
+msgstr "search"
 
 msgid "WPBABEL"
-msgstr "%|%WPBABEL%|%en%|%"
+msgstr "WPBABEL"
 
-msgid "Just another WordPress site"
-msgstr "%|%Just another WordPress site%|%en%|%"
+msgid "Eine ziemlich coole Seite"
+msgstr "Quite a cool site"
 
 msgid "Menü"
-msgstr "%|%Menü%|%en%|%"
+msgstr "menu"
 
 msgid "Dies ist ein Test"
-msgstr "%|%Dies ist ein Test%|%en%|%"
+msgstr "this is a test"
 
 msgid "steffen"
-msgstr "%|%steffen%|%en%|%"
+msgstr "steffen"
 
 msgid "Suche nach:"
-msgstr "%|%Suche nach:%|%en%|%"
+msgstr "Search for:"
 
 msgid "Suche schließen"
-msgstr "%|%Suche schließen%|%en%|%"
+msgstr "Close search"
 
 msgid "Menü schließen"
-msgstr "%|%Menü schließen%|%en%|%"
+msgstr "Close menu"
 
-msgid "/mnt/c/htdocs/wpbabel/wp-content/themes/twentytwenty/header.php:191:"
-msgstr "%|%/mnt/c/htdocs/wpbabel/wp-content/themes/twentytwenty/header.php:191:%|%en%|%"
+msgid "/mnt/c/htdocs/wpbabel/wp-content/themes/twentytwenty/header.php:190:"
+msgstr "/mnt/c/htdocs/wpbabel/wp-content/themes/twentytwenty/header.php:190:"
 
 msgid "string"
-msgstr "%|%string%|%en%|%"
+msgstr "string"
 
 msgid "(length=2)"
-msgstr "%|%(length=2)%|%en%|%"
+msgstr "(Length = 2)"
 
-msgid "/mnt/c/htdocs/wpbabel/wp-content/themes/twentytwenty/header.php:192:"
-msgstr "%|%/mnt/c/htdocs/wpbabel/wp-content/themes/twentytwenty/header.php:192:%|%en%|%"
+msgid "Der Freistaat Bayern (Zum Anhören bitte klicken! [ˈbaɪ̯ɐn]; Ländercode BY) ist mit mehr als 70.500 Quadratkilometern das flächengrößte der 16 Länder in Deutschland und liegt in dessen Südosten. Mit rund 13 Millionen Einwohnern ist er nach Nordrhein-Westfalen das zweitbevölkerungsreichste deutsche Land."
+msgstr "The Free State of Bavaria (Please click to listen! [ˈBaɪ̯ɐn]; country code BY) is the largest of the 16 countries in Germany with more than 70,500 square kilometers and is located in its southeast. With around 13 million inhabitants, it is the second most populous German country after North Rhine-Westphalia."
 
-msgid "array"
-msgstr "%|%array%|%en%|%"
+msgid "Der Freistaat hat im Süden Anteil am Hochgebirge der Ostalpen und dem bis zur Donau reichenden flachen Alpenvorland. Nördlich der Donau bestimmen Mittelgebirge wie etwa der Bayerische Wald oder das Fichtelgebirge das Landschaftsbild. Größte Stadt Bayerns ist die Landeshauptstadt und Millionenmetropole München, gefolgt von Nürnberg und Augsburg. Weitere Großstädte sind Regensburg, Ingolstadt, Würzburg, Fürth und Erlangen."
+msgstr "In the south, the Free State has a share in the high mountains of the Eastern Alps and the flat Alpine foothills that reach as far as the Danube. To the north of the Danube, low mountain ranges such as the Bavarian Forest or the Fichtel Mountains determine the landscape. Bavaria&#39;s largest city is the state capital and metropolis of Munich, followed by Nuremberg and Augsburg. Other major cities are Regensburg, Ingolstadt, Würzburg, Fürth and Erlangen."
 
-msgid "(size=104)"
-msgstr "%|%(size=104)%|%en%|%"
+msgid "Bayern ist eine parlamentarische Republik mit dem Bayerischen Landtag als Legislative und der Bayerischen Staatsregierung, an deren Spitze der Ministerpräsident als Regierungschef steht, als Exekutive. Grundlage der Politik ist die Verfassung des Freistaates Bayern, gemäß der Bayern ein Volks-, Rechts-, Kultur- und Sozialstaat ist. Die Bezeichnung Freier Volksstaat bzw. Freistaat als Republik trägt Bayern seit 1918, mit der Ausrufung durch den revolutionären Ministerpräsidenten Kurt Eisner am 8. November 1918 und dem damit verbundenen Ende des Königreichs Bayern."
+msgstr "Bavaria is a parliamentary republic with the Bavarian State Parliament as the legislature and the Bavarian State Government, headed by the Prime Minister as head of government, as the executive. The basis of the policy is the constitution of the Free State of Bavaria, according to which Bavaria is a people&#39;s, legal, cultural and social state. Bavaria has been known as the Free People&#39;s State or Free State as a republic since 1918, when it was proclaimed by the revolutionary Prime Minister Kurt Eisner on November 8, 1918 and the associated end of the Kingdom of Bavaria."
 
-msgid "=>"
-msgstr "%|%=>%|%en%|%"
+msgid "Bereits im Jahre 555 n. Chr. (und damit rund 500 Jahre vor der Verwendung des Begriffs „deutsch“ im heutigen Sinn) ist das ältere bayerische Stammesherzogtum nachgewiesen, das unter den Merowingern Teil des fränkischen Herrschaftsbereichs wurde. Unter den Karolingern entstand erstmals ein baierisches Königtum, das diese entweder in Personalunion als Könige oder Unterkönige regierten oder Statthalter einsetzten. Nach dem Ende der Herrschaft der Karolinger erstarkte die baierische Eigenständigkeit im jüngeren bayerischen Stammesherzogtum. Mit Beginn der Herrschaft der Wittelsbacher 1180 folgte der Übergang zum Territorialstaat. Sie regierten Bayern über 700 Jahre bis 1918. Baiern war Kurfürstentum des Heiligen Römischen Reiches und ab 1806 Königreich. Durch die Gewährung der Verfassungen von 1808, 1818 und 1848 wurde Bayern konstitutionelle Monarchie. Bayern konnte auf dem Wiener Kongress 1814 als eine der Siegermächte einen großen Teil der Gebietsgewinne behalten; unter anderem kamen das heutige Nordbayern, Teile Schwabens und die neugeschaffene linksrheinische Pfalz zu Bayern. 1918 brach die Wittelsbachermonarchie in der Novemberrevolution zusammen. Nach der Besetzung durch die US-Armee wurde Bayern 1949 Teil der neu gegründeten Bundesrepublik. Die Pfalz wurde 1946 von Bayern abgetrennt und ist heute Teil von Rheinland-Pfalz. Es begann ein wirtschaftlicher Aufschwung und eine Entwicklung vom Agrarstaat zum modernen Industriestaat."
+msgstr "Already in 555 AD (and thus around 500 years before the term “German” was used in today&#39;s sense), the older Bavarian tribal duchy was established, which became part of the Franconian domain under the Merovingians. Under the Carolingians, a Bavarian kingship emerged for the first time, which they either ruled as kings or sub-kings, or appointed governors. After the end of the Carolingian rule, Bavarian independence in the younger Bavarian tribal duchy increased. With the beginning of the rule of the Wittelsbacher in 1180, the transition to the territorial state followed. They ruled Bavaria for over 700 years until 1918. Baiern was electorate of the Holy Roman Empire and from 1806 a kingdom. With the granting of the constitutions of 1808, 1818 and 1848, Bavaria became a constitutional monarchy. At the Vienna Congress in 1814, Bavaria was able to retain a large part of the area&#39;s profits as one of the victorious powers; among other things, today&#39;s northern Bavaria, parts of Swabia and the newly created Palatinate on the left bank of the Rhine came to Bavaria. In 1918 the Wittelsbach monarchy collapsed in the November Revolution. After the occupation by the US Army, Bavaria became part of the newly founded Federal Republic in 1949. The Palatinate was separated from Bavaria in 1946 and is now part of Rhineland-Palatinate. An economic upswing began and a development from an agricultural state to a modern industrial state."
 
-msgid "(length=3)"
-msgstr "%|%(length=3)%|%en%|%"
+msgid "Bayern liegt fast vollständig im oberdeutschen Sprachraum. Traditionell gliedert es sich in die drei Landesteile Franken (heute die Regierungsbezirke Ober-, Mittel- und Unterfranken), Schwaben (gleichnamiger Regierungsbezirk) und Altbayern (Regierungsbezirke Oberpfalz, Ober- sowie Niederbayern)."
+msgstr "Bavaria is almost entirely in the Upper German language area. Traditionally, it is divided into the three parts of the country Franconia (today the administrative districts of Upper, Middle and Lower Franconia), Swabia (administrative district of the same name) and Old Bavaria (administrative districts of Upper Palatinate, Upper and Lower Bavaria)."
 
-msgid "(length=5)"
-msgstr "%|%(length=5)%|%en%|%"
-
-msgid "/mnt/c/htdocs/wpbabel/wp-content/themes/twentytwenty/header.php:193:"
-msgstr "%|%/mnt/c/htdocs/wpbabel/wp-content/themes/twentytwenty/header.php:193:%|%en%|%"
-
-msgid "(size=3)"
-msgstr "%|%(size=3)%|%en%|%"
-
-msgid "'lng'"
-msgstr "%|%'lng'%|%en%|%"
-
-msgid "'url'"
-msgstr "%|%'url'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/dies-ist-ein-test/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/dies-ist-ein-test/'%|%en%|%"
-
-msgid "(length=52)"
-msgstr "%|%(length=52)%|%en%|%"
-
-msgid "'active'"
-msgstr "%|%'active'%|%en%|%"
-
-msgid "boolean"
-msgstr "%|%boolean%|%en%|%"
-
-msgid "false"
-msgstr "%|%false%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/en/dies-ist-ein-test-en/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/en/dies-ist-ein-test-en/'%|%en%|%"
-
-msgid "(length=58)"
-msgstr "%|%(length=58)%|%en%|%"
-
-msgid "true"
-msgstr "%|%true%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/fr/dies-ist-ein-test-fr/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/fr/dies-ist-ein-test-fr/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/af/dies-ist-ein-test-af/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/af/dies-ist-ein-test-af/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/am/dies-ist-ein-test-am/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/am/dies-ist-ein-test-am/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/ar/dies-ist-ein-test-ar/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/ar/dies-ist-ein-test-ar/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/az/dies-ist-ein-test-az/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/az/dies-ist-ein-test-az/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/be/dies-ist-ein-test-be/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/be/dies-ist-ein-test-be/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/bg/dies-ist-ein-test-bg/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/bg/dies-ist-ein-test-bg/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/bn/dies-ist-ein-test-bn/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/bn/dies-ist-ein-test-bn/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/bs/dies-ist-ein-test-bs/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/bs/dies-ist-ein-test-bs/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/ca/dies-ist-ein-test-ca/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/ca/dies-ist-ein-test-ca/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/ceb/dies-ist-ein-test-ceb/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/ceb/dies-ist-ein-test-ceb/'%|%en%|%"
-
-msgid "(length=60)"
-msgstr "%|%(length=60)%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/co/dies-ist-ein-test-co/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/co/dies-ist-ein-test-co/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/cs/dies-ist-ein-test-cs/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/cs/dies-ist-ein-test-cs/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/cy/dies-ist-ein-test-cy/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/cy/dies-ist-ein-test-cy/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/da/dies-ist-ein-test-da/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/da/dies-ist-ein-test-da/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/el/dies-ist-ein-test-el/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/el/dies-ist-ein-test-el/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/eo/dies-ist-ein-test-eo/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/eo/dies-ist-ein-test-eo/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/es/dies-ist-ein-test-es/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/es/dies-ist-ein-test-es/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/et/dies-ist-ein-test-et/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/et/dies-ist-ein-test-et/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/eu/dies-ist-ein-test-eu/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/eu/dies-ist-ein-test-eu/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/fa/dies-ist-ein-test-fa/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/fa/dies-ist-ein-test-fa/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/fi/dies-ist-ein-test-fi/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/fi/dies-ist-ein-test-fi/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/fy/dies-ist-ein-test-fy/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/fy/dies-ist-ein-test-fy/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/ga/dies-ist-ein-test-ga/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/ga/dies-ist-ein-test-ga/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/gd/dies-ist-ein-test-gd/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/gd/dies-ist-ein-test-gd/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/gl/dies-ist-ein-test-gl/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/gl/dies-ist-ein-test-gl/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/gu/dies-ist-ein-test-gu/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/gu/dies-ist-ein-test-gu/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/ha/dies-ist-ein-test-ha/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/ha/dies-ist-ein-test-ha/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/haw/dies-ist-ein-test-haw/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/haw/dies-ist-ein-test-haw/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/he/dies-ist-ein-test-he/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/he/dies-ist-ein-test-he/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/hi/dies-ist-ein-test-hi/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/hi/dies-ist-ein-test-hi/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/hmn/dies-ist-ein-test-hmn/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/hmn/dies-ist-ein-test-hmn/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/hr/dies-ist-ein-test-hr/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/hr/dies-ist-ein-test-hr/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/ht/dies-ist-ein-test-ht/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/ht/dies-ist-ein-test-ht/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/hu/dies-ist-ein-test-hu/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/hu/dies-ist-ein-test-hu/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/hy/dies-ist-ein-test-hy/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/hy/dies-ist-ein-test-hy/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/id/dies-ist-ein-test-id/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/id/dies-ist-ein-test-id/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/ig/dies-ist-ein-test-ig/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/ig/dies-ist-ein-test-ig/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/is/dies-ist-ein-test-is/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/is/dies-ist-ein-test-is/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/it/dies-ist-ein-test-it/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/it/dies-ist-ein-test-it/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/ja/dies-ist-ein-test-ja/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/ja/dies-ist-ein-test-ja/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/jw/dies-ist-ein-test-jw/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/jw/dies-ist-ein-test-jw/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/ka/dies-ist-ein-test-ka/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/ka/dies-ist-ein-test-ka/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/kk/dies-ist-ein-test-kk/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/kk/dies-ist-ein-test-kk/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/km/dies-ist-ein-test-km/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/km/dies-ist-ein-test-km/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/kn/dies-ist-ein-test-kn/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/kn/dies-ist-ein-test-kn/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/ko/dies-ist-ein-test-ko/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/ko/dies-ist-ein-test-ko/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/ku/dies-ist-ein-test-ku/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/ku/dies-ist-ein-test-ku/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/ky/dies-ist-ein-test-ky/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/ky/dies-ist-ein-test-ky/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/la/dies-ist-ein-test-la/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/la/dies-ist-ein-test-la/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/lb/dies-ist-ein-test-lb/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/lb/dies-ist-ein-test-lb/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/lo/dies-ist-ein-test-lo/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/lo/dies-ist-ein-test-lo/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/lt/dies-ist-ein-test-lt/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/lt/dies-ist-ein-test-lt/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/lv/dies-ist-ein-test-lv/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/lv/dies-ist-ein-test-lv/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/mg/dies-ist-ein-test-mg/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/mg/dies-ist-ein-test-mg/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/mi/dies-ist-ein-test-mi/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/mi/dies-ist-ein-test-mi/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/mk/dies-ist-ein-test-mk/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/mk/dies-ist-ein-test-mk/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/ml/dies-ist-ein-test-ml/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/ml/dies-ist-ein-test-ml/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/mn/dies-ist-ein-test-mn/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/mn/dies-ist-ein-test-mn/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/mr/dies-ist-ein-test-mr/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/mr/dies-ist-ein-test-mr/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/ms/dies-ist-ein-test-ms/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/ms/dies-ist-ein-test-ms/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/mt/dies-ist-ein-test-mt/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/mt/dies-ist-ein-test-mt/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/my/dies-ist-ein-test-my/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/my/dies-ist-ein-test-my/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/ne/dies-ist-ein-test-ne/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/ne/dies-ist-ein-test-ne/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/nl/dies-ist-ein-test-nl/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/nl/dies-ist-ein-test-nl/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/no/dies-ist-ein-test-no/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/no/dies-ist-ein-test-no/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/ny/dies-ist-ein-test-ny/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/ny/dies-ist-ein-test-ny/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/pa/dies-ist-ein-test-pa/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/pa/dies-ist-ein-test-pa/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/pl/dies-ist-ein-test-pl/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/pl/dies-ist-ein-test-pl/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/ps/dies-ist-ein-test-ps/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/ps/dies-ist-ein-test-ps/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/pt/dies-ist-ein-test-pt/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/pt/dies-ist-ein-test-pt/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/ro/dies-ist-ein-test-ro/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/ro/dies-ist-ein-test-ro/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/ru/dies-ist-ein-test-ru/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/ru/dies-ist-ein-test-ru/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/sd/dies-ist-ein-test-sd/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/sd/dies-ist-ein-test-sd/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/si/dies-ist-ein-test-si/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/si/dies-ist-ein-test-si/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/sk/dies-ist-ein-test-sk/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/sk/dies-ist-ein-test-sk/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/sl/dies-ist-ein-test-sl/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/sl/dies-ist-ein-test-sl/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/sm/dies-ist-ein-test-sm/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/sm/dies-ist-ein-test-sm/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/sn/dies-ist-ein-test-sn/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/sn/dies-ist-ein-test-sn/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/so/dies-ist-ein-test-so/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/so/dies-ist-ein-test-so/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/sq/dies-ist-ein-test-sq/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/sq/dies-ist-ein-test-sq/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/sr/dies-ist-ein-test-sr/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/sr/dies-ist-ein-test-sr/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/st/dies-ist-ein-test-st/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/st/dies-ist-ein-test-st/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/su/dies-ist-ein-test-su/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/su/dies-ist-ein-test-su/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/sv/dies-ist-ein-test-sv/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/sv/dies-ist-ein-test-sv/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/sw/dies-ist-ein-test-sw/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/sw/dies-ist-ein-test-sw/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/ta/dies-ist-ein-test-ta/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/ta/dies-ist-ein-test-ta/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/te/dies-ist-ein-test-te/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/te/dies-ist-ein-test-te/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/tg/dies-ist-ein-test-tg/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/tg/dies-ist-ein-test-tg/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/th/dies-ist-ein-test-th/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/th/dies-ist-ein-test-th/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/tl/dies-ist-ein-test-tl/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/tl/dies-ist-ein-test-tl/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/tr/dies-ist-ein-test-tr/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/tr/dies-ist-ein-test-tr/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/uk/dies-ist-ein-test-uk/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/uk/dies-ist-ein-test-uk/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/ur/dies-ist-ein-test-ur/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/ur/dies-ist-ein-test-ur/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/uz/dies-ist-ein-test-uz/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/uz/dies-ist-ein-test-uz/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/vi/dies-ist-ein-test-vi/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/vi/dies-ist-ein-test-vi/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/xh/dies-ist-ein-test-xh/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/xh/dies-ist-ein-test-xh/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/yi/dies-ist-ein-test-yi/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/yi/dies-ist-ein-test-yi/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/yo/dies-ist-ein-test-yo/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/yo/dies-ist-ein-test-yo/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/zh-cn/dies-ist-ein-test-zh-cn/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/zh-cn/dies-ist-ein-test-zh-cn/'%|%en%|%"
-
-msgid "(length=64)"
-msgstr "%|%(length=64)%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/zh-tw/dies-ist-ein-test-zh-tw/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/zh-tw/dies-ist-ein-test-zh-tw/'%|%en%|%"
-
-msgid "'http://wpbabel.local.vielhuber.de/zu/dies-ist-ein-test-zu/'"
-msgstr "%|%'http://wpbabel.local.vielhuber.de/zu/dies-ist-ein-test-zu/'%|%en%|%"
-
-msgid "/mnt/c/htdocs/wpbabel/wp-content/themes/twentytwenty/header.php:197:"
-msgstr "%|%/mnt/c/htdocs/wpbabel/wp-content/themes/twentytwenty/header.php:197:%|%en%|%"
-
-msgid "'BINGO'"
-msgstr "%|%'BINGO'%|%en%|%"
-
-msgid "Die Seite konnte nicht gefunden werden"
-msgstr "%|%Die Seite konnte nicht gefunden werden%|%en%|%"
-
-msgid "Die gesuchte Seite konnte nicht gefunden werden. Sie wurde möglicherweise entfernt, umbenannt oder existierte von vornherein nicht."
-msgstr "%|%Die gesuchte Seite konnte nicht gefunden werden. Sie wurde möglicherweise entfernt, umbenannt oder existierte von vornherein nicht.%|%en%|%"
+msgid "bearbeiten"
+msgstr "to edit"
 
 msgid "Neueste Beiträge"
-msgstr "%|%Neueste Beiträge%|%en%|%"
+msgstr "Latest posts"
 
 msgid "<a>Hello world!</a>"
-msgstr "%|%<a>Hello world!</a>%|%en%|%"
+msgstr "<a>Hello world!</a>"
 
 msgid "Neueste Kommentare"
-msgstr "%|%Neueste Kommentare%|%en%|%"
+msgstr "Latest comments"
 
 msgid "A WordPress Commenter"
-msgstr "%|%A WordPress Commenter%|%en%|%"
+msgstr "A WordPress Commenter"
 
 msgid "bei"
-msgstr "%|%bei%|%en%|%"
+msgstr "at"
 
 msgid "Hello world!"
-msgstr "%|%Hello world!%|%en%|%"
+msgstr "Hello world!"
 
 msgid "Archive"
-msgstr "%|%Archive%|%en%|%"
+msgstr "Archive"
 
 msgid "November 2019"
-msgstr "%|%November 2019%|%en%|%"
+msgstr "November 2019"
 
 msgid "Kategorien"
-msgstr "%|%Kategorien%|%en%|%"
+msgstr "Categories"
 
 msgid "<a>Uncategorized</a>"
-msgstr "%|%<a>Uncategorized</a>%|%en%|%"
+msgstr "<a>Uncategorized</a>"
 
 msgid "Meta"
-msgstr "%|%Meta%|%en%|%"
+msgstr "Meta"
 
-msgid "Anmelden"
-msgstr "%|%Anmelden%|%en%|%"
+msgid "Website-Administration"
+msgstr "Site administration"
+
+msgid "Abmelden"
+msgstr "Sign out"
 
 msgid "Feed der Einträge"
-msgstr "%|%Feed der Einträge%|%en%|%"
+msgstr "Feed the entries"
 
 msgid "Kommentare-Feed"
-msgstr "%|%Kommentare-Feed%|%en%|%"
+msgstr "Comments Feed"
 
 msgid "WordPress.org"
-msgstr "%|%WordPress.org%|%en%|%"
+msgstr "WordPress.org"
 
 msgid "© 2019\t\t\t\t<a>WPBABEL</a>"
-msgstr "%|%© 2019\t\t\t\t<a>WPBABEL</a>%|%en%|%"
+msgstr "© 2019 <a>WPBABEL</a>"
 
 msgid "<a> Powered by WordPress\t\t\t\t</a>"
-msgstr "%|%<a> Powered by WordPress\t\t\t\t</a>%|%en%|%"
+msgstr "<a>Powered by WordPress</a>"
 
 msgid "Nach oben"
-msgstr "%|%Nach oben%|%en%|%"
+msgstr "Up"
 
 msgid "Hoch"
-msgstr "%|%Hoch%|%en%|%"
+msgstr "High"
+
+msgid "Zur Werkzeugleiste springen"
+msgstr "Jump to the toolbar"
+
+msgid "Über WordPress"
+msgstr "About WordPress"
+
+msgid "Dokumentation"
+msgstr "documentation"
+
+msgid "Support"
+msgstr "Support"
+
+msgid "Feedback"
+msgstr "Feedback"
+
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "Themes"
+msgstr "Themes"
+
+msgid "Widgets"
+msgstr "widgets"
+
+msgid "Menüs"
+msgstr "menus"
+
+msgid "Hintergrund"
+msgstr "background"
+
+msgid "Customizer"
+msgstr "Customizer"
+
+msgid "1 Theme-Aktualisierung"
+msgstr "1 theme update"
+
+msgid "0 Kommentare in Moderation"
+msgstr "0 comments in moderation"
+
+msgid "Neu"
+msgstr "New"
+
+msgid "Beitrag"
+msgstr "contribution"
+
+msgid "Medien"
+msgstr "media"
+
+msgid "Seite"
+msgstr "page"
+
+msgid "Benutzer"
+msgstr "user"
+
+msgid "Seite bearbeiten"
+msgstr "Edit page"
+
+msgid "Suchen"
+msgstr "Search"
+
+msgid "Willkommen,"
+msgstr "Welcome,"
+
+msgid "root"
+msgstr "root"
+
+msgid "Profil bearbeiten"
+msgstr "edit profile"
+
+# slug
+msgid "wp-admin"
+msgstr "wp-admin"
+
+# slug
+msgid "post.php?post=2&action=edit"
+msgstr "post-php-post-2-amp-action-edit"
 
 # slug
 msgid "hello-world"
-msgstr "hello-world-en"
+msgstr "hello-world"
 
 # slug
 msgid "#comment-1"
-msgstr "#comment-1-en"
+msgstr "comment-1"
 
 # slug
 msgid "category"
-msgstr "category-en"
+msgstr "category"
 
 # slug
 msgid "uncategorized"
-msgstr "uncategorized-en"
+msgstr "uncategorized"
 
 # slug
-msgid "wp-login.php"
-msgstr "wp-login.php-en"
+msgid "wp-login.php?action=logout&_wpnonce=5dcf99dc0a"
+msgstr "wp-login-php-action-logout-amp-wpnonce-5dcf99dc0a"
 
 # slug
 msgid "feed"
-msgstr "feed-en"
+msgstr "feed"
 
 # slug
 msgid "comments"
-msgstr "comments-en"
+msgstr "comments"
+
+# slug
+msgid "about.php"
+msgstr "about-php"
+
+# slug
+msgid "themes.php"
+msgstr "themes-php"
+
+# slug
+msgid "widgets.php"
+msgstr "widgets-php"
+
+# slug
+msgid "nav-menus.php"
+msgstr "nav-menus-php"
+
+# slug
+msgid "themes.php?page=custom-background"
+msgstr "themes-php-page-custom-background"
+
+# slug
+msgid "customize.php?url=http%3A%2F%2Fwpbabel.local.vielhuber.de%2Fdies-ist-ein-test%2F"
+msgstr "customize-php-url-http-3a-2f-2fwpbabel-local-vielhuber-de-2fdies-is-a-test-2f"
+
+# slug
+msgid "update-core.php"
+msgstr "update-core-php"
+
+# slug
+msgid "edit-comments.php"
+msgstr "edit-comments-php"
+
+# slug
+msgid "post-new.php"
+msgstr "post-new-php"
+
+# slug
+msgid "media-new.php"
+msgstr "media-new-php"
+
+# slug
+msgid "post-new.php?post_type=page"
+msgstr "post-new-php-post-type-page"
+
+# slug
+msgid "user-new.php"
+msgstr "user-new-php"
+
+# slug
+msgid "profile.php"
+msgstr "profile-php"
+
+msgid "Beitragsautor"
+msgstr "Post Author"
+
+msgid "Von <a>root</a>"
+msgstr "From <a>root</a>"
+
+msgid "Beitragsdatum"
+msgstr "Post date"
+
+msgid "<a>November 29, 2019</a>"
+msgstr "<a>November 29, 2019</a>"
+
+msgid "1 Kommentar"
+msgstr "1 comment"
+
+msgid "zu Hello world!"
+msgstr "to Hello world!"
+
+msgid "Welcome to WordPress. This is your first post. Edit or delete it, then start writing!"
+msgstr "Welcome to WordPress. This is your first post. Edit or delete it, then start writing!"
+
+# slug
+msgid "author"
+msgstr "author"
+
+# slug
+msgid "#comments"
+msgstr "comments"
+
+# slug
+msgid "post.php?post=1&action=edit"
+msgstr "post-php-post-1-amp-action-edit"
+
+# slug
+msgid "customize.php?url=http%3A%2F%2Fwpbabel.local.vielhuber.de%2F"
+msgstr "customize-php-url-http-3a-2f-2f-2fwpbabel-local-vielhuber-de"

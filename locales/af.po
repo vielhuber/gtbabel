@@ -8,4 +8,278 @@ msgstr ""
 
 # slug
 msgid "dies-ist-ein-test"
-msgstr "dies-ist-ein-test-af"
+msgstr "hierdie-is-39-n-toets"
+
+msgid "Direkt zum Inhalt wechseln"
+msgstr "Skakel direk oor na die inhoud"
+
+msgid "Suche"
+msgstr "soek"
+
+msgid "WPBABEL"
+msgstr "WPBABEL"
+
+msgid "Eine ziemlich coole Seite"
+msgstr "Nogal &#39;n gawe webwerf"
+
+msgid "Menü"
+msgstr "spyskaart"
+
+msgid "Dies ist ein Test"
+msgstr "Dit is &#39;n toets"
+
+msgid "steffen"
+msgstr "Steffen"
+
+msgid "Suche nach:"
+msgstr "Soek vir:"
+
+msgid "Suche schließen"
+msgstr "Sluit soek"
+
+msgid "Menü schließen"
+msgstr "Sluit menu"
+
+msgid "/mnt/c/htdocs/wpbabel/wp-content/themes/twentytwenty/header.php:190:"
+msgstr "/mnt/c/htdocs/wpbabel/wp-content/themes/twentytwenty/header.php:190:"
+
+msgid "string"
+msgstr "string"
+
+msgid "(length=2)"
+msgstr "(Lengte = 2)"
+
+msgid "Der Freistaat Bayern (Zum Anhören bitte klicken! [ˈbaɪ̯ɐn]; Ländercode BY) ist mit mehr als 70.500 Quadratkilometern das flächengrößte der 16 Länder in Deutschland und liegt in dessen Südosten. Mit rund 13 Millionen Einwohnern ist er nach Nordrhein-Westfalen das zweitbevölkerungsreichste deutsche Land."
+msgstr "Die Vrystaat Beiere (klik asseblief om te luister! [ˈBaɪ̯ɐn]; landkode BY) is die grootste van die 16 lande in Duitsland met meer as 70 500 vierkante kilometer en is in die suidooste geleë. Met ongeveer 13 miljoen inwoners is dit die naasbevolkte Duitse land na Noordryn-Wesfale."
+
+msgid "Der Freistaat hat im Süden Anteil am Hochgebirge der Ostalpen und dem bis zur Donau reichenden flachen Alpenvorland. Nördlich der Donau bestimmen Mittelgebirge wie etwa der Bayerische Wald oder das Fichtelgebirge das Landschaftsbild. Größte Stadt Bayerns ist die Landeshauptstadt und Millionenmetropole München, gefolgt von Nürnberg und Augsburg. Weitere Großstädte sind Regensburg, Ingolstadt, Würzburg, Fürth und Erlangen."
+msgstr "In die suide het die Vrystaat &#39;n aandeel aan die hoë berge van die Oostelike Alpe en die plat Alpynse voetheuwels wat tot by die Donau bereik. Ten noorde van die Donau bepaal lae bergreekse soos die Beierse woud of die Fichtelberge die landskap. Die grootste stad van Beiere is die hoofstad en metropool van München, gevolg deur Neurenberg en Augsburg. Ander groot stede is Regensburg, Ingolstadt, Würzburg, Fürth en Erlangen."
+
+msgid "Bayern ist eine parlamentarische Republik mit dem Bayerischen Landtag als Legislative und der Bayerischen Staatsregierung, an deren Spitze der Ministerpräsident als Regierungschef steht, als Exekutive. Grundlage der Politik ist die Verfassung des Freistaates Bayern, gemäß der Bayern ein Volks-, Rechts-, Kultur- und Sozialstaat ist. Die Bezeichnung Freier Volksstaat bzw. Freistaat als Republik trägt Bayern seit 1918, mit der Ausrufung durch den revolutionären Ministerpräsidenten Kurt Eisner am 8. November 1918 und dem damit verbundenen Ende des Königreichs Bayern."
+msgstr "Beiere is &#39;n parlementêre republiek met die Beierse Staatsparlement as wetgewer en die Beierse Staatsregering, onder leiding van die Eerste Minister as regeringshoof, as die uitvoerende gesag. Die basis van die beleid is die samestelling van die Vrystaat Beiere, waarvolgens Beiere &#39;n volks-, wettige, kulturele en sosiale staat is. Beiere staan al sedert 1918 bekend as die Vrystaat of Vrystaat as &#39;n republiek, toe dit op 8 November 1918 deur die revolusionêre premier Kurt Eisner en die gepaardgaande einde van die Koninkryk Beiere verklaar is."
+
+msgid "Bereits im Jahre 555 n. Chr. (und damit rund 500 Jahre vor der Verwendung des Begriffs „deutsch“ im heutigen Sinn) ist das ältere bayerische Stammesherzogtum nachgewiesen, das unter den Merowingern Teil des fränkischen Herrschaftsbereichs wurde. Unter den Karolingern entstand erstmals ein baierisches Königtum, das diese entweder in Personalunion als Könige oder Unterkönige regierten oder Statthalter einsetzten. Nach dem Ende der Herrschaft der Karolinger erstarkte die baierische Eigenständigkeit im jüngeren bayerischen Stammesherzogtum. Mit Beginn der Herrschaft der Wittelsbacher 1180 folgte der Übergang zum Territorialstaat. Sie regierten Bayern über 700 Jahre bis 1918. Baiern war Kurfürstentum des Heiligen Römischen Reiches und ab 1806 Königreich. Durch die Gewährung der Verfassungen von 1808, 1818 und 1848 wurde Bayern konstitutionelle Monarchie. Bayern konnte auf dem Wiener Kongress 1814 als eine der Siegermächte einen großen Teil der Gebietsgewinne behalten; unter anderem kamen das heutige Nordbayern, Teile Schwabens und die neugeschaffene linksrheinische Pfalz zu Bayern. 1918 brach die Wittelsbachermonarchie in der Novemberrevolution zusammen. Nach der Besetzung durch die US-Armee wurde Bayern 1949 Teil der neu gegründeten Bundesrepublik. Die Pfalz wurde 1946 von Bayern abgetrennt und ist heute Teil von Rheinland-Pfalz. Es begann ein wirtschaftlicher Aufschwung und eine Entwicklung vom Agrarstaat zum modernen Industriestaat."
+msgstr "Reeds in 555 nC (en dus ongeveer 500 jaar voordat die term &quot;Duits&quot; in die hedendaagse sin gebruik is), is die ouer Beierse stam hertogdom gedokumenteer, wat onder die Merovingiërs deel geword het van die Frankiese domein. Onder die Karolingiërs het &#39;n Beierse koningskap vir die eerste keer ontstaan, wat hulle óf as konings of onder-konings regeer het, óf as goewerneurs aangestel is. Na die beëindiging van die Karolingiese bewind het die Beierse onafhanklikheid in die jonger Beierse stam hertogdom toegeneem. Met die begin van die bewind van die Wittelsbacher in 1180 het die oorgang na die territoriale staat gevolg. Hulle het Beiere regeer vir meer as 700 jaar tot 1918. Baiern was kiesers van die Heilige Romeinse Ryk en vanaf 1806 &#39;n koninkryk. Met die toestaan van die grondwette van 1808, 1818 en 1848, het Beiere &#39;n grondwetlike monargie geword. Beiere was een van die oorwinnende magte op die kongres in Wene in 1814 om &#39;n groot deel van die wins te behou; onder andere het die hedendaagse Noord-Beiere, dele van Swabië en die nuutgeskepte Palts op die linkeroewer van die Ryn na Beiere gekom. In 1918 het die Wittelsbach-monargie in duie gestort in die November-rewolusie. Na die besetting deur die Amerikaanse leër het Beiere in 1949 deel geword van die nuutgestigte Federale Republiek. Die Palts is in 1946 van Beiere geskei en is nou deel van Rynland-Palts. &#39;N Ekonomiese opswaai het begin en &#39;n ontwikkeling vanaf &#39;n landboustaat na &#39;n moderne nywerheidsstaat."
+
+msgid "Bayern liegt fast vollständig im oberdeutschen Sprachraum. Traditionell gliedert es sich in die drei Landesteile Franken (heute die Regierungsbezirke Ober-, Mittel- und Unterfranken), Schwaben (gleichnamiger Regierungsbezirk) und Altbayern (Regierungsbezirke Oberpfalz, Ober- sowie Niederbayern)."
+msgstr "Beiere is byna geheel en al in die Hoog-Duitse taalgebied. Tradisioneel word dit verdeel in die drie dele van die land Franconia (vandag die administratiewe distrikte Bo, Midde en Neder-Franken), Swabië (administratiewe distrik met dieselfde naam) en Ou Beiere (administratiewe distrikte Bo-Palts, Bo en Neder-Beiere)."
+
+msgid "bearbeiten"
+msgstr "wysig"
+
+msgid "Neueste Beiträge"
+msgstr "Laaste plasings"
+
+msgid "<a>Hello world!</a>"
+msgstr "<a>Hallo wêreld!</a>"
+
+msgid "Neueste Kommentare"
+msgstr "Laaste kommentaar"
+
+msgid "A WordPress Commenter"
+msgstr "&#39;N WordPress-kommentator"
+
+msgid "bei"
+msgstr "by"
+
+msgid "Hello world!"
+msgstr "Hallo wêreld!"
+
+msgid "Archive"
+msgstr "Argief"
+
+msgid "November 2019"
+msgstr "November 2019"
+
+msgid "Kategorien"
+msgstr "kategorieë"
+
+msgid "<a>Uncategorized</a>"
+msgstr "<a>Uncategorized</a>"
+
+msgid "Meta"
+msgstr "meta"
+
+msgid "Website-Administration"
+msgstr "webwerf-administrasie"
+
+msgid "Abmelden"
+msgstr "teken af"
+
+msgid "Feed der Einträge"
+msgstr "Voer die inskrywings in"
+
+msgid "Kommentare-Feed"
+msgstr "kommentaar Feed"
+
+msgid "WordPress.org"
+msgstr "WordPress.org"
+
+msgid "© 2019\t\t\t\t<a>WPBABEL</a>"
+msgstr "© 2019 <a>WPBABEL</a>"
+
+msgid "<a> Powered by WordPress\t\t\t\t</a>"
+msgstr "<a>Aangedryf deur WordPress</a>"
+
+msgid "Nach oben"
+msgstr "Na bo"
+
+msgid "Hoch"
+msgstr "hoë"
+
+msgid "Zur Werkzeugleiste springen"
+msgstr "Spring na die werkbalk"
+
+msgid "Über WordPress"
+msgstr "Oor WordPress"
+
+msgid "Dokumentation"
+msgstr "dokumentasie"
+
+msgid "Support"
+msgstr "ondersteuning"
+
+msgid "Feedback"
+msgstr "terugvoer"
+
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "Themes"
+msgstr "temas"
+
+msgid "Widgets"
+msgstr "widgets"
+
+msgid "Menüs"
+msgstr "spyskaarte"
+
+msgid "Hintergrund"
+msgstr "agtergrond"
+
+msgid "Customizer"
+msgstr "Customizer"
+
+msgid "1 Theme-Aktualisierung"
+msgstr "1 tema-opdatering"
+
+msgid "0 Kommentare in Moderation"
+msgstr "0 kommentaar in moderering"
+
+msgid "Neu"
+msgstr "nuwe"
+
+msgid "Beitrag"
+msgstr "bydrae"
+
+msgid "Medien"
+msgstr "media"
+
+msgid "Seite"
+msgstr "bladsy"
+
+msgid "Benutzer"
+msgstr "gebruiker"
+
+msgid "Seite bearbeiten"
+msgstr "Wysig bladsy"
+
+msgid "Suchen"
+msgstr "soek"
+
+msgid "Willkommen,"
+msgstr "Welkom,"
+
+msgid "root"
+msgstr "wortel"
+
+msgid "Profil bearbeiten"
+msgstr "Wysig profiel"
+
+# slug
+msgid "wp-admin"
+msgstr "wp-admin"
+
+# slug
+msgid "post.php?post=2&action=edit"
+msgstr "post-php-post-2-amp-action-edit"
+
+# slug
+msgid "hello-world"
+msgstr "hallo-wreld"
+
+# slug
+msgid "#comment-1"
+msgstr "comment-1"
+
+# slug
+msgid "category"
+msgstr "kategorie"
+
+# slug
+msgid "uncategorized"
+msgstr "uncategorized"
+
+# slug
+msgid "wp-login.php?action=logout&_wpnonce=5dcf99dc0a"
+msgstr "wp-login-php-action-logout-amp-wpnonce-5dcf99dc0a"
+
+# slug
+msgid "feed"
+msgstr "feed"
+
+# slug
+msgid "comments"
+msgstr "kommentaar"
+
+# slug
+msgid "about.php"
+msgstr "about-php"
+
+# slug
+msgid "themes.php"
+msgstr "themes-php"
+
+# slug
+msgid "widgets.php"
+msgstr "widgets-php"
+
+# slug
+msgid "nav-menus.php"
+msgstr "nav-menus-php"
+
+# slug
+msgid "themes.php?page=custom-background"
+msgstr "themes-php-page-maat-agtergrond"
+
+# slug
+msgid "customize.php?url=http%3A%2F%2Fwpbabel.local.vielhuber.de%2Fdies-ist-ein-test%2F"
+msgstr "customize-php-url-http-3a-2f-2fwpbabel-local-vielhuber-de-2fdies-is-39-n-toets-2f"
+
+# slug
+msgid "update-core.php"
+msgstr "update-core-php"
+
+# slug
+msgid "edit-comments.php"
+msgstr "wysig-comments-php"
+
+# slug
+msgid "post-new.php"
+msgstr "post-new-php"
+
+# slug
+msgid "media-new.php"
+msgstr "media-new-php"
+
+# slug
+msgid "post-new.php?post_type=page"
+msgstr "post-new-php-post-type-bladsy"
+
+# slug
+msgid "user-new.php"
+msgstr "gebruikersvriendelik-new-php"
+
+# slug
+msgid "profile.php"
+msgstr "profile-php"

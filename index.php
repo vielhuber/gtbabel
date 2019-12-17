@@ -8,14 +8,16 @@ $gtbabel = new gtbabel();
 
 $gtbabel->start([
     'google_api_key' => getenv('GOOGLE_API_KEY'),
+    'auto_translation' => false,
     'lng_folder' => '/locales',
     'lng_source' => 'de',
     'lng_target' => 'en',
     'prefix_source_lng' => false,
-    'exclude' => null,
+    'exclude_urls' => null,
+    'exclude_dom' => ['.test'],
     'languages' => ['de', 'en', 'fr']
 ]);
 
-require_once 'demo/complex/7.php';
+require_once 'demo/simple/9.html';
 
 $gtbabel->stop();

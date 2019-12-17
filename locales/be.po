@@ -8,4 +8,289 @@ msgstr ""
 
 # slug
 msgid "dies-ist-ein-test"
-msgstr "dies-ist-ein-test-be"
+msgstr ""
+
+msgid "Direkt zum Inhalt wechseln"
+msgstr "Пераключыцеся непасрэдна на змест"
+
+msgid "Suche"
+msgstr "пошук"
+
+msgid "WPBABEL"
+msgstr "WPBABEL"
+
+msgid "Eine ziemlich coole Seite"
+msgstr "Даволі класны сайт"
+
+msgid "Menü"
+msgstr "меню"
+
+msgid "Dies ist ein Test"
+msgstr "Гэта тэст"
+
+msgid "steffen"
+msgstr "Штэфэн"
+
+msgid "Suche nach:"
+msgstr "Шукаць:"
+
+msgid "Suche schließen"
+msgstr "Пільны пошук"
+
+msgid "Menü schließen"
+msgstr "Зачыніць меню"
+
+msgid "/mnt/c/htdocs/wpbabel/wp-content/themes/twentytwenty/header.php:190:"
+msgstr "/mnt/c/htdocs/wpbabel/wp-content/themes/twentytwenty/header.php:190:"
+
+msgid "string"
+msgstr "радок"
+
+msgid "(length=2)"
+msgstr "(Даўжыня = 2)"
+
+msgid "Kategorien"
+msgstr "катэгорыі"
+
+msgid "<a>Uncategorized</a>"
+msgstr "<a>без</a>"
+
+msgid "Hello world!"
+msgstr "Прывітанне, свет!"
+
+msgid "Beitragsautor"
+msgstr "паведамленне Аўтар"
+
+msgid "Von <a>root</a>"
+msgstr "Ад <a>кораня</a>"
+
+msgid "Beitragsdatum"
+msgstr "дата публікацыі"
+
+msgid "<a>November 29, 2019</a>"
+msgstr "<a>29 лістапада 2019 года</a>"
+
+msgid "1 Kommentar"
+msgstr "1 каментар"
+
+msgid "zu Hello world!"
+msgstr "Прывітанне, свет!"
+
+msgid "Welcome to WordPress. This is your first post. Edit or delete it, then start writing!"
+msgstr "Сардэчна запрашаем у WordPress. Гэта ваша першая публікацыя: рэдагуйце альбо выдаліце яе, а потым пачніце пісаць!"
+
+msgid "bearbeiten"
+msgstr "рэдагаваць"
+
+msgid "Neueste Beiträge"
+msgstr "Апошнія паведамленні"
+
+msgid "<a>Hello world!</a>"
+msgstr "<a>Прывітанне, свет!</a>"
+
+msgid "Neueste Kommentare"
+msgstr "Апошнія каментарыі"
+
+msgid "A WordPress Commenter"
+msgstr "WordPress Commenter"
+
+msgid "bei"
+msgstr "у"
+
+msgid "Archive"
+msgstr "архіў"
+
+msgid "November 2019"
+msgstr "Лістапад 2019 года"
+
+msgid "Meta"
+msgstr "Meta"
+
+msgid "Website-Administration"
+msgstr "адміністрацыя сайта"
+
+msgid "Abmelden"
+msgstr "выхад з сістэмы"
+
+msgid "Feed der Einträge"
+msgstr "Падайце запісы"
+
+msgid "Kommentare-Feed"
+msgstr "каментары Стужка"
+
+msgid "WordPress.org"
+msgstr "WordPress.org"
+
+msgid "© 2019\t\t\t\t<a>WPBABEL</a>"
+msgstr "© 2019 <a>WPBABEL</a>"
+
+msgid "<a> Powered by WordPress\t\t\t\t</a>"
+msgstr "<a>Працуе на WordPress</a>"
+
+msgid "Nach oben"
+msgstr "Да вяршыні"
+
+msgid "Hoch"
+msgstr "высокая"
+
+msgid "Zur Werkzeugleiste springen"
+msgstr "Перайсці на панэль інструментаў"
+
+msgid "Über WordPress"
+msgstr "Аб WordPress"
+
+msgid "Dokumentation"
+msgstr "дакументацыя"
+
+msgid "Support"
+msgstr "падтрымка"
+
+msgid "Feedback"
+msgstr "зваротная сувязь"
+
+msgid "Dashboard"
+msgstr "прыборная панэль"
+
+msgid "Themes"
+msgstr "тэмы"
+
+msgid "Widgets"
+msgstr "фішкі"
+
+msgid "Menüs"
+msgstr "меню"
+
+msgid "Hintergrund"
+msgstr "фон"
+
+msgid "Customizer"
+msgstr "наладчык"
+
+msgid "1 Theme-Aktualisierung"
+msgstr "1 абнаўленне тэмы"
+
+msgid "0 Kommentare in Moderation"
+msgstr "0 каментары ў меру"
+
+msgid "Neu"
+msgstr "новы"
+
+msgid "Beitrag"
+msgstr "ўклад"
+
+msgid "Medien"
+msgstr "сродкі масавай інфармацыі"
+
+msgid "Seite"
+msgstr "старонка"
+
+msgid "Benutzer"
+msgstr "карыстальнік"
+
+msgid "Suchen"
+msgstr "пошук"
+
+msgid "Willkommen,"
+msgstr "Сардэчна запрашаем,"
+
+msgid "root"
+msgstr "корань"
+
+msgid "Profil bearbeiten"
+msgstr "Рэдагаваць профіль"
+
+# slug
+msgid "category"
+msgstr ""
+
+# slug
+msgid "uncategorized"
+msgstr ""
+
+# slug
+msgid "hello-world"
+msgstr ""
+
+# slug
+msgid "author"
+msgstr ""
+
+# slug
+msgid "#comments"
+msgstr ""
+
+# slug
+msgid "wp-admin"
+msgstr "wp"
+
+# slug
+msgid "post.php?post=1&action=edit"
+msgstr "post-php-1-amp"
+
+# slug
+msgid "#comment-1"
+msgstr "1"
+
+# slug
+msgid "wp-login.php?action=logout&_wpnonce=5dcf99dc0a"
+msgstr "login-php-wpnonce-5dcf99dc0a"
+
+# slug
+msgid "feed"
+msgstr ""
+
+# slug
+msgid "comments"
+msgstr ""
+
+# slug
+msgid "about.php"
+msgstr "about-php"
+
+# slug
+msgid "themes.php"
+msgstr "themes-php"
+
+# slug
+msgid "widgets.php"
+msgstr "widgets-php"
+
+# slug
+msgid "nav-menus.php"
+msgstr "menus-php"
+
+# slug
+msgid "themes.php?page=custom-background"
+msgstr "themes-php"
+
+# slug
+msgid "customize.php?url=http%3A%2F%2Fwpbabel.local.vielhuber.de%2F"
+msgstr "customize-php-url-http-3a-2f-2f-2fwpbabel-local-vielhuber-de"
+
+# slug
+msgid "update-core.php"
+msgstr "core-php"
+
+# slug
+msgid "edit-comments.php"
+msgstr "comments-php"
+
+# slug
+msgid "post-new.php"
+msgstr "new-php"
+
+# slug
+msgid "media-new.php"
+msgstr "new-php"
+
+# slug
+msgid "post-new.php?post_type=page"
+msgstr "new-php-post-type"
+
+# slug
+msgid "user-new.php"
+msgstr "new-php"
+
+# slug
+msgid "profile.php"
+msgstr "profile-php"

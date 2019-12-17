@@ -11,10 +11,10 @@ class gtbabel
     private $args = null;
 
     private $original_path = null;
+    private $original_path_with_args = null;
+    private $original_path_args = null;
     private $original_url = null;
     private $original_host = null;
-
-    private $auto_translation = false;
 
     private $html = null;
     private $translations = null;
@@ -24,6 +24,7 @@ class gtbabel
     private $DOMXpath = null;
 
     private $group_cache = null;
+    private $excluded_nodes = null;
 
     public function start($args = [])
     {
@@ -47,6 +48,9 @@ class gtbabel
 
     public function stop()
     {
+        if ($this->currentUrlIsExcluded()) {
+            return;
+        }
         if (!$this->sourceLngIsCurrentLng() && !$this->currentUrlIsExcluded()) {
             $html = ob_get_contents();
             $html = $this->translate($html);
@@ -112,7 +116,14 @@ class gtbabel
     private function initArgs($args)
     {
         $this->args = (object) $args;
+        $this->group_cache = [];
         $this->original_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH); // store without get parameters
+        $this->original_path_with_args = $_SERVER['REQUEST_URI'];
+        $this->original_path_args = str_replace(
+            $this->original_path,
+            '',
+            $this->original_path_with_args
+        );
         $this->original_url =
             'http' .
             (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 's' : '') .
@@ -124,7 +135,6 @@ class gtbabel
             (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 's' : '') .
             '://' .
             $_SERVER['HTTP_HOST'];
-        $this->cache = [];
     }
 
     private function sourceLngIsCurrentLng()
@@ -136,8 +146,8 @@ class gtbabel
     }
     private function currentUrlIsExcluded()
     {
-        if ($this->args->exclude !== null && is_array($this->args->exclude)) {
-            foreach ($this->args->exclude as $exclude__value) {
+        if ($this->args->exclude_urls !== null && is_array($this->args->exclude_urls)) {
+            foreach ($this->args->exclude_urls as $exclude__value) {
                 if (strpos(trim($this->getCurrentPath(), '/'), trim($exclude__value, '/')) === 0) {
                     return true;
                 }
@@ -238,9 +248,34 @@ msgstr ""
         }
     }
 
+    private function id($node)
+    {
+        return $node->getNodePath();
+    }
+
+    private function preloadExcludedNodes()
+    {
+        if ($this->args->exclude_dom !== null) {
+            foreach ($this->args->exclude_dom as $exclude__value) {
+                $nodes = $this->DOMXpath->query(
+                    '/html/body//*[contains(concat(" ", normalize-space(@class), " "), " ' .
+                        str_replace('.', '', $exclude__value) .
+                        ' ")]'
+                );
+                foreach ($nodes as $nodes__value) {
+                    $this->excluded_nodes[$this->id($nodes__value)] = true;
+                    foreach ($this->getChildrenOfNode($nodes__value) as $nodes__value__value) {
+                        $this->excluded_nodes[$this->id($nodes__value__value)] = true;
+                    }
+                }
+            }
+        }
+    }
+
     private function modifyHtml()
     {
         $this->setupDomDocument();
+        $this->preloadExcludedNodes();
         $this->modifyTextNodes();
         $this->modifyLinks();
         $this->html = $this->DOMDocument->saveHTML();
@@ -261,38 +296,33 @@ msgstr ""
     {
         $groups = [];
 
-        // index all nodes (for later sorting out duplicates)
-        $nodes = $this->DOMXpath->query('/html/body//node()');
-        $nodes_id = 1;
-        foreach ($nodes as $nodes__value) {
-            $nodes__value->id = $nodes_id;
-            $nodes_id++;
-        }
-
         $to_delete = [];
         $textnodes = $this->DOMXpath->query('/html/body//text()');
         foreach ($textnodes as $textnodes__value) {
+            if (array_key_exists($this->id($textnodes__value), $this->excluded_nodes)) {
+                continue;
+            }
             if ($this->stringShouldNotBeTranslated($textnodes__value->nodeValue)) {
                 continue;
             }
             if (@$textnodes__value->parentNode->tagName === 'script') {
                 continue;
             }
-            if (array_key_exists($textnodes__value->id, $to_delete)) {
+            if (array_key_exists($this->id($textnodes__value), $to_delete)) {
                 continue;
             }
             $group = $this->getNearestLogicalGroup($textnodes__value);
-            if (array_key_exists($group->id, $to_delete)) {
+            if (array_key_exists($this->id($group), $to_delete)) {
                 continue;
             }
             $groups[] = $group;
             $children = $this->getChildrenOfNode($group);
             foreach ($children as $children__value) {
-                $to_delete[$children__value->id] = true;
+                $to_delete[$this->id($children__value)] = true;
             }
         }
         foreach ($groups as $groups__key => $groups__value) {
-            if (array_key_exists($groups__value->id, $to_delete)) {
+            if (array_key_exists($this->id($groups__value), $to_delete)) {
                 unset($groups[$groups__key]);
             }
         }
@@ -348,10 +378,13 @@ msgstr ""
 
     private function autoTranslateString($orig, $to_lng, $comment = null, $from_lng = null)
     {
-        if ($this->auto_translation === false) {
+        if ($this->args->auto_translation === false) {
             $trans = $this->translateStringMock($orig, $to_lng, $comment, $from_lng);
         } else {
             $trans = $this->translateStringWithGoogle($orig, $to_lng, $comment, $from_lng);
+        }
+        if ($comment === 'slug') {
+            $trans = $this->slugify($trans);
         }
         return $trans;
     }
@@ -499,8 +532,8 @@ msgstr ""
     private function getNearestLogicalGroup($node)
     {
         $parent = $this->getParentNodeWithMoreThanOneChildren($node);
-        if (!array_key_exists($parent->id, $this->group_cache)) {
-            $this->group_cache[$parent->id] = false;
+        if (!array_key_exists($this->id($parent), $this->group_cache)) {
+            $this->group_cache[$this->id($parent)] = false;
             foreach ($this->getChildrenOfNode($parent) as $nodes__value) {
                 if (
                     !(
@@ -509,12 +542,12 @@ msgstr ""
                             $this->getChildrenCountRecursivelyOfNodeTagsOnly($nodes__value) <= 2)
                     )
                 ) {
-                    $this->group_cache[$parent->id] = true;
+                    $this->group_cache[$this->id($parent)] = true;
                     break;
                 }
             }
         }
-        if ($this->group_cache[$parent->id] === true) {
+        if ($this->group_cache[$this->id($parent)] === true) {
             return $node;
         }
         return $parent;
@@ -611,6 +644,9 @@ msgstr ""
     {
         $links = $this->DOMXpath->query('/html/body//a');
         foreach ($links as $links__value) {
+            if (array_key_exists($this->id($links__value), $this->excluded_nodes)) {
+                continue;
+            }
             $link = $links__value->getAttribute('href');
             if ($link === null || trim($link) === '') {
                 continue;
@@ -685,10 +721,12 @@ msgstr ""
 
     private function getCurrentUrlTranslationsInLanguage($lng)
     {
-        return trim($this->getCurrentHost(), '/') .
-            '/' .
-            trim($this->getCurrentPathTranslationsInLanguage($lng), '/') .
-            '/';
+        return trim(
+            trim($this->getCurrentHost(), '/') .
+                '/' .
+                trim($this->getCurrentPathTranslationsInLanguage($lng), '/'),
+            '/'
+        ) . '/';
     }
 
     private function getTranslationInForeignLng($str, $to_lng, $from_lng = null)
@@ -765,33 +803,14 @@ msgstr ""
         }
         $url = implode('/', $url_parts);
         return $url;
-
-        // if root
-        // if prefixed root
-        // if subpath
-
-        return 'TODO3';
     }
 
     private function initMagicRouter()
     {
-        /*
-        $url_parts = $this->getCurrentPath();
-        $url_parts = explode('/', $url_parts);
-        foreach ($url_parts as $url_parts__key => $url_parts__value) {
-            if ($this->stringShouldNotBeTranslated($url_parts__value)) {
-                continue;
-            }
-            $url_parts[$url_parts__key] = $this->getTranslationAndAddDynamicallyIfNeeded(
-                $url_parts__value,
-                $this->getCurrentLng(),
-                'slug'
-            );
-        }
-        if ($this->getCurrentPath() === '/en/sample-page/') {
-            $this->getCurrentPath() = '/sample-page/';
-        }
-        */
+        $path = $this->getCurrentPathTranslationsInLanguage($this->getSourceLng());
+        $path = trim($path, '/');
+        $path = '/' . $path . ($path != '' ? '/' : '') . $this->original_path_args;
+        $_SERVER['REQUEST_URI'] = $path;
     }
 
     private function addCurrentUrlToTranslations()
@@ -813,6 +832,28 @@ msgstr ""
                 );
             }
         }
+    }
+
+    private function slugify($string)
+    {
+        /* TODO: MAKE THIS WORK IN ANY LANGUAGE */
+
+        // replace non letter or digits by -
+        $string = preg_replace('~[^\pL\d]+~u', '-', $string);
+        // transliterate
+        $string = iconv('utf-8', 'us-ascii//TRANSLIT', $string);
+        // remove unwanted characters
+        $string = preg_replace('~[^-\w]+~', '', $string);
+        // trim
+        $string = trim($string, '-');
+        // remove duplicate -
+        $string = preg_replace('~-+~', '-', $string);
+        // lowercase
+        $string = strtolower($string);
+        if (empty($string)) {
+            return '';
+        }
+        return $string;
     }
 
     private function lb($message = '')
