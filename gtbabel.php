@@ -26,7 +26,17 @@ add_action('after_setup_theme', function () use ($gtbabel) {
         'prefix_source_lng' => false,
         'exclude_urls' => ['/wp-admin', 'wp-login.php', 'wp-cron.php'],
         'exclude_dom' => ['.lngpicker'],
-        'include' => ['.search-field' => 'value'],
+        'include' => [
+            [
+                'selector' => '.search-field',
+                'attribute' => 'value'
+            ],
+            [
+                'selector' => '.js-link',
+                'attribute' => 'alt-href',
+                'type' => 'link'
+            ]
+        ],
         'languages' => [
             'de',
             'en',

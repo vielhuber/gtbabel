@@ -247,15 +247,34 @@ msgstr ""
         return $node->getNodePath();
     }
 
+    private function transformSelectorToXpath($selector)
+    {
+        $xpath = '/html/body//';
+
+        $parts = explode(' ', $selector);
+        foreach ($parts as $parts__key => $parts__value) {
+            // input[placeholder] => input[@placeholder]
+            if (strpos($parts__value, '[') !== false) {
+                $parts__value = str_replace('[', '[@', $parts__value);
+            }
+            // .foo => *[contains(concat(" ", normalize-space(@class), " "), " foo ")]
+            if (strpos($parts__value, '.') === 0) {
+                $parts__value =
+                    '*[contains(concat(" ", normalize-space(@class), " "), " ' .
+                    str_replace('.', '', $parts__value) .
+                    ' ")]';
+            }
+            $parts[$parts__key] = $parts__value;
+        }
+        $xpath .= implode('/', $parts);
+        return $xpath;
+    }
+
     private function preloadExcludedNodes()
     {
         if ($this->args->exclude_dom !== null) {
             foreach ($this->args->exclude_dom as $exclude__value) {
-                $nodes = $this->DOMXpath->query(
-                    '/html/body//*[contains(concat(" ", normalize-space(@class), " "), " ' .
-                        str_replace('.', '', $exclude__value) .
-                        ' ")]'
-                );
+                $nodes = $this->DOMXpath->query($this->transformSelectorToXpath($exclude__value));
                 foreach ($nodes as $nodes__value) {
                     $this->excluded_nodes[$this->id($nodes__value)] = true;
                     foreach ($this->getChildrenOfNode($nodes__value) as $nodes__value__value) {
@@ -675,13 +694,35 @@ msgstr ""
     private function modifyGeneral()
     {
         $include = [
-            'a' => 'href',
-            'img' => 'alt',
-            'input' => 'placeholder'
+            [
+                'selector' => 'a',
+                'attribute' => 'href',
+                'type' => 'link'
+            ],
+            [
+                'selector' => 'img',
+                'attribute' => 'alt'
+            ],
+            [
+                'selector' => 'input',
+                'attribute' => 'placeholder'
+            ]
         ];
         $include = array_merge($include, $this->args->include);
 
-        /* TODO */
+        foreach ($include as $include__value) {
+            $nodes = $this->DOMXpath->query(
+                $this->transformSelectorToXpath($include__value['selector'])
+            );
+            if (!empty($nodes)) {
+                foreach ($nodes as $nodes__value) {
+                    $attr = $nodes__value->getAttribute($include__value['attribute']);
+                    if ($attr != '') {
+                        $nodes__value->setAttribute($include__value['attribute'], 'bar');
+                    }
+                }
+            }
+        }
     }
 
     private function modifyLinks()

@@ -14,11 +14,21 @@ $gtbabel->start([
     'lng_target' => 'en',
     'prefix_source_lng' => false,
     'exclude_urls' => null,
-    'exclude_dom' => ['.test'],
-    'include' => ['.search-field' => 'value'],
+    'exclude_dom' => ['.lngpicker'],
+    'include' => [
+        [
+            'selector' => '.search-field',
+            'attribute' => 'value'
+        ],
+        [
+            'selector' => '.js-link',
+            'attribute' => 'alt-href',
+            'type' => 'link'
+        ]
+    ],
     'languages' => ['de', 'en', 'fr']
 ]);
 
-require_once 'demo/simple/10.html';
+require_once 'demo/simple/11.html';
 
 $gtbabel->stop();

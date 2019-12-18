@@ -56,7 +56,17 @@ $gtbabel->start([
     'prefix_source_lng' => false,
     'exclude_urls' => ['/backend'],
     'exclude_dom' => ['.lngpicker'],
-    'include' => ['.search-field' => 'value'],
+    'include' => [
+        [
+            'selector' => '.search-field',
+            'attribute' => 'value'
+        ],
+        [
+            'selector' => '.js-link',
+            'attribute' => 'alt-href',
+            'type' => 'link'
+        ]
+    ],
     'languages' => ['de', 'en', 'fr']
 ]);
 
