@@ -292,7 +292,6 @@ msgstr ""
         if (!$this->sourceLngIsCurrentLng() && !$this->currentUrlIsExcluded()) {
             $this->preloadExcludedNodes();
             $this->modifyTextNodes();
-            $this->modifyLinks();
             $this->modifyGeneral();
         }
         $this->html = $this->DOMDocument->saveHTML();
@@ -378,7 +377,7 @@ msgstr ""
                 $originalText
             );
 
-            $translatedTextWithPlaceholders = $this->getTranslationAndAddDynamicallyIfNeeded(
+            $translatedTextWithPlaceholders = $this->prepareTranslationAndAddDynamicallyIfNeeded(
                 $originalTextWithPlaceholders,
                 $this->getCurrentLng()
             );
@@ -396,29 +395,68 @@ msgstr ""
         }
     }
 
-    private function getTranslationAndAddDynamicallyIfNeeded($orig, $lng, $comment = null)
+    private function prepareTranslationAndAddDynamicallyIfNeeded($orig, $lng, $context = null)
+    {
+        if ($context === 'slug') {
+            $link = $orig;
+            if ($link === null || trim($link) === '') {
+                return $link;
+            }
+            if (strpos($link, '#') === 0) {
+                return $link;
+            }
+            $is_absolute_link = strpos($link, $this->getCurrentHost()) === 0;
+            if (strpos($link, 'http') !== false && $is_absolute_link === false) {
+                return $link;
+            }
+            if (strpos($link, 'http') === false && strpos($link, ':') !== false) {
+                return $link;
+            }
+            $link = str_replace($this->getCurrentHost(), '', $link);
+            $url_parts = explode('/', $link);
+            foreach ($url_parts as $url_parts__key => $url_parts__value) {
+                if ($this->stringShouldNotBeTranslated($url_parts__value)) {
+                    continue;
+                }
+                $url_parts[$url_parts__key] = $this->getTranslationAndAddDynamicallyIfNeeded(
+                    $url_parts__value,
+                    $lng,
+                    'slug'
+                );
+            }
+            $link = implode('/', $url_parts);
+            $link = '/' . $lng . '' . $link;
+            if ($is_absolute_link === true) {
+                $link = $this->getCurrentHost() . $link;
+            }
+            return $link;
+        }
+        return $this->getTranslationAndAddDynamicallyIfNeeded($orig, $lng, $context);
+    }
+
+    private function getTranslationAndAddDynamicallyIfNeeded($orig, $lng, $context = null)
     {
         $trans = $this->getExistingTranslationFromCache($orig, $lng);
         if ($trans === false) {
-            $trans = $this->autoTranslateString($orig, $lng, $comment);
-            $this->addTranslationToGettextAndToCache($orig, $trans, $lng, $comment);
+            $trans = $this->autoTranslateString($orig, $lng, $context);
+            $this->addTranslationToGettextAndToCache($orig, $trans, $lng, $context);
         }
         return $trans;
     }
 
-    private function addTranslationToGettextAndToCache($orig, $trans, $lng, $comment = null)
+    private function addTranslationToGettextAndToCache($orig, $trans, $lng, $context = null)
     {
-        $this->createNewTranslation($orig, $trans, $lng, $comment);
+        $this->createNewTranslation($orig, $trans, $lng, $context);
         $this->translations_cache[$lng][$orig] = $trans;
         $this->translations_cache_reverse[$lng][$trans] = $orig;
     }
 
-    private function autoTranslateString($orig, $to_lng, $comment = null, $from_lng = null)
+    private function autoTranslateString($orig, $to_lng, $context = null, $from_lng = null)
     {
         if ($this->args->auto_translation === false) {
-            $trans = $this->translateStringMock($orig, $to_lng, $comment, $from_lng);
+            $trans = $this->translateStringMock($orig, $to_lng, $context, $from_lng);
         } else {
-            $trans = $this->translateStringWithGoogle($orig, $to_lng, $comment, $from_lng);
+            $trans = $this->translateStringWithGoogle($orig, $to_lng, $context, $from_lng);
         }
         return $trans;
     }
@@ -603,13 +641,10 @@ msgstr ""
         }
     }
 
-    private function createNewTranslation($orig, $translated, $lng, $comment = null)
+    private function createNewTranslation($orig, $translated, $lng, $context = null)
     {
-        $translation = Translation::create(null, $orig);
+        $translation = Translation::create($context, $orig);
         $translation->translate($translated);
-        if ($comment !== null) {
-            $translation->getComments()->add($comment);
-        }
         $this->translations[$lng]->add($translation);
     }
 
@@ -639,15 +674,15 @@ msgstr ""
         return $this->translations_cache_reverse[$lng][$str];
     }
 
-    private function translateStringMock($str, $to_lng, $comment = null, $from_lng = null)
+    private function translateStringMock($str, $to_lng, $context = null, $from_lng = null)
     {
-        if ($comment === 'slug') {
+        if ($context === 'slug') {
             return $str . '-' . $to_lng;
         }
         return '%|%' . $str . '%|%' . $to_lng . '%|%';
     }
 
-    private function translateStringWithGoogle($str, $to_lng, $comment = null, $from_lng = null)
+    private function translateStringWithGoogle($str, $to_lng, $context = null, $from_lng = null)
     {
         $apiKey = $this->args->google_api_key;
         $url =
@@ -684,7 +719,7 @@ msgstr ""
         }
 
         // slugify
-        if ($comment === 'slug') {
+        if ($context === 'slug') {
             $trans = $this->slugify($trans, $str, $to_lng);
         }
 
@@ -716,54 +751,30 @@ msgstr ""
             );
             if (!empty($nodes)) {
                 foreach ($nodes as $nodes__value) {
+                    if (array_key_exists($this->id($nodes__value), $this->excluded_nodes)) {
+                        continue;
+                    }
                     $attr = $nodes__value->getAttribute($include__value['attribute']);
                     if ($attr != '') {
-                        $nodes__value->setAttribute($include__value['attribute'], 'bar');
+                        $context = null;
+                        if (
+                            $include__value['selector'] === 'a' &&
+                            $include__value['attribute'] === 'href'
+                        ) {
+                            $context = 'slug';
+                        }
+                        if (strpos($attr, $this->getCurrentHost()) === 0) {
+                            $context = 'slug';
+                        }
+                        $trans = $this->prepareTranslationAndAddDynamicallyIfNeeded(
+                            $attr,
+                            $this->getCurrentLng(),
+                            $context
+                        );
+                        $nodes__value->setAttribute($include__value['attribute'], $trans);
                     }
                 }
             }
-        }
-    }
-
-    private function modifyLinks()
-    {
-        $links = $this->DOMXpath->query('/html/body//a');
-        foreach ($links as $links__value) {
-            if (array_key_exists($this->id($links__value), $this->excluded_nodes)) {
-                continue;
-            }
-            $link = $links__value->getAttribute('href');
-            if ($link === null || trim($link) === '') {
-                continue;
-            }
-            if (strpos($link, '#') === 0) {
-                continue;
-            }
-            $is_absolute_link = strpos($link, $this->getCurrentHost()) === 0;
-            if (strpos($link, 'http') !== false && $is_absolute_link === false) {
-                continue;
-            }
-            if (strpos($link, 'http') === false && strpos($link, ':') !== false) {
-                continue;
-            }
-            $link = str_replace($this->getCurrentHost(), '', $link);
-            $url_parts = explode('/', $link);
-            foreach ($url_parts as $url_parts__key => $url_parts__value) {
-                if ($this->stringShouldNotBeTranslated($url_parts__value)) {
-                    continue;
-                }
-                $url_parts[$url_parts__key] = $this->getTranslationAndAddDynamicallyIfNeeded(
-                    $url_parts__value,
-                    $this->getCurrentLng(),
-                    'slug'
-                );
-            }
-            $link = implode('/', $url_parts);
-            $link = '/' . $this->getCurrentLng() . '' . $link;
-            if ($is_absolute_link === true) {
-                $link = $this->getCurrentHost() . $link;
-            }
-            $links__value->setAttribute('href', $link);
         }
     }
 
@@ -903,19 +914,12 @@ msgstr ""
         if ($this->getCurrentLng() !== $this->getSourceLng()) {
             return;
         }
-        $url_parts = $this->getCurrentPath();
-        $url_parts = explode('/', $url_parts);
-        foreach ($url_parts as $url_parts__value) {
-            if ($this->stringShouldNotBeTranslated($url_parts__value)) {
-                continue;
-            }
-            foreach ($this->getLanguagesWithoutSource() as $languages__value) {
-                $this->getTranslationAndAddDynamicallyIfNeeded(
-                    $url_parts__value,
-                    $languages__value,
-                    'slug'
-                );
-            }
+        foreach ($this->getLanguagesWithoutSource() as $languages__value) {
+            $this->prepareTranslationAndAddDynamicallyIfNeeded(
+                $this->getCurrentUrl(),
+                $languages__value,
+                'slug'
+            );
         }
     }
 

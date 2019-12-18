@@ -28,7 +28,7 @@ add_action('after_setup_theme', function () use ($gtbabel) {
         'exclude_dom' => ['.lngpicker'],
         'include' => [
             [
-                'selector' => '.search-field',
+                'selector' => '.search-submit',
                 'attribute' => 'value'
             ],
             [

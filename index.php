@@ -17,7 +17,7 @@ $gtbabel->start([
     'exclude_dom' => ['.lngpicker'],
     'include' => [
         [
-            'selector' => '.search-field',
+            'selector' => '.search-submit',
             'attribute' => 'value'
         ],
         [

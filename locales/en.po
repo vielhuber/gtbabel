@@ -6,8 +6,18 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
-msgid "Test"
-msgstr "%|%Test%|%en%|%"
+msgid "test"
+msgstr "%|%test%|%en%|%"
 
 msgid "Link"
 msgstr "%|%Link%|%en%|%"
+
+msgctxt "slug"
+msgid "dies-ist-ein-test"
+msgstr "dies-ist-ein-test-en"
+
+msgid "Test"
+msgstr "%|%Test%|%en%|%"
+
+msgid "Platzhalter"
+msgstr "%|%Platzhalter%|%en%|%"
