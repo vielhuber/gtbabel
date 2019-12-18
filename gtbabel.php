@@ -19,13 +19,14 @@ $gtbabel = new gtbabel();
 add_action('after_setup_theme', function () use ($gtbabel) {
     $gtbabel->start([
         'google_api_key' => getenv('GOOGLE_API_KEY'),
-        'auto_translation' => true,
+        'auto_translation' => false,
         'lng_folder' => '/wp-content/plugins/gtbabel/locales',
         'lng_source' => 'de',
         'lng_target' => null, // auto
         'prefix_source_lng' => false,
         'exclude_urls' => ['/wp-admin', 'wp-login.php', 'wp-cron.php'],
         'exclude_dom' => ['.lngpicker'],
+        'include' => ['.search-field' => 'value'],
         'languages' => [
             'de',
             'en',

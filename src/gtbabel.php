@@ -5,6 +5,7 @@ use Gettext\Loader\PoLoader;
 use Gettext\Generator\MoGenerator;
 use Gettext\Generator\PoGenerator;
 use Gettext\Translation;
+use Cocur\Slugify\Slugify;
 
 class gtbabel
 {
@@ -42,8 +43,8 @@ class gtbabel
         $this->addCurrentUrlToTranslations();
         if (!$this->sourceLngIsCurrentLng() && !$this->currentUrlIsExcluded()) {
             $this->initMagicRouter();
-            ob_start();
         }
+        ob_start();
     }
 
     public function stop()
@@ -51,12 +52,12 @@ class gtbabel
         if ($this->currentUrlIsExcluded()) {
             return;
         }
-        if (!$this->sourceLngIsCurrentLng() && !$this->currentUrlIsExcluded()) {
-            $html = ob_get_contents();
-            $html = $this->translate($html);
-            ob_end_clean();
-            echo $html;
-        }
+
+        $this->html = ob_get_contents();
+        $this->modifyHtml();
+        ob_end_clean();
+        echo $this->html;
+
         $this->generatePoAndMoFilesFromNewTranslations();
         $this->le();
     }
@@ -154,13 +155,6 @@ class gtbabel
             }
         }
         return false;
-    }
-
-    private function translate($html)
-    {
-        $this->html = $html;
-        $this->modifyHtml();
-        return $this->html;
     }
 
     private function getSourceLng()
@@ -275,9 +269,13 @@ msgstr ""
     private function modifyHtml()
     {
         $this->setupDomDocument();
-        $this->preloadExcludedNodes();
-        $this->modifyTextNodes();
-        $this->modifyLinks();
+        $this->setLangTags();
+        if (!$this->sourceLngIsCurrentLng() && !$this->currentUrlIsExcluded()) {
+            $this->preloadExcludedNodes();
+            $this->modifyTextNodes();
+            $this->modifyLinks();
+            $this->modifyGeneral();
+        }
         $this->html = $this->DOMDocument->saveHTML();
     }
 
@@ -290,6 +288,26 @@ msgstr ""
         //@$this->DOMDocument->loadHTML($this->html);
         @$this->DOMDocument->loadHTML(mb_convert_encoding($this->html, 'HTML-ENTITIES', 'UTF-8'));
         $this->DOMXpath = new \DOMXpath($this->DOMDocument);
+    }
+
+    private function setLangTags()
+    {
+        $html_node = $this->DOMXpath->query('/html')[0];
+        if ($html_node !== null) {
+            $html_node->setAttribute('lang', $this->getCurrentLng());
+        }
+
+        $head_node = $this->DOMXpath->query('/html/head')[0];
+        if ($head_node !== null) {
+            $data = $this->getLanguagePickerData();
+            foreach ($data as $data__value) {
+                $tag = $this->DOMDocument->createElement('link', '');
+                $tag->setAttribute('rel', 'alternate');
+                $tag->setAttribute('hreflang', $data__value['lng']);
+                $tag->setAttribute('href', $data__value['url']);
+                $head_node->appendChild($tag);
+            }
+        }
     }
 
     private function modifyTextNodes()
@@ -382,9 +400,6 @@ msgstr ""
             $trans = $this->translateStringMock($orig, $to_lng, $comment, $from_lng);
         } else {
             $trans = $this->translateStringWithGoogle($orig, $to_lng, $comment, $from_lng);
-        }
-        if ($comment === 'slug') {
-            $trans = $this->slugify($trans);
         }
         return $trans;
     }
@@ -633,11 +648,40 @@ msgstr ""
         $responseDecoded = json_decode($response, true);
         curl_close($handle);
         if (@$responseDecoded['data']['translations'][0]['translatedText'] != '') {
-            $return = $responseDecoded['data']['translations'][0]['translatedText'];
+            $trans = $responseDecoded['data']['translations'][0]['translatedText'];
         } else {
-            $return = $str;
+            $trans = $str;
         }
-        return $return;
+
+        // the api returns some characters in their html characters form (e.g. "'" is returned as "&#39;")
+        // we want to store the real values
+        $trans = html_entity_decode($trans, ENT_QUOTES);
+
+        // uppercase
+        // the google translation api does a very bad job at keeping uppercased words at the beginning
+        // we fix this here
+        if ($this->firstCharIsUppercase($str) && !$this->firstCharIsUppercase($trans)) {
+            $trans = $this->setFirstCharUppercase($trans);
+        }
+
+        // slugify
+        if ($comment === 'slug') {
+            $trans = $this->slugify($trans, $str, $to_lng);
+        }
+
+        return $trans;
+    }
+
+    private function modifyGeneral()
+    {
+        $include = [
+            'a' => 'href',
+            'img' => 'alt',
+            'input' => 'placeholder'
+        ];
+        $include = array_merge($include, $this->args->include);
+
+        /* TODO */
     }
 
     private function modifyLinks()
@@ -834,26 +878,25 @@ msgstr ""
         }
     }
 
-    private function slugify($string)
+    private function slugify($trans, $orig, $lng)
     {
-        /* TODO: MAKE THIS WORK IN ANY LANGUAGE */
-
-        // replace non letter or digits by -
-        $string = preg_replace('~[^\pL\d]+~u', '-', $string);
-        // transliterate
-        $string = iconv('utf-8', 'us-ascii//TRANSLIT', $string);
-        // remove unwanted characters
-        $string = preg_replace('~[^-\w]+~', '', $string);
-        // trim
-        $string = trim($string, '-');
-        // remove duplicate -
-        $string = preg_replace('~-+~', '-', $string);
-        // lowercase
-        $string = strtolower($string);
-        if (empty($string)) {
-            return '';
+        $slugify = new Slugify();
+        $suggestion = $slugify->slugify($trans, '-');
+        if (mb_strlen($suggestion) < mb_strlen($trans) / 2) {
+            return $orig . '-' . $lng;
         }
-        return $string;
+        return $suggestion;
+    }
+
+    private function firstCharIsUppercase($str)
+    {
+        return mb_substr($str, 0, 1) == mb_strtoupper(mb_substr($str, 0, 1));
+    }
+
+    private function setFirstCharUppercase($str)
+    {
+        $fc = mb_strtoupper(mb_substr($str, 0, 1));
+        return $fc . mb_substr($str, 1);
     }
 
     private function lb($message = '')

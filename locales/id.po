@@ -8,4 +8,4 @@ msgstr ""
 
 # slug
 msgid "dies-ist-ein-test"
-msgstr "ini-adalah-a-test"
+msgstr "dies-ist-ein-test-id"

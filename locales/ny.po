@@ -8,4 +8,4 @@ msgstr ""
 
 # slug
 msgid "dies-ist-ein-test"
-msgstr "izi-ndi-a-mayeso"
+msgstr "dies-ist-ein-test-ny"

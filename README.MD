@@ -19,7 +19,7 @@ gtbabel automatically translates your html/php pages – server sided!
 -   embraces the full power of [gettext](https://www.gnu.org/software/gettext/)
 -   framework agnostic: works with nearly any php based cms or static sites
 -   fast: once all translations are available, gtbabel reaches a throughput of XXX words / second
--   auto translation: use the power of the [Google Translation API](https://cloud.google.com/translate/docs) to auto translate your pages into any language
+-   auto translation: use the power of the [Google Translation API](https://cloud.google.com/translate/docs) to auto translate your pages and links into any language
 -   router included: spoof your request uri and let the magic happen, links are automatically converted
 -   helper functions for current language and all languages available
 -   basic seo considered: html lang tag, hreflang tags included
@@ -56,6 +56,7 @@ $gtbabel->start([
     'prefix_source_lng' => false,
     'exclude_urls' => ['/backend'],
     'exclude_dom' => ['.lngpicker'],
+    'include' => ['.search-field' => 'value'],
     'languages' => ['de', 'en', 'fr']
 ]);
 

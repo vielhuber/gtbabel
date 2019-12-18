@@ -15,9 +15,10 @@ $gtbabel->start([
     'prefix_source_lng' => false,
     'exclude_urls' => null,
     'exclude_dom' => ['.test'],
+    'include' => ['.search-field' => 'value'],
     'languages' => ['de', 'en', 'fr']
 ]);
 
-require_once 'demo/simple/9.html';
+require_once 'demo/simple/10.html';
 
 $gtbabel->stop();
