@@ -103,4 +103,4 @@ if you use the auto translation feature with the help of Google Transpation API,
 
 # credits
 
-shout out to [Steffen Wenzel](https://www.zeile1.com/) to make this work.\
+shout out to my coworker to make this work.
