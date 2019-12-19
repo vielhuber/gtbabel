@@ -34,7 +34,7 @@ add_action('after_setup_theme', function () use ($gtbabel) {
             [
                 'selector' => '.js-link',
                 'attribute' => 'alt-href',
-                'type' => 'link'
+                'context' => 'slug'
             ]
         ],
         'languages' => [

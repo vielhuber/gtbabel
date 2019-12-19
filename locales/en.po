@@ -6,18 +6,28 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
-msgid "test"
-msgstr "%|%test%|%en%|%"
+msgid "Dies ist ein Beispieltext"
+msgstr "%|%Dies ist ein Beispieltext%|%en%|%"
 
-msgid "Link"
-msgstr "%|%Link%|%en%|%"
+msgid "Überschrift 1"
+msgstr "%|%Überschrift 1%|%en%|%"
 
-msgctxt "slug"
-msgid "dies-ist-ein-test"
-msgstr "dies-ist-ein-test-en"
+msgid "Überschrift 2"
+msgstr "%|%Überschrift 2%|%en%|%"
 
-msgid "Test"
-msgstr "%|%Test%|%en%|%"
+msgid "foo"
+msgstr "%|%foo%|%en%|%"
 
-msgid "Platzhalter"
-msgstr "%|%Platzhalter%|%en%|%"
+msgid "bar"
+msgstr "%|%bar%|%en%|%"
+
+msgctxt "title"
+msgid "Der Webseitentitel"
+msgstr "%|%Der Webseitentitel%|%en%|%"
+
+msgctxt "title"
+msgid "Webseite"
+msgstr "%|%Webseite%|%en%|%"
+
+msgid "🌀 Vielhuber David ist ein Web-Geek mit einem Faible für schönes Design, einer Prise Perfektionismus und Augen für klare Konturen. 🌀"
+msgstr "%|%🌀 Vielhuber David ist ein Web-Geek mit einem Faible für schönes Design, einer Prise Perfektionismus und Augen für klare Konturen. 🌀%|%en%|%"

@@ -232,10 +232,11 @@ msgstr ""
                 $this->translations[$languages__value]->getTranslations()
                 as $translations__value
             ) {
-                $this->translations_cache[$languages__value][
+                $context = $translations__value->getContext() ?? '';
+                $this->translations_cache[$languages__value][$context][
                     $translations__value->getOriginal()
                 ] = $translations__value->getTranslation();
-                $this->translations_cache_reverse[$languages__value][
+                $this->translations_cache_reverse[$languages__value][$context][
                     $translations__value->getTranslation()
                 ] = $translations__value->getOriginal();
             }
@@ -249,7 +250,7 @@ msgstr ""
 
     private function transformSelectorToXpath($selector)
     {
-        $xpath = '/html/body//';
+        $xpath = './/';
 
         $parts = explode(' ', $selector);
         foreach ($parts as $parts__key => $parts__value) {
@@ -266,7 +267,7 @@ msgstr ""
             }
             $parts[$parts__key] = $parts__value;
         }
-        $xpath .= implode('/', $parts);
+        $xpath .= implode('//', $parts);
         return $xpath;
     }
 
@@ -431,12 +432,32 @@ msgstr ""
             }
             return $link;
         }
+        if ($context === 'title') {
+            foreach (
+                ['-', '–', '—', ':', '·', '•', '*', '⋆', '|', '~', '«', '»', '<', '>']
+                as $delimiters__value
+            ) {
+                if (strpos($orig, ' ' . $delimiters__value . ' ') !== false) {
+                    $orig_parts = explode(' ' . $delimiters__value . ' ', $orig);
+                    foreach ($orig_parts as $orig_parts__key => $orig_parts__value) {
+                        $trans = $this->getTranslationAndAddDynamicallyIfNeeded(
+                            $orig_parts__value,
+                            $lng,
+                            $context
+                        );
+                        $orig_parts[$orig_parts__key] = $trans;
+                    }
+                    $trans = implode(' ' . $delimiters__value . ' ', $orig_parts);
+                    return $trans;
+                }
+            }
+        }
         return $this->getTranslationAndAddDynamicallyIfNeeded($orig, $lng, $context);
     }
 
     private function getTranslationAndAddDynamicallyIfNeeded($orig, $lng, $context = null)
     {
-        $trans = $this->getExistingTranslationFromCache($orig, $lng);
+        $trans = $this->getExistingTranslationFromCache($orig, $lng, $context);
         if ($trans === false) {
             $trans = $this->autoTranslateString($orig, $lng, $context);
             $this->addTranslationToGettextAndToCache($orig, $trans, $lng, $context);
@@ -447,8 +468,8 @@ msgstr ""
     private function addTranslationToGettextAndToCache($orig, $trans, $lng, $context = null)
     {
         $this->createNewTranslation($orig, $trans, $lng, $context);
-        $this->translations_cache[$lng][$orig] = $trans;
-        $this->translations_cache_reverse[$lng][$trans] = $orig;
+        $this->translations_cache[$lng][$context ?? ''][$orig] = $trans;
+        $this->translations_cache_reverse[$lng][$context ?? ''][$trans] = $orig;
     }
 
     private function autoTranslateString($orig, $to_lng, $context = null, $from_lng = null)
@@ -648,30 +669,32 @@ msgstr ""
         $this->translations[$lng]->add($translation);
     }
 
-    private function getExistingTranslationFromCache($str, $lng)
+    private function getExistingTranslationFromCache($str, $lng, $context = null)
     {
         if (
             $str === '' ||
             $str === null ||
             $this->translations_cache[$lng] === null ||
-            !array_key_exists($str, $this->translations_cache[$lng])
+            !array_key_exists($context ?? '', $this->translations_cache[$lng]) ||
+            !array_key_exists($str, $this->translations_cache[$lng][$context ?? ''])
         ) {
             return false;
         }
-        return $this->translations_cache[$lng][$str];
+        return $this->translations_cache[$lng][$context ?? ''][$str];
     }
 
-    private function getExistingTranslationReverseFromCache($str, $lng)
+    private function getExistingTranslationReverseFromCache($str, $lng, $context = null)
     {
         if (
             $str === '' ||
             $str === null ||
             $this->translations_cache_reverse[$lng] === null ||
-            !array_key_exists($str, $this->translations_cache_reverse[$lng])
+            !array_key_exists($context ?? '', $this->translations_cache_reverse[$lng]) ||
+            !array_key_exists($str, $this->translations_cache_reverse[$lng][$context ?? ''])
         ) {
             return false;
         }
-        return $this->translations_cache_reverse[$lng][$str];
+        return $this->translations_cache_reverse[$lng][$context ?? ''][$str];
     }
 
     private function translateStringMock($str, $to_lng, $context = null, $from_lng = null)
@@ -732,15 +755,27 @@ msgstr ""
             [
                 'selector' => 'a',
                 'attribute' => 'href',
-                'type' => 'link'
+                'context' => 'slug'
             ],
             [
                 'selector' => 'img',
-                'attribute' => 'alt'
+                'attribute' => 'alt',
+                'context' => null
             ],
             [
                 'selector' => 'input',
-                'attribute' => 'placeholder'
+                'attribute' => 'placeholder',
+                'context' => null
+            ],
+            [
+                'selector' => 'head title',
+                'attribute' => null,
+                'context' => 'title'
+            ],
+            [
+                'selector' => 'head meta[name="description"]',
+                'attribute' => 'content',
+                'context' => null
             ]
         ];
         $include = array_merge($include, $this->args->include);
@@ -754,24 +789,35 @@ msgstr ""
                     if (array_key_exists($this->id($nodes__value), $this->excluded_nodes)) {
                         continue;
                     }
-                    $attr = $nodes__value->getAttribute($include__value['attribute']);
-                    if ($attr != '') {
+                    if (@$include__value['attribute'] != '') {
+                        $value = $nodes__value->getAttribute($include__value['attribute']);
+                    } else {
+                        $value = $nodes__value->nodeValue;
+                    }
+                    if ($value != '') {
                         $context = null;
+                        if (@$include__value['context'] != '') {
+                            $context = $include__value['context'];
+                        }
                         if (
                             $include__value['selector'] === 'a' &&
                             $include__value['attribute'] === 'href'
                         ) {
                             $context = 'slug';
                         }
-                        if (strpos($attr, $this->getCurrentHost()) === 0) {
+                        if (strpos($value, $this->getCurrentHost()) === 0) {
                             $context = 'slug';
                         }
                         $trans = $this->prepareTranslationAndAddDynamicallyIfNeeded(
-                            $attr,
+                            $value,
                             $this->getCurrentLng(),
                             $context
                         );
-                        $nodes__value->setAttribute($include__value['attribute'], $trans);
+                        if (@$include__value['attribute'] != '') {
+                            $nodes__value->setAttribute($include__value['attribute'], $trans);
+                        } else {
+                            $nodes__value->nodeValue = $trans;
+                        }
                     }
                 }
             }
@@ -825,7 +871,7 @@ msgstr ""
         ) . '/';
     }
 
-    private function getTranslationInForeignLng($str, $to_lng, $from_lng = null)
+    private function getTranslationInForeignLng($str, $to_lng, $from_lng = null, $context = null)
     {
         if ($from_lng === null) {
             $from_lng = $this->getCurrentLng();
@@ -833,7 +879,11 @@ msgstr ""
         if ($from_lng === $this->getSourceLng()) {
             $str_in_source_lng = $str;
         } else {
-            $str_in_source_lng = $this->getExistingTranslationReverseFromCache($str, $from_lng); // str in source lng
+            $str_in_source_lng = $this->getExistingTranslationReverseFromCache(
+                $str,
+                $from_lng,
+                $context
+            ); // str in source lng
         }
         if ($str_in_source_lng === false) {
             return false;
@@ -841,25 +891,26 @@ msgstr ""
         if ($to_lng === $this->getSourceLng()) {
             return $str_in_source_lng;
         }
-        return $this->getExistingTranslationFromCache($str_in_source_lng, $to_lng);
+        return $this->getExistingTranslationFromCache($str_in_source_lng, $to_lng, $context);
     }
 
     public function getTranslationInForeignLngAndAddDynamicallyIfNeeded(
         $str,
         $to_lng,
-        $from_lng = null
+        $from_lng = null,
+        $context = null
     ) {
-        $trans = $this->getTranslationInForeignLng($str, $to_lng, $from_lng);
+        $trans = $this->getTranslationInForeignLng($str, $to_lng, $from_lng, $context);
         if ($trans === false) {
             $str_in_source = $this->autoTranslateString(
                 $str,
                 $this->getSourceLng(),
-                null,
+                $context,
                 $from_lng
             );
-            $trans = $this->autoTranslateString($str, $to_lng, null);
-            $this->addTranslationToGettextAndToCache($str_in_source, $str, $from_lng, null);
-            $this->addTranslationToGettextAndToCache($str_in_source, $trans, $to_lng, null);
+            $trans = $this->autoTranslateString($str, $to_lng, $context);
+            $this->addTranslationToGettextAndToCache($str_in_source, $str, $from_lng, $context);
+            $this->addTranslationToGettextAndToCache($str_in_source, $trans, $to_lng, $context);
         }
         return $trans;
     }
@@ -892,7 +943,7 @@ msgstr ""
         }
 
         foreach ($url_parts as $url_parts__key => $url_parts__value) {
-            $trans = $this->getTranslationInForeignLng($url_parts__value, $lng);
+            $trans = $this->getTranslationInForeignLng($url_parts__value, $lng, null, 'slug');
             if ($trans !== false) {
                 $url_parts[$url_parts__key] = $trans;
             }

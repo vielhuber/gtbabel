@@ -22,7 +22,7 @@ gtbabel automatically translates your html/php pages – server sided!
 -   auto translation: use the power of the [Google Translation API](https://cloud.google.com/translate/docs) to auto translate your pages and links into any language
 -   router included: spoof your request uri and let the magic happen, links are automatically converted
 -   helper functions for current language and all languages available
--   basic seo considered: html lang tag, hreflang tags included
+-   basic seo considered: title tags, seo descriptions, html lang tag, hreflang tags included
 -   wordpress plugin available: configure your settings easily in your wp backend
 -   works seamlessly with caching/preloading plugins
 -   phpunit tests available
@@ -64,7 +64,7 @@ $gtbabel->start([
         [
             'selector' => '.js-link',
             'attribute' => 'alt-href',
-            'type' => 'link'
+            'context' => 'slug'
         ]
     ],
     'languages' => ['de', 'en', 'fr']

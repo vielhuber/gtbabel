@@ -23,12 +23,12 @@ $gtbabel->start([
         [
             'selector' => '.js-link',
             'attribute' => 'alt-href',
-            'type' => 'link'
+            'context' => 'slug'
         ]
     ],
     'languages' => ['de', 'en', 'fr']
 ]);
 
-require_once 'demo/simple/11.html';
+require_once 'demo/simple/1.html';
 
 $gtbabel->stop();
