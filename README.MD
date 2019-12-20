@@ -91,15 +91,18 @@ the idea can be relatively easy implemented in js frameworks like Vue or React.
 
 by default gtbabel translates all text nodes and the following tag nodes:
 
--   <a> (attribute: href)
--   <img> (attribute: alt)
--   <input> (attribute: placeholder)
--   <title>
--   <meta name="description" /> (attribute: content)
-    to disable text/tag node transformation, provide the options:
+-   `<a>` (attribute: href)
+-   `<img>` (attribute: alt)
+-   `<input>` (attribute: placeholder)
+-   `<title>`
+-   `<meta name="description">` (attribute: content)
+
+to disable text/tag node transformation, provide the options:
+
 -   `'translate_text_nodes' => false`.
 -   `'translate_default_tag_nodes' => false`.
-    you can add your own tag node transformations via the `include` option.
+
+you can add your own tag node transformations via the `include` option.
 
 # router
 
