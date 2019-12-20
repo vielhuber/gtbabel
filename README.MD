@@ -87,7 +87,7 @@ $gtbabel->stop();
 gtbabel itself is based on php and only works for static pages or pages rendered via php.\
 the idea can be relatively easy implemented in js frameworks like Vue or React.
 
-# modified nodes
+## modified nodes
 
 by default gtbabel translates all text nodes and the following tag nodes:
 
@@ -104,12 +104,12 @@ to disable text/tag node transformation, provide the options:
 
 you can add your own tag node transformations via the `include` option.
 
-# router
+## router
 
-the router automatically modifies the \$\_SERVER['REQUEST_URI'] variable to catch translated urls.\
+the router automatically modifies the `$_SERVER['REQUEST_URI']` variable to catch translated urls.\
 unknown translations of urls are picked up from the current url and from links that are on the page.
 
-# helper functions
+## helper functions
 
 ```php
 gtbabel_current_lng() // 'en'
@@ -124,12 +124,12 @@ gtbabel_languagepicker()
 gtbabel_get_translation('hello', 'fr', 'en') // 'bonjour'
 ```
 
-# language codes
+## language codes
 
 it is recommended to use iso language codes in lowercase.
 but you can use any language code you want (even i-klingon).
 if you use the auto translation feature with the help of Google Transpation API, you must use iso language codes.
 
-# credits
+## credits
 
 shout out to my coworker to make this work.
