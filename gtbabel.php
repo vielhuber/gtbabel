@@ -16,6 +16,9 @@ $dotenv = Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 $gtbabel = new gtbabel();
 
+// disable wp auto redirect
+remove_action('template_redirect', 'redirect_canonical');
+
 add_action('after_setup_theme', function () use ($gtbabel) {
     $gtbabel->start([
         'google_api_key' => getenv('GOOGLE_API_KEY'),
@@ -23,7 +26,7 @@ add_action('after_setup_theme', function () use ($gtbabel) {
         'lng_folder' => '/wp-content/plugins/gtbabel/locales',
         'lng_source' => 'de',
         'lng_target' => null, // auto
-        'prefix_source_lng' => false,
+        'prefix_source_lng' => true,
         'translate_text_nodes' => true,
         'translate_default_tag_nodes' => true,
         'exclude_urls' => ['/wp-admin', 'wp-login.php', 'wp-cron.php'],

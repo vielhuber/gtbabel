@@ -99,8 +99,8 @@ by default gtbabel translates all text nodes and the following tag nodes:
 
 to disable text/tag node transformation, provide the options:
 
--   `'translate_text_nodes' => false`.
--   `'translate_default_tag_nodes' => false`.
+-   `'translate_text_nodes' => false`
+-   `'translate_default_tag_nodes' => false`
 
 you can add your own tag node transformations via the `include` option.
 

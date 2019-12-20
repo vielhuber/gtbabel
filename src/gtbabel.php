@@ -13,8 +13,9 @@ class gtbabel
 
     private $original_path = null;
     private $original_path_with_args = null;
-    private $original_path_args = null;
+    private $original_args = null;
     private $original_url = null;
+    private $original_url_with_args = null;
     private $original_host = null;
 
     private $html = null;
@@ -40,8 +41,9 @@ class gtbabel
         }
         $this->createPoFilesIfNotExists();
         $this->preloadTranslationsInCache();
+        $this->redirectPrefixedSourceLng();
         $this->addCurrentUrlToTranslations();
-        if (!$this->sourceLngIsCurrentLng() && !$this->currentUrlIsExcluded()) {
+        if (!$this->currentUrlIsExcluded()) {
             $this->initMagicRouter();
         }
         ob_start();
@@ -79,17 +81,22 @@ class gtbabel
         return $lng;
     }
 
-    public function getCurrentLng()
+    public function getCurrentPrefix()
     {
-        if ($this->args->lng_target !== null) {
-            return $this->args->lng_target;
-        }
         foreach ($this->getLanguages() as $languages__value) {
             if (strpos($this->getCurrentPath(), '/' . $languages__value . '/') === 0) {
                 return $languages__value;
             }
         }
-        return $this->args->lng_source;
+        return null;
+    }
+
+    public function getCurrentLng()
+    {
+        if ($this->args->lng_target !== null) {
+            return $this->args->lng_target;
+        }
+        return $this->getCurrentPrefix() ?? $this->args->lng_source;
     }
 
     public function getLanguagePickerData()
@@ -120,7 +127,7 @@ class gtbabel
         $this->group_cache = [];
         $this->original_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH); // store without get parameters
         $this->original_path_with_args = $_SERVER['REQUEST_URI'];
-        $this->original_path_args = str_replace(
+        $this->original_args = str_replace(
             $this->original_path,
             '',
             $this->original_path_with_args
@@ -131,6 +138,12 @@ class gtbabel
             '://' .
             $_SERVER['HTTP_HOST'] .
             parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $this->original_url_with_args =
+            'http' .
+            (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 's' : '') .
+            '://' .
+            $_SERVER['HTTP_HOST'] .
+            $_SERVER['REQUEST_URI'];
         $this->original_host =
             'http' .
             (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 's' : '') .
@@ -290,8 +303,10 @@ msgstr ""
     {
         $this->setupDomDocument();
         $this->setLangTags();
-        if (!$this->sourceLngIsCurrentLng() && !$this->currentUrlIsExcluded()) {
-            $this->preloadExcludedNodes();
+        $this->preloadExcludedNodes();
+        if ($this->sourceLngIsCurrentLng()) {
+            $this->modifyPrefixedSourceLngLinks();
+        } else {
             $this->modifyTextNodes();
             $this->modifyTagNodes();
         }
@@ -865,9 +880,19 @@ msgstr ""
         return $this->original_url;
     }
 
+    private function getCurrentUrlWithArgs()
+    {
+        return $this->original_url_with_args;
+    }
+
     private function getCurrentPath()
     {
         return $this->original_path;
+    }
+
+    private function getCurrentPathWithArgs()
+    {
+        return $this->original_path_with_args;
     }
 
     private function getCurrentUrlTranslationsInLanguage($lng)
@@ -875,7 +900,7 @@ msgstr ""
         return trim(
             trim($this->getCurrentHost(), '/') .
                 '/' .
-                trim($this->getCurrentPathTranslationsInLanguage($lng), '/'),
+                trim($this->getCurrentPathTranslationsInLanguage($lng, false), '/'),
             '/'
         ) . '/';
     }
@@ -924,7 +949,7 @@ msgstr ""
         return $trans;
     }
 
-    private function getCurrentPathTranslationsInLanguage($lng)
+    private function getCurrentPathTranslationsInLanguage($lng, $always_remove_prefix = false)
     {
         $url = $this->getCurrentPath();
         if ($this->getCurrentLng() === $lng) {
@@ -939,7 +964,10 @@ msgstr ""
         $url_parts = array_values($url_parts);
 
         // prefix
-        if ($this->getSourceLng() === $lng && $this->args->prefix_source_lng === false) {
+        if (
+            $always_remove_prefix === true ||
+            ($this->getSourceLng() === $lng && $this->args->prefix_source_lng === false)
+        ) {
             if (@$url_parts[0] === $this->getCurrentLng()) {
                 unset($url_parts[0]);
             }
@@ -961,17 +989,95 @@ msgstr ""
         return $url;
     }
 
+    private function modifyPrefixedSourceLngLinks()
+    {
+        if ($this->args->prefix_source_lng === false) {
+            return;
+        }
+        if (!$this->sourceLngIsCurrentLng()) {
+            return;
+        }
+        $nodes = $this->DOMXpath->query($this->transformSelectorToXpath('a'));
+        if (!empty($nodes)) {
+            foreach ($nodes as $nodes__value) {
+                if (array_key_exists($this->id($nodes__value), $this->excluded_nodes)) {
+                    continue;
+                }
+                $value = $nodes__value->getAttribute('href');
+                if ($value != '') {
+                    $link = $value;
+                    if ($link === null || trim($link) === '') {
+                        continue;
+                    }
+                    if (strpos($link, '#') === 0) {
+                        continue;
+                    }
+                    $is_absolute_link = strpos($link, $this->getCurrentHost()) === 0;
+                    if (strpos($link, 'http') !== false && $is_absolute_link === false) {
+                        continue;
+                    }
+                    if (strpos($link, 'http') === false && strpos($link, ':') !== false) {
+                        continue;
+                    }
+                    $link = str_replace($this->getCurrentHost(), '', $link);
+                    $link = '/' . $this->getCurrentLng() . '' . $link;
+                    if ($is_absolute_link === true) {
+                        $link = $this->getCurrentHost() . $link;
+                    }
+                    $nodes__value->setAttribute('href', $link);
+                }
+            }
+        }
+    }
+
+    private function redirectPrefixedSourceLng()
+    {
+        if ($this->args->prefix_source_lng === false) {
+            return;
+        }
+        if (!$this->sourceLngIsCurrentLng()) {
+            return;
+        }
+        if ($this->getCurrentPrefix() !== null) {
+            return;
+        }
+
+        $url = '';
+        $url .= trim($this->getCurrentHost(), '/');
+        $url .= '/';
+        $url .= $this->getCurrentLng();
+        $url .= '/';
+        if (trim($this->getCurrentPath(), '/') != '') {
+            $url .= trim($this->getCurrentPath(), '/') . '/';
+        }
+
+        header('Location: ' . $url, true, 301);
+        die();
+    }
+
     private function initMagicRouter()
     {
-        $path = $this->getCurrentPathTranslationsInLanguage($this->getSourceLng());
-        $path = trim($path, '/');
-        $path = '/' . $path . ($path != '' ? '/' : '') . $this->original_path_args;
+        if ($this->sourceLngIsCurrentLng()) {
+            if ($this->args->prefix_source_lng === false) {
+                return;
+            }
+            if (strpos($this->getCurrentPathWithArgs(), '/' . $this->getSourceLng()) === 0) {
+                $path = substr(
+                    $this->getCurrentPathWithArgs(),
+                    mb_strlen('/' . $this->getSourceLng())
+                );
+            }
+        } else {
+            $path = $this->getCurrentPathTranslationsInLanguage($this->getSourceLng(), true);
+            $path = trim($path, '/');
+            $path = '/' . $path . ($path != '' ? '/' : '') . $this->original_args;
+        }
         $_SERVER['REQUEST_URI'] = $path;
     }
 
     private function addCurrentUrlToTranslations()
     {
-        if ($this->getCurrentLng() !== $this->getSourceLng()) {
+        if (!$this->sourceLngIsCurrentLng()) {
             return;
         }
         foreach ($this->getLanguagesWithoutSource() as $languages__value) {

@@ -1,0 +1,19 @@
+msgid ""
+msgstr ""
+"Content-Transfer-Encoding: 8bit\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: su\n"
+"MIME-Version: 1.0\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+msgctxt "slug"
+msgid "dies-ist-ein-test"
+msgstr "dies-ist-ein-test-su"
+
+msgctxt "slug"
+msgid "scheiss-wp-auto-redirect"
+msgstr "scheiss-wp-auto-redirect-su"
+
+msgctxt "slug"
+msgid "steffen"
+msgstr "steffen-su"
