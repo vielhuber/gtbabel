@@ -293,7 +293,7 @@ msgstr ""
         if (!$this->sourceLngIsCurrentLng() && !$this->currentUrlIsExcluded()) {
             $this->preloadExcludedNodes();
             $this->modifyTextNodes();
-            $this->modifyGeneral();
+            $this->modifyTagNodes();
         }
         $this->html = $this->DOMDocument->saveHTML();
     }
@@ -331,6 +331,10 @@ msgstr ""
 
     private function modifyTextNodes()
     {
+        if ($this->args->translate_text_nodes === false) {
+            return;
+        }
+
         $groups = [];
 
         $to_delete = [];
@@ -749,35 +753,40 @@ msgstr ""
         return $trans;
     }
 
-    private function modifyGeneral()
+    private function modifyTagNodes()
     {
-        $include = [
-            [
-                'selector' => 'a',
-                'attribute' => 'href',
-                'context' => 'slug'
-            ],
-            [
-                'selector' => 'img',
-                'attribute' => 'alt',
-                'context' => null
-            ],
-            [
-                'selector' => 'input',
-                'attribute' => 'placeholder',
-                'context' => null
-            ],
-            [
-                'selector' => 'head title',
-                'attribute' => null,
-                'context' => 'title'
-            ],
-            [
-                'selector' => 'head meta[name="description"]',
-                'attribute' => 'content',
-                'context' => null
-            ]
-        ];
+        $include = [];
+
+        if ($this->args->translate_default_tag_nodes === true) {
+            $include = array_merge($include, [
+                [
+                    'selector' => 'a',
+                    'attribute' => 'href',
+                    'context' => 'slug'
+                ],
+                [
+                    'selector' => 'img',
+                    'attribute' => 'alt',
+                    'context' => null
+                ],
+                [
+                    'selector' => 'input',
+                    'attribute' => 'placeholder',
+                    'context' => null
+                ],
+                [
+                    'selector' => 'head title',
+                    'attribute' => null,
+                    'context' => 'title'
+                ],
+                [
+                    'selector' => 'head meta[name="description"]',
+                    'attribute' => 'content',
+                    'context' => null
+                ]
+            ]);
+        }
+
         $include = array_merge($include, $this->args->include);
 
         foreach ($include as $include__value) {

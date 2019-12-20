@@ -13,6 +13,8 @@ $gtbabel->start([
     'lng_source' => 'de',
     'lng_target' => 'en',
     'prefix_source_lng' => false,
+    'translate_text_nodes' => true,
+    'translate_default_tag_nodes' => true,
     'exclude_urls' => null,
     'exclude_dom' => ['.lngpicker'],
     'include' => [

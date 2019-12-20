@@ -24,6 +24,8 @@ add_action('after_setup_theme', function () use ($gtbabel) {
         'lng_source' => 'de',
         'lng_target' => null, // auto
         'prefix_source_lng' => false,
+        'translate_text_nodes' => true,
+        'translate_default_tag_nodes' => true,
         'exclude_urls' => ['/wp-admin', 'wp-login.php', 'wp-cron.php'],
         'exclude_dom' => ['.lngpicker'],
         'include' => [

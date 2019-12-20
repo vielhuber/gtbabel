@@ -54,6 +54,8 @@ $gtbabel->start([
     'lng_source' => 'de',
     'lng_target' => 'en',
     'prefix_source_lng' => false,
+    'translate_text_nodes' => true,
+    'translate_default_tag_nodes' => true,
     'exclude_urls' => ['/backend'],
     'exclude_dom' => ['.lngpicker'],
     'include' => [
@@ -84,6 +86,20 @@ $gtbabel->stop();
 
 gtbabel itself is based on php and only works for static pages or pages rendered via php.\
 the idea can be relatively easy implemented in js frameworks like Vue or React.
+
+# modified nodes
+
+by default gtbabel translates all text nodes and the following tag nodes:
+
+-   <a> (attribute: href)
+-   <img> (attribute: alt)
+-   <input> (attribute: placeholder)
+-   <title>
+-   <meta name="description" /> (attribute: content)
+    to disable text/tag node transformation, provide the options:
+-   `'translate_text_nodes' => false`.
+-   `'translate_default_tag_nodes' => false`.
+    you can add your own tag node transformations via the `include` option.
 
 # router
 
