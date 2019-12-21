@@ -11,9 +11,9 @@ msgid "dies-ist-ein-test"
 msgstr "dies-ist-ein-test-pa"
 
 msgctxt "slug"
-msgid "scheiss-wp-auto-redirect"
-msgstr "scheiss-wp-auto-redirect-pa"
-
-msgctxt "slug"
 msgid "steffen"
 msgstr "steffen-pa"
+
+msgctxt "slug"
+msgid "hello-world"
+msgstr "hello-world-pa"

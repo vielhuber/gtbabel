@@ -10,16 +10,8 @@ msgctxt "slug"
 msgid "dies-ist-ein-test"
 msgstr "dies-ist-ein-test-en"
 
-msgctxt "slug"
-msgid "scheiss-wp-auto-redirect"
-msgstr "scheiss-wp-auto-redirect-en"
-
 msgid "%|%hello%|%de%|%"
 msgstr "hello"
-
-msgctxt "slug"
-msgid "steffen"
-msgstr "steffen-en"
 
 msgid "Direkt zum Inhalt wechseln"
 msgstr "%|%Direkt zum Inhalt wechseln%|%en%|%"
@@ -60,11 +52,20 @@ msgstr "%|%string%|%en%|%"
 msgid "(length=2)"
 msgstr "%|%(length=2)%|%en%|%"
 
-msgid "Die Seite konnte nicht gefunden werden"
-msgstr "%|%Die Seite konnte nicht gefunden werden%|%en%|%"
+msgid "Der Freistaat Bayern (Zum Anhören bitte klicken! [ˈbaɪ̯ɐn]; Ländercode BY) ist mit mehr als 70.500 Quadratkilometern das flächengrößte der 16 Länder in Deutschland und liegt in dessen Südosten. Mit rund 13 Millionen Einwohnern ist er nach Nordrhein-Westfalen das zweitbevölkerungsreichste deutsche Land."
+msgstr "%|%Der Freistaat Bayern (Zum Anhören bitte klicken! [ˈbaɪ̯ɐn]; Ländercode BY) ist mit mehr als 70.500 Quadratkilometern das flächengrößte der 16 Länder in Deutschland und liegt in dessen Südosten. Mit rund 13 Millionen Einwohnern ist er nach Nordrhein-Westfalen das zweitbevölkerungsreichste deutsche Land.%|%en%|%"
 
-msgid "Die gesuchte Seite konnte nicht gefunden werden. Sie wurde möglicherweise entfernt, umbenannt oder existierte von vornherein nicht."
-msgstr "%|%Die gesuchte Seite konnte nicht gefunden werden. Sie wurde möglicherweise entfernt, umbenannt oder existierte von vornherein nicht.%|%en%|%"
+msgid "Der Freistaat hat im Süden Anteil am Hochgebirge der Ostalpen und dem bis zur Donau reichenden flachen Alpenvorland. Nördlich der Donau bestimmen Mittelgebirge wie etwa der Bayerische Wald oder das Fichtelgebirge das Landschaftsbild. Größte Stadt Bayerns ist die Landeshauptstadt und Millionenmetropole München, gefolgt von Nürnberg und Augsburg. Weitere Großstädte sind Regensburg, Ingolstadt, Würzburg, Fürth und Erlangen."
+msgstr "%|%Der Freistaat hat im Süden Anteil am Hochgebirge der Ostalpen und dem bis zur Donau reichenden flachen Alpenvorland. Nördlich der Donau bestimmen Mittelgebirge wie etwa der Bayerische Wald oder das Fichtelgebirge das Landschaftsbild. Größte Stadt Bayerns ist die Landeshauptstadt und Millionenmetropole München, gefolgt von Nürnberg und Augsburg. Weitere Großstädte sind Regensburg, Ingolstadt, Würzburg, Fürth und Erlangen.%|%en%|%"
+
+msgid "Bayern ist eine parlamentarische Republik mit dem Bayerischen Landtag als Legislative und der Bayerischen Staatsregierung, an deren Spitze der Ministerpräsident als Regierungschef steht, als Exekutive. Grundlage der Politik ist die Verfassung des Freistaates Bayern, gemäß der Bayern ein Volks-, Rechts-, Kultur- und Sozialstaat ist. Die Bezeichnung Freier Volksstaat bzw. Freistaat als Republik trägt Bayern seit 1918, mit der Ausrufung durch den revolutionären Ministerpräsidenten Kurt Eisner am 8. November 1918 und dem damit verbundenen Ende des Königreichs Bayern."
+msgstr "%|%Bayern ist eine parlamentarische Republik mit dem Bayerischen Landtag als Legislative und der Bayerischen Staatsregierung, an deren Spitze der Ministerpräsident als Regierungschef steht, als Exekutive. Grundlage der Politik ist die Verfassung des Freistaates Bayern, gemäß der Bayern ein Volks-, Rechts-, Kultur- und Sozialstaat ist. Die Bezeichnung Freier Volksstaat bzw. Freistaat als Republik trägt Bayern seit 1918, mit der Ausrufung durch den revolutionären Ministerpräsidenten Kurt Eisner am 8. November 1918 und dem damit verbundenen Ende des Königreichs Bayern.%|%en%|%"
+
+msgid "Bereits im Jahre 555 n. Chr. (und damit rund 500 Jahre vor der Verwendung des Begriffs „deutsch“ im heutigen Sinn) ist das ältere bayerische Stammesherzogtum nachgewiesen, das unter den Merowingern Teil des fränkischen Herrschaftsbereichs wurde. Unter den Karolingern entstand erstmals ein baierisches Königtum, das diese entweder in Personalunion als Könige oder Unterkönige regierten oder Statthalter einsetzten. Nach dem Ende der Herrschaft der Karolinger erstarkte die baierische Eigenständigkeit im jüngeren bayerischen Stammesherzogtum. Mit Beginn der Herrschaft der Wittelsbacher 1180 folgte der Übergang zum Territorialstaat. Sie regierten Bayern über 700 Jahre bis 1918. Baiern war Kurfürstentum des Heiligen Römischen Reiches und ab 1806 Königreich. Durch die Gewährung der Verfassungen von 1808, 1818 und 1848 wurde Bayern konstitutionelle Monarchie. Bayern konnte auf dem Wiener Kongress 1814 als eine der Siegermächte einen großen Teil der Gebietsgewinne behalten; unter anderem kamen das heutige Nordbayern, Teile Schwabens und die neugeschaffene linksrheinische Pfalz zu Bayern. 1918 brach die Wittelsbachermonarchie in der Novemberrevolution zusammen. Nach der Besetzung durch die US-Armee wurde Bayern 1949 Teil der neu gegründeten Bundesrepublik. Die Pfalz wurde 1946 von Bayern abgetrennt und ist heute Teil von Rheinland-Pfalz. Es begann ein wirtschaftlicher Aufschwung und eine Entwicklung vom Agrarstaat zum modernen Industriestaat."
+msgstr "%|%Bereits im Jahre 555 n. Chr. (und damit rund 500 Jahre vor der Verwendung des Begriffs „deutsch“ im heutigen Sinn) ist das ältere bayerische Stammesherzogtum nachgewiesen, das unter den Merowingern Teil des fränkischen Herrschaftsbereichs wurde. Unter den Karolingern entstand erstmals ein baierisches Königtum, das diese entweder in Personalunion als Könige oder Unterkönige regierten oder Statthalter einsetzten. Nach dem Ende der Herrschaft der Karolinger erstarkte die baierische Eigenständigkeit im jüngeren bayerischen Stammesherzogtum. Mit Beginn der Herrschaft der Wittelsbacher 1180 folgte der Übergang zum Territorialstaat. Sie regierten Bayern über 700 Jahre bis 1918. Baiern war Kurfürstentum des Heiligen Römischen Reiches und ab 1806 Königreich. Durch die Gewährung der Verfassungen von 1808, 1818 und 1848 wurde Bayern konstitutionelle Monarchie. Bayern konnte auf dem Wiener Kongress 1814 als eine der Siegermächte einen großen Teil der Gebietsgewinne behalten; unter anderem kamen das heutige Nordbayern, Teile Schwabens und die neugeschaffene linksrheinische Pfalz zu Bayern. 1918 brach die Wittelsbachermonarchie in der Novemberrevolution zusammen. Nach der Besetzung durch die US-Armee wurde Bayern 1949 Teil der neu gegründeten Bundesrepublik. Die Pfalz wurde 1946 von Bayern abgetrennt und ist heute Teil von Rheinland-Pfalz. Es begann ein wirtschaftlicher Aufschwung und eine Entwicklung vom Agrarstaat zum modernen Industriestaat.%|%en%|%"
+
+msgid "Bayern liegt fast vollständig im oberdeutschen Sprachraum. Traditionell gliedert es sich in die drei Landesteile Franken (heute die Regierungsbezirke Ober-, Mittel- und Unterfranken), Schwaben (gleichnamiger Regierungsbezirk) und Altbayern (Regierungsbezirke Oberpfalz, Ober- sowie Niederbayern)."
+msgstr "%|%Bayern liegt fast vollständig im oberdeutschen Sprachraum. Traditionell gliedert es sich in die drei Landesteile Franken (heute die Regierungsbezirke Ober-, Mittel- und Unterfranken), Schwaben (gleichnamiger Regierungsbezirk) und Altbayern (Regierungsbezirke Oberpfalz, Ober- sowie Niederbayern).%|%en%|%"
 
 msgid "Neueste Beiträge"
 msgstr "%|%Neueste Beiträge%|%en%|%"
@@ -124,6 +125,10 @@ msgid "Hoch"
 msgstr "%|%Hoch%|%en%|%"
 
 msgctxt "slug"
+msgid "steffen"
+msgstr "steffen-en"
+
+msgctxt "slug"
 msgid "hello-world"
 msgstr "hello-world-en"
 
@@ -155,8 +160,8 @@ msgid "Suche …"
 msgstr "%|%Suche …%|%en%|%"
 
 msgctxt "title"
-msgid "Seite wurde nicht gefunden."
-msgstr "%|%Seite wurde nicht gefunden.%|%en%|%"
+msgid "Dies ist ein Test"
+msgstr "%|%Dies ist ein Test%|%en%|%"
 
 msgctxt "title"
 msgid "WPBABEL"
@@ -165,48 +170,12 @@ msgstr "%|%WPBABEL%|%en%|%"
 msgid "Suchen"
 msgstr "%|%Suchen%|%en%|%"
 
-msgid "/mnt/c/htdocs/gtbabel/src/gtbabel.php:1028:"
-msgstr "%|%/mnt/c/htdocs/gtbabel/src/gtbabel.php:1028:%|%en%|%"
-
-msgid "'/de/dies-ist-ein-test/'"
-msgstr "%|%'/de/dies-ist-ein-test/'%|%en%|%"
-
-msgid "(length=22)"
-msgstr "%|%(length=22)%|%en%|%"
-
-msgid "/mnt/c/htdocs/gtbabel/src/gtbabel.php:1031:"
-msgstr "%|%/mnt/c/htdocs/gtbabel/src/gtbabel.php:1031:%|%en%|%"
-
-msgid "/mnt/c/htdocs/gtbabel/src/gtbabel.php:1032:"
-msgstr "%|%/mnt/c/htdocs/gtbabel/src/gtbabel.php:1032:%|%en%|%"
-
-msgid "'/en/dies-ist-ein-test/'"
-msgstr "%|%'/en/dies-ist-ein-test/'%|%en%|%"
-
-msgid "'/dies-ist-ein-test/'"
-msgstr "%|%'/dies-ist-ein-test/'%|%en%|%"
-
-msgid "(length=19)"
-msgstr "%|%(length=19)%|%en%|%"
-
-msgid "Der Freistaat Bayern (Zum Anhören bitte klicken! [ˈbaɪ̯ɐn]; Ländercode BY) ist mit mehr als 70.500 Quadratkilometern das flächengrößte der 16 Länder in Deutschland und liegt in dessen Südosten. Mit rund 13 Millionen Einwohnern ist er nach Nordrhein-Westfalen das zweitbevölkerungsreichste deutsche Land."
-msgstr "%|%Der Freistaat Bayern (Zum Anhören bitte klicken! [ˈbaɪ̯ɐn]; Ländercode BY) ist mit mehr als 70.500 Quadratkilometern das flächengrößte der 16 Länder in Deutschland und liegt in dessen Südosten. Mit rund 13 Millionen Einwohnern ist er nach Nordrhein-Westfalen das zweitbevölkerungsreichste deutsche Land.%|%en%|%"
-
-msgid "Der Freistaat hat im Süden Anteil am Hochgebirge der Ostalpen und dem bis zur Donau reichenden flachen Alpenvorland. Nördlich der Donau bestimmen Mittelgebirge wie etwa der Bayerische Wald oder das Fichtelgebirge das Landschaftsbild. Größte Stadt Bayerns ist die Landeshauptstadt und Millionenmetropole München, gefolgt von Nürnberg und Augsburg. Weitere Großstädte sind Regensburg, Ingolstadt, Würzburg, Fürth und Erlangen."
-msgstr "%|%Der Freistaat hat im Süden Anteil am Hochgebirge der Ostalpen und dem bis zur Donau reichenden flachen Alpenvorland. Nördlich der Donau bestimmen Mittelgebirge wie etwa der Bayerische Wald oder das Fichtelgebirge das Landschaftsbild. Größte Stadt Bayerns ist die Landeshauptstadt und Millionenmetropole München, gefolgt von Nürnberg und Augsburg. Weitere Großstädte sind Regensburg, Ingolstadt, Würzburg, Fürth und Erlangen.%|%en%|%"
-
-msgid "Bayern ist eine parlamentarische Republik mit dem Bayerischen Landtag als Legislative und der Bayerischen Staatsregierung, an deren Spitze der Ministerpräsident als Regierungschef steht, als Exekutive. Grundlage der Politik ist die Verfassung des Freistaates Bayern, gemäß der Bayern ein Volks-, Rechts-, Kultur- und Sozialstaat ist. Die Bezeichnung Freier Volksstaat bzw. Freistaat als Republik trägt Bayern seit 1918, mit der Ausrufung durch den revolutionären Ministerpräsidenten Kurt Eisner am 8. November 1918 und dem damit verbundenen Ende des Königreichs Bayern."
-msgstr "%|%Bayern ist eine parlamentarische Republik mit dem Bayerischen Landtag als Legislative und der Bayerischen Staatsregierung, an deren Spitze der Ministerpräsident als Regierungschef steht, als Exekutive. Grundlage der Politik ist die Verfassung des Freistaates Bayern, gemäß der Bayern ein Volks-, Rechts-, Kultur- und Sozialstaat ist. Die Bezeichnung Freier Volksstaat bzw. Freistaat als Republik trägt Bayern seit 1918, mit der Ausrufung durch den revolutionären Ministerpräsidenten Kurt Eisner am 8. November 1918 und dem damit verbundenen Ende des Königreichs Bayern.%|%en%|%"
-
-msgid "Bereits im Jahre 555 n. Chr. (und damit rund 500 Jahre vor der Verwendung des Begriffs „deutsch“ im heutigen Sinn) ist das ältere bayerische Stammesherzogtum nachgewiesen, das unter den Merowingern Teil des fränkischen Herrschaftsbereichs wurde. Unter den Karolingern entstand erstmals ein baierisches Königtum, das diese entweder in Personalunion als Könige oder Unterkönige regierten oder Statthalter einsetzten. Nach dem Ende der Herrschaft der Karolinger erstarkte die baierische Eigenständigkeit im jüngeren bayerischen Stammesherzogtum. Mit Beginn der Herrschaft der Wittelsbacher 1180 folgte der Übergang zum Territorialstaat. Sie regierten Bayern über 700 Jahre bis 1918. Baiern war Kurfürstentum des Heiligen Römischen Reiches und ab 1806 Königreich. Durch die Gewährung der Verfassungen von 1808, 1818 und 1848 wurde Bayern konstitutionelle Monarchie. Bayern konnte auf dem Wiener Kongress 1814 als eine der Siegermächte einen großen Teil der Gebietsgewinne behalten; unter anderem kamen das heutige Nordbayern, Teile Schwabens und die neugeschaffene linksrheinische Pfalz zu Bayern. 1918 brach die Wittelsbachermonarchie in der Novemberrevolution zusammen. Nach der Besetzung durch die US-Armee wurde Bayern 1949 Teil der neu gegründeten Bundesrepublik. Die Pfalz wurde 1946 von Bayern abgetrennt und ist heute Teil von Rheinland-Pfalz. Es begann ein wirtschaftlicher Aufschwung und eine Entwicklung vom Agrarstaat zum modernen Industriestaat."
-msgstr "%|%Bereits im Jahre 555 n. Chr. (und damit rund 500 Jahre vor der Verwendung des Begriffs „deutsch“ im heutigen Sinn) ist das ältere bayerische Stammesherzogtum nachgewiesen, das unter den Merowingern Teil des fränkischen Herrschaftsbereichs wurde. Unter den Karolingern entstand erstmals ein baierisches Königtum, das diese entweder in Personalunion als Könige oder Unterkönige regierten oder Statthalter einsetzten. Nach dem Ende der Herrschaft der Karolinger erstarkte die baierische Eigenständigkeit im jüngeren bayerischen Stammesherzogtum. Mit Beginn der Herrschaft der Wittelsbacher 1180 folgte der Übergang zum Territorialstaat. Sie regierten Bayern über 700 Jahre bis 1918. Baiern war Kurfürstentum des Heiligen Römischen Reiches und ab 1806 Königreich. Durch die Gewährung der Verfassungen von 1808, 1818 und 1848 wurde Bayern konstitutionelle Monarchie. Bayern konnte auf dem Wiener Kongress 1814 als eine der Siegermächte einen großen Teil der Gebietsgewinne behalten; unter anderem kamen das heutige Nordbayern, Teile Schwabens und die neugeschaffene linksrheinische Pfalz zu Bayern. 1918 brach die Wittelsbachermonarchie in der Novemberrevolution zusammen. Nach der Besetzung durch die US-Armee wurde Bayern 1949 Teil der neu gegründeten Bundesrepublik. Die Pfalz wurde 1946 von Bayern abgetrennt und ist heute Teil von Rheinland-Pfalz. Es begann ein wirtschaftlicher Aufschwung und eine Entwicklung vom Agrarstaat zum modernen Industriestaat.%|%en%|%"
-
-msgid "Bayern liegt fast vollständig im oberdeutschen Sprachraum. Traditionell gliedert es sich in die drei Landesteile Franken (heute die Regierungsbezirke Ober-, Mittel- und Unterfranken), Schwaben (gleichnamiger Regierungsbezirk) und Altbayern (Regierungsbezirke Oberpfalz, Ober- sowie Niederbayern)."
-msgstr "%|%Bayern liegt fast vollständig im oberdeutschen Sprachraum. Traditionell gliedert es sich in die drei Landesteile Franken (heute die Regierungsbezirke Ober-, Mittel- und Unterfranken), Schwaben (gleichnamiger Regierungsbezirk) und Altbayern (Regierungsbezirke Oberpfalz, Ober- sowie Niederbayern).%|%en%|%"
+msgid "test"
+msgstr "%|%test%|%en%|%"
 
 msgctxt "title"
-msgid "Dies ist ein Test"
-msgstr "%|%Dies ist ein Test%|%en%|%"
+msgid "steffen"
+msgstr "%|%steffen%|%en%|%"
 
 msgid "Beitragsautor"
 msgstr "%|%Beitragsautor%|%en%|%"
@@ -245,9 +214,81 @@ msgctxt "title"
 msgid "Eine ziemlich coole Seite"
 msgstr "%|%Eine ziemlich coole Seite%|%en%|%"
 
-msgid "test"
-msgstr "%|%test%|%en%|%"
+msgid "/mnt/c/htdocs/wpbabel/wp-content/themes/twentytwenty/header.php:201:"
+msgstr "%|%/mnt/c/htdocs/wpbabel/wp-content/themes/twentytwenty/header.php:201:%|%en%|%"
+
+msgid "'BINGO'"
+msgstr "%|%'BINGO'%|%en%|%"
+
+msgid "(length=5)"
+msgstr "%|%(length=5)%|%en%|%"
+
+msgid "Suchen:"
+msgstr "%|%Suchen:%|%en%|%"
+
+msgid "“test”"
+msgstr "%|%“test”%|%en%|%"
+
+msgid "Es gibt 2 Treffer für diese Suche."
+msgstr "%|%Es gibt 2 Treffer für diese Suche.%|%en%|%"
+
+msgid "Der Freistaat Bayern (Zum Anhören bitte klicken! [ˈbaɪ̯ɐn]; Ländercode BY) ist mit mehr als 70.500 Quadratkilometern das flächengrößte der 16 Länder in Deutschland und liegt in dessen Südosten. Mit rund 13 Millionen Einwohnern ist er nach Nordrhein-Westfalen das zweitbevölkerungsreichste deutsche Land. Der Freistaat hat im Süden Anteil am Hochgebirge der Ostalpen und dem bis zur […]"
+msgstr "%|%Der Freistaat Bayern (Zum Anhören bitte klicken! [ˈbaɪ̯ɐn]; Ländercode BY) ist mit mehr als 70.500 Quadratkilometern das flächengrößte der 16 Länder in Deutschland und liegt in dessen Südosten. Mit rund 13 Millionen Einwohnern ist er nach Nordrhein-Westfalen das zweitbevölkerungsreichste deutsche Land. Der Freistaat hat im Süden Anteil am Hochgebirge der Ostalpen und dem bis zur […]%|%en%|%"
 
 msgctxt "title"
-msgid "steffen"
-msgstr "%|%steffen%|%en%|%"
+msgid "Du hast nach test gesucht"
+msgstr "%|%Du hast nach test gesucht%|%en%|%"
+
+msgid "1 Anwort auf „Hello world!“"
+msgstr "%|%1 Anwort auf „Hello world!“%|%en%|%"
+
+msgid "sagt:"
+msgstr "%|%sagt:%|%en%|%"
+
+msgid "November 29, 2019 um 10:45 am"
+msgstr "%|%November 29, 2019 um 10:45 am%|%en%|%"
+
+msgid "Hi, this is a comment.<br> To get started with moderating, editing, and deleting comments, please visit the Comments screen in the dashboard.<br> Commenter avatars come from <a>Gravatar</a>."
+msgstr "%|%Hi, this is a comment.<br> To get started with moderating, editing, and deleting comments, please visit the Comments screen in the dashboard.<br> Commenter avatars come from <a>Gravatar</a>.%|%en%|%"
+
+msgid "Antworten"
+msgstr "%|%Antworten%|%en%|%"
+
+msgid "Schreibe einen Kommentar <small><a>Antworten abbrechen</a></small>"
+msgstr "%|%Schreibe einen Kommentar <small><a>Antworten abbrechen</a></small>%|%en%|%"
+
+msgid "Deine E-Mail-Adresse wird nicht veröffentlicht."
+msgstr "%|%Deine E-Mail-Adresse wird nicht veröffentlicht.%|%en%|%"
+
+msgid "Erforderliche Felder sind mit"
+msgstr "%|%Erforderliche Felder sind mit%|%en%|%"
+
+msgid "markiert."
+msgstr "%|%markiert.%|%en%|%"
+
+msgid "Kommentar"
+msgstr "%|%Kommentar%|%en%|%"
+
+msgid "Name"
+msgstr "%|%Name%|%en%|%"
+
+msgid "E-Mail"
+msgstr "%|%E-Mail%|%en%|%"
+
+msgid "Website"
+msgstr "%|%Website%|%en%|%"
+
+msgid "Meinen Namen, E-Mail und Website in diesem Browser speichern, bis ich wieder kommentiere."
+msgstr "%|%Meinen Namen, E-Mail und Website in diesem Browser speichern, bis ich wieder kommentiere.%|%en%|%"
+
+msgctxt "slug"
+msgid "#respond"
+msgstr "#respond-en"
+
+msgctxt "slug"
+msgid "wp-comments-post.php"
+msgstr "wp-comments-post.php-en"
+
+msgctxt "title"
+msgid "Hello world!"
+msgstr "%|%Hello world!%|%en%|%"

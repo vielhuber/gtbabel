@@ -29,7 +29,7 @@ add_action('after_setup_theme', function () use ($gtbabel) {
         'prefix_source_lng' => true,
         'translate_text_nodes' => true,
         'translate_default_tag_nodes' => true,
-        'exclude_urls' => ['/wp-admin', 'wp-login.php', 'wp-cron.php'],
+        'exclude_urls' => ['/wp-admin', 'wp-login.php', 'wp-cron.php', 'wp-comments-post.php'],
         'exclude_dom' => ['.lngpicker'],
         'include' => [
             [

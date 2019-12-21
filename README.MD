@@ -92,6 +92,7 @@ the idea can be relatively easy implemented in js frameworks like Vue or React.
 by default gtbabel translates all text nodes and the following tag nodes:
 
 -   `<a>` (attribute: href)
+-   `<form>` (attribute: action)
 -   `<img>` (attribute: alt)
 -   `<input>` (attribute: placeholder)
 -   `<title>`

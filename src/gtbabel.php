@@ -160,9 +160,14 @@ class gtbabel
     }
     private function currentUrlIsExcluded()
     {
+        return $this->urlIsExcluded($this->getCurrentPath());
+    }
+
+    private function urlIsExcluded($url)
+    {
         if ($this->args->exclude_urls !== null && is_array($this->args->exclude_urls)) {
             foreach ($this->args->exclude_urls as $exclude__value) {
-                if (strpos(trim($this->getCurrentPath(), '/'), trim($exclude__value, '/')) === 0) {
+                if (strpos(trim($url, '/'), trim($exclude__value, '/')) !== false) {
                     return true;
                 }
             }
@@ -272,11 +277,23 @@ msgstr ""
                 $parts__value = str_replace('[', '[@', $parts__value);
             }
             // .foo => *[contains(concat(" ", normalize-space(@class), " "), " foo ")]
-            if (strpos($parts__value, '.') === 0) {
-                $parts__value =
-                    '*[contains(concat(" ", normalize-space(@class), " "), " ' .
-                    str_replace('.', '', $parts__value) .
-                    ' ")]';
+            if (strpos($parts__value, '.') !== false) {
+                $parts__value_parts = explode('.',$parts__value);
+                foreach($parts__value_parts as $parts__value_parts__key=>$parts__value_parts__value)
+                {
+                    if( $parts__value_parts__key === 0 && $parts__value_parts__value === '' )
+                    {
+                        $parts__value_parts[$parts__value_parts__key] = '*';
+                    }
+                    if( $parts__value_parts__key > 0 )
+                    {
+                        $parts__value_parts[$parts__value_parts__key] =
+                            '[contains(concat(" ", normalize-space(@class), " "), " ' .
+                            $parts__value_parts__value .
+                            ' ")]';
+                    }
+                }
+                $parts__value = implode('',$parts__value_parts);
             }
             $parts[$parts__key] = $parts__value;
         }
@@ -304,12 +321,8 @@ msgstr ""
         $this->setupDomDocument();
         $this->setLangTags();
         $this->preloadExcludedNodes();
-        if ($this->sourceLngIsCurrentLng()) {
-            $this->modifyPrefixedSourceLngLinks();
-        } else {
-            $this->modifyTextNodes();
-            $this->modifyTagNodes();
-        }
+        $this->modifyTextNodes();
+        $this->modifyTagNodes();
         $this->html = $this->DOMDocument->saveHTML();
     }
 
@@ -347,6 +360,9 @@ msgstr ""
     private function modifyTextNodes()
     {
         if ($this->args->translate_text_nodes === false) {
+            return;
+        }
+        if ($this->sourceLngIsCurrentLng()) {
             return;
         }
 
@@ -770,6 +786,11 @@ msgstr ""
 
     private function modifyTagNodes()
     {
+        if( $this->sourceLngIsCurrentLng() && $this->args->prefix_source_lng === false )
+        {
+            return;
+        }
+        
         $include = [];
 
         if ($this->args->translate_default_tag_nodes === true) {
@@ -777,6 +798,11 @@ msgstr ""
                 [
                     'selector' => 'a',
                     'attribute' => 'href',
+                    'context' => 'slug'
+                ],
+                [
+                    'selector' => 'form',
+                    'attribute' => 'action',
                     'context' => 'slug'
                 ],
                 [
@@ -832,11 +858,46 @@ msgstr ""
                         if (strpos($value, $this->getCurrentHost()) === 0) {
                             $context = 'slug';
                         }
-                        $trans = $this->prepareTranslationAndAddDynamicallyIfNeeded(
-                            $value,
-                            $this->getCurrentLng(),
-                            $context
-                        );
+
+                        if( $context === 'slug' && $this->urlIsExcluded($value) )
+                        {
+                            continue;
+                        }
+
+                        if ($this->sourceLngIsCurrentLng()) {
+                            if( $context === 'slug' )
+                            {
+                                if ($value === null || trim($value) === '' || strpos($value, '#') === 0) {
+                                    continue;
+                                }
+                                $is_absolute_link = strpos($value, $this->getCurrentHost()) === 0;
+                                if (strpos($value, 'http') !== false && $is_absolute_link === false) {
+                                    continue;
+                                }
+                                if (strpos($value, 'http') === false && strpos($value, ':') !== false) {
+                                    continue;
+                                }
+                                $value = str_replace($this->getCurrentHost(), '', $value);
+                                $value = '/' . $this->getCurrentLng() . '' . $value;
+                                if ($is_absolute_link === true) {
+                                    $value = $this->getCurrentHost() . $value;
+                                }
+                                $trans = $value;
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            $trans = $this->prepareTranslationAndAddDynamicallyIfNeeded(
+                                $value,
+                                $this->getCurrentLng(),
+                                $context
+                            );
+                        }
+
                         if (@$include__value['attribute'] != '') {
                             $nodes__value->setAttribute($include__value['attribute'], $trans);
                         } else {
@@ -1032,23 +1093,30 @@ msgstr ""
 
     private function redirectPrefixedSourceLng()
     {
-        if ($this->args->prefix_source_lng === false) {
-            return;
-        }
         if (!$this->sourceLngIsCurrentLng()) {
             return;
         }
-        if ($this->getCurrentPrefix() !== null) {
+        if( $this->args->prefix_source_lng === false && $this->getCurrentPrefix() !== $this->getSourceLng() )
+        {
             return;
         }
-
-        $url = '';
-        $url .= trim($this->getCurrentHost(), '/');
-        $url .= '/';
-        $url .= $this->getCurrentLng();
-        $url .= '/';
-        if (trim($this->getCurrentPath(), '/') != '') {
-            $url .= trim($this->getCurrentPath(), '/') . '/';
+        if( $this->args->prefix_source_lng === true && $this->getCurrentPrefix() !== null )
+        {
+            return;
+        }
+        if ($this->args->prefix_source_lng === false) {
+            $url = trim($this->getCurrentHost(), '/').'/'.str_replace($this->getSourceLng().'/','',$this->getCurrentPathWithArgs());
+        }
+        else
+        {
+            $url = '';
+            $url .= trim($this->getCurrentHost(), '/');
+            $url .= '/';
+            $url .= $this->getCurrentLng();
+            $url .= '/';
+            if (trim($this->getCurrentPath(), '/') != '') {
+                $url .= trim($this->getCurrentPath(), '/') . '/';
+            }
         }
 
         header('Location: ' . $url, true, 301);

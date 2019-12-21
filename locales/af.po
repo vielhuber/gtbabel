@@ -11,9 +11,172 @@ msgid "dies-ist-ein-test"
 msgstr "dies-ist-ein-test-af"
 
 msgctxt "slug"
-msgid "scheiss-wp-auto-redirect"
-msgstr "scheiss-wp-auto-redirect-af"
-
-msgctxt "slug"
 msgid "steffen"
 msgstr "steffen-af"
+
+msgctxt "slug"
+msgid "hello-world"
+msgstr "hello-world-af"
+
+msgid "Direkt zum Inhalt wechseln"
+msgstr "%|%Direkt zum Inhalt wechseln%|%af%|%"
+
+msgid "Suche"
+msgstr "%|%Suche%|%af%|%"
+
+msgid "WPBABEL"
+msgstr "%|%WPBABEL%|%af%|%"
+
+msgid "Eine ziemlich coole Seite"
+msgstr "%|%Eine ziemlich coole Seite%|%af%|%"
+
+msgid "Menü"
+msgstr "%|%Menü%|%af%|%"
+
+msgid "Dies ist ein Test"
+msgstr "%|%Dies ist ein Test%|%af%|%"
+
+msgid "steffen"
+msgstr "%|%steffen%|%af%|%"
+
+msgid "Suche nach:"
+msgstr "%|%Suche nach:%|%af%|%"
+
+msgid "Suche schließen"
+msgstr "%|%Suche schließen%|%af%|%"
+
+msgid "Menü schließen"
+msgstr "%|%Menü schließen%|%af%|%"
+
+msgid "/mnt/c/htdocs/wpbabel/wp-content/themes/twentytwenty/header.php:190:"
+msgstr "%|%/mnt/c/htdocs/wpbabel/wp-content/themes/twentytwenty/header.php:190:%|%af%|%"
+
+msgid "string"
+msgstr "%|%string%|%af%|%"
+
+msgid "(length=2)"
+msgstr "%|%(length=2)%|%af%|%"
+
+msgid "Kategorien"
+msgstr "%|%Kategorien%|%af%|%"
+
+msgid "<a>Uncategorized</a>"
+msgstr "%|%<a>Uncategorized</a>%|%af%|%"
+
+msgid "Hello world!"
+msgstr "%|%Hello world!%|%af%|%"
+
+msgid "Beitragsautor"
+msgstr "%|%Beitragsautor%|%af%|%"
+
+msgid "Von <a>root</a>"
+msgstr "%|%Von <a>root</a>%|%af%|%"
+
+msgid "Beitragsdatum"
+msgstr "%|%Beitragsdatum%|%af%|%"
+
+msgid "<a>November 29, 2019</a>"
+msgstr "%|%<a>November 29, 2019</a>%|%af%|%"
+
+msgid "1 Kommentar"
+msgstr "%|%1 Kommentar%|%af%|%"
+
+msgid "zu Hello world!"
+msgstr "%|%zu Hello world!%|%af%|%"
+
+msgid "Welcome to WordPress. This is your first post. Edit or delete it, then start writing!"
+msgstr "%|%Welcome to WordPress. This is your first post. Edit or delete it, then start writing!%|%af%|%"
+
+msgid "Neueste Beiträge"
+msgstr "%|%Neueste Beiträge%|%af%|%"
+
+msgid "<a>Hello world!</a>"
+msgstr "%|%<a>Hello world!</a>%|%af%|%"
+
+msgid "Neueste Kommentare"
+msgstr "%|%Neueste Kommentare%|%af%|%"
+
+msgid "A WordPress Commenter"
+msgstr "%|%A WordPress Commenter%|%af%|%"
+
+msgid "bei"
+msgstr "%|%bei%|%af%|%"
+
+msgid "Archive"
+msgstr "%|%Archive%|%af%|%"
+
+msgid "November 2019"
+msgstr "%|%November 2019%|%af%|%"
+
+msgid "Meta"
+msgstr "%|%Meta%|%af%|%"
+
+msgid "Anmelden"
+msgstr "%|%Anmelden%|%af%|%"
+
+msgid "Feed der Einträge"
+msgstr "%|%Feed der Einträge%|%af%|%"
+
+msgid "Kommentare-Feed"
+msgstr "%|%Kommentare-Feed%|%af%|%"
+
+msgid "WordPress.org"
+msgstr "%|%WordPress.org%|%af%|%"
+
+msgid "© 2019\t\t\t\t<a>WPBABEL</a>"
+msgstr "%|%© 2019\t\t\t\t<a>WPBABEL</a>%|%af%|%"
+
+msgid "<a> Powered by WordPress\t\t\t\t</a>"
+msgstr "%|%<a> Powered by WordPress\t\t\t\t</a>%|%af%|%"
+
+msgid "Nach oben"
+msgstr "%|%Nach oben%|%af%|%"
+
+msgid "Hoch"
+msgstr "%|%Hoch%|%af%|%"
+
+msgctxt "slug"
+msgid "category"
+msgstr "category-af"
+
+msgctxt "slug"
+msgid "uncategorized"
+msgstr "uncategorized-af"
+
+msgctxt "slug"
+msgid "author"
+msgstr "author-af"
+
+msgctxt "slug"
+msgid "root"
+msgstr "root-af"
+
+msgctxt "slug"
+msgid "#comments"
+msgstr "#comments-af"
+
+msgctxt "slug"
+msgid "#comment-1"
+msgstr "#comment-1-af"
+
+msgctxt "slug"
+msgid "feed"
+msgstr "feed-af"
+
+msgctxt "slug"
+msgid "comments"
+msgstr "comments-af"
+
+msgid "Suche …"
+msgstr "%|%Suche …%|%af%|%"
+
+msgctxt "title"
+msgid "WPBABEL"
+msgstr "%|%WPBABEL%|%af%|%"
+
+msgctxt "title"
+msgid "Eine ziemlich coole Seite"
+msgstr "%|%Eine ziemlich coole Seite%|%af%|%"
+
+msgid "Suchen"
+msgstr "%|%Suchen%|%af%|%"
