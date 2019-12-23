@@ -1,10 +1,12 @@
 <?php
 namespace vielhuber\gtbabel;
 
+use Gettext\Loader\MoLoader;
 use Gettext\Loader\PoLoader;
 use Gettext\Generator\MoGenerator;
 use Gettext\Generator\PoGenerator;
 use Gettext\Translation;
+use Gettext\Translations;
 use Cocur\Slugify\Slugify;
 
 class gtbabel
@@ -19,9 +21,14 @@ class gtbabel
     private $original_host = null;
 
     private $html = null;
-    private $translations = null;
-    private $translations_cache = null;
-    private $translations_cache_reverse = null;
+
+    private $gettext = null;
+    private $gettext_cache = null;
+    private $gettext_cache_reverse = null;
+    private $gettext_pot = null;
+    private $gettext_pot_cache = null;
+    private $gettext_save_counter = null;
+
     private $DOMDocument = null;
     private $DOMXpath = null;
 
@@ -37,10 +44,9 @@ class gtbabel
         }
         $this->createLngFolderIfNotExists();
         if ($this->shouldBeResetted() === true) {
-            $this->deletePoMoFiles();
+            $this->deletePotPoMoFiles();
         }
-        $this->createPoFilesIfNotExists();
-        $this->preloadTranslationsInCache();
+        $this->preloadGettextInCache();
         $this->redirectPrefixedSourceLng();
         $this->addCurrentUrlToTranslations();
         if (!$this->currentUrlIsExcluded()) {
@@ -60,7 +66,7 @@ class gtbabel
         ob_end_clean();
         echo $this->html;
 
-        $this->generatePoAndMoFilesFromNewTranslations();
+        $this->generateGettextFiles();
         $this->le();
     }
 
@@ -190,12 +196,13 @@ class gtbabel
         return $this->getLngFolder() . '/' . $lng . '.' . $type;
     }
 
-    private function deletePoMoFiles()
+    private function deletePotPoMoFiles()
     {
         $files = glob($this->getLngFolder() . '/*'); // get all file names
         foreach ($files as $files__value) {
             if (is_file($files__value)) {
                 if (
+                    strpos($files__value, '.pot') !== false ||
                     strpos($files__value, '.po') !== false ||
                     strpos($files__value, '.mo') !== false
                 ) {
@@ -212,51 +219,52 @@ class gtbabel
         }
     }
 
-    private function createPoFilesIfNotExists()
+    private function preloadGettextInCache()
     {
+        $this->gettext = [];
+        $this->gettext_cache = [];
+        $this->gettext_cache_reverse = [];
+        $this->gettext_pot = [];
+        $this->gettext_pot_cache = [];
+        $this->gettext_save_counter = [];
+
+        $poLoader = new PoLoader();
+        $moLoader = new MoLoader();
+
+        // pot
+        $filename = $this->getLngFilename('pot', '_template');
+        $this->gettext_save_counter['pot'] = false;
+        if (!file_exists($filename)) {
+            $this->gettext_pot = Translations::create('gtbabel');
+        } else {
+            $this->gettext_pot = $poLoader->loadFile($filename);
+        }
+        foreach ($this->gettext_pot->getTranslations() as $gettext__value) {
+            $context = $gettext__value->getContext() ?? '';
+            $str = $gettext__value->getOriginal();
+            $this->gettext_pot_cache[$context][$str] = null;
+        }
+
+        // po
         foreach ($this->getLanguagesWithoutSource() as $languages__value) {
-            $filename = $this->getLngFilename('po', $languages__value);
-            if (!file_exists($filename)) {
-                file_put_contents(
-                    $filename,
-                    '# gtbabel
-msgid ""
-msgstr ""
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
-"Language: ' .
-                        $languages__value .
-                        '\n"'
+            $this->gettext_save_counter['po'][$languages__value] = false;
+            $this->gettext_cache[$languages__value] = [];
+            $this->gettext_cache_reverse[$languages__value] = [];
+            if (!file_exists($this->getLngFilename('mo', $languages__value))) {
+                $this->gettext[$languages__value] = Translations::create('gtbabel');
+            } else {
+                $this->gettext[$languages__value] = $moLoader->loadFile(
+                    $this->getLngFilename('mo', $languages__value)
                 );
             }
-        }
-    }
-
-    private function preloadTranslationsInCache()
-    {
-        $this->translations = [];
-        $this->translations_cache = [];
-        $this->translations_cache_reverse = [];
-        $poLoader = new PoLoader();
-        foreach ($this->getLanguagesWithoutSource() as $languages__value) {
-            $this->translations_cache[$languages__value] = [];
-            $this->translations_cache_reverse[$languages__value] = [];
-            $this->translations[$languages__value] = $poLoader->loadFile(
-                $this->getLngFilename('po', $languages__value)
-            );
-            foreach (
-                $this->translations[$languages__value]->getTranslations()
-                as $translations__value
-            ) {
-                $context = $translations__value->getContext() ?? '';
-                $this->translations_cache[$languages__value][$context][
-                    $translations__value->getOriginal()
-                ] = $translations__value->getTranslation();
-                $this->translations_cache_reverse[$languages__value][$context][
-                    $translations__value->getTranslation()
-                ] = $translations__value->getOriginal();
+            foreach ($this->gettext[$languages__value]->getTranslations() as $gettext__value) {
+                $context = $gettext__value->getContext() ?? '';
+                $this->gettext_cache[$languages__value][$context][
+                    $gettext__value->getOriginal()
+                ] = $gettext__value->getTranslation();
+                $this->gettext_cache_reverse[$languages__value][$context][
+                    $gettext__value->getTranslation()
+                ] = $gettext__value->getOriginal();
             }
         }
     }
@@ -278,22 +286,22 @@ msgstr ""
             }
             // .foo => *[contains(concat(" ", normalize-space(@class), " "), " foo ")]
             if (strpos($parts__value, '.') !== false) {
-                $parts__value_parts = explode('.',$parts__value);
-                foreach($parts__value_parts as $parts__value_parts__key=>$parts__value_parts__value)
-                {
-                    if( $parts__value_parts__key === 0 && $parts__value_parts__value === '' )
-                    {
+                $parts__value_parts = explode('.', $parts__value);
+                foreach (
+                    $parts__value_parts
+                    as $parts__value_parts__key => $parts__value_parts__value
+                ) {
+                    if ($parts__value_parts__key === 0 && $parts__value_parts__value === '') {
                         $parts__value_parts[$parts__value_parts__key] = '*';
                     }
-                    if( $parts__value_parts__key > 0 )
-                    {
+                    if ($parts__value_parts__key > 0) {
                         $parts__value_parts[$parts__value_parts__key] =
                             '[contains(concat(" ", normalize-space(@class), " "), " ' .
                             $parts__value_parts__value .
                             ' ")]';
                     }
                 }
-                $parts__value = implode('',$parts__value_parts);
+                $parts__value = implode('', $parts__value_parts);
             }
             $parts[$parts__key] = $parts__value;
         }
@@ -303,6 +311,7 @@ msgstr ""
 
     private function preloadExcludedNodes()
     {
+        $this->excluded_nodes = [];
         if ($this->args->exclude_dom !== null) {
             foreach ($this->args->exclude_dom as $exclude__value) {
                 $nodes = $this->DOMXpath->query($this->transformSelectorToXpath($exclude__value));
@@ -494,22 +503,37 @@ msgstr ""
     {
         $trans = $this->getExistingTranslationFromCache($orig, $lng, $context);
         if ($trans === false) {
+            $this->addStringToPotFileAndToCache($orig, $context);
             $trans = $this->autoTranslateString($orig, $lng, $context);
-            $this->addTranslationToGettextAndToCache($orig, $trans, $lng, $context);
+            if ($this->args->google_translation === true) {
+                $this->addTranslationToPoFileAndToCache($orig, $trans, $lng, $context);
+            }
         }
         return $trans;
     }
 
-    private function addTranslationToGettextAndToCache($orig, $trans, $lng, $context = null)
+    private function addStringToPotFileAndToCache($str, $context)
     {
-        $this->createNewTranslation($orig, $trans, $lng, $context);
-        $this->translations_cache[$lng][$context ?? ''][$orig] = $trans;
-        $this->translations_cache_reverse[$lng][$context ?? ''][$trans] = $orig;
+        $translation = Translation::create($context, $str);
+        $translation->translate('');
+        $this->gettext_pot->add($translation);
+        $this->gettext_pot_cache[$context][$str] = null;
+        $this->gettext_save_counter['pot'] = true;
+    }
+
+    private function addTranslationToPoFileAndToCache($orig, $trans, $lng, $context = null)
+    {
+        $translation = Translation::create($context, $orig);
+        $translation->translate($trans);
+        $this->gettext[$lng]->add($translation);
+        $this->gettext_cache[$lng][$context ?? ''][$orig] = $trans;
+        $this->gettext_cache_reverse[$lng][$context ?? ''][$trans] = $orig;
+        $this->gettext_save_counter['po'][$lng] = true;
     }
 
     private function autoTranslateString($orig, $to_lng, $context = null, $from_lng = null)
     {
-        if ($this->args->auto_translation === false) {
+        if ($this->args->google_translation === false) {
             $trans = $this->translateStringMock($orig, $to_lng, $context, $from_lng);
         } else {
             $trans = $this->translateStringWithGoogle($orig, $to_lng, $context, $from_lng);
@@ -681,27 +705,31 @@ msgstr ""
         return $parent;
     }
 
-    private function generatePoAndMoFilesFromNewTranslations()
+    private function generateGettextFiles()
     {
         $poGenerator = new PoGenerator();
         $moGenerator = new MoGenerator();
-        foreach ($this->getLanguagesWithoutSource() as $languages__value) {
+
+        if ($this->gettext_save_counter['pot'] === true) {
             $poGenerator->generateFile(
-                $this->translations[$languages__value],
+                $this->gettext_pot,
+                $this->getLngFilename('pot', '_template')
+            );
+        }
+
+        foreach ($this->getLanguagesWithoutSource() as $languages__value) {
+            if ($this->gettext_save_counter['po'][$languages__value] === false) {
+                continue;
+            }
+            $poGenerator->generateFile(
+                $this->gettext[$languages__value],
                 $this->getLngFilename('po', $languages__value)
             );
             $moGenerator->generateFile(
-                $this->translations[$languages__value],
+                $this->gettext[$languages__value],
                 $this->getLngFilename('mo', $languages__value)
             );
         }
-    }
-
-    private function createNewTranslation($orig, $translated, $lng, $context = null)
-    {
-        $translation = Translation::create($context, $orig);
-        $translation->translate($translated);
-        $this->translations[$lng]->add($translation);
     }
 
     private function getExistingTranslationFromCache($str, $lng, $context = null)
@@ -709,13 +737,14 @@ msgstr ""
         if (
             $str === '' ||
             $str === null ||
-            $this->translations_cache[$lng] === null ||
-            !array_key_exists($context ?? '', $this->translations_cache[$lng]) ||
-            !array_key_exists($str, $this->translations_cache[$lng][$context ?? ''])
+            $this->gettext_cache[$lng] === null ||
+            !array_key_exists($context ?? '', $this->gettext_cache[$lng]) ||
+            !array_key_exists($str, $this->gettext_cache[$lng][$context ?? '']) ||
+            $this->gettext_cache[$lng][$context ?? ''][$str] === ''
         ) {
             return false;
         }
-        return $this->translations_cache[$lng][$context ?? ''][$str];
+        return $this->gettext_cache[$lng][$context ?? ''][$str];
     }
 
     private function getExistingTranslationReverseFromCache($str, $lng, $context = null)
@@ -723,13 +752,14 @@ msgstr ""
         if (
             $str === '' ||
             $str === null ||
-            $this->translations_cache_reverse[$lng] === null ||
-            !array_key_exists($context ?? '', $this->translations_cache_reverse[$lng]) ||
-            !array_key_exists($str, $this->translations_cache_reverse[$lng][$context ?? ''])
+            $this->gettext_cache_reverse[$lng] === null ||
+            !array_key_exists($context ?? '', $this->gettext_cache_reverse[$lng]) ||
+            !array_key_exists($str, $this->gettext_cache_reverse[$lng][$context ?? '']) ||
+            $this->gettext_cache_reverse[$lng][$context ?? ''][$str] === ''
         ) {
             return false;
         }
-        return $this->translations_cache_reverse[$lng][$context ?? ''][$str];
+        return $this->gettext_cache_reverse[$lng][$context ?? ''][$str];
     }
 
     private function translateStringMock($str, $to_lng, $context = null, $from_lng = null)
@@ -742,7 +772,7 @@ msgstr ""
 
     private function translateStringWithGoogle($str, $to_lng, $context = null, $from_lng = null)
     {
-        $apiKey = $this->args->google_api_key;
+        $apiKey = $this->args->google_translation_api_key;
         $url =
             'https://www.googleapis.com/language/translate/v2?key=' .
             $apiKey .
@@ -786,11 +816,10 @@ msgstr ""
 
     private function modifyTagNodes()
     {
-        if( $this->sourceLngIsCurrentLng() && $this->args->prefix_source_lng === false )
-        {
+        if ($this->sourceLngIsCurrentLng() && $this->args->prefix_source_lng === false) {
             return;
         }
-        
+
         $include = [];
 
         if ($this->args->translate_default_tag_nodes === true) {
@@ -859,22 +888,30 @@ msgstr ""
                             $context = 'slug';
                         }
 
-                        if( $context === 'slug' && $this->urlIsExcluded($value) )
-                        {
+                        if ($context === 'slug' && $this->urlIsExcluded($value)) {
                             continue;
                         }
 
                         if ($this->sourceLngIsCurrentLng()) {
-                            if( $context === 'slug' )
-                            {
-                                if ($value === null || trim($value) === '' || strpos($value, '#') === 0) {
+                            if ($context === 'slug') {
+                                if (
+                                    $value === null ||
+                                    trim($value) === '' ||
+                                    strpos($value, '#') === 0
+                                ) {
                                     continue;
                                 }
                                 $is_absolute_link = strpos($value, $this->getCurrentHost()) === 0;
-                                if (strpos($value, 'http') !== false && $is_absolute_link === false) {
+                                if (
+                                    strpos($value, 'http') !== false &&
+                                    $is_absolute_link === false
+                                ) {
                                     continue;
                                 }
-                                if (strpos($value, 'http') === false && strpos($value, ':') !== false) {
+                                if (
+                                    strpos($value, 'http') === false &&
+                                    strpos($value, ':') !== false
+                                ) {
                                     continue;
                                 }
                                 $value = str_replace($this->getCurrentHost(), '', $value);
@@ -883,14 +920,10 @@ msgstr ""
                                     $value = $this->getCurrentHost() . $value;
                                 }
                                 $trans = $value;
-                            }
-                            else
-                            {
+                            } else {
                                 continue;
                             }
-                        }
-                        else
-                        {
+                        } else {
                             $trans = $this->prepareTranslationAndAddDynamicallyIfNeeded(
                                 $value,
                                 $this->getCurrentLng(),
@@ -1003,9 +1036,12 @@ msgstr ""
                 $context,
                 $from_lng
             );
+            $this->addStringToPotFileAndToCache($str_in_source, $context);
             $trans = $this->autoTranslateString($str, $to_lng, $context);
-            $this->addTranslationToGettextAndToCache($str_in_source, $str, $from_lng, $context);
-            $this->addTranslationToGettextAndToCache($str_in_source, $trans, $to_lng, $context);
+            if ($this->args->google_translation === true) {
+                $this->addTranslationToPoFileAndToCache($str_in_source, $str, $from_lng, $context);
+                $this->addTranslationToPoFileAndToCache($str_in_source, $trans, $to_lng, $context);
+            }
         }
         return $trans;
     }
@@ -1096,19 +1132,21 @@ msgstr ""
         if (!$this->sourceLngIsCurrentLng()) {
             return;
         }
-        if( $this->args->prefix_source_lng === false && $this->getCurrentPrefix() !== $this->getSourceLng() )
-        {
+        if (
+            $this->args->prefix_source_lng === false &&
+            $this->getCurrentPrefix() !== $this->getSourceLng()
+        ) {
             return;
         }
-        if( $this->args->prefix_source_lng === true && $this->getCurrentPrefix() !== null )
-        {
+        if ($this->args->prefix_source_lng === true && $this->getCurrentPrefix() !== null) {
             return;
         }
         if ($this->args->prefix_source_lng === false) {
-            $url = trim($this->getCurrentHost(), '/').'/'.str_replace($this->getSourceLng().'/','',$this->getCurrentPathWithArgs());
-        }
-        else
-        {
+            $url =
+                trim($this->getCurrentHost(), '/') .
+                '/' .
+                str_replace($this->getSourceLng() . '/', '', $this->getCurrentPathWithArgs());
+        } else {
             $url = '';
             $url .= trim($this->getCurrentHost(), '/');
             $url .= '/';

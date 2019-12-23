@@ -21,14 +21,14 @@ remove_action('template_redirect', 'redirect_canonical');
 
 add_action('after_setup_theme', function () use ($gtbabel) {
     $gtbabel->start([
-        'google_api_key' => getenv('GOOGLE_API_KEY'),
-        'auto_translation' => false,
         'lng_folder' => '/wp-content/plugins/gtbabel/locales',
         'lng_source' => 'de',
         'lng_target' => null, // auto
         'prefix_source_lng' => true,
         'translate_text_nodes' => true,
         'translate_default_tag_nodes' => true,
+        'google_translation' => false,
+        'google_translation_api_key' => getenv('GOOGLE_TRANSLATION_API_KEY'),
         'exclude_urls' => ['/wp-admin', 'wp-login.php', 'wp-cron.php', 'wp-comments-post.php'],
         'exclude_dom' => ['.lngpicker'],
         'include' => [

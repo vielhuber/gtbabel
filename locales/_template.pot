@@ -1,0 +1,29 @@
+msgid ""
+msgstr ""
+"X-Domain: gtbabel\n"
+
+msgid "Dies ist ein Beispieltext"
+msgstr ""
+
+msgid "Überschrift 1"
+msgstr ""
+
+msgid "Überschrift 2"
+msgstr ""
+
+msgid "foo"
+msgstr ""
+
+msgid "bar"
+msgstr ""
+
+msgctxt "title"
+msgid "Der Webseitentitel"
+msgstr ""
+
+msgctxt "title"
+msgid "Webseite"
+msgstr ""
+
+msgid "🌀 Vielhuber David ist ein Web-Geek mit einem Faible für schönes Design, einer Prise Perfektionismus und Augen für klare Konturen. 🌀"
+msgstr ""

@@ -48,14 +48,14 @@ use vielhuber\gtbabel\gtbabel;
 $gtbabel = new gtbabel();
 
 $gtbabel->start([
-    'google_api_key' => getenv('GOOGLE_API_KEY'),
-    'auto_translation' => false,
     'lng_folder' => '/locales',
     'lng_source' => 'de',
     'lng_target' => 'en',
     'prefix_source_lng' => false,
     'translate_text_nodes' => true,
     'translate_default_tag_nodes' => true,
+    'google_translation' => false,
+    'google_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
     'exclude_urls' => ['/backend'],
     'exclude_dom' => ['.lngpicker'],
     'include' => [
@@ -81,6 +81,17 @@ $gtbabel->stop();
 ## wordpress adapter
 
 [de.wordpress.org/plugins/gtbabel](https://de.wordpress.org/plugins/gtbabel/)
+
+## gettext
+
+-   the final html gets parsed by gtbabel and is split up in reasonable strings.
+-   all new strings are appended to a template pot-file
+-   if you disable auto translation:
+    -   the strings in the pot-file can be translated by hand (just put your mo-files inside the locales folder)
+-   if you enable auto translation:
+    -   po- and mo-files are automatically generated (and loaded on the next request)
+    -   new strings are automatically appended
+    -   you can modify these auto generated files afterwards, modified strings won't be overwritten
 
 ## javascript
 
