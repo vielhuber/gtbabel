@@ -1,12 +1,10 @@
 <?php
 require_once __DIR__ . '/vendor/autoload.php';
 use vielhuber\gtbabel\Gtbabel;
-use vielhuber\gtbabel\Dom;
-use vielhuber\gtbabel\Utils;
 use Dotenv\Dotenv;
 $dotenv = Dotenv::createImmutable(__DIR__);
 $dotenv->load();
-$gtbabel = new Gtbabel(new Dom(), new Utils());
+$gtbabel = new Gtbabel();
 
 $gtbabel->start([
     'lng_folder' => '/locales',

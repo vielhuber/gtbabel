@@ -6,6 +6,286 @@ class Dom
     public $DOMDocument;
     public $DOMXpath;
 
+    public $excluded_nodes;
+    public $group_cache;
+
+    public $gettext;
+    public $host;
+    public $settings;
+
+    function __construct(Gettext $gettext = null, Host $host = null, Settings $settings = null)
+    {
+        $this->gettext = $gettext ?: new Gettext();
+        $this->host = $host ?: new Host();
+        $this->settings = $settings ?: new Settings();
+    }
+
+    function preloadExcludedNodes()
+    {
+        $this->excluded_nodes = [];
+        if ($this->settings->get('exclude_dom') !== null) {
+            foreach ($this->settings->get('exclude_dom') as $exclude__value) {
+                $nodes = $this->DOMXpath->query($this->transformSelectorToXpath($exclude__value));
+                foreach ($nodes as $nodes__value) {
+                    $this->excluded_nodes[$this->getIdOfNode($nodes__value)] = true;
+                    foreach ($this->getChildrenOfNode($nodes__value) as $nodes__value__value) {
+                        $this->excluded_nodes[$this->getIdOfNode($nodes__value__value)] = true;
+                    }
+                }
+            }
+        }
+    }
+
+    function modifyTextNodes()
+    {
+        if ($this->settings->get('translate_text_nodes') === false) {
+            return;
+        }
+        if ($this->gettext->sourceLngIsCurrentLng()) {
+            return;
+        }
+
+        $groups = [];
+
+        $to_delete = [];
+        $textnodes = $this->DOMXpath->query('/html/body//text()');
+        foreach ($textnodes as $textnodes__value) {
+            if (array_key_exists($this->getIdOfNode($textnodes__value), $this->excluded_nodes)) {
+                continue;
+            }
+            if ($this->gettext->stringShouldNotBeTranslated($textnodes__value->nodeValue)) {
+                continue;
+            }
+            if (@$textnodes__value->parentNode->tagName === 'script') {
+                continue;
+            }
+            if (array_key_exists($this->getIdOfNode($textnodes__value), $to_delete)) {
+                continue;
+            }
+            $group = $this->getNearestLogicalGroup($textnodes__value);
+            if (array_key_exists($this->getIdOfNode($group), $to_delete)) {
+                continue;
+            }
+            $groups[] = $group;
+            $children = $this->getChildrenOfNode($group);
+            foreach ($children as $children__value) {
+                $to_delete[$this->getIdOfNode($children__value)] = true;
+            }
+        }
+        foreach ($groups as $groups__key => $groups__value) {
+            if (array_key_exists($this->getIdOfNode($groups__value), $to_delete)) {
+                unset($groups[$groups__key]);
+            }
+        }
+        $groups = array_values($groups);
+
+        foreach ($groups as $groups__value) {
+            if ($this->isTextNode($groups__value)) {
+                $originalText = $groups__value->nodeValue;
+            } else {
+                $originalText = $this->getInnerHtml($groups__value);
+            }
+
+            $originalText = $this->gettext->formatTextFromTextNode($originalText);
+
+            [
+                $originalTextWithPlaceholders,
+                $mappingTable
+            ] = $this->gettext->placeholderConversionIn($originalText);
+
+            $translatedTextWithPlaceholders = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
+                $originalTextWithPlaceholders,
+                $this->gettext->getCurrentLng()
+            );
+
+            $translatedText = $this->gettext->placeholderConversionOut(
+                $translatedTextWithPlaceholders,
+                $mappingTable
+            );
+
+            if ($this->isTextNode($groups__value)) {
+                $groups__value->nodeValue = $translatedText;
+            } else {
+                $this->setInnerHtml($groups__value, $translatedText);
+            }
+        }
+    }
+
+    function modifyTagNodes()
+    {
+        if (
+            $this->gettext->sourceLngIsCurrentLng() &&
+            $this->settings->get('prefix_source_lng') === false
+        ) {
+            return;
+        }
+
+        $include = [];
+
+        if ($this->settings->get('translate_default_tag_nodes') === true) {
+            $include = array_merge($include, [
+                [
+                    'selector' => 'a',
+                    'attribute' => 'href',
+                    'context' => 'slug'
+                ],
+                [
+                    'selector' => 'form',
+                    'attribute' => 'action',
+                    'context' => 'slug'
+                ],
+                [
+                    'selector' => 'img',
+                    'attribute' => 'alt',
+                    'context' => null
+                ],
+                [
+                    'selector' => 'input',
+                    'attribute' => 'placeholder',
+                    'context' => null
+                ],
+                [
+                    'selector' => 'head title',
+                    'attribute' => null,
+                    'context' => 'title'
+                ],
+                [
+                    'selector' => 'head meta[name="description"]',
+                    'attribute' => 'content',
+                    'context' => null
+                ]
+            ]);
+        }
+
+        $include = array_merge($include, $this->settings->get('include'));
+
+        foreach ($include as $include__value) {
+            $nodes = $this->DOMXpath->query(
+                $this->transformSelectorToXpath($include__value['selector'])
+            );
+            if (!empty($nodes)) {
+                foreach ($nodes as $nodes__value) {
+                    if (
+                        array_key_exists($this->getIdOfNode($nodes__value), $this->excluded_nodes)
+                    ) {
+                        continue;
+                    }
+                    if (@$include__value['attribute'] != '') {
+                        $value = $nodes__value->getAttribute($include__value['attribute']);
+                    } else {
+                        $value = $nodes__value->nodeValue;
+                    }
+                    if ($value != '') {
+                        $context = null;
+                        if (@$include__value['context'] != '') {
+                            $context = $include__value['context'];
+                        }
+                        if (
+                            $include__value['selector'] === 'a' &&
+                            $include__value['attribute'] === 'href'
+                        ) {
+                            $context = 'slug';
+                        }
+                        if (strpos($value, $this->host->getCurrentHost()) === 0) {
+                            $context = 'slug';
+                        }
+
+                        if ($context === 'slug' && $this->host->urlIsExcluded($value)) {
+                            continue;
+                        }
+
+                        if ($this->gettext->sourceLngIsCurrentLng()) {
+                            if ($context === 'slug') {
+                                if (
+                                    $value === null ||
+                                    trim($value) === '' ||
+                                    strpos($value, '#') === 0
+                                ) {
+                                    continue;
+                                }
+                                $is_absolute_link =
+                                    strpos($value, $this->host->getCurrentHost()) === 0;
+                                if (
+                                    strpos($value, 'http') !== false &&
+                                    $is_absolute_link === false
+                                ) {
+                                    continue;
+                                }
+                                if (
+                                    strpos($value, 'http') === false &&
+                                    strpos($value, ':') !== false
+                                ) {
+                                    continue;
+                                }
+                                $value = str_replace($this->host->getCurrentHost(), '', $value);
+                                $value = '/' . $this->gettext->getCurrentLng() . '' . $value;
+                                if ($is_absolute_link === true) {
+                                    $value = $this->host->getCurrentHost() . $value;
+                                }
+                                $trans = $value;
+                            } else {
+                                continue;
+                            }
+                        } else {
+                            $trans = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
+                                $value,
+                                $this->gettext->getCurrentLng(),
+                                $context
+                            );
+                        }
+
+                        if (@$include__value['attribute'] != '') {
+                            $nodes__value->setAttribute($include__value['attribute'], $trans);
+                        } else {
+                            $nodes__value->nodeValue = $trans;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    function modifyHtml($html)
+    {
+        $this->setupDomDocument($html);
+        $this->setLangTags();
+        $this->preloadExcludedNodes();
+        $this->modifyTextNodes();
+        $this->modifyTagNodes();
+        return $this->DOMDocument->saveHTML();
+    }
+
+    function setupDomDocument($html)
+    {
+        $this->DOMDocument = new \DOMDocument();
+
+        // if the html source doesn't contain a valid utf8 header, domdocument interprets is as iso
+        // we circumvent this with mb_convert_encoding
+        //@$this->DOMDocument->loadHTML($html);
+        @$this->DOMDocument->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+        $this->DOMXpath = new \DOMXpath($this->DOMDocument);
+    }
+
+    function setLangTags()
+    {
+        $html_node = $this->DOMXpath->query('/html')[0];
+        if ($html_node !== null) {
+            $html_node->setAttribute('lang', $this->gettext->getCurrentLng());
+        }
+
+        $head_node = $this->DOMXpath->query('/html/head')[0];
+        if ($head_node !== null) {
+            $data = $this->gettext->getLanguagePickerData();
+            foreach ($data as $data__value) {
+                $tag = $this->DOMDocument->createElement('link', '');
+                $tag->setAttribute('rel', 'alternate');
+                $tag->setAttribute('hreflang', $data__value['lng']);
+                $tag->setAttribute('href', $data__value['url']);
+                $head_node->appendChild($tag);
+            }
+        }
+    }
+
     function transformSelectorToXpath($selector)
     {
         $xpath = './/';
@@ -131,6 +411,9 @@ class Dom
 
     function getNearestLogicalGroup($node)
     {
+        if ($this->group_cache === null) {
+            $this->group_cache = [];
+        }
         $parent = $this->getParentNodeWithMoreThanOneChildren($node);
         if (!array_key_exists($this->getIdOfNode($parent), $this->group_cache)) {
             $this->group_cache[$this->getIdOfNode($parent)] = false;

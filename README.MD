@@ -40,14 +40,12 @@ then add this to your files:
 ```php
 require __DIR__ . '/vendor/autoload.php';
 use vielhuber\gtbabel\Gtbabel;
-use vielhuber\gtbabel\Dom;
-use vielhuber\gtbabel\Utils;
 ```
 
 ## usage
 
 ```php
-$gtbabel = new Gtbabel(new Dom(), new Utils());
+$gtbabel = new Gtbabel();
 
 $gtbabel->start([
     'lng_folder' => '/locales',
