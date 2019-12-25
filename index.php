@@ -1,10 +1,12 @@
 <?php
 require_once __DIR__ . '/vendor/autoload.php';
-use vielhuber\gtbabel\gtbabel;
+use vielhuber\gtbabel\Gtbabel;
+use vielhuber\gtbabel\Dom;
+use vielhuber\gtbabel\Utils;
 use Dotenv\Dotenv;
 $dotenv = Dotenv::createImmutable(__DIR__);
 $dotenv->load();
-$gtbabel = new gtbabel();
+$gtbabel = new Gtbabel(new Dom(), new Utils());
 
 $gtbabel->start([
     'lng_folder' => '/locales',
@@ -13,7 +15,7 @@ $gtbabel->start([
     'prefix_source_lng' => false,
     'translate_text_nodes' => true,
     'translate_default_tag_nodes' => true,
-    'google_translation' => true,
+    'google_translation' => false,
     'google_translation_api_key' => getenv('GOOGLE_TRANSLATION_API_KEY'),
     'exclude_urls' => null,
     'exclude_dom' => ['.lngpicker'],

@@ -27,3 +27,181 @@ msgstr ""
 
 msgid "🌀 Vielhuber David ist ein Web-Geek mit einem Faible für schönes Design, einer Prise Perfektionismus und Augen für klare Konturen. 🌀"
 msgstr ""
+
+msgid "%|%hello%|%de%|%"
+msgstr ""
+
+msgid "Direkt zum Inhalt wechseln"
+msgstr ""
+
+msgid "Suche"
+msgstr ""
+
+msgid "WPBABEL"
+msgstr ""
+
+msgid "Eine ziemlich coole Seite"
+msgstr ""
+
+msgid "Menü"
+msgstr ""
+
+msgid "Dies ist ein Test"
+msgstr ""
+
+msgid "steffen"
+msgstr ""
+
+msgid "Suche nach:"
+msgstr ""
+
+msgid "Suche schließen"
+msgstr ""
+
+msgid "Menü schließen"
+msgstr ""
+
+msgid "/mnt/c/htdocs/wpbabel/wp-content/themes/twentytwenty/header.php:190:"
+msgstr ""
+
+msgid "string"
+msgstr ""
+
+msgid "(length=2)"
+msgstr ""
+
+msgid "Kategorien"
+msgstr ""
+
+msgid "<a>Uncategorized</a>"
+msgstr ""
+
+msgid "Hello world!"
+msgstr ""
+
+msgid "Beitragsautor"
+msgstr ""
+
+msgid "Von <a>root</a>"
+msgstr ""
+
+msgid "Beitragsdatum"
+msgstr ""
+
+msgid "<a>November 29, 2019</a>"
+msgstr ""
+
+msgid "1 Kommentar"
+msgstr ""
+
+msgid "zu Hello world!"
+msgstr ""
+
+msgid "Welcome to WordPress. This is your first post. Edit or delete it, then start writing!"
+msgstr ""
+
+msgid "Neueste Beiträge"
+msgstr ""
+
+msgid "<a>Hello world!</a>"
+msgstr ""
+
+msgid "Neueste Kommentare"
+msgstr ""
+
+msgid "A WordPress Commenter"
+msgstr ""
+
+msgid "bei"
+msgstr ""
+
+msgid "Archive"
+msgstr ""
+
+msgid "November 2019"
+msgstr ""
+
+msgid "Meta"
+msgstr ""
+
+msgid "Anmelden"
+msgstr ""
+
+msgid "Feed der Einträge"
+msgstr ""
+
+msgid "Kommentare-Feed"
+msgstr ""
+
+msgid "WordPress.org"
+msgstr ""
+
+msgid "© 2019\t\t\t\t<a>WPBABEL</a>"
+msgstr ""
+
+msgid "<a> Powered by WordPress\t\t\t\t</a>"
+msgstr ""
+
+msgid "Nach oben"
+msgstr ""
+
+msgid "Hoch"
+msgstr ""
+
+msgctxt "slug"
+msgid "dies-ist-ein-test"
+msgstr ""
+
+msgctxt "slug"
+msgid "steffen"
+msgstr ""
+
+msgctxt "slug"
+msgid "category"
+msgstr ""
+
+msgctxt "slug"
+msgid "uncategorized"
+msgstr ""
+
+msgctxt "slug"
+msgid "hello-world"
+msgstr ""
+
+msgctxt "slug"
+msgid "author"
+msgstr ""
+
+msgctxt "slug"
+msgid "root"
+msgstr ""
+
+msgctxt "slug"
+msgid "#comments"
+msgstr ""
+
+msgctxt "slug"
+msgid "#comment-1"
+msgstr ""
+
+msgctxt "slug"
+msgid "feed"
+msgstr ""
+
+msgctxt "slug"
+msgid "comments"
+msgstr ""
+
+msgid "Suche …"
+msgstr ""
+
+msgctxt "title"
+msgid "WPBABEL"
+msgstr ""
+
+msgctxt "title"
+msgid "Eine ziemlich coole Seite"
+msgstr ""
+
+msgid "Suchen"
+msgstr ""
