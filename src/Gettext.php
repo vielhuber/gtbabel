@@ -314,7 +314,7 @@ class Gettext
         if ($trans === false) {
             $this->addStringToPotFileAndToCache($orig, $context);
             $trans = $this->autoTranslateString($orig, $lng, $context);
-            if ($this->settings->get('google_translation') === true) {
+            if ($this->settings->get('auto_translation') === true) {
                 $this->addTranslationToPoFileAndToCache($orig, $trans, $lng, $context);
             }
         }
@@ -323,10 +323,13 @@ class Gettext
 
     function autoTranslateString($orig, $to_lng, $context = null, $from_lng = null)
     {
-        if ($this->settings->get('google_translation') === false) {
-            $trans = $this->translateStringMock($orig, $to_lng, $context, $from_lng);
-        } else {
+        if (
+            $this->settings->get('auto_translation') === true &&
+            $this->settings->get('auto_translation_service') === 'google'
+        ) {
             $trans = $this->translateStringWithGoogle($orig, $to_lng, $context, $from_lng);
+        } else {
+            $trans = $this->translateStringMock($orig, $to_lng, $context, $from_lng);
         }
         return $trans;
     }
@@ -384,10 +387,23 @@ class Gettext
 
     function translateStringMock($str, $to_lng, $context = null, $from_lng = null)
     {
+        if ($from_lng === null) {
+            $from_lng = $this->getSourceLng();
+        }
         if ($context === 'slug') {
+            $pos = mb_strlen($str) - mb_strlen('-' . $from_lng);
+            if (strrpos($str, '-' . $from_lng) === $pos) {
+                $str = substr($str, 0, $pos);
+            }
+            if ($to_lng === $this->getSourceLng()) {
+                return $str;
+            }
             return $str . '-' . $to_lng;
         }
-        return '%|%' . $str . '%|%' . $to_lng . '%|%';
+        if ($this->settings->get('debug_mode') === true) {
+            return '%|%' . $str . '%|%' . $to_lng . '%|%';
+        }
+        return $str . '-' . $to_lng;
     }
 
     function translateStringWithGoogle($str, $to_lng, $context = null, $from_lng = null)
@@ -489,7 +505,8 @@ class Gettext
         if ($to_lng === $this->getSourceLng()) {
             return $str_in_source_lng;
         }
-        return $this->getExistingTranslationFromCache($str_in_source_lng, $to_lng, $context);
+        $trans = $this->getExistingTranslationFromCache($str_in_source_lng, $to_lng, $context);
+        return $trans;
     }
 
     function getTranslationInForeignLngAndAddDynamicallyIfNeeded(
@@ -508,7 +525,7 @@ class Gettext
             );
             $this->addStringToPotFileAndToCache($str_in_source, $context);
             $trans = $this->autoTranslateString($str, $to_lng, $context);
-            if ($this->settings->get('google_translation') === true) {
+            if ($this->settings->get('auto_translation') === true) {
                 $this->addTranslationToPoFileAndToCache($str_in_source, $str, $from_lng, $context);
                 $this->addTranslationToPoFileAndToCache($str_in_source, $trans, $to_lng, $context);
             }
@@ -547,7 +564,19 @@ class Gettext
         }
 
         foreach ($url_parts as $url_parts__key => $url_parts__value) {
+            if (in_array($url_parts__value, $this->getLanguages())) {
+                continue;
+            }
             $trans = $this->getTranslationInForeignLng($url_parts__value, $lng, null, 'slug');
+            // if translation is not yet available, also provide default translation (in case auto translation is disabled)
+            if ($trans === false && $this->settings->get('auto_translation') === false) {
+                $trans = $this->autoTranslateString(
+                    $url_parts__value,
+                    $lng,
+                    'slug',
+                    $this->getCurrentLng()
+                );
+            }
             if ($trans !== false) {
                 $url_parts[$url_parts__key] = $trans;
             }

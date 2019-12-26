@@ -3,12 +3,18 @@ namespace vielhuber\gtbabel;
 
 class Router
 {
+    public $utils;
     public $gettext;
     public $host;
     public $settings;
 
-    function __construct(Gettext $gettext = null, Host $host = null, Settings $settings = null)
-    {
+    function __construct(
+        Utils $utils = null,
+        Gettext $gettext = null,
+        Host $host = null,
+        Settings $settings = null
+    ) {
+        $this->utils = $utils ?: new Utils();
         $this->gettext = $gettext ?: new Gettext();
         $this->host = $host ?: new Host();
         $this->settings = $settings ?: new Settings();
@@ -35,10 +41,13 @@ class Router
             $url =
                 trim($this->host->getCurrentHost(), '/') .
                 '/' .
-                str_replace(
-                    $this->gettext->getSourceLng() . '/',
-                    '',
-                    $this->host->getCurrentPathWithArgs()
+                trim(
+                    str_replace(
+                        $this->gettext->getSourceLng() . '/',
+                        '',
+                        $this->host->getCurrentPathWithArgs()
+                    ),
+                    '/'
                 );
         } else {
             $url = '';

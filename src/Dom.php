@@ -9,12 +9,18 @@ class Dom
     public $excluded_nodes;
     public $group_cache;
 
+    public $utils;
     public $gettext;
     public $host;
     public $settings;
 
-    function __construct(Gettext $gettext = null, Host $host = null, Settings $settings = null)
-    {
+    function __construct(
+        Utils $utils = null,
+        Gettext $gettext = null,
+        Host $host = null,
+        Settings $settings = null
+    ) {
+        $this->utils = $utils ?: new Utils();
         $this->gettext = $gettext ?: new Gettext();
         $this->host = $host ?: new Host();
         $this->settings = $settings ?: new Settings();

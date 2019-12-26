@@ -10,10 +10,12 @@ class Host
     public $original_url_with_args;
     public $original_host;
 
+    public $utils;
     public $settings;
 
-    function __construct(Settings $settings = null)
+    function __construct(Utils $utils = null, Settings $settings = null)
     {
+        $this->utils = $utils ?: new Utils();
         $this->settings = $settings ?: new Settings();
     }
 

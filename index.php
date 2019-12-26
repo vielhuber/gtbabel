@@ -13,7 +13,9 @@ $gtbabel->start([
     'prefix_source_lng' => false,
     'translate_text_nodes' => true,
     'translate_default_tag_nodes' => true,
-    'google_translation' => false,
+    'debug_mode' => true,
+    'auto_translation' => false,
+    'auto_translation_service' => 'google',
     'google_translation_api_key' => getenv('GOOGLE_TRANSLATION_API_KEY'),
     'exclude_urls' => null,
     'exclude_dom' => ['.lngpicker'],
@@ -31,6 +33,6 @@ $gtbabel->start([
     'languages' => ['de', 'en', 'fr']
 ]);
 
-require_once 'demo/simple/1.html';
+require_once 'demo/simple/12.html';
 
 $gtbabel->stop();

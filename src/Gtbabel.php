@@ -23,10 +23,11 @@ class Gtbabel
     ) {
         $this->settings = $settings ?: new Settings();
         $this->utils = $utils ?: new Utils();
-        $this->host = $host ?: new Host($this->settings);
+        $this->host = $host ?: new Host($this->utils, $this->settings);
         $this->gettext = $gettext ?: new Gettext($this->utils, $this->host, $this->settings);
-        $this->dom = $dom ?: new Dom($this->gettext, $this->host, $this->settings);
-        $this->router = $router ?: new Router($this->gettext, $this->host, $this->settings);
+        $this->dom = $dom ?: new Dom($this->utils, $this->gettext, $this->host, $this->settings);
+        $this->router =
+            $router ?: new Router($this->utils, $this->gettext, $this->host, $this->settings);
     }
 
     function start($args = [])
