@@ -59,7 +59,6 @@ class Router
                 $url .= trim($this->host->getCurrentPath(), '/') . '/';
             }
         }
-
         header('Location: ' . $url, true, 301);
         die();
     }

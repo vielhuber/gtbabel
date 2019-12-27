@@ -135,7 +135,8 @@ gtbabel_languagepicker()
     ['lng' => 'en', 'url' => 'https://tld.com/en/noodle', 'active' => false]
 ]
 */
-gtbabel_get_translation('hello', 'fr', 'en') // 'bonjour'
+gtbabel__('Hallo') // 'Hello'
+gtbabel__('Hello', 'fr', 'en') // 'Bonjour'
 ```
 
 ## language codes

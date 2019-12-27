@@ -11,9 +11,6 @@
 
 require_once __DIR__ . '/vendor/autoload.php';
 use vielhuber\gtbabel\Gtbabel;
-use Dotenv\Dotenv;
-$dotenv = Dotenv::createImmutable(__DIR__);
-$dotenv->load();
 $gtbabel = new Gtbabel();
 
 // disable wp auto redirect
@@ -30,7 +27,7 @@ add_action('after_setup_theme', function () use ($gtbabel) {
         'debug_mode' => false,
         'auto_translation' => true,
         'auto_translation_service' => 'google',
-        'google_translation_api_key' => getenv('GOOGLE_TRANSLATION_API_KEY'),
+        'google_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
         'exclude_urls' => ['/wp-admin', 'wp-login.php', 'wp-cron.php', 'wp-comments-post.php'],
         'exclude_dom' => ['.lngpicker'],
         'include' => [

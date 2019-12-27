@@ -223,7 +223,16 @@ class Dom
                                 ) {
                                     continue;
                                 }
-                                $value = str_replace($this->host->getCurrentHost(), '', $value);
+                                $value = str_replace(
+                                    [
+                                        $this->host->getCurrentHost() .
+                                            '/' .
+                                            $this->gettext->getSourceLng(),
+                                        $this->host->getCurrentHost()
+                                    ],
+                                    '',
+                                    $value
+                                );
                                 $value = '/' . $this->gettext->getCurrentLng() . '' . $value;
                                 if ($is_absolute_link === true) {
                                     $value = $this->host->getCurrentHost() . $value;
@@ -332,6 +341,11 @@ class Dom
         return @$node->nodeName === '#text';
     }
 
+    function isEmptyTextNode($node)
+    {
+        return @$node->nodeName === '#text' && trim(@$node->nodeValue) == '';
+    }
+
     function getIdOfNode($node)
     {
         return $node->getNodePath();
@@ -342,7 +356,7 @@ class Dom
         if (@$node->tagName == '') {
             return false;
         }
-        return in_array($node->tagName, ['a', 'br', 'strong', 'b', 'small', 'i']);
+        return in_array($node->tagName, ['a', 'br', 'strong', 'b', 'small', 'i', 'span']);
     }
 
     function getInnerHtml($node)
@@ -389,27 +403,27 @@ class Dom
 
     function getChildrenCountOfNode($node)
     {
-        return $this->DOMXpath->evaluate('count(./node())', $node);
+        return $this->DOMXpath->evaluate('count(./node()[normalize-space()])', $node);
     }
 
     function getChildrenOfNode($node)
     {
-        return $this->DOMXpath->query('.//node()', $node);
+        return $this->DOMXpath->query('.//node()[normalize-space()]', $node);
     }
 
     function getParentNodeWithMoreThanOneChildren($node)
     {
         $cur = $node;
         $level = 0;
-        $max_level = 11;
+        $max_level = 10;
         while ($this->getChildrenCountOfNode($cur) <= 1) {
             $cur = $cur->parentNode;
             if ($cur === null) {
-                break;
+                return $node;
             }
             $level++;
             if ($level >= $max_level) {
-                break;
+                return $node;
             }
         }
         return $cur;
@@ -424,6 +438,10 @@ class Dom
         if (!array_key_exists($this->getIdOfNode($parent), $this->group_cache)) {
             $this->group_cache[$this->getIdOfNode($parent)] = false;
             foreach ($this->getChildrenOfNode($parent) as $nodes__value) {
+                // exclude empty text nodes
+                if ($this->isEmptyTextNode($nodes__value)) {
+                    continue;
+                }
                 if (
                     !(
                         $this->isTextNode($nodes__value) ||

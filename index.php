@@ -33,6 +33,6 @@ $gtbabel->start([
     'languages' => ['de', 'en', 'fr']
 ]);
 
-require_once 'demo/simple/12.html';
+require_once 'demo/simple/16.html';
 
 $gtbabel->stop();

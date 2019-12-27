@@ -207,7 +207,7 @@ class Gettext
     function getCurrentPrefix()
     {
         foreach ($this->getLanguages() as $languages__value) {
-            if (strpos($this->host->getCurrentPath(), '/' . $languages__value . '/') === 0) {
+            if (strpos($this->host->getCurrentPath(), '/' . $languages__value) === 0) {
                 return $languages__value;
             }
         }
@@ -256,7 +256,7 @@ class Gettext
             if ($link === null || trim($link) === '') {
                 return $link;
             }
-            if (strpos($link, '#') === 0) {
+            if (strpos(trim($link, '/'), '#') === 0) {
                 return $link;
             }
             $is_absolute_link = strpos($link, $this->host->getCurrentHost()) === 0;
@@ -266,10 +266,17 @@ class Gettext
             if (strpos($link, 'http') === false && strpos($link, ':') !== false) {
                 return $link;
             }
-            $link = str_replace($this->host->getCurrentHost(), '', $link);
+            $link = str_replace(
+                [
+                    $this->host->getCurrentHost() . '/' . $this->getSourceLng(),
+                    $this->host->getCurrentHost()
+                ],
+                '',
+                $link
+            );
             $url_parts = explode('/', $link);
             foreach ($url_parts as $url_parts__key => $url_parts__value) {
-                if ($this->stringShouldNotBeTranslated($url_parts__value)) {
+                if ($this->stringShouldNotBeTranslated($url_parts__value, 'slug')) {
                     continue;
                 }
                 $url_parts[$url_parts__key] = $this->getTranslationAndAddDynamicallyIfNeeded(
@@ -453,7 +460,7 @@ class Gettext
         return $trans;
     }
 
-    function stringShouldNotBeTranslated($str)
+    function stringShouldNotBeTranslated($str, $context = null)
     {
         $str = trim($str);
         $str = trim($str, '"');
@@ -471,6 +478,21 @@ class Gettext
             if ($languages__value === trim(strtolower($str))) {
                 return true;
             }
+        }
+        if ($context === 'slug' && strpos($str, '#') === 0) {
+            return true;
+        }
+        // detect paths to php scripts
+        if (strpos($str, ' ') === false && strpos($str, '.php') !== false) {
+            return true;
+        }
+        // detect print_r outputs
+        if (
+            strpos($str, '(') === 0 &&
+            strrpos($str, ')') === mb_strlen($str) - 1 &&
+            strpos($str, '=') !== false
+        ) {
+            return true;
         }
         return false;
     }
@@ -511,10 +533,16 @@ class Gettext
 
     function getTranslationInForeignLngAndAddDynamicallyIfNeeded(
         $str,
-        $to_lng,
+        $to_lng = null,
         $from_lng = null,
         $context = null
     ) {
+        if ($to_lng === null) {
+            $to_lng = $this->getCurrentLng();
+        }
+        if ($from_lng === null) {
+            $from_lng = $this->getSourceLng();
+        }
         $trans = $this->getTranslationInForeignLng($str, $to_lng, $from_lng, $context);
         if ($trans === false) {
             $str_in_source = $this->autoTranslateString(

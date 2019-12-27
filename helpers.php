@@ -17,7 +17,7 @@ function gtbabel_languagepicker()
     return $gtbabel->gettext->getLanguagePickerData();
 }
 
-function gtbabel_get_translation($str, $to_lng, $from_lng = null)
+function gtbabel__($str, $to_lng = null, $from_lng = null)
 {
     global $gtbabel;
     return $gtbabel->gettext->getTranslationInForeignLngAndAddDynamicallyIfNeeded(
