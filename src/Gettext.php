@@ -62,18 +62,12 @@ class Gettext
             if (!file_exists($this->getLngFilename('mo', $languages__value))) {
                 $this->gettext[$languages__value] = Translations::create('gtbabel');
             } else {
-                $this->gettext[$languages__value] = $moLoader->loadFile(
-                    $this->getLngFilename('mo', $languages__value)
-                );
+                $this->gettext[$languages__value] = $moLoader->loadFile($this->getLngFilename('mo', $languages__value));
             }
             foreach ($this->gettext[$languages__value]->getTranslations() as $gettext__value) {
                 $context = $gettext__value->getContext() ?? '';
-                $this->gettext_cache[$languages__value][$context][
-                    $gettext__value->getOriginal()
-                ] = $gettext__value->getTranslation();
-                $this->gettext_cache_reverse[$languages__value][$context][
-                    $gettext__value->getTranslation()
-                ] = $gettext__value->getOriginal();
+                $this->gettext_cache[$languages__value][$context][$gettext__value->getOriginal()] = $gettext__value->getTranslation();
+                $this->gettext_cache_reverse[$languages__value][$context][$gettext__value->getTranslation()] = $gettext__value->getOriginal();
             }
         }
     }
@@ -84,24 +78,15 @@ class Gettext
         $moGenerator = new MoGenerator();
 
         if ($this->gettext_save_counter['pot'] === true) {
-            $poGenerator->generateFile(
-                $this->gettext_pot,
-                $this->getLngFilename('pot', '_template')
-            );
+            $poGenerator->generateFile($this->gettext_pot, $this->getLngFilename('pot', '_template'));
         }
 
         foreach ($this->getLanguagesWithoutSource() as $languages__value) {
             if ($this->gettext_save_counter['po'][$languages__value] === false) {
                 continue;
             }
-            $poGenerator->generateFile(
-                $this->gettext[$languages__value],
-                $this->getLngFilename('po', $languages__value)
-            );
-            $moGenerator->generateFile(
-                $this->gettext[$languages__value],
-                $this->getLngFilename('mo', $languages__value)
-            );
+            $poGenerator->generateFile($this->gettext[$languages__value], $this->getLngFilename('po', $languages__value));
+            $moGenerator->generateFile($this->gettext[$languages__value], $this->getLngFilename('mo', $languages__value));
         }
     }
 
@@ -169,11 +154,7 @@ class Gettext
         $files = glob($this->getLngFolder() . '/*'); // get all file names
         foreach ($files as $files__value) {
             if (is_file($files__value)) {
-                if (
-                    strpos($files__value, '.pot') !== false ||
-                    strpos($files__value, '.po') !== false ||
-                    strpos($files__value, '.mo') !== false
-                ) {
+                if (strpos($files__value, '.pot') !== false || strpos($files__value, '.po') !== false || strpos($files__value, '.mo') !== false) {
                     @unlink($files__value);
                 }
             }
@@ -377,24 +358,13 @@ class Gettext
             if (strpos($link, 'http') === false && strpos($link, ':') !== false) {
                 return $link;
             }
-            $link = str_replace(
-                [
-                    $this->host->getCurrentHost() . '/' . $this->getSourceLng(),
-                    $this->host->getCurrentHost()
-                ],
-                '',
-                $link
-            );
+            $link = str_replace([$this->host->getCurrentHost() . '/' . $this->getSourceLng(), $this->host->getCurrentHost()], '', $link);
             $url_parts = explode('/', $link);
             foreach ($url_parts as $url_parts__key => $url_parts__value) {
                 if ($this->stringShouldNotBeTranslated($url_parts__value, 'slug')) {
                     continue;
                 }
-                $url_parts[$url_parts__key] = $this->getTranslationAndAddDynamicallyIfNeeded(
-                    $url_parts__value,
-                    $lng,
-                    'slug'
-                );
+                $url_parts[$url_parts__key] = $this->getTranslationAndAddDynamicallyIfNeeded($url_parts__value, $lng, 'slug');
             }
             $link = implode('/', $url_parts);
             $link = '/' . $lng . '' . $link;
@@ -404,18 +374,11 @@ class Gettext
             return $link;
         }
         if ($context === 'title') {
-            foreach (
-                ['-', '–', '—', ':', '·', '•', '*', '⋆', '|', '~', '«', '»', '<', '>']
-                as $delimiters__value
-            ) {
+            foreach (['-', '–', '—', ':', '·', '•', '*', '⋆', '|', '~', '«', '»', '<', '>'] as $delimiters__value) {
                 if (strpos($orig, ' ' . $delimiters__value . ' ') !== false) {
                     $orig_parts = explode(' ' . $delimiters__value . ' ', $orig);
                     foreach ($orig_parts as $orig_parts__key => $orig_parts__value) {
-                        $trans = $this->getTranslationAndAddDynamicallyIfNeeded(
-                            $orig_parts__value,
-                            $lng,
-                            $context
-                        );
+                        $trans = $this->getTranslationAndAddDynamicallyIfNeeded($orig_parts__value, $lng, $context);
                         $orig_parts[$orig_parts__key] = $trans;
                     }
                     $trans = implode(' ' . $delimiters__value . ' ', $orig_parts);
@@ -441,10 +404,7 @@ class Gettext
 
     function autoTranslateString($orig, $to_lng, $context = null, $from_lng = null)
     {
-        if (
-            $this->settings->get('auto_translation') === true &&
-            $this->settings->get('auto_translation_service') === 'google'
-        ) {
+        if ($this->settings->get('auto_translation') === true && $this->settings->get('auto_translation_service') === 'google') {
             $trans = $this->translateStringWithGoogle($orig, $to_lng, $context, $from_lng);
         } else {
             $trans = $this->translateStringMock($orig, $to_lng, $context, $from_lng);
@@ -466,8 +426,7 @@ class Gettext
                         $pos_end = $pos_end_;
                     }
                 }
-                $placeholder =
-                    '<' . substr($matches__value, $pos_begin, $pos_end - $pos_begin) . '>';
+                $placeholder = '<' . substr($matches__value, $pos_begin, $pos_end - $pos_begin) . '>';
                 $str = $this->utils->strReplaceFirst($matches__value, $placeholder, $str);
                 $mappingTable[] = [$placeholder, $matches__value];
             }
@@ -478,11 +437,7 @@ class Gettext
     function placeholderConversionOut($str, $mappingTable)
     {
         foreach ($mappingTable as $mappingTable__value) {
-            $str = $this->utils->strReplaceFirst(
-                $mappingTable__value[0],
-                $mappingTable__value[1],
-                $str
-            );
+            $str = $this->utils->strReplaceFirst($mappingTable__value[0], $mappingTable__value[1], $str);
         }
         return $str;
     }
@@ -556,10 +511,7 @@ class Gettext
         // uppercase
         // the google translation api does a very bad job at keeping uppercased words at the beginning
         // we fix this here
-        if (
-            $this->utils->firstCharIsUppercase($str) &&
-            !$this->utils->firstCharIsUppercase($trans)
-        ) {
+        if ($this->utils->firstCharIsUppercase($str) && !$this->utils->firstCharIsUppercase($trans)) {
             $trans = $this->utils->setFirstCharUppercase($trans);
         }
 
@@ -598,11 +550,7 @@ class Gettext
             return true;
         }
         // detect print_r outputs
-        if (
-            strpos($str, '(') === 0 &&
-            strrpos($str, ')') === mb_strlen($str) - 1 &&
-            strpos($str, '=') !== false
-        ) {
+        if (strpos($str, '(') === 0 && strrpos($str, ')') === mb_strlen($str) - 1 && strpos($str, '=') !== false) {
             return true;
         }
         return false;
@@ -610,12 +558,7 @@ class Gettext
 
     function getCurrentUrlTranslationsInLanguage($lng)
     {
-        return trim(
-            trim($this->host->getCurrentHost(), '/') .
-                '/' .
-                trim($this->getCurrentPathTranslationsInLanguage($lng, false), '/'),
-            '/'
-        ) . '/';
+        return trim(trim($this->host->getCurrentHost(), '/') . '/' . trim($this->getCurrentPathTranslationsInLanguage($lng, false), '/'), '/') . '/';
     }
 
     function getTranslationInForeignLng($str, $to_lng, $from_lng = null, $context = null)
@@ -626,11 +569,7 @@ class Gettext
         if ($from_lng === $this->getSourceLng()) {
             $str_in_source_lng = $str;
         } else {
-            $str_in_source_lng = $this->getExistingTranslationReverseFromCache(
-                $str,
-                $from_lng,
-                $context
-            ); // str in source lng
+            $str_in_source_lng = $this->getExistingTranslationReverseFromCache($str, $from_lng, $context); // str in source lng
         }
         if ($str_in_source_lng === false) {
             return false;
@@ -642,12 +581,8 @@ class Gettext
         return $trans;
     }
 
-    function getTranslationInForeignLngAndAddDynamicallyIfNeeded(
-        $str,
-        $to_lng = null,
-        $from_lng = null,
-        $context = null
-    ) {
+    function getTranslationInForeignLngAndAddDynamicallyIfNeeded($str, $to_lng = null, $from_lng = null, $context = null)
+    {
         if ($to_lng === null) {
             $to_lng = $this->getCurrentLng();
         }
@@ -656,12 +591,7 @@ class Gettext
         }
         $trans = $this->getTranslationInForeignLng($str, $to_lng, $from_lng, $context);
         if ($trans === false) {
-            $str_in_source = $this->autoTranslateString(
-                $str,
-                $this->getSourceLng(),
-                $context,
-                $from_lng
-            );
+            $str_in_source = $this->autoTranslateString($str, $this->getSourceLng(), $context, $from_lng);
             $this->addStringToPotFileAndToCache($str_in_source, $context);
             $trans = $this->autoTranslateString($str, $to_lng, $context);
             if ($this->settings->get('auto_translation') === true) {
@@ -687,10 +617,7 @@ class Gettext
         $url_parts = array_values($url_parts);
 
         // prefix
-        if (
-            $always_remove_prefix === true ||
-            ($this->getSourceLng() === $lng && $this->settings->get('prefix_source_lng') === false)
-        ) {
+        if ($always_remove_prefix === true || ($this->getSourceLng() === $lng && $this->settings->get('prefix_source_lng') === false)) {
             if (@$url_parts[0] === $this->getCurrentLng()) {
                 unset($url_parts[0]);
             }
@@ -709,12 +636,7 @@ class Gettext
             $trans = $this->getTranslationInForeignLng($url_parts__value, $lng, null, 'slug');
             // if translation is not yet available, also provide default translation (in case auto translation is disabled)
             if ($trans === false && $this->settings->get('auto_translation') === false) {
-                $trans = $this->autoTranslateString(
-                    $url_parts__value,
-                    $lng,
-                    'slug',
-                    $this->getCurrentLng()
-                );
+                $trans = $this->autoTranslateString($url_parts__value, $lng, 'slug', $this->getCurrentLng());
             }
             if ($trans !== false) {
                 $url_parts[$url_parts__key] = $trans;
@@ -730,11 +652,7 @@ class Gettext
             return;
         }
         foreach ($this->getLanguagesWithoutSource() as $languages__value) {
-            $this->prepareTranslationAndAddDynamicallyIfNeeded(
-                $this->host->getCurrentUrl(),
-                $languages__value,
-                'slug'
-            );
+            $this->prepareTranslationAndAddDynamicallyIfNeeded($this->host->getCurrentUrl(), $languages__value, 'slug');
         }
     }
 }

@@ -34,7 +34,7 @@ function gtbabel_default_settings($args = [])
     if ($gtbabel === null) {
         $gtbabel = new Gtbabel();
     }
-    return $gtbabel->settings->getDefaultSettings($args);
+    return $gtbabel->settings->setupSettings($args);
 }
 
 function gtbabel_languagepicker()

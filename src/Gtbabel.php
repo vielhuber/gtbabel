@@ -13,21 +13,14 @@ class Gtbabel
     public $settings;
     public $translation;
 
-    function __construct(
-        Dom $dom = null,
-        Utils $utils = null,
-        Host $host = null,
-        Gettext $gettext = null,
-        Router $router = null,
-        Settings $settings = null
-    ) {
+    function __construct(Dom $dom = null, Utils $utils = null, Host $host = null, Gettext $gettext = null, Router $router = null, Settings $settings = null)
+    {
         $this->settings = $settings ?: new Settings();
         $this->utils = $utils ?: new Utils();
         $this->host = $host ?: new Host($this->utils, $this->settings);
         $this->gettext = $gettext ?: new Gettext($this->utils, $this->host, $this->settings);
         $this->dom = $dom ?: new Dom($this->utils, $this->gettext, $this->host, $this->settings);
-        $this->router =
-            $router ?: new Router($this->utils, $this->gettext, $this->host, $this->settings);
+        $this->router = $router ?: new Router($this->utils, $this->gettext, $this->host, $this->settings);
     }
 
     function start($args = [])

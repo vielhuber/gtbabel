@@ -11,35 +11,77 @@
 
 require_once __DIR__ . '/vendor/autoload.php';
 use vielhuber\gtbabel\Gtbabel;
-$gtbabel = new Gtbabel();
 
-// install
-register_activation_hook(__FILE__, function () {
-    delete_option('gtbabel_settings');
-    add_option(
-        'gtbabel_settings',
-        gtbabel_default_settings([
-            'lng_folder' => '/wp-content/plugins/gtbabel/locales'
-        ])
-    );
-});
-
-// uninstall
-register_uninstall_hook(__FILE__, 'gtbabel_uninstall');
-function gtbabel_uninstall()
+class GtbabelWordPress
 {
-    delete_option('gtbabel_settings');
-}
+    private $gtbabel;
 
-// backend
-add_action('admin_menu', function () {
-    add_menu_page(
-        'Gtbabel',
-        'Gtbabel',
-        'manage_options',
-        'gtbabel',
-        function () {
-            ?>
+    public function __construct($gtbabel)
+    {
+        $this->gtbabel = $gtbabel;
+        $this->installHook();
+        $this->uninstallHook();
+        $this->initBackend();
+        $this->disableAutoRedirect();
+        $this->start();
+        $this->stop();
+    }
+
+    private function disableAutoRedirect()
+    {
+        remove_action('template_redirect', 'redirect_canonical');
+    }
+
+    private function start()
+    {
+        add_action('after_setup_theme', function () {
+            $this->gtbabel->start(get_option('gtbabel_settings'));
+        });
+    }
+
+    private function stop()
+    {
+        add_action(
+            'shutdown',
+            function () {
+                $this->gtbabel->stop();
+            },
+            0
+        );
+    }
+
+    private function installHook()
+    {
+        register_activation_hook(__FILE__, function () {
+            add_option(
+                'gtbabel_settings',
+                gtbabel_default_settings([
+                    'lng_folder' => '/wp-content/plugins/gtbabel/locales',
+                    'exclude_urls' => ['/wp-admin', 'wp-login.php', 'wp-cron.php', 'wp-comments-post.php']
+                ])
+            );
+        });
+    }
+
+    private function uninstallHook()
+    {
+        register_uninstall_hook(__FILE__, 'gtbabel_uninstall');
+        function gtbabel_uninstall()
+        {
+            delete_option('gtbabel_settings');
+        }
+    }
+
+    private function initBackend()
+    {
+        add_action('admin_menu', function () {
+            add_menu_page(
+                'Gtbabel',
+                'Gtbabel',
+                'manage_options',
+                'gtbabel',
+                function () {
+                    ?>
             <style>
                 .gtbabel__label-wrapper {
                     display: flex;
@@ -62,6 +104,9 @@ add_action('admin_menu', function () {
             echo '<h1 class="gtbabel__title">🦜 Gtbabel 🦜</h1>';
             if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
                 $settings = @$_POST['gtbabel'];
+                $settings['exclude_urls'] = explode(PHP_EOL, $settings['exclude_urls']);
+                $settings['exclude_dom'] = explode(PHP_EOL, $settings['exclude_dom']);
+                $settings['languages'] = array_keys($settings['languages']);
                 update_option('gtbabel_settings', $settings);
                 echo '<div class="gtbabel__notice notice notice-success is-dismissible"><p>Erfolgreich editiert</p></div>';
             }
@@ -78,7 +123,7 @@ add_action('admin_menu', function () {
                 echo '<input class="gtbabel__input" type="checkbox" name="gtbabel[languages][' .
                     $languages__value .
                     ']"' .
-                    ($settings['languages'][$languages__value] == '1' ? ' checked="checked"' : '') .
+                    (in_array($languages__value, $settings['languages']) == '1' ? ' checked="checked"' : '') .
                     ' value="1" />';
                 echo '</label>';
             }
@@ -169,14 +214,14 @@ add_action('admin_menu', function () {
             echo '<li class="gtbabel__field">';
             echo '<label class="gtbabel__label-wrapper">';
             echo '<span class="gtbabel__label">URLs ausschließen</span>';
-            echo '<textarea class="gtbabel__input" name="gtbabel[exclude_urls]">' . $settings['exclude_urls'] . '</textarea>';
+            echo '<textarea class="gtbabel__input" name="gtbabel[exclude_urls]">' . implode(PHP_EOL, $settings['exclude_urls']) . '</textarea>';
             echo '</label>';
             echo '</li>';
 
             echo '<li class="gtbabel__field">';
             echo '<label class="gtbabel__label-wrapper">';
             echo '<span class="gtbabel__label">DOM-Elemente ausschließen</span>';
-            echo '<textarea class="gtbabel__input" name="gtbabel[exclude_dom]">' . $settings['exclude_dom'] . '</textarea>';
+            echo '<textarea class="gtbabel__input" name="gtbabel[exclude_dom]">' . implode(PHP_EOL, $settings['exclude_dom']) . '</textarea>';
             echo '</label>';
             echo '</li>';
 
@@ -184,48 +229,13 @@ add_action('admin_menu', function () {
             echo '<input class="gtbabel__submit button button-primary" name="submit" value="Speichern" type="submit" />';
             echo '</form>';
             echo '</div>';
-        },
-        'dashicons-admin-site',
-        100
-    );
-});
+                },
+                'dashicons-admin-site',
+                100
+            );
+        });
+    }
+}
 
-// disable wp auto redirect
-remove_action('template_redirect', 'redirect_canonical');
-
-add_action('after_setup_theme', function () use ($gtbabel) {
-    $gtbabel->start([
-        'languages' => gtbabel_default_languages(),
-        'lng_folder' => '/wp-content/plugins/gtbabel/locales',
-        'lng_source' => 'de',
-        'lng_target' => null, // auto
-        'prefix_source_lng' => true,
-        'translate_text_nodes' => true,
-        'translate_default_tag_nodes' => true,
-        'debug_mode' => false,
-        'auto_translation' => true,
-        'auto_translation_service' => 'google',
-        'google_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-        'exclude_urls' => ['/wp-admin', 'wp-login.php', 'wp-cron.php', 'wp-comments-post.php'],
-        'exclude_dom' => ['.lngpicker'],
-        'include' => [
-            [
-                'selector' => '.search-submit',
-                'attribute' => 'value'
-            ],
-            [
-                'selector' => '.js-link',
-                'attribute' => 'alt-href',
-                'context' => 'slug'
-            ]
-        ]
-    ]);
-});
-
-add_action(
-    'shutdown',
-    function () use ($gtbabel) {
-        $gtbabel->stop();
-    },
-    0
-);
+$gtbabel = new Gtbabel();
+new GtbabelWordPress($gtbabel);
