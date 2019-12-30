@@ -134,7 +134,7 @@ gtbabel_languages() // ['de','en']
 gtbabel_default_languages() // ['de','en','fr','af','am','ar','az','be','bg','bn','bs','ca','ceb','co','cs','cy','da','el','eo','es','et','eu','fa','fi','fy','ga','gd','gl','gu','ha','haw','he','hi','hmn','hr','ht','hu','hy','id','ig','is','it','ja','jw','ka','kk','km','kn','ko','ku','ky','la','lb','lo','lt','lv','mg','mi','mk','ml','mn','mr','ms','mt','my','ne','nl','no','ny','pa','pl','ps','pt','ro','ru','sd','si','sk','sl','sm','sn','so','sq','sr','st','su','sv','sw','ta','te','tg','th','tl','tr','uk','ur','uz','vi','xh','yi','yo','zh-cn','zh-tw','zu']
 gtbabel_default_settings() // ['languages' => ['de', 'en', 'fr'], 'lng_folder' => '/locales', ...]
 gtbabel_default_settings(['lng_folder' => '/foo']) // ['languages' => ['de', 'en', 'fr'], 'lng_folder' => '/foo', ...]
-gtbabel_languagepicker() /* [['lng' => 'de', 'url' => 'https://tld.com/de/nudel', 'active' => true], ['lng' => 'en', 'url' => 'https://tld.com/en/noodle', 'active' => false], ...] */
+gtbabel_languagepicker() // [['lng' => 'de', 'url' => 'https://tld.com/de/nudel', 'active' => true], ['lng' => 'en', 'url' => 'https://tld.com/en/noodle', 'active' => false], ...]
 gtbabel__('Hallo') // 'Hello'
 gtbabel__('Hello', 'fr', 'en') // 'Bonjour'
 ```
