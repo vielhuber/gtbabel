@@ -64,7 +64,7 @@ $gtbabel->start([
   'google_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
   'exclude_urls' => ['/backend'],
   'exclude_dom' => ['.lngpicker'],
-  'include' => [
+  'include_dom' => [
     [
       'selector' => '.search-submit',
       'attribute' => 'value'
@@ -135,6 +135,7 @@ gtbabel_default_languages() // ['de','en','fr','af','am','ar','az','be','bg','bn
 gtbabel_default_settings() // ['languages' => ['de', 'en', 'fr'], 'lng_folder' => '/locales', ...]
 gtbabel_default_settings(['lng_folder' => '/foo']) // ['languages' => ['de', 'en', 'fr'], 'lng_folder' => '/foo', ...]
 gtbabel_languagepicker() // [['lng' => 'de', 'url' => 'https://tld.com/de/nudel', 'active' => true], ['lng' => 'en', 'url' => 'https://tld.com/en/noodle', 'active' => false], ...]
+gtbabel_reset() // resets all language files
 gtbabel__('Hallo') // 'Hello'
 gtbabel__('Hello', 'fr', 'en') // 'Bonjour'
 ```

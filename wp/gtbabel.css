@@ -1,0 +1,12 @@
+.gtbabel__label-wrapper {
+    display: flex;
+    align-items: flex-start;
+    align-content: flex-start;
+}
+.gtbabel__label {
+    line-height: 2;
+    flex: 0 1 10%;
+}
+.gtbabel__input {
+    flex: 0 1 90%;
+}

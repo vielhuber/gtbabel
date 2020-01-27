@@ -161,6 +161,11 @@ class Gettext
         }
     }
 
+    function reset()
+    {
+        $this->deletePotPoMoFiles();
+    }
+
     function createLngFolderIfNotExists()
     {
         if (!is_dir($this->getLngFolder())) {

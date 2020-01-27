@@ -32,9 +32,6 @@ class Gtbabel
             return;
         }
         $this->gettext->createLngFolderIfNotExists();
-        if ($this->settings->shouldBeResetted() === true) {
-            $this->gettext->deletePotPoMoFiles();
-        }
         $this->gettext->preloadGettextInCache();
         $this->router->redirectPrefixedSourceLng();
         $this->gettext->addCurrentUrlToTranslations();

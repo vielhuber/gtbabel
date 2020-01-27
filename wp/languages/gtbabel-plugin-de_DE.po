@@ -1,0 +1,97 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gtbabel-plugin\n"
+"POT-Creation-Date: 2020-01-27 02:23+0100\n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: de_DE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: gtbabel-plugin\n"
+"X-Generator: Poedit 2.2.4\n"
+"X-Poedit-KeywordsList: __\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-SearchPath-0: gtbabel.php\n"
+
+#: gtbabel.php:102
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: gtbabel.php:143
+msgid "Successfully edited"
+msgstr "Erfolgreiche Bearbeitung"
+
+#: gtbabel.php:154
+msgid "Languages"
+msgstr "Sprachen"
+
+#: gtbabel.php:170
+msgid "Language folder"
+msgstr "Sprachenordner"
+
+#: gtbabel.php:179
+msgid "Source language"
+msgstr "Ausgangssprache"
+
+#: gtbabel.php:199
+msgid "Prefix source language urls"
+msgstr "Präfix für Quellsprachen-URLs"
+
+#: gtbabel.php:209
+msgid "Translate text nodes"
+msgstr "Textknoten übersetzen"
+
+#: gtbabel.php:219
+msgid "Translate additional nodes"
+msgstr "Zusätzliche Knoten übersetzen"
+
+#: gtbabel.php:230
+msgid "Enable automatic translation"
+msgstr "Automatische Übersetzung aktivieren"
+
+#: gtbabel.php:240
+msgid "Translation service"
+msgstr "Übersetzungsdienst"
+
+#: gtbabel.php:253
+msgid "Google Translation API Key"
+msgstr "Google Übersetzungs-API-Schlüssel"
+
+#: gtbabel.php:255
+msgid "Link"
+msgstr "Link"
+
+#: gtbabel.php:265
+msgid "Exclude urls"
+msgstr "URLs ausschließen"
+
+#: gtbabel.php:274
+msgid "Exclude dom nodes"
+msgstr "DOM-Knoten ausschließen"
+
+#: gtbabel.php:283
+msgid "Include dom nodes"
+msgstr "DOM-Knoten einschließen"
+
+#: gtbabel.php:301
+msgid "Remove"
+msgstr "Entfernen"
+
+#: gtbabel.php:305
+msgid "Add"
+msgstr "Hinzufügen"
+
+#: gtbabel.php:313
+msgid "Save"
+msgstr "Speichern"
+
+#: gtbabel.php:316
+msgid "Reset settings"
+msgstr "Einstellungen zurücksetzen"
+
+#: gtbabel.php:318
+msgid "Reset"
+msgstr "Zurücksetzen"

@@ -17,14 +17,6 @@ class Settings
         return $this->args->{$prop};
     }
 
-    function shouldBeResetted()
-    {
-        if (@$_GET['gtbabel_reset'] == 1) {
-            return true;
-        }
-        return false;
-    }
-
     function setupSettings($args = [])
     {
         $default_args = [
@@ -41,7 +33,7 @@ class Settings
             'google_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
             'exclude_urls' => ['/backend'],
             'exclude_dom' => ['.lngpicker'],
-            'include' => [
+            'include_dom' => [
                 [
                     'selector' => '.search-submit',
                     'attribute' => 'value'
@@ -53,14 +45,16 @@ class Settings
                 ]
             ]
         ];
-        foreach ($args as $args__key => $args__value) {
-            if ($args__value === '1') {
-                $args__value = true;
+        if (!empty($args)) {
+            foreach ($args as $args__key => $args__value) {
+                if ($args__value === '1') {
+                    $args__value = true;
+                }
+                if ($args__value === '0') {
+                    $args__value = false;
+                }
+                $default_args[$args__key] = $args__value;
             }
-            if ($args__value === '0') {
-                $args__value = false;
-            }
-            $default_args[$args__key] = $args__value;
         }
         return $default_args;
     }

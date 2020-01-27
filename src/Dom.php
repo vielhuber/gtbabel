@@ -163,7 +163,7 @@ class Dom
             ]);
         }
 
-        $include = array_merge($include, $this->settings->get('include'));
+        $include = array_merge($include, $this->settings->get('include_dom'));
 
         foreach ($include as $include__value) {
             $nodes = $this->DOMXpath->query(

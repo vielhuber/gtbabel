@@ -23,11 +23,7 @@ class Host
     {
         $this->original_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH); // store without get parameters
         $this->original_path_with_args = $_SERVER['REQUEST_URI'];
-        $this->original_args = str_replace(
-            $this->original_path,
-            '',
-            $this->original_path_with_args
-        );
+        $this->original_args = str_replace($this->original_path, '', $this->original_path_with_args);
         $this->original_url =
             'http' .
             (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 's' : '') .
@@ -35,16 +31,8 @@ class Host
             $_SERVER['HTTP_HOST'] .
             parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $this->original_url_with_args =
-            'http' .
-            (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 's' : '') .
-            '://' .
-            $_SERVER['HTTP_HOST'] .
-            $_SERVER['REQUEST_URI'];
-        $this->original_host =
-            'http' .
-            (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 's' : '') .
-            '://' .
-            $_SERVER['HTTP_HOST'];
+            'http' . (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        $this->original_host = 'http' . (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 's' : '') . '://' . $_SERVER['HTTP_HOST'];
     }
 
     function getCurrentArgs()
@@ -84,10 +72,7 @@ class Host
 
     function urlIsExcluded($url)
     {
-        if (
-            $this->settings->get('exclude_urls') !== null &&
-            is_array($this->settings->get('exclude_urls'))
-        ) {
+        if ($this->settings->get('exclude_urls') !== null && is_array($this->settings->get('exclude_urls'))) {
             foreach ($this->settings->get('exclude_urls') as $exclude__value) {
                 if (strpos(trim($url, '/'), trim($exclude__value, '/')) !== false) {
                     return true;
