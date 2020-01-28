@@ -78,9 +78,16 @@ class GtbabelWordPress
     private function setDefaultSettingsToOption()
     {
         if (get_option('gtbabel_settings') === false) {
+            $lng_source = mb_strtolower(substr(get_locale(), 0, 2));
+            $languages = ['de', 'en'];
+            if (!in_array($lng_source, $languages)) {
+                $languages[] = $lng_source;
+            }
             add_option(
                 'gtbabel_settings',
                 gtbabel_default_settings([
+                    'languages' => $languages,
+                    'lng_source' => $lng_source,
                     'lng_folder' => '/wp-content/plugins/gtbabel/locales',
                     'exclude_urls' => ['/wp-admin', 'wp-login.php', 'wp-cron.php', 'wp-comments-post.php']
                 ])
@@ -97,9 +104,7 @@ class GtbabelWordPress
                 'manage_options',
                 'gtbabel',
                 function () {
-                    echo '<div class="gtbabel wrap">';
-                    echo '<h1 class="gtbabel__title">🦜 Gtbabel 🦜</h1>';
-                    echo '<h2 class="gtbabel__subtitle">' . __('Settings', 'gtbabel-plugin') . '</h2>';
+                    $message = '';
                     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         if (isset($_POST['save_settings'])) {
                             $settings = @$_POST['gtbabel'];
@@ -139,46 +144,50 @@ class GtbabelWordPress
                             $this->setDefaultSettingsToOption();
                             $this->start();
                         }
-                        echo '<div class="gtbabel__notice notice notice-success is-dismissible"><p>' .
+                        $message =
+                            '<div class="gtbabel__notice notice notice-success is-dismissible"><p>' .
                             __('Successfully edited', 'gtbabel-plugin') .
                             '</p></div>';
                     }
                     $settings = get_option('gtbabel_settings');
+
+                    echo '<div class="gtbabel wrap">';
                     echo '<form class="gtbabel__form" method="post" action="' .
                         admin_url('admin.php?page=gtbabel') .
                         '">';
+                    echo '<h1 class="gtbabel__title">🦜 Gtbabel 🦜</h1>';
+                    echo $message;
+                    echo '<h2 class="gtbabel__subtitle">' . __('Settings', 'gtbabel-plugin') . '</h2>';
                     echo '<ul class="gtbabel__fields">';
-
                     echo '<li class="gtbabel__field">';
-                    echo '<label class="gtbabel__label-wrapper">';
-                    echo '<span class="gtbabel__label">' . __('Languages', 'gtbabel-plugin') . '</span>';
+                    echo '<label class="gtbabel__label">';
+                    echo __('Languages', 'gtbabel-plugin');
+                    echo '</label>';
+                    echo '<div class="gtbabel__inputbox">';
+                    echo '<ul class="gtbabel__languagelist">';
                     foreach (gtbabel_default_languages() as $languages__value) {
+                        echo '<li class="gtbabel__languagelist-item">';
                         echo '<label>';
-                        echo mb_strtoupper($languages__value);
-                        echo '<input class="gtbabel__input" type="checkbox" name="gtbabel[languages][' .
+                        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" name="gtbabel[languages][' .
                             $languages__value .
                             ']"' .
                             (in_array($languages__value, $settings['languages']) == '1' ? ' checked="checked"' : '') .
                             ' value="1" />';
+                        echo mb_strtoupper($languages__value);
                         echo '</label>';
+                        echo '</li>';
                     }
-                    echo '</label>';
+                    echo '</ul>';
+                    echo '</div>';
                     echo '</li>';
 
                     echo '<li class="gtbabel__field">';
-                    echo '<label class="gtbabel__label-wrapper">';
-                    echo '<span class="gtbabel__label">' . __('Language folder', 'gtbabel-plugin') . '</span>';
-                    echo '<input class="gtbabel__input" type="text" name="gtbabel[lng_folder]" value="' .
-                        $settings['lng_folder'] .
-                        '" />';
+                    echo '<label for="gtbabel_lng_source" class="gtbabel__label">';
+                    echo __('Source language', 'gtbabel-plugin');
                     echo '</label>';
-                    echo '</li>';
-
-                    echo '<li class="gtbabel__field">';
-                    echo '<label class="gtbabel__label-wrapper">';
-                    echo '<span class="gtbabel__label">' . __('Source language', 'gtbabel-plugin') . '</span>';
-                    echo '<select class="gtbabel__input" name="gtbabel[lng_source]">';
-                    echo '<option value=""></option>';
+                    echo '<div class="gtbabel__inputbox">';
+                    echo '<select class="gtbabel__input gtbabel__input--select" id="gtbabel_lng_source" name="gtbabel[lng_source]">';
+                    echo '<option value="">&ndash;&ndash;</option>';
                     foreach (gtbabel_default_languages() as $languages__value) {
                         echo '<option value="' .
                             $languages__value .
@@ -189,99 +198,119 @@ class GtbabelWordPress
                             '</option>';
                     }
                     echo '</select>';
-
-                    echo '</label>';
+                    echo '</div>';
                     echo '</li>';
 
                     echo '<li class="gtbabel__field">';
-                    echo '<label class="gtbabel__label-wrapper">';
-                    echo '<span class="gtbabel__label">' .
-                        __('Prefix source language urls', 'gtbabel-plugin') .
-                        '</span>';
-                    echo '<input class="gtbabel__input" type="checkbox" name="gtbabel[prefix_source_lng]" value="1"' .
+                    echo '<label for="gtbabel_lng_folder" class="gtbabel__label">';
+                    echo __('Language folder', 'gtbabel-plugin');
+                    echo '</label>';
+                    echo '<div class="gtbabel__inputbox">';
+                    echo '<input class="gtbabel__input" type="text" id="gtbabel_lng_folder" name="gtbabel[lng_folder]" value="' .
+                        $settings['lng_folder'] .
+                        '" />';
+                    echo '</div>';
+                    echo '</li>';
+
+                    echo '<li class="gtbabel__field">';
+                    echo '<label for="gtbabel_prefix_source_lng" class="gtbabel__label">';
+                    echo __('Prefix source language urls', 'gtbabel-plugin');
+                    echo '</label>';
+                    echo '<div class="gtbabel__inputbox">';
+                    echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_prefix_source_lng" name="gtbabel[prefix_source_lng]" value="1"' .
                         ($settings['prefix_source_lng'] == '1' ? ' checked="checked"' : '') .
                         ' />';
-                    echo '</label>';
+                    echo '</div>';
                     echo '</li>';
 
                     echo '<li class="gtbabel__field">';
-                    echo '<label class="gtbabel__label-wrapper">';
-                    echo '<span class="gtbabel__label">' . __('Translate text nodes', 'gtbabel-plugin') . '</span>';
-                    echo '<input class="gtbabel__input" type="checkbox" name="gtbabel[translate_text_nodes]" value="1"' .
+                    echo '<label for="gtbabel_translate_text_nodes" class="gtbabel__label">';
+                    echo __('Translate text nodes', 'gtbabel-plugin');
+                    echo '</label>';
+                    echo '<div class="gtbabel__inputbox">';
+                    echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_translate_text_nodes" name="gtbabel[translate_text_nodes]" value="1"' .
                         ($settings['translate_text_nodes'] == '1' ? ' checked="checked"' : '') .
                         ' />';
-                    echo '</label>';
+                    echo '</div>';
                     echo '</li>';
 
                     echo '<li class="gtbabel__field">';
-                    echo '<label class="gtbabel__label-wrapper">';
-                    echo '<span class="gtbabel__label">' .
-                        __('Translate additional nodes', 'gtbabel-plugin') .
-                        '</span>';
-                    echo '<input class="gtbabel__input" type="checkbox" name="gtbabel[translate_default_tag_nodes]" value="1"' .
+                    echo '<label for="gtbabel_translate_default_tag_nodes" class="gtbabel__label">';
+                    echo __('Translate additional nodes', 'gtbabel-plugin');
+                    echo '</label>';
+                    echo '<div class="gtbabel__inputbox">';
+                    echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_translate_default_tag_nodes" name="gtbabel[translate_default_tag_nodes]" value="1"' .
                         ($settings['translate_default_tag_nodes'] == '1' ? ' checked="checked"' : '') .
                         ' />';
-                    echo '</label>';
+                    echo '</div>';
                     echo '</li>';
 
                     echo '<li class="gtbabel__field">';
-                    echo '<label class="gtbabel__label-wrapper">';
-                    echo '<span class="gtbabel__label">' .
-                        __('Enable automatic translation', 'gtbabel-plugin') .
-                        '</span>';
-                    echo '<input class="gtbabel__input" type="checkbox" name="gtbabel[auto_translation]" value="1"' .
+                    echo '<label for="gtbabel_auto_translation" class="gtbabel__label">';
+                    echo __('Enable automatic translation', 'gtbabel-plugin');
+                    echo '</label>';
+                    echo '<div class="gtbabel__inputbox">';
+                    echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_auto_translation" name="gtbabel[auto_translation]" value="1"' .
                         ($settings['auto_translation'] == '1' ? ' checked="checked"' : '') .
                         ' />';
-                    echo '</label>';
+                    echo '</div>';
                     echo '</li>';
 
                     echo '<li class="gtbabel__field">';
-                    echo '<label class="gtbabel__label-wrapper">';
-                    echo '<span class="gtbabel__label">' . __('Translation service', 'gtbabel-plugin') . '</span>';
-                    echo '<select class="gtbabel__input" name="gtbabel[auto_translation_service]">';
-                    echo '<option value=""></option>';
+                    echo '<label for="gtbabel_auto_translation_service" class="gtbabel__label">';
+                    echo __('Translation service', 'gtbabel-plugin');
+                    echo '</label>';
+                    echo '<div class="gtbabel__inputbox">';
+                    echo '<select class="gtbabel__input gtbabel__input--select" id="gtbabel_auto_translation_service" name="gtbabel[auto_translation_service]">';
+                    echo '<option value="">&ndash;&ndash;</option>';
                     echo '<option value="google"' .
                         ($settings['auto_translation_service'] == 'google' ? ' selected="selected"' : '') .
                         '>Google</option>';
                     echo '</select>';
-                    echo '</label>';
+                    echo '</div>';
                     echo '</li>';
 
                     echo '<li class="gtbabel__field">';
-                    echo '<label class="gtbabel__label-wrapper">';
-                    echo '<span class="gtbabel__label">' .
-                        __('Google Translation API Key', 'gtbabel-plugin') .
+                    echo '<label for="gtbabel_google_translation_api_key" class="gtbabel__label">';
+                    echo __('Google Translation API Key', 'gtbabel-plugin') .
                         ' (<a href="https://console.cloud.google.com/apis/library/translate.googleapis.com" target="_blank">' .
                         __('Link', 'gtbabel-plugin') .
-                        '</a>)</span>';
-                    echo '<input class="gtbabel__input" type="text" name="gtbabel[google_translation_api_key]" value="' .
+                        '</a>)';
+                    echo '</label>';
+                    echo '<div class="gtbabel__inputbox">';
+                    echo '<input class="gtbabel__input" type="text" id="gtbabel_google_translation_api_key" name="gtbabel[google_translation_api_key]" value="' .
                         $settings['google_translation_api_key'] .
                         '" />';
-                    echo '</label>';
+                    echo '</div>';
                     echo '</li>';
 
                     echo '<li class="gtbabel__field">';
-                    echo '<label class="gtbabel__label-wrapper">';
-                    echo '<span class="gtbabel__label">' . __('Exclude urls', 'gtbabel-plugin') . '</span>';
-                    echo '<textarea class="gtbabel__input" name="gtbabel[exclude_urls]">' .
+                    echo '<label for="gtbabel_exclude_urls" class="gtbabel__label">';
+                    echo __('Exclude urls', 'gtbabel-plugin');
+                    echo '</label>';
+                    echo '<div class="gtbabel__inputbox">';
+                    echo '<textarea class="gtbabel__input gtbabel__input--textarea" id="gtbabel_exclude_urls" name="gtbabel[exclude_urls]">' .
                         implode(PHP_EOL, $settings['exclude_urls']) .
                         '</textarea>';
-                    echo '</label>';
+                    echo '</div>';
                     echo '</li>';
 
                     echo '<li class="gtbabel__field">';
-                    echo '<label class="gtbabel__label-wrapper">';
-                    echo '<span class="gtbabel__label">' . __('Exclude dom nodes', 'gtbabel-plugin') . '</span>';
-                    echo '<textarea class="gtbabel__input" name="gtbabel[exclude_dom]">' .
+                    echo '<label for="gtbabel_exclude_dom" class="gtbabel__label">';
+                    echo __('Exclude dom nodes', 'gtbabel-plugin');
+                    echo '</label>';
+                    echo '<div class="gtbabel__inputbox">';
+                    echo '<textarea class="gtbabel__input gtbabel__input--textarea" id="gtbabel_exclude_dom" name="gtbabel[exclude_dom]">' .
                         implode(PHP_EOL, $settings['exclude_dom']) .
                         '</textarea>';
-                    echo '</label>';
+                    echo '</div>';
                     echo '</li>';
 
                     echo '<li class="gtbabel__field">';
-                    echo '<label class="gtbabel__label-wrapper">';
-                    echo '<span class="gtbabel__label">' . __('Include dom nodes', 'gtbabel-plugin') . '</span>';
-
+                    echo '<label class="gtbabel__label">';
+                    echo __('Include dom nodes', 'gtbabel-plugin');
+                    echo '</label>';
+                    echo '<div class="gtbabel__inputbox">';
                     echo '<div class="gtbabel__repeater">';
                     echo '<ul class="gtbabel__repeater-list">';
                     if (empty(@$settings['include_dom'])) {
@@ -298,29 +327,33 @@ class GtbabelWordPress
                         echo '<input class="gtbabel__input" type="text" name="gtbabel[include_dom][context][]" value="' .
                             $include_dom__value['context'] .
                             '" />';
-                        echo '<a href="#" class="gtbabel__repeater-remove">' . __('Remove', 'gtbabel-plugin') . '</a>';
+                        echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
+                            __('Remove', 'gtbabel-plugin') .
+                            '</a>';
                         echo '</li>';
                     }
                     echo '</ul>';
-                    echo '<a href="#" class="gtbabel__repeater-add">' . __('Add', 'gtbabel-plugin') . '</a>';
+                    echo '<a href="#" class="gtbabel__repeater-add button button-secondary">' .
+                        __('Add', 'gtbabel-plugin') .
+                        '</a>';
                     echo '</div>';
-
-                    echo '</label>';
+                    echo '</div>';
                     echo '</li>';
 
                     echo '</ul>';
+
                     echo '<input class="gtbabel__submit button button-primary" name="save_settings" value="' .
                         __('Save', 'gtbabel-plugin') .
                         '" type="submit" />';
 
                     echo '<h2 class="gtbabel__subtitle">' . __('Reset settings', 'gtbabel-plugin') . '</h2>';
-                    echo '<input class="gtbabel__submit button button-primary" name="reset_settings" value="' .
+                    echo '<input class="gtbabel__submit button button-secondary" name="reset_settings" value="' .
                         __('Reset', 'gtbabel-plugin') .
                         '" type="submit" />';
                     echo '</form>';
                     echo '</div>';
                 },
-                'dashicons-admin-site',
+                'dashicons-admin-site-alt3',
                 100
             );
             add_action('admin_print_styles-' . $menu, function () {

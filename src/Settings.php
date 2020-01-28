@@ -21,9 +21,9 @@ class Settings
     {
         $default_args = [
             'languages' => gtbabel_default_languages(),
-            'lng_folder' => '/locales',
             'lng_source' => 'de',
             'lng_target' => null,
+            'lng_folder' => '/locales',
             'prefix_source_lng' => true,
             'translate_text_nodes' => true,
             'translate_default_tag_nodes' => true,

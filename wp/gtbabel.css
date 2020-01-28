@@ -1,12 +1,58 @@
-.gtbabel__label-wrapper {
+.gtbabel__field {
     display: flex;
     align-items: flex-start;
     align-content: flex-start;
+    margin: 0;
+    border-bottom: 1px solid #dadada;
+    padding: 2px 5px;
 }
 .gtbabel__label {
-    line-height: 2;
-    flex: 0 1 10%;
+    flex: 0 1 270px;
+    line-height: 30px;
+    min-height: 30px;
+}
+.gtbabel__inputbox {
+    flex: 0 1 calc(100% - 270px);
 }
 .gtbabel__input {
-    flex: 0 1 90%;
+    width: 100%;
+    max-width: 100%;
+}
+.gtbabel__input--textarea {
+    display: block;
+    height: 46px;
+}
+.gtbabel__input--select,
+.gtbabel__input--select.gtbabel__input--select {
+    max-width: 100%;
+}
+.gtbabel__input--checkbox,
+.gtbabel__input--checkbox.gtbabel__input--checkbox {
+    margin-top: 7px;
+}
+.gtbabel__repeater-listitem {
+    display: flex;
+    align-items: flex-start;
+    align-content: flex-start;
+    margin-bottom: 3px;
+}
+.gtbabel__repeater-listitem .gtbabel__input {
+    flex: 0 1 30%;
+}
+.gtbabel__repeater-listitem .gtbabel__repeater-remove {
+    flex: 0 1 10%;
+    text-align: center;
+}
+.gtbabel__languagelist {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    align-content: flex-start;
+}
+.gtbabel__languagelist-item {
+    flex: 0 1 70px;
+    line-height: 10px;
+}
+.gtbabel__languagelist-item .gtbabel__input--checkbox {
+    margin-top: -1px;
 }

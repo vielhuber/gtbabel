@@ -52,9 +52,9 @@ $gtbabel->start();
 // start with advanced settings
 $gtbabel->start([
   'languages' => ['de', 'en', 'fr'],
-  'lng_folder' => '/locales',
   'lng_source' => 'de',
   'lng_target' => 'en',
+  'lng_folder' => '/locales',
   'prefix_source_lng' => false,
   'translate_text_nodes' => true,
   'translate_default_tag_nodes' => true,
