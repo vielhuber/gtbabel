@@ -37,10 +37,10 @@
     margin-bottom: 3px;
 }
 .gtbabel__repeater-listitem .gtbabel__input {
-    flex: 0 1 30%;
+    flex: 0 1 calc((100% - 80px) / 3);
 }
 .gtbabel__repeater-listitem .gtbabel__repeater-remove {
-    flex: 0 1 10%;
+    flex: 0 1 80px;
     text-align: center;
 }
 .gtbabel__languagelist {

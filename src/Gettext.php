@@ -131,6 +131,9 @@ class Gettext
 
     function addTranslationToPoFileAndToCache($orig, $trans, $lng, $context = null)
     {
+        if( $lng === $this->getSourceLng() || empty(@$this->gettext[$lng]) ) {
+            return;
+        }
         $translation = Translation::create($context, $orig);
         $translation->translate($trans);
         $this->gettext[$lng]->add($translation);
