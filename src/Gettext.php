@@ -66,8 +66,12 @@ class Gettext
             }
             foreach ($this->gettext[$languages__value]->getTranslations() as $gettext__value) {
                 $context = $gettext__value->getContext() ?? '';
-                $this->gettext_cache[$languages__value][$context][$gettext__value->getOriginal()] = $gettext__value->getTranslation();
-                $this->gettext_cache_reverse[$languages__value][$context][$gettext__value->getTranslation()] = $gettext__value->getOriginal();
+                $this->gettext_cache[$languages__value][$context][
+                    $gettext__value->getOriginal()
+                ] = $gettext__value->getTranslation();
+                $this->gettext_cache_reverse[$languages__value][$context][
+                    $gettext__value->getTranslation()
+                ] = $gettext__value->getOriginal();
             }
         }
     }
@@ -85,8 +89,14 @@ class Gettext
             if ($this->gettext_save_counter['po'][$languages__value] === false) {
                 continue;
             }
-            $poGenerator->generateFile($this->gettext[$languages__value], $this->getLngFilename('po', $languages__value));
-            $moGenerator->generateFile($this->gettext[$languages__value], $this->getLngFilename('mo', $languages__value));
+            $poGenerator->generateFile(
+                $this->gettext[$languages__value],
+                $this->getLngFilename('po', $languages__value)
+            );
+            $moGenerator->generateFile(
+                $this->gettext[$languages__value],
+                $this->getLngFilename('mo', $languages__value)
+            );
         }
     }
 
@@ -131,7 +141,7 @@ class Gettext
 
     function addTranslationToPoFileAndToCache($orig, $trans, $lng, $context = null)
     {
-        if( $lng === $this->getSourceLng() || empty(@$this->gettext[$lng]) ) {
+        if ($lng === $this->getSourceLng() || empty(@$this->gettext[$lng])) {
             return;
         }
         $translation = Translation::create($context, $orig);
@@ -157,16 +167,15 @@ class Gettext
         $files = glob($this->getLngFolder() . '/*'); // get all file names
         foreach ($files as $files__value) {
             if (is_file($files__value)) {
-                if (strpos($files__value, '.pot') !== false || strpos($files__value, '.po') !== false || strpos($files__value, '.mo') !== false) {
+                if (
+                    strpos($files__value, '.pot') !== false ||
+                    strpos($files__value, '.po') !== false ||
+                    strpos($files__value, '.mo') !== false
+                ) {
                     @unlink($files__value);
                 }
             }
         }
-    }
-
-    function reset()
-    {
-        $this->deletePotPoMoFiles();
     }
 
     function createLngFolderIfNotExists()
@@ -366,13 +375,21 @@ class Gettext
             if (strpos($link, 'http') === false && strpos($link, ':') !== false) {
                 return $link;
             }
-            $link = str_replace([$this->host->getCurrentHost() . '/' . $this->getSourceLng(), $this->host->getCurrentHost()], '', $link);
+            $link = str_replace(
+                [$this->host->getCurrentHost() . '/' . $this->getSourceLng(), $this->host->getCurrentHost()],
+                '',
+                $link
+            );
             $url_parts = explode('/', $link);
             foreach ($url_parts as $url_parts__key => $url_parts__value) {
                 if ($this->stringShouldNotBeTranslated($url_parts__value, 'slug')) {
                     continue;
                 }
-                $url_parts[$url_parts__key] = $this->getTranslationAndAddDynamicallyIfNeeded($url_parts__value, $lng, 'slug');
+                $url_parts[$url_parts__key] = $this->getTranslationAndAddDynamicallyIfNeeded(
+                    $url_parts__value,
+                    $lng,
+                    'slug'
+                );
             }
             $link = implode('/', $url_parts);
             $link = '/' . $lng . '' . $link;
@@ -412,7 +429,10 @@ class Gettext
 
     function autoTranslateString($orig, $to_lng, $context = null, $from_lng = null)
     {
-        if ($this->settings->get('auto_translation') === true && $this->settings->get('auto_translation_service') === 'google') {
+        if (
+            $this->settings->get('auto_translation') === true &&
+            $this->settings->get('auto_translation_service') === 'google'
+        ) {
             $trans = $this->translateStringWithGoogle($orig, $to_lng, $context, $from_lng);
         } else {
             $trans = $this->translateStringMock($orig, $to_lng, $context, $from_lng);
@@ -566,7 +586,12 @@ class Gettext
 
     function getCurrentUrlTranslationsInLanguage($lng)
     {
-        return trim(trim($this->host->getCurrentHost(), '/') . '/' . trim($this->getCurrentPathTranslationsInLanguage($lng, false), '/'), '/') . '/';
+        return trim(
+            trim($this->host->getCurrentHost(), '/') .
+                '/' .
+                trim($this->getCurrentPathTranslationsInLanguage($lng, false), '/'),
+            '/'
+        ) . '/';
     }
 
     function getTranslationInForeignLng($str, $to_lng, $from_lng = null, $context = null)
@@ -589,8 +614,12 @@ class Gettext
         return $trans;
     }
 
-    function getTranslationInForeignLngAndAddDynamicallyIfNeeded($str, $to_lng = null, $from_lng = null, $context = null)
-    {
+    function getTranslationInForeignLngAndAddDynamicallyIfNeeded(
+        $str,
+        $to_lng = null,
+        $from_lng = null,
+        $context = null
+    ) {
         if ($to_lng === null) {
             $to_lng = $this->getCurrentLng();
         }
@@ -625,7 +654,10 @@ class Gettext
         $url_parts = array_values($url_parts);
 
         // prefix
-        if ($always_remove_prefix === true || ($this->getSourceLng() === $lng && $this->settings->get('prefix_source_lng') === false)) {
+        if (
+            $always_remove_prefix === true ||
+            ($this->getSourceLng() === $lng && $this->settings->get('prefix_source_lng') === false)
+        ) {
             if (@$url_parts[0] === $this->getCurrentLng()) {
                 unset($url_parts[0]);
             }

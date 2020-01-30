@@ -22,7 +22,7 @@ Gtbabel automatically translates your html/php pages – server sided!
 -   auto translation: use the power of the [Google Translation API](https://cloud.google.com/translate/docs) to auto translate your pages and links into any language
 -   router included: spoof your request uri and let the magic happen, links are automatically converted
 -   helper functions for current language and all languages available
--   basic seo considered: title tags, seo descriptions, html lang tag, hreflang tags included
+-   basic seo considered: title tags, seo descriptions, html lang attribute, hreflang tags included
 -   wordpress plugin available: configure your settings easily in your wp backend
 -   works seamlessly with caching/preloading plugins
 -   phpunit tests available
@@ -51,30 +51,32 @@ $gtbabel->start();
 
 // start with advanced settings
 $gtbabel->start([
-  'languages' => ['de', 'en', 'fr'],
-  'lng_source' => 'de',
-  'lng_target' => 'en',
-  'lng_folder' => '/locales',
-  'prefix_source_lng' => false,
-  'translate_text_nodes' => true,
-  'translate_default_tag_nodes' => true,
-  'debug_mode' => false,
-  'auto_translation' => false,
-  'auto_translation_service' => 'google',
-  'google_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-  'exclude_urls' => ['/backend'],
-  'exclude_dom' => ['.lngpicker'],
-  'include_dom' => [
-    [
-      'selector' => '.search-submit',
-      'attribute' => 'value'
-    ],
-    [
-      'selector' => '.js-link',
-      'attribute' => 'alt-href',
-      'context' => 'slug'
+    'languages' => ['de', 'en', 'fr'],
+    'lng_source' => 'de',
+    'lng_target' => 'en',
+    'lng_folder' => '/locales',
+    'prefix_source_lng' => false,
+    'translate_text_nodes' => true,
+    'translate_default_tag_nodes' => true,
+    'html_lang_attribute' => true,
+    'html_hreflang_tags' => true,
+    'debug_mode' => false,
+    'auto_translation' => false,
+    'auto_translation_service' => 'google',
+    'google_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+    'exclude_urls' => ['/backend'],
+    'exclude_dom' => ['.lngpicker'],
+    'include_dom' => [
+        [
+            'selector' => '.search-submit',
+            'attribute' => 'value'
+        ],
+        [
+            'selector' => '.js-link',
+            'attribute' => 'alt-href',
+            'context' => 'slug'
+        ]
     ]
-  ]
 ]);
 
 // any static or dynamic content
@@ -83,7 +85,7 @@ require_once 'template.html';
 $gtbabel->stop();
 ```
 
-## wordpress adapter
+## wordpress plugin
 
 [de.wordpress.org/plugins/gtbabel](https://de.wordpress.org/plugins/gtbabel/)
 
@@ -135,7 +137,7 @@ gtbabel_default_languages() // ['de','en','fr','af','am','ar','az','be','bg','bn
 gtbabel_default_settings() // ['languages' => ['de', 'en', 'fr'], 'lng_folder' => '/locales', ...]
 gtbabel_default_settings(['lng_folder' => '/foo']) // ['languages' => ['de', 'en', 'fr'], 'lng_folder' => '/foo', ...]
 gtbabel_languagepicker() // [['lng' => 'de', 'url' => 'https://tld.com/de/nudel', 'active' => true], ['lng' => 'en', 'url' => 'https://tld.com/en/noodle', 'active' => false], ...]
-gtbabel_reset() // resets all language files
+gtbabel_reset_translations() // deletes all language files
 gtbabel__('Hallo') // 'Hi there'
 gtbabel__('Hi there', 'de', 'en') // 'Hello'
 ```

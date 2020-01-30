@@ -9,4 +9,4 @@
  * License: free
  */
 
-require_once __DIR__ . '/wp/gtbabel.php';
+require_once __DIR__ . '/wordpress/gtbabel.php';

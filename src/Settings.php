@@ -27,6 +27,8 @@ class Settings
             'prefix_source_lng' => true,
             'translate_text_nodes' => true,
             'translate_default_tag_nodes' => true,
+            'html_lang_attribute' => true,
+            'html_hreflang_tags' => true,
             'debug_mode' => false,
             'auto_translation' => true,
             'auto_translation_service' => 'google',

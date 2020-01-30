@@ -14,12 +14,8 @@ class Dom
     public $host;
     public $settings;
 
-    function __construct(
-        Utils $utils = null,
-        Gettext $gettext = null,
-        Host $host = null,
-        Settings $settings = null
-    ) {
+    function __construct(Utils $utils = null, Gettext $gettext = null, Host $host = null, Settings $settings = null)
+    {
         $this->utils = $utils ?: new Utils();
         $this->gettext = $gettext ?: new Gettext();
         $this->host = $host ?: new Host();
@@ -94,20 +90,14 @@ class Dom
 
             $originalText = $this->gettext->formatTextFromTextNode($originalText);
 
-            [
-                $originalTextWithPlaceholders,
-                $mappingTable
-            ] = $this->gettext->placeholderConversionIn($originalText);
+            [$originalTextWithPlaceholders, $mappingTable] = $this->gettext->placeholderConversionIn($originalText);
 
             $translatedTextWithPlaceholders = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
                 $originalTextWithPlaceholders,
                 $this->gettext->getCurrentLng()
             );
 
-            $translatedText = $this->gettext->placeholderConversionOut(
-                $translatedTextWithPlaceholders,
-                $mappingTable
-            );
+            $translatedText = $this->gettext->placeholderConversionOut($translatedTextWithPlaceholders, $mappingTable);
 
             if ($this->isTextNode($groups__value)) {
                 $groups__value->nodeValue = $translatedText;
@@ -119,10 +109,7 @@ class Dom
 
     function modifyTagNodes()
     {
-        if (
-            $this->gettext->sourceLngIsCurrentLng() &&
-            $this->settings->get('prefix_source_lng') === false
-        ) {
+        if ($this->gettext->sourceLngIsCurrentLng() && $this->settings->get('prefix_source_lng') === false) {
             return;
         }
 
@@ -166,14 +153,10 @@ class Dom
         $include = array_merge($include, $this->settings->get('include_dom'));
 
         foreach ($include as $include__value) {
-            $nodes = $this->DOMXpath->query(
-                $this->transformSelectorToXpath($include__value['selector'])
-            );
+            $nodes = $this->DOMXpath->query($this->transformSelectorToXpath($include__value['selector']));
             if (!empty($nodes)) {
                 foreach ($nodes as $nodes__value) {
-                    if (
-                        array_key_exists($this->getIdOfNode($nodes__value), $this->excluded_nodes)
-                    ) {
+                    if (array_key_exists($this->getIdOfNode($nodes__value), $this->excluded_nodes)) {
                         continue;
                     }
                     if (@$include__value['attribute'] != '') {
@@ -186,10 +169,7 @@ class Dom
                         if (@$include__value['context'] != '') {
                             $context = $include__value['context'];
                         }
-                        if (
-                            $include__value['selector'] === 'a' &&
-                            $include__value['attribute'] === 'href'
-                        ) {
+                        if ($include__value['selector'] === 'a' && $include__value['attribute'] === 'href') {
                             $context = 'slug';
                         }
                         if (strpos($value, $this->host->getCurrentHost()) === 0) {
@@ -202,32 +182,19 @@ class Dom
 
                         if ($this->gettext->sourceLngIsCurrentLng()) {
                             if ($context === 'slug') {
-                                if (
-                                    $value === null ||
-                                    trim($value) === '' ||
-                                    strpos($value, '#') === 0
-                                ) {
+                                if ($value === null || trim($value) === '' || strpos($value, '#') === 0) {
                                     continue;
                                 }
-                                $is_absolute_link =
-                                    strpos($value, $this->host->getCurrentHost()) === 0;
-                                if (
-                                    strpos($value, 'http') !== false &&
-                                    $is_absolute_link === false
-                                ) {
+                                $is_absolute_link = strpos($value, $this->host->getCurrentHost()) === 0;
+                                if (strpos($value, 'http') !== false && $is_absolute_link === false) {
                                     continue;
                                 }
-                                if (
-                                    strpos($value, 'http') === false &&
-                                    strpos($value, ':') !== false
-                                ) {
+                                if (strpos($value, 'http') === false && strpos($value, ':') !== false) {
                                     continue;
                                 }
                                 $value = str_replace(
                                     [
-                                        $this->host->getCurrentHost() .
-                                            '/' .
-                                            $this->gettext->getSourceLng(),
+                                        $this->host->getCurrentHost() . '/' . $this->gettext->getSourceLng(),
                                         $this->host->getCurrentHost()
                                     ],
                                     '',
@@ -283,20 +250,24 @@ class Dom
 
     function setLangTags()
     {
-        $html_node = $this->DOMXpath->query('/html')[0];
-        if ($html_node !== null) {
-            $html_node->setAttribute('lang', $this->gettext->getCurrentLng());
+        if ($this->settings->get('html_lang_attribute') === true) {
+            $html_node = $this->DOMXpath->query('/html')[0];
+            if ($html_node !== null) {
+                $html_node->setAttribute('lang', $this->gettext->getCurrentLng());
+            }
         }
 
-        $head_node = $this->DOMXpath->query('/html/head')[0];
-        if ($head_node !== null) {
-            $data = $this->gettext->getLanguagePickerData();
-            foreach ($data as $data__value) {
-                $tag = $this->DOMDocument->createElement('link', '');
-                $tag->setAttribute('rel', 'alternate');
-                $tag->setAttribute('hreflang', $data__value['lng']);
-                $tag->setAttribute('href', $data__value['url']);
-                $head_node->appendChild($tag);
+        if ($this->settings->get('html_hreflang_tags') === true) {
+            $head_node = $this->DOMXpath->query('/html/head')[0];
+            if ($head_node !== null) {
+                $data = $this->gettext->getLanguagePickerData();
+                foreach ($data as $data__value) {
+                    $tag = $this->DOMDocument->createElement('link', '');
+                    $tag->setAttribute('rel', 'alternate');
+                    $tag->setAttribute('hreflang', $data__value['lng']);
+                    $tag->setAttribute('href', $data__value['url']);
+                    $head_node->appendChild($tag);
+                }
             }
         }
     }
@@ -314,10 +285,7 @@ class Dom
             // .foo => *[contains(concat(" ", normalize-space(@class), " "), " foo ")]
             if (strpos($parts__value, '.') !== false) {
                 $parts__value_parts = explode('.', $parts__value);
-                foreach (
-                    $parts__value_parts
-                    as $parts__value_parts__key => $parts__value_parts__value
-                ) {
+                foreach ($parts__value_parts as $parts__value_parts__key => $parts__value_parts__value) {
                     if ($parts__value_parts__key === 0 && $parts__value_parts__value === '') {
                         $parts__value_parts[$parts__value_parts__key] = '*';
                     }

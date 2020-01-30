@@ -71,7 +71,7 @@ class GtbabelWordPress
     private function localize()
     {
         add_action('plugins_loaded', function () {
-            load_plugin_textdomain('gtbabel-plugin', false, 'gtbabel/wp/languages');
+            load_plugin_textdomain('gtbabel-plugin', false, 'gtbabel/wordpress/languages');
         });
     }
 
@@ -108,6 +108,23 @@ class GtbabelWordPress
                     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         if (isset($_POST['save_settings'])) {
                             $settings = @$_POST['gtbabel'];
+                            foreach (
+                                [
+                                    'prefix_source_lng',
+                                    'translate_text_nodes',
+                                    'translate_default_tag_nodes',
+                                    'html_lang_attribute',
+                                    'html_hreflang_tags',
+                                    'auto_translation'
+                                ]
+                                as $checkbox__value
+                            ) {
+                                if (@$settings[$checkbox__value] == '1') {
+                                    $settings[$checkbox__value] = true;
+                                } else {
+                                    $settings[$checkbox__value] = false;
+                                }
+                            }
                             foreach (['exclude_urls', 'exclude_dom'] as $exclude__value) {
                                 $post_data = $settings[$exclude__value];
                                 $settings[$exclude__value] = [];
@@ -140,9 +157,11 @@ class GtbabelWordPress
                         }
                         if (isset($_POST['reset_settings'])) {
                             delete_option('gtbabel_settings');
-                            gtbabel_reset();
                             $this->setDefaultSettingsToOption();
                             $this->start();
+                        }
+                        if (isset($_POST['reset_translations'])) {
+                            gtbabel_reset_translations();
                         }
                         $message =
                             '<div class="gtbabel__notice notice notice-success is-dismissible"><p>' .
@@ -241,6 +260,28 @@ class GtbabelWordPress
                     echo '<div class="gtbabel__inputbox">';
                     echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_translate_default_tag_nodes" name="gtbabel[translate_default_tag_nodes]" value="1"' .
                         ($settings['translate_default_tag_nodes'] == '1' ? ' checked="checked"' : '') .
+                        ' />';
+                    echo '</div>';
+                    echo '</li>';
+
+                    echo '<li class="gtbabel__field">';
+                    echo '<label for="gtbabel_html_lang_attribute" class="gtbabel__label">';
+                    echo __('Set html lang attribute', 'gtbabel-plugin');
+                    echo '</label>';
+                    echo '<div class="gtbabel__inputbox">';
+                    echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_html_lang_attribute" name="gtbabel[html_lang_attribute]" value="1"' .
+                        ($settings['html_lang_attribute'] == '1' ? ' checked="checked"' : '') .
+                        ' />';
+                    echo '</div>';
+                    echo '</li>';
+
+                    echo '<li class="gtbabel__field">';
+                    echo '<label for="gtbabel_html_hreflang_tags" class="gtbabel__label">';
+                    echo __('Add html hreflang tags', 'gtbabel-plugin');
+                    echo '</label>';
+                    echo '<div class="gtbabel__inputbox">';
+                    echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_html_hreflang_tags" name="gtbabel[html_hreflang_tags]" value="1"' .
+                        ($settings['html_hreflang_tags'] == '1' ? ' checked="checked"' : '') .
                         ' />';
                     echo '</div>';
                     echo '</li>';
@@ -348,6 +389,11 @@ class GtbabelWordPress
 
                     echo '<h2 class="gtbabel__subtitle">' . __('Reset settings', 'gtbabel-plugin') . '</h2>';
                     echo '<input class="gtbabel__submit button button-secondary" name="reset_settings" value="' .
+                        __('Reset', 'gtbabel-plugin') .
+                        '" type="submit" />';
+
+                    echo '<h2 class="gtbabel__subtitle">' . __('Reset translations', 'gtbabel-plugin') . '</h2>';
+                    echo '<input class="gtbabel__submit button button-secondary" name="reset_translations" value="' .
                         __('Reset', 'gtbabel-plugin') .
                         '" type="submit" />';
                     echo '</form>';
