@@ -2,9 +2,7 @@
 
 Gtbabel automatically translates your html/php pages – server sided!
 
-# WORK IN PROGRESS
-
-# WARNING: this is experimental
+# WORK IN PROGRESS /// WARNING: THIS IS EXPERIMENTAL
 
 ## basic idea
 
