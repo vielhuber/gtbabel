@@ -4,3 +4,4 @@ composer.lock
 log.txt
 /locales/*
 /.phpunit.result.cache
+/tests/files/**/*_expected

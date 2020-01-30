@@ -13,9 +13,11 @@ $gtbabel->start([
     'auto_translation' => false,
     'auto_translation_service' => 'google',
     'google_translation_api_key' => getenv('GOOGLE_TRANSLATION_API_KEY'),
-    'exclude_urls' => null
+    'exclude_urls' => null,
+    'html_lang_attribute' => false,
+    'html_hreflang_tags' => false
 ]);
 
-require_once 'demo/simple/16.html';
+require_once 'demo/simple/1.html';
 
 $gtbabel->stop();

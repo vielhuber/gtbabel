@@ -16,6 +16,7 @@ class Test extends \PHPUnit\Framework\TestCase
     public function testMainFunctionality()
     {
         $this->runDiff('1.html', ['html_lang_attribute' => false, 'html_hreflang_tags' => false]);
+        $this->runDiff('2.html', ['html_lang_attribute' => false, 'html_hreflang_tags' => false]);
         /*
         $this->runDiff('2.php');
         $this->runDiff('3.html', ['lng_target' => 'fr']);
@@ -56,18 +57,35 @@ class Test extends \PHPUnit\Framework\TestCase
         ob_end_clean();
 
         $html_target = file_get_contents(__DIR__ . '/files/out/' . $filename);
-        $this->assertEquals($this->lineEndingWeakEquals($html_translated, $html_target), true);
+
+        $html_translated = $this->normalize($html_translated);
+        $html_translated = $this->minify($html_translated);
+        $html_target = $this->normalize($html_target);
+        $html_target = $this->minify($html_target);
+
+        $debug_filename = __DIR__ . '/files/out/' . $filename . '_expected';
+        if ($html_translated !== $html_target) {
+            file_put_contents($debug_filename, $html_translated);
+        } else {
+            @unlink($debug_filename);
+        }
+
+        $this->assertEquals($html_translated, $html_target);
     }
 
-    public function lineEndingWeakEquals($str1, $str2)
+    public function normalize($str)
     {
-        if ((!is_string($str1) || !is_string($str2)) && $str1 !== $str2) {
-            return false;
+        $str = str_replace("\r\n", "\n", $str);
+        $str = str_replace("\r", "\n", $str);
+        return $str;
+    }
+
+    public function minify($html)
+    {
+        if (class_exists('TinyHtmlMinifier') === false) {
+            require __DIR__ . '/../lib/TinyHtmlMinifier.php';
         }
-        $str1 = str_replace("\r\n", "\n", $str1);
-        $str1 = str_replace("\r", "\n", $str1);
-        $str2 = str_replace("\r\n", "\n", $str2);
-        $str2 = str_replace("\r", "\n", $str2);
-        return $str1 === $str2;
+        $minifier = new TinyHtmlMinifier([]);
+        return $minifier->minify($html);
     }
 }
