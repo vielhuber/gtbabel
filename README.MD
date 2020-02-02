@@ -60,7 +60,7 @@ $gtbabel->start([
     'html_hreflang_tags' => true,
     'debug_mode' => false,
     'auto_translation' => false,
-    'auto_translation_service' => 'google',
+    'auto_translation_service' => 'google', // google|microsoft
     'google_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
     'microsoft_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
     'exclude_urls' => ['/backend'],
