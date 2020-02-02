@@ -13,6 +13,11 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->gtbabel = new Gtbabel();
     }
 
+    protected function tearDown(): void
+    {
+        $this->gtbabel->reset();
+    }
+
     public function testMainFunctionality()
     {
         $this->runDiff('1.html', ['html_lang_attribute' => false, 'html_hreflang_tags' => false]);
@@ -31,8 +36,6 @@ class Test extends \PHPUnit\Framework\TestCase
             'prefix_source_lng' => false,
             'debug_mode' => true,
             'auto_translation' => false,
-            'auto_translation_service' => 'google',
-            'google_translation_api_key' => getenv('GOOGLE_TRANSLATION_API_KEY'),
             'exclude_urls' => null
         ];
     }
@@ -59,9 +62,9 @@ class Test extends \PHPUnit\Framework\TestCase
         $html_target = file_get_contents(__DIR__ . '/files/out/' . $filename);
 
         $html_translated = $this->normalize($html_translated);
-        $html_translated = $this->minify($html_translated);
+        $html_translated = __minify_html($html_translated);
         $html_target = $this->normalize($html_target);
-        $html_target = $this->minify($html_target);
+        $html_target = __minify_html($html_target);
 
         $debug_filename = __DIR__ . '/files/out/' . $filename . '_expected';
         if ($html_translated !== $html_target) {
@@ -78,14 +81,5 @@ class Test extends \PHPUnit\Framework\TestCase
         $str = str_replace("\r\n", "\n", $str);
         $str = str_replace("\r", "\n", $str);
         return $str;
-    }
-
-    public function minify($html)
-    {
-        if (class_exists('TinyHtmlMinifier') === false) {
-            require __DIR__ . '/../lib/TinyHtmlMinifier.php';
-        }
-        $minifier = new TinyHtmlMinifier([]);
-        return $minifier->minify($html);
     }
 }

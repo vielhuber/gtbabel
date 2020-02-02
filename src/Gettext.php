@@ -162,7 +162,7 @@ class Gettext
         return $this->getLngFolder() . '/' . $lng . '.' . $type;
     }
 
-    function deletePotPoMoFiles()
+    function resetTranslations()
     {
         $files = glob($this->getLngFolder() . '/*'); // get all file names
         foreach ($files as $files__value) {
@@ -429,11 +429,25 @@ class Gettext
 
     function autoTranslateString($orig, $to_lng, $context = null, $from_lng = null)
     {
-        if (
-            $this->settings->get('auto_translation') === true &&
-            $this->settings->get('auto_translation_service') === 'google'
-        ) {
-            $trans = $this->translateStringWithGoogle($orig, $to_lng, $context, $from_lng);
+        if ($this->settings->get('auto_translation') === true) {
+            if ($this->settings->get('auto_translation_service') === 'google') {
+                $trans = __translate_google(
+                    $orig,
+                    $from_lng,
+                    $to_lng,
+                    $this->settings->get('google_translation_api_key')
+                );
+            } elseif ($this->settings->get('auto_translation_service') === 'microsoft') {
+                $trans = __translate_microsoft(
+                    $orig,
+                    $from_lng,
+                    $to_lng,
+                    $this->settings->get('microsoft_translation_api_key')
+                );
+            }
+            if ($context === 'slug') {
+                $trans = $this->utils->slugify($trans, $orig, $to_lng);
+            }
         } else {
             $trans = $this->translateStringMock($orig, $to_lng, $context, $from_lng);
         }
@@ -505,50 +519,6 @@ class Gettext
             return '%|%' . $str . '%|%' . $to_lng . '%|%';
         }
         return $str . '-' . $to_lng;
-    }
-
-    function translateStringWithGoogle($str, $to_lng, $context = null, $from_lng = null)
-    {
-        $apiKey = $this->settings->get('google_translation_api_key');
-        $url =
-            'https://www.googleapis.com/language/translate/v2?key=' .
-            $apiKey .
-            '&q=' .
-            rawurlencode($str) .
-            '&source=' .
-            ($from_lng === null ? $this->getSourceLng() : $from_lng) .
-            '&target=' .
-            $to_lng;
-        $handle = curl_init($url);
-        curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($handle);
-        $responseDecoded = json_decode($response, true);
-        curl_close($handle);
-        if (@$responseDecoded['data']['translations'][0]['translatedText'] != '') {
-            $trans = $responseDecoded['data']['translations'][0]['translatedText'];
-        } else {
-            $trans = $str;
-        }
-
-        // the api returns some characters in their html characters form (e.g. "'" is returned as "&#39;")
-        // we want to store the real values
-        $trans = html_entity_decode($trans, ENT_QUOTES);
-
-        // uppercase
-        // the google translation api does a very bad job at keeping uppercased words at the beginning
-        // we fix this here
-        if ($this->utils->firstCharIsUppercase($str) && !$this->utils->firstCharIsUppercase($trans)) {
-            $trans = $this->utils->setFirstCharUppercase($trans);
-        }
-
-        // slugify
-        if ($context === 'slug') {
-            $trans = $this->utils->slugify($trans, $str, $to_lng);
-        }
-
-        return $trans;
     }
 
     function stringShouldNotBeTranslated($str, $context = null)

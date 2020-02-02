@@ -17,7 +17,7 @@ Gtbabel automatically translates your html/php pages – server sided!
 -   embraces the power of [gettext](https://www.gnu.org/software/gettext/) (e.g. using contexts and template files)
 -   framework agnostic: works with nearly any php based cms or static sites
 -   fast: once all translations are available, gtbabel reaches a throughput of XXX words / second
--   auto translation: use the power of the [Google Translation API](https://cloud.google.com/translate/docs) to auto translate your pages and links into any language
+-   auto translation: use the power of [Google Translation API](https://cloud.google.com/translate/docs) or [Microsoft Azure Translation API](https://azure.microsoft.com/de-de/services/cognitive-services/translator-text-api/) to auto translate your pages and links into any language
 -   router included: spoof your request uri and let the magic happen, links are automatically converted
 -   helper functions for current language and all languages available
 -   basic seo considered: title tags, seo descriptions, html lang attribute, hreflang tags included
@@ -62,6 +62,7 @@ $gtbabel->start([
     'auto_translation' => false,
     'auto_translation_service' => 'google',
     'google_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+    'microsoft_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
     'exclude_urls' => ['/backend'],
     'exclude_dom' => ['.lngpicker'],
     'include_dom' => [
@@ -135,7 +136,6 @@ gtbabel_default_languages() // ['de','en','fr','af','am','ar','az','be','bg','bn
 gtbabel_default_settings() // ['languages' => ['de', 'en', 'fr'], 'lng_folder' => '/locales', ...]
 gtbabel_default_settings(['lng_folder' => '/foo']) // ['languages' => ['de', 'en', 'fr'], 'lng_folder' => '/foo', ...]
 gtbabel_languagepicker() // [['lng' => 'de', 'url' => 'https://tld.com/de/nudel', 'active' => true], ['lng' => 'en', 'url' => 'https://tld.com/en/noodle', 'active' => false], ...]
-gtbabel_reset_translations() // deletes all language files
 gtbabel__('Hallo') // 'Hi there'
 gtbabel__('Hi there', 'de', 'en') // 'Hello'
 ```
@@ -144,7 +144,7 @@ gtbabel__('Hi there', 'de', 'en') // 'Hello'
 
 it is recommended to use iso language codes in lowercase.
 but you can use any language code you want (even i-klingon).
-if you use the auto translation feature with the help of Google Transpation API, you must use iso language codes.
+if you use the auto translation feature for example with the help of the Google Transpation API, you must use iso language codes.
 
 ## credits
 

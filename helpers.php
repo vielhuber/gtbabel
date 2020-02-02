@@ -46,15 +46,6 @@ function gtbabel_languagepicker()
     return $gtbabel->gettext->getLanguagePickerData();
 }
 
-function gtbabel_reset_translations()
-{
-    global $gtbabel;
-    if ($gtbabel === null) {
-        $gtbabel = new Gtbabel();
-    }
-    return $gtbabel->gettext->deletePotPoMoFiles();
-}
-
 function gtbabel__($str, $to_lng = null, $from_lng = null)
 {
     global $gtbabel;

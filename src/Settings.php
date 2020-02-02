@@ -33,6 +33,7 @@ class Settings
             'auto_translation' => true,
             'auto_translation_service' => 'google',
             'google_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+            'microsoft_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
             'exclude_urls' => ['/backend'],
             'exclude_dom' => ['.lngpicker'],
             'include_dom' => [

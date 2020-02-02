@@ -52,6 +52,11 @@ class GtbabelWordPress
         $this->gtbabel->stop();
     }
 
+    private function reset()
+    {
+        $this->gtbabel->reset();
+    }
+
     private function installHook()
     {
         register_activation_hook(__FILE__, function () {
@@ -161,7 +166,7 @@ class GtbabelWordPress
                             $this->start();
                         }
                         if (isset($_POST['reset_translations'])) {
-                            gtbabel_reset_translations();
+                            $this->reset();
                         }
                         $message =
                             '<div class="gtbabel__notice notice notice-success is-dismissible"><p>' .
@@ -307,6 +312,9 @@ class GtbabelWordPress
                     echo '<option value="google"' .
                         ($settings['auto_translation_service'] == 'google' ? ' selected="selected"' : '') .
                         '>Google</option>';
+                    echo '<option value="microsoft"' .
+                        ($settings['auto_translation_service'] == 'microsoft' ? ' selected="selected"' : '') .
+                        '>Microsoft</option>';
                     echo '</select>';
                     echo '</div>';
                     echo '</li>';
@@ -321,6 +329,20 @@ class GtbabelWordPress
                     echo '<div class="gtbabel__inputbox">';
                     echo '<input class="gtbabel__input" type="text" id="gtbabel_google_translation_api_key" name="gtbabel[google_translation_api_key]" value="' .
                         $settings['google_translation_api_key'] .
+                        '" />';
+                    echo '</div>';
+                    echo '</li>';
+
+                    echo '<li class="gtbabel__field">';
+                    echo '<label for="gtbabel_microsoft_translation_api_key" class="gtbabel__label">';
+                    echo __('Microsoft Translation API Key', 'gtbabel-plugin') .
+                        ' (<a href="https://azure.microsoft.com/de-de/services/cognitive-services/translator-text-api" target="_blank">' .
+                        __('Link', 'gtbabel-plugin') .
+                        '</a>)';
+                    echo '</label>';
+                    echo '<div class="gtbabel__inputbox">';
+                    echo '<input class="gtbabel__input" type="text" id="gtbabel_microsoft_translation_api_key" name="gtbabel[microsoft_translation_api_key]" value="' .
+                        $settings['microsoft_translation_api_key'] .
                         '" />';
                     echo '</div>';
                     echo '</li>';

@@ -5,12 +5,6 @@ use Cocur\Slugify\Slugify;
 
 class Utils
 {
-    function setFirstCharUppercase($str)
-    {
-        $fc = mb_strtoupper(mb_substr($str, 0, 1));
-        return $fc . mb_substr($str, 1);
-    }
-
     function slugify($trans, $orig, $lng)
     {
         $slugify = new Slugify();
@@ -36,8 +30,7 @@ class Utils
                 $GLOBALS['performance'][count($GLOBALS['performance']) - 1]['message'] .
                 ' execution time: ' .
                 number_format(
-                    microtime(true) -
-                        $GLOBALS['performance'][count($GLOBALS['performance']) - 1]['time'],
+                    microtime(true) - $GLOBALS['performance'][count($GLOBALS['performance']) - 1]['time'],
                     5
                 ) .
                 ' seconds'
@@ -63,10 +56,5 @@ class Utils
             $newstring = substr_replace($str, $replace, $pos, strlen($search));
         }
         return $newstring;
-    }
-
-    function firstCharIsUppercase($str)
-    {
-        return mb_substr($str, 0, 1) == mb_strtoupper(mb_substr($str, 0, 1));
     }
 }

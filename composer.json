@@ -13,7 +13,8 @@
     "require": {
         "gettext/gettext": "^5.2",
         "vlucas/phpdotenv": "^4.0",
-        "cocur/slugify": "^4.0"
+        "cocur/slugify": "^4.0",
+        "vielhuber/stringhelper": "^3.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^8.5"
