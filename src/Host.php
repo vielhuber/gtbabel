@@ -31,8 +31,16 @@ class Host
             $_SERVER['HTTP_HOST'] .
             parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $this->original_url_with_args =
-            'http' . (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-        $this->original_host = 'http' . (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 's' : '') . '://' . $_SERVER['HTTP_HOST'];
+            'http' .
+            (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 's' : '') .
+            '://' .
+            $_SERVER['HTTP_HOST'] .
+            $_SERVER['REQUEST_URI'];
+        $this->original_host =
+            'http' .
+            (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 's' : '') .
+            '://' .
+            $_SERVER['HTTP_HOST'];
     }
 
     function getCurrentArgs()

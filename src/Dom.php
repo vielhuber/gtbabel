@@ -83,12 +83,12 @@ class Dom
 
         foreach ($groups as $groups__value) {
             if ($this->isTextNode($groups__value)) {
-                $originalText = $groups__value->nodeValue;
+                $originalTextRaw = $groups__value->nodeValue;
             } else {
-                $originalText = $this->getInnerHtml($groups__value);
+                $originalTextRaw = $this->getInnerHtml($groups__value);
             }
 
-            $originalText = $this->gettext->formatTextFromTextNode($originalText);
+            $originalText = $this->gettext->removeLineBreaks($originalTextRaw);
 
             [$originalTextWithPlaceholders, $mappingTable] = $this->gettext->placeholderConversionIn($originalText);
 
@@ -98,6 +98,8 @@ class Dom
             );
 
             $translatedText = $this->gettext->placeholderConversionOut($translatedTextWithPlaceholders, $mappingTable);
+
+            $translatedText = $this->gettext->reintroduceLineBreaks($translatedText, $originalText, $originalTextRaw);
 
             if ($this->isTextNode($groups__value)) {
                 $groups__value->nodeValue = $translatedText;
@@ -182,29 +184,14 @@ class Dom
 
                         if ($this->gettext->sourceLngIsCurrentLng()) {
                             if ($context === 'slug') {
-                                if ($value === null || trim($value) === '' || strpos($value, '#') === 0) {
-                                    continue;
-                                }
-                                $is_absolute_link = strpos($value, $this->host->getCurrentHost()) === 0;
-                                if (strpos($value, 'http') !== false && $is_absolute_link === false) {
-                                    continue;
-                                }
-                                if (strpos($value, 'http') === false && strpos($value, ':') !== false) {
-                                    continue;
-                                }
-                                $value = str_replace(
-                                    [
-                                        $this->host->getCurrentHost() . '/' . $this->gettext->getSourceLng(),
-                                        $this->host->getCurrentHost()
-                                    ],
-                                    '',
-                                    $value
+                                $trans = $this->gettext->getTranslationOfLinkHrefAndAddDynamicallyIfNeeded(
+                                    $value,
+                                    $this->gettext->getCurrentLng(),
+                                    false
                                 );
-                                $value = '/' . $this->gettext->getCurrentLng() . '' . $value;
-                                if ($is_absolute_link === true) {
-                                    $value = $this->host->getCurrentHost() . $value;
+                                if ($trans === null) {
+                                    continue;
                                 }
-                                $trans = $value;
                             } else {
                                 continue;
                             }
@@ -234,7 +221,9 @@ class Dom
         $this->preloadExcludedNodes();
         $this->modifyTextNodes();
         $this->modifyTagNodes();
-        return $this->DOMDocument->saveHTML();
+        $this->finishDomDocument();
+        $html = $this->finishDomDocument();
+        return $html;
     }
 
     function setupDomDocument($html)
@@ -246,6 +235,14 @@ class Dom
         //@$this->DOMDocument->loadHTML($html);
         @$this->DOMDocument->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
         $this->DOMXpath = new \DOMXpath($this->DOMDocument);
+    }
+
+    function finishDomDocument()
+    {
+        $html = $this->DOMDocument->saveHTML();
+        // since domdocument converts all umlauts to html entities, we revert that completely
+        $html = html_entity_decode($html);
+        return $html;
     }
 
     function setLangTags()

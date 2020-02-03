@@ -47,14 +47,4 @@ class Utils
         }
         file_put_contents($filename, $msg . PHP_EOL . @file_get_contents($filename));
     }
-
-    function strReplaceFirst($search, $replace, $str)
-    {
-        $newstring = $str;
-        $pos = strpos($str, $search);
-        if ($pos !== false) {
-            $newstring = substr_replace($str, $replace, $pos, strlen($search));
-        }
-        return $newstring;
-    }
 }

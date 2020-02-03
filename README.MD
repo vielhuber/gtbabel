@@ -23,7 +23,7 @@ Gtbabel automatically translates your html/php pages – server sided!
 -   basic seo considered: title tags, seo descriptions, html lang attribute, hreflang tags included
 -   wordpress plugin available: configure your settings easily in your wp backend
 -   works seamlessly with caching/preloading plugins
--   phpunit tests available
+-   phpunit e2e tests available
 
 ## installation
 

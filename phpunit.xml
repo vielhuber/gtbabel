@@ -15,8 +15,8 @@
     <php>
         <ini name="display_errors" value="On" />
         <ini name="display_startup_errors" value="On" />
-        <server name="HTTPS" value="on" />
+        <server name="HTTPS" value="off" />
         <server name="HTTP_HOST" value="gtbabel.local.vielhuber.de" />
-        <server name="REQUEST_URI" value="/" />
+        <server name="REQUEST_URI" value="/en/" />
     </php>
 </phpunit>

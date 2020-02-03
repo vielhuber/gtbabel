@@ -361,42 +361,11 @@ class Gettext
     function prepareTranslationAndAddDynamicallyIfNeeded($orig, $lng, $context = null)
     {
         if ($context === 'slug') {
-            $link = $orig;
-            if ($link === null || trim($link) === '') {
-                return $link;
+            $trans = $this->getTranslationOfLinkHrefAndAddDynamicallyIfNeeded($orig, $lng, true);
+            if ($trans === null) {
+                return $orig;
             }
-            if (strpos(trim($link, '/'), '#') === 0) {
-                return $link;
-            }
-            $is_absolute_link = strpos($link, $this->host->getCurrentHost()) === 0;
-            if (strpos($link, 'http') !== false && $is_absolute_link === false) {
-                return $link;
-            }
-            if (strpos($link, 'http') === false && strpos($link, ':') !== false) {
-                return $link;
-            }
-            $link = str_replace(
-                [$this->host->getCurrentHost() . '/' . $this->getSourceLng(), $this->host->getCurrentHost()],
-                '',
-                $link
-            );
-            $url_parts = explode('/', $link);
-            foreach ($url_parts as $url_parts__key => $url_parts__value) {
-                if ($this->stringShouldNotBeTranslated($url_parts__value, 'slug')) {
-                    continue;
-                }
-                $url_parts[$url_parts__key] = $this->getTranslationAndAddDynamicallyIfNeeded(
-                    $url_parts__value,
-                    $lng,
-                    'slug'
-                );
-            }
-            $link = implode('/', $url_parts);
-            $link = '/' . $lng . '' . $link;
-            if ($is_absolute_link === true) {
-                $link = $this->host->getCurrentHost() . $link;
-            }
-            return $link;
+            return $trans;
         }
         if ($context === 'title') {
             foreach (['-', '–', '—', ':', '·', '•', '*', '⋆', '|', '~', '«', '»', '<', '>'] as $delimiters__value) {
@@ -412,6 +381,49 @@ class Gettext
             }
         }
         return $this->getTranslationAndAddDynamicallyIfNeeded($orig, $lng, $context);
+    }
+
+    function getTranslationOfLinkHrefAndAddDynamicallyIfNeeded($link, $lng, $translate)
+    {
+        if ($link === null || trim($link) === '') {
+            return $link;
+        }
+        if (strpos(trim($link, '/'), '#') === 0) {
+            return $link;
+        }
+        $is_absolute_link = strpos($link, $this->host->getCurrentHost()) === 0;
+        if (strpos($link, 'http') !== false && $is_absolute_link === false) {
+            return $link;
+        }
+        if (strpos($link, 'http') === false && strpos($link, ':') !== false) {
+            return $link;
+        }
+        $link = str_replace(
+            [$this->host->getCurrentHost() . '/' . $this->getSourceLng(), $this->host->getCurrentHost()],
+            '',
+            $link
+        );
+
+        if ($translate === true) {
+            $url_parts = explode('/', $link);
+            foreach ($url_parts as $url_parts__key => $url_parts__value) {
+                if ($this->stringShouldNotBeTranslated($url_parts__value, 'slug')) {
+                    continue;
+                }
+                $url_parts[$url_parts__key] = $this->getTranslationAndAddDynamicallyIfNeeded(
+                    $url_parts__value,
+                    $lng,
+                    'slug'
+                );
+            }
+            $link = implode('/', $url_parts);
+        }
+
+        $link = (strpos($link, '/') === 0 ? '/' : '') . $lng . '/' . ltrim($link, '/');
+        if ($is_absolute_link === true) {
+            $link = $this->host->getCurrentHost() . $link;
+        }
+        return $link;
     }
 
     function getTranslationAndAddDynamicallyIfNeeded($orig, $lng, $context = null)
@@ -469,7 +481,7 @@ class Gettext
                     }
                 }
                 $placeholder = '<' . substr($matches__value, $pos_begin, $pos_end - $pos_begin) . '>';
-                $str = $this->utils->strReplaceFirst($matches__value, $placeholder, $str);
+                $str = __str_replace_first($matches__value, $placeholder, $str);
                 $mappingTable[] = [$placeholder, $matches__value];
             }
         }
@@ -479,15 +491,16 @@ class Gettext
     function placeholderConversionOut($str, $mappingTable)
     {
         foreach ($mappingTable as $mappingTable__value) {
-            $str = $this->utils->strReplaceFirst($mappingTable__value[0], $mappingTable__value[1], $str);
+            $str = __str_replace_first($mappingTable__value[0], $mappingTable__value[1], $str);
         }
         return $str;
     }
 
-    function formatTextFromTextNode($str)
+    function removeLineBreaks($orig)
     {
+        $str = $orig;
         $str = trim($str);
-        $str = str_replace('&#13;', '', $str); // replace nasty carriage returns \r
+        $str = str_replace(['&#13;', "\r"], '', $str); // replace nasty carriage returns \r
         $parts = explode(PHP_EOL, $str);
         foreach ($parts as $parts__key => $parts__value) {
             if (trim($parts__value) == '') {
@@ -497,6 +510,22 @@ class Gettext
             }
         }
         $str = implode(' ', $parts);
+        return $str;
+    }
+
+    function reintroduceLineBreaks($str, $orig_withoutlb, $orig_with_lb)
+    {
+        $pos_lb_begin = 0;
+        while (mb_substr($orig_with_lb, $pos_lb_begin, 1) !== mb_substr($orig_withoutlb, 0, 1)) {
+            $pos_lb_begin++;
+        }
+        $pos_lb_end = mb_strlen($orig_with_lb) - 1;
+        while (
+            mb_substr($orig_with_lb, $pos_lb_end, 1) !== mb_substr($orig_withoutlb, mb_strlen($orig_withoutlb) - 1, 1)
+        ) {
+            $pos_lb_end--;
+        }
+        $str = mb_substr($orig_with_lb, 0, $pos_lb_begin) . $str . mb_substr($orig_with_lb, $pos_lb_end + 1);
         return $str;
     }
 
@@ -532,7 +561,7 @@ class Gettext
         if (is_numeric($str)) {
             return true;
         }
-        if (mb_strlen($str) === 1 && preg_match('/[^a-zA-Z]/', $str)) {
+        if (preg_match('/[a-zA-Z]/', $str) !== 1) {
             return true;
         }
         foreach ($this->getLanguages() as $languages__value) {
