@@ -15,7 +15,7 @@ Gtbabel automatically translates your html/php pages – server sided!
 
 -   lightweight: only ~1500 lines of code
 -   embraces the power of [gettext](https://www.gnu.org/software/gettext/) (e.g. using contexts and template files)
--   framework agnostic: works with nearly any php based cms or static sites
+-   framework agnostic: works with nearly any php based cms or static site
 -   fast: once all translations are available, gtbabel reaches a throughput of ~4000 words/s
 -   auto translation: use the power of [Google Translation API](https://cloud.google.com/translate/docs) or [Microsoft Azure Translation API](https://azure.microsoft.com/de-de/services/cognitive-services/translator-text-api/) to auto translate your pages and links into any language
 -   router included: spoof your request uri and let the magic happen, links are automatically converted
