@@ -3,5 +3,6 @@ composer.lock
 .env
 log.txt
 /locales/*
+/wordpress/locales/*
 /.phpunit.result.cache
 /tests/files/**/*_expected
