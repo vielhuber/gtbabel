@@ -148,4 +148,4 @@ if you use the auto translation feature for example with the help of the Google 
 
 ## credits
 
-shout out to my coworker to make this work.
+greetings to my coworker, without whom this would not have been possible.
