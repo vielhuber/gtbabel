@@ -1,0 +1,113 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: gtbabel-plugin\n"
+"POT-Creation-Date: 2020-02-01 22:59+0100\n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: de_DE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: gtbabel-plugin\n"
+"X-Generator: Poedit 2.2.4\n"
+"X-Poedit-KeywordsList: __\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-SearchPath-0: gtbabel.php\n"
+
+#: gtbabel.php:168
+msgid "Successfully edited"
+msgstr "Erfolgreiche Bearbeitung"
+
+#: gtbabel.php:179
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: gtbabel.php:183
+msgid "Languages"
+msgstr "Sprachen"
+
+#: gtbabel.php:205
+msgid "Source language"
+msgstr "Ausgangssprache"
+
+#: gtbabel.php:225
+msgid "Language folder"
+msgstr "Sprachenordner"
+
+#: gtbabel.php:236
+msgid "Prefix source language urls"
+msgstr "Präfix für Quellsprachen-URLs"
+
+#: gtbabel.php:247
+msgid "Translate text nodes"
+msgstr "Textknoten übersetzen"
+
+#: gtbabel.php:258
+msgid "Translate additional nodes"
+msgstr "Zusätzliche Knoten übersetzen"
+
+#: gtbabel.php:269
+msgid "Set html lang attribute"
+msgstr ""
+
+#: gtbabel.php:280
+msgid "Add html hreflang tags"
+msgstr ""
+
+#: gtbabel.php:291
+msgid "Enable automatic translation"
+msgstr "Automatische Übersetzung aktivieren"
+
+#: gtbabel.php:302
+msgid "Translation service"
+msgstr "Übersetzungsdienst"
+
+#: gtbabel.php:319
+msgid "Google Translation API Key"
+msgstr "Google Übersetzungs-API-Schlüssel"
+
+#: gtbabel.php:321 gtbabel.php:335
+msgid "Link"
+msgstr "Link"
+
+#: gtbabel.php:333
+msgid "Microsoft Translation API Key"
+msgstr "Microsoft Übersetzungs-API-Schlüssel"
+
+#: gtbabel.php:347
+msgid "Exclude urls"
+msgstr "URLs ausschließen"
+
+#: gtbabel.php:358
+msgid "Exclude dom nodes"
+msgstr "DOM-Knoten ausschließen"
+
+#: gtbabel.php:369
+msgid "Include dom nodes"
+msgstr "DOM-Knoten einschließen"
+
+#: gtbabel.php:389
+msgid "Remove"
+msgstr "Entfernen"
+
+#: gtbabel.php:395
+msgid "Add"
+msgstr "Hinzufügen"
+
+#: gtbabel.php:404
+msgid "Save"
+msgstr "Speichern"
+
+#: gtbabel.php:407
+msgid "Reset settings"
+msgstr "Einstellungen zurücksetzen"
+
+#: gtbabel.php:409 gtbabel.php:414
+msgid "Reset"
+msgstr "Zurücksetzen"
+
+#: gtbabel.php:412
+msgid "Reset translations"
+msgstr "Übersetzungen zurücksetzen"

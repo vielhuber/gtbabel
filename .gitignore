@@ -3,7 +3,8 @@ composer.lock
 .env
 log.txt
 /locales/*
-/wordpress/gtbabel/locales/*
-/wordpress/gtbabel/vendor/
+/wordpress/locales/*
+/wordpress/vendor
+/wordpress/vendor/
 /.phpunit.result.cache
 /tests/files/**/*_expected
