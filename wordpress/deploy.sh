@@ -1,4 +1,5 @@
 #!/bin/bash
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 # delete symlink that has been created when developing locally
 unlink vendor
@@ -13,10 +14,10 @@ composer update
 # do the prefixing with php-scoper
 wget https://github.com/humbug/php-scoper/releases/download/0.13.1/php-scoper.phar
 rm -f ./gtbabel.zip
-php ./php-scoper.phar add-prefix --no-config
+php ./php-scoper.phar add-prefix --config scoper.inc.php
 cd ./build
 composer dump-autoload
-cd ..
+cd $SCRIPT_DIR
 sleep 3
 
 # rename and zip the build directory

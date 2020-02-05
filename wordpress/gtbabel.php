@@ -8,6 +8,7 @@
  * Author URI: https://vielhuber.de
  * License: free
  */
+namespace GtbabelWordPress;
 
 if (file_exists(__DIR__ . '/vendor/scoper-autoload.php')) {
     require_once __DIR__ . '/vendor/scoper-autoload.php';
@@ -81,10 +82,6 @@ class GtbabelWordPress
     private function uninstallHook()
     {
         register_uninstall_hook(__FILE__, 'gtbabel_uninstall');
-        function gtbabel_uninstall()
-        {
-            delete_option('gtbabel_settings');
-        }
     }
 
     private function localize()
@@ -96,12 +93,13 @@ class GtbabelWordPress
 
     private function setDefaultSettingsToOption()
     {
-        if (get_option('gtbabel_settings') === false) {
+        if (get_option('gtbabel_settings') === false || get_option('gtbabel_settings') == '') {
             $lng_source = mb_strtolower(substr(get_locale(), 0, 2));
             $languages = ['de', 'en'];
             if (!in_array($lng_source, $languages)) {
                 $languages[] = $lng_source;
             }
+            delete_option('gtbabel_settings'); // this is needed, because sometimes the option exists (with the value '')
             add_option(
                 'gtbabel_settings',
                 gtbabel_default_settings([
@@ -446,6 +444,11 @@ class GtbabelWordPress
             });
         });
     }
+}
+
+function gtbabel_uninstall()
+{
+    delete_option('gtbabel_settings');
 }
 
 $gtbabel = new Gtbabel();
