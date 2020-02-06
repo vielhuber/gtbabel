@@ -25,7 +25,6 @@ class GtbabelWordPress
     {
         $this->gtbabel = $gtbabel;
         $this->installHook();
-        $this->uninstallHook();
         $this->localize();
         $this->initBackend();
         $this->disableAutoRedirect();
@@ -77,11 +76,6 @@ class GtbabelWordPress
         register_activation_hook(__FILE__, function () {
             $this->setDefaultSettingsToOption();
         });
-    }
-
-    private function uninstallHook()
-    {
-        register_uninstall_hook(__FILE__, 'gtbabel_uninstall');
     }
 
     private function localize()
@@ -444,11 +438,6 @@ class GtbabelWordPress
             });
         });
     }
-}
-
-function gtbabel_uninstall()
-{
-    delete_option('gtbabel_settings');
 }
 
 $gtbabel = new Gtbabel();
