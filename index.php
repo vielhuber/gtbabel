@@ -9,8 +9,9 @@ $gtbabel = new Gtbabel();
 $gtbabel->start([
     'lng_target' => 'en',
     'prefix_source_lng' => false,
-    'debug_mode' => true,
-    'auto_translation' => false,
+    'debug_translations' => true,
+    'auto_add_translations_to_gettext' => false,
+    'auto_translation' => true,
     'auto_translation_service' => 'google',
     'google_translation_api_key' => getenv('GOOGLE_TRANSLATION_API_KEY'),
     'microsoft_translation_api_key' => getenv('MICROSOFT_TRANSLATION_API_KEY'),
@@ -22,6 +23,6 @@ $gtbabel->start([
 
 $gtbabel->reset();
 
-require_once 'tests/files/in/20.html';
+require_once 'tests/files/in/2.html';
 
 $gtbabel->stop();

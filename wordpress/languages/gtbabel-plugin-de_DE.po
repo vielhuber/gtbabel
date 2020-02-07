@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gtbabel-plugin\n"
-"POT-Creation-Date: 2020-02-01 22:59+0100\n"
+"POT-Creation-Date: 2020-02-07 03:45+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -10,104 +10,112 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Domain: gtbabel-plugin\n"
-"X-Generator: Poedit 2.2.4\n"
+"X-Generator: Poedit 2.3\n"
 "X-Poedit-KeywordsList: __\n"
 "X-Poedit-Basepath: ..\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-SearchPath-0: gtbabel.php\n"
 
-#: gtbabel.php:168
+#: gtbabel.php:181
 msgid "Successfully edited"
 msgstr "Erfolgreiche Bearbeitung"
 
-#: gtbabel.php:179
+#: gtbabel.php:192
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: gtbabel.php:183
+#: gtbabel.php:196
 msgid "Languages"
 msgstr "Sprachen"
 
-#: gtbabel.php:205
+#: gtbabel.php:218
 msgid "Source language"
 msgstr "Ausgangssprache"
 
-#: gtbabel.php:225
+#: gtbabel.php:238
 msgid "Language folder"
 msgstr "Sprachenordner"
 
-#: gtbabel.php:236
+#: gtbabel.php:249
 msgid "Prefix source language urls"
 msgstr "Präfix für Quellsprachen-URLs"
 
-#: gtbabel.php:247
+#: gtbabel.php:260
 msgid "Translate text nodes"
 msgstr "Textknoten übersetzen"
 
-#: gtbabel.php:258
+#: gtbabel.php:271
 msgid "Translate additional nodes"
 msgstr "Zusätzliche Knoten übersetzen"
 
-#: gtbabel.php:269
+#: gtbabel.php:282
 msgid "Set html lang attribute"
-msgstr ""
+msgstr "HTML-Lang-Attribut setzen"
 
-#: gtbabel.php:280
+#: gtbabel.php:293
 msgid "Add html hreflang tags"
-msgstr ""
+msgstr "Hreflang-Tags setzen"
 
-#: gtbabel.php:291
+#: gtbabel.php:304
+msgid "Enable debug mode"
+msgstr "Debug-Modus aktivieren"
+
+#: gtbabel.php:315
+msgid "Auto add translations to gettext"
+msgstr "Übersetzung automatisch zu Gettext hinzufügen"
+
+#: gtbabel.php:326
 msgid "Enable automatic translation"
 msgstr "Automatische Übersetzung aktivieren"
 
-#: gtbabel.php:302
+#: gtbabel.php:337
 msgid "Translation service"
 msgstr "Übersetzungsdienst"
 
-#: gtbabel.php:319
+#: gtbabel.php:354
 msgid "Google Translation API Key"
 msgstr "Google Übersetzungs-API-Schlüssel"
 
-#: gtbabel.php:321 gtbabel.php:335
+#: gtbabel.php:356 gtbabel.php:370
 msgid "Link"
 msgstr "Link"
 
-#: gtbabel.php:333
+#: gtbabel.php:368
 msgid "Microsoft Translation API Key"
 msgstr "Microsoft Übersetzungs-API-Schlüssel"
 
-#: gtbabel.php:347
+#: gtbabel.php:382
 msgid "Exclude urls"
 msgstr "URLs ausschließen"
 
-#: gtbabel.php:358
+#: gtbabel.php:393
 msgid "Exclude dom nodes"
 msgstr "DOM-Knoten ausschließen"
 
-#: gtbabel.php:369
+#: gtbabel.php:404
 msgid "Include dom nodes"
 msgstr "DOM-Knoten einschließen"
 
-#: gtbabel.php:389
+#: gtbabel.php:424
 msgid "Remove"
 msgstr "Entfernen"
 
-#: gtbabel.php:395
+#: gtbabel.php:430
 msgid "Add"
 msgstr "Hinzufügen"
 
-#: gtbabel.php:404
+#: gtbabel.php:439
 msgid "Save"
 msgstr "Speichern"
 
-#: gtbabel.php:407
+#: gtbabel.php:442
 msgid "Reset settings"
 msgstr "Einstellungen zurücksetzen"
 
-#: gtbabel.php:409 gtbabel.php:414
+#: gtbabel.php:444 gtbabel.php:449
 msgid "Reset"
 msgstr "Zurücksetzen"
 
-#: gtbabel.php:412
+#: gtbabel.php:447
 msgid "Reset translations"
 msgstr "Übersetzungen zurücksetzen"

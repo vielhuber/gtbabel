@@ -78,6 +78,10 @@ class Gettext
 
     function generateGettextFiles()
     {
+        if ($this->settings->get('auto_add_translations_to_gettext') === false) {
+            return;
+        }
+
         $poGenerator = new PoGenerator();
         $moGenerator = new MoGenerator();
 
@@ -430,17 +434,17 @@ class Gettext
     {
         $trans = $this->getExistingTranslationFromCache($orig, $lng, $context);
         if ($trans === false) {
-            $this->addStringToPotFileAndToCache($orig, $context);
             $trans = $this->autoTranslateString($orig, $lng, $context);
-            if ($this->settings->get('auto_translation') === true) {
-                $this->addTranslationToPoFileAndToCache($orig, $trans, $lng, $context);
-            }
+            $this->addStringToPotFileAndToCache($orig, $context);
+            $this->addTranslationToPoFileAndToCache($orig, $trans, $lng, $context);
         }
         return $trans;
     }
 
     function autoTranslateString($orig, $to_lng, $context = null, $from_lng = null)
     {
+        $trans = null;
+
         if ($this->settings->get('auto_translation') === true) {
             if ($this->settings->get('auto_translation_service') === 'google') {
                 $trans = __translate_google(
@@ -460,9 +464,19 @@ class Gettext
             if ($context === 'slug') {
                 $trans = $this->utils->slugify($trans, $orig, $to_lng);
             }
-        } else {
+        }
+
+        // this does apply if auto_translation is either false or failed (due to wrong api key)
+        if ($trans === null) {
             $trans = $this->translateStringMock($orig, $to_lng, $context, $from_lng);
         }
+
+        if ($this->settings->get('debug_translations') === true) {
+            if ($context !== 'slug') {
+                $trans = '%|%' . $trans . '%|%';
+            }
+        }
+
         return $trans;
     }
 
@@ -543,9 +557,6 @@ class Gettext
                 return $str;
             }
             return $str . '-' . $to_lng;
-        }
-        if ($this->settings->get('debug_mode') === true) {
-            return '%|%' . $str . '%|%' . $to_lng . '%|%';
         }
         return $str . '-' . $to_lng;
     }
@@ -628,12 +639,10 @@ class Gettext
         $trans = $this->getTranslationInForeignLng($str, $to_lng, $from_lng, $context);
         if ($trans === false) {
             $str_in_source = $this->autoTranslateString($str, $this->getSourceLng(), $context, $from_lng);
-            $this->addStringToPotFileAndToCache($str_in_source, $context);
             $trans = $this->autoTranslateString($str, $to_lng, $context);
-            if ($this->settings->get('auto_translation') === true) {
-                $this->addTranslationToPoFileAndToCache($str_in_source, $str, $from_lng, $context);
-                $this->addTranslationToPoFileAndToCache($str_in_source, $trans, $to_lng, $context);
-            }
+            $this->addStringToPotFileAndToCache($str_in_source, $context);
+            $this->addTranslationToPoFileAndToCache($str_in_source, $str, $from_lng, $context);
+            $this->addTranslationToPoFileAndToCache($str_in_source, $trans, $to_lng, $context);
         }
         return $trans;
     }

@@ -136,12 +136,12 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test23()
     {
-        $this->runDiff('23.php', 3000);
+        $this->runDiff('23.php', 3500);
     }
 
     public function test24()
     {
-        $this->runDiff('24.php', 3000);
+        $this->runDiff('24.php', 3500);
     }
 
     public function getDefaultSettings()
@@ -149,7 +149,8 @@ class Test extends \PHPUnit\Framework\TestCase
         return [
             'lng_target' => 'en',
             'prefix_source_lng' => false,
-            'debug_mode' => true,
+            'debug_translations' => true,
+            'auto_add_translations_to_gettext' => false,
             'auto_translation' => false,
             'exclude_urls' => null,
             'html_lang_attribute' => false,

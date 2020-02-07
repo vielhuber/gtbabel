@@ -126,6 +126,8 @@ class GtbabelWordPress
                                     'translate_default_tag_nodes',
                                     'html_lang_attribute',
                                     'html_hreflang_tags',
+                                    'debug_translations',
+                                    'auto_add_translations_to_gettext',
                                     'auto_translation'
                                 ]
                                 as $checkbox__value
@@ -243,6 +245,17 @@ class GtbabelWordPress
                     echo '</li>';
 
                     echo '<li class="gtbabel__field">';
+                    echo '<label for="gtbabel_debug_translations" class="gtbabel__label">';
+                    echo __('Enable debug mode', 'gtbabel-plugin');
+                    echo '</label>';
+                    echo '<div class="gtbabel__inputbox">';
+                    echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_debug_translations" name="gtbabel[debug_translations]" value="1"' .
+                        ($settings['debug_translations'] == '1' ? ' checked="checked"' : '') .
+                        ' />';
+                    echo '</div>';
+                    echo '</li>';
+
+                    echo '<li class="gtbabel__field">';
                     echo '<label for="gtbabel_prefix_source_lng" class="gtbabel__label">';
                     echo __('Prefix source language urls', 'gtbabel-plugin');
                     echo '</label>';
@@ -293,6 +306,17 @@ class GtbabelWordPress
                     echo '<div class="gtbabel__inputbox">';
                     echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_html_hreflang_tags" name="gtbabel[html_hreflang_tags]" value="1"' .
                         ($settings['html_hreflang_tags'] == '1' ? ' checked="checked"' : '') .
+                        ' />';
+                    echo '</div>';
+                    echo '</li>';
+
+                    echo '<li class="gtbabel__field">';
+                    echo '<label for="gtbabel_auto_add_translations_to_gettext" class="gtbabel__label">';
+                    echo __('Auto add translations to gettext', 'gtbabel-plugin');
+                    echo '</label>';
+                    echo '<div class="gtbabel__inputbox">';
+                    echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_auto_add_translations_to_gettext" name="gtbabel[auto_add_translations_to_gettext]" value="1"' .
+                        ($settings['auto_add_translations_to_gettext'] == '1' ? ' checked="checked"' : '') .
                         ' />';
                     echo '</div>';
                     echo '</li>';

@@ -58,8 +58,9 @@ $gtbabel->start([
     'translate_default_tag_nodes' => true,
     'html_lang_attribute' => true,
     'html_hreflang_tags' => true,
-    'debug_mode' => false,
-    'auto_translation' => false,
+    'debug_translations' => false, // surround outputted translations with "%|%" to see borders
+    'auto_add_translations_to_gettext' => true,
+    'auto_translation' => true,
     'auto_translation_service' => 'google', // google|microsoft
     'google_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
     'microsoft_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
