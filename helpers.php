@@ -46,13 +46,13 @@ function gtbabel_languagepicker()
     return $gtbabel->gettext->getLanguagePickerData();
 }
 
-function gtbabel__($str, $to_lng = null, $from_lng = null)
+function gtbabel__($str, $context = null, $to_lng = null, $from_lng = null)
 {
     global $gtbabel;
     if ($gtbabel === null) {
         $gtbabel = new Gtbabel();
     }
-    return $gtbabel->gettext->getTranslationInForeignLngAndAddDynamicallyIfNeeded($str, $to_lng, $from_lng);
+    return $gtbabel->gettext->getTranslationInForeignLngAndAddDynamicallyIfNeeded($str, $to_lng, $from_lng, $context);
 }
 
 function gtbabel_localize_js($data)
