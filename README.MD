@@ -106,7 +106,20 @@ You don't have to change any code in the frontend at all: If you already have fu
 
 Gtbabel itself is based on PHP and only works for static pages or pages rendered via PHP.\
 The whole idea can be relatively easy implemented in js frameworks like Vue or React.\
-To get translations in JavaScript from your PHP application, use ideas like [this](https://gist.github.com/vielhuber/f6294c31c3259fe2572dc557f584704f) or if inside WordPress [this](https://codex.wordpress.org/Function_Reference/wp_localize_script).
+To get translations in JavaScript from your PHP application, use [this](https://codex.wordpress.org/Function_Reference/wp_localize_script) if inside WordPress.\
+Gtbabel also provides a neat helper function to hotload your translations in the header.
+Just execute the following function before you include your js-files:\
+
+```php
+gtbabel_localize_js(['string', ['string', 'context']]);
+```
+
+Now you can access those strings easily inside JavaScript with:
+
+```js
+gtbabel__('string');
+gtbabel__('string', 'context');
+```
 
 ## Modified nodes
 
@@ -141,7 +154,8 @@ gtbabel_default_settings() // ['languages' => ['de', 'en', 'fr'], 'lng_folder' =
 gtbabel_default_settings(['lng_folder' => '/foo']) // ['languages' => ['de', 'en', 'fr'], 'lng_folder' => '/foo', ...]
 gtbabel_languagepicker() // [['lng' => 'de', 'url' => 'https://tld.com/de/nudel', 'active' => true], ['lng' => 'en', 'url' => 'https://tld.com/en/noodle', 'active' => false], ...]
 gtbabel__('Hallo') // 'Hi there'
-gtbabel__('Hi there', 'de', 'en') // 'Hello'
+gtbabel__('blog', 'slug') // 'blog-en'
+gtbabel__('Hi there', null, 'de', 'en') // 'Hello'
 ```
 
 Always surround these functions with `if( function_exists('...') ) { }`.

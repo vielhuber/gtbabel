@@ -54,3 +54,12 @@ function gtbabel__($str, $to_lng = null, $from_lng = null)
     }
     return $gtbabel->gettext->getTranslationInForeignLngAndAddDynamicallyIfNeeded($str, $to_lng, $from_lng);
 }
+
+function gtbabel_localize_js($data)
+{
+    global $gtbabel;
+    if ($gtbabel === null) {
+        $gtbabel = new Gtbabel();
+    }
+    return $gtbabel->dom->outputJsLocalizationHelper($data);
+}
