@@ -106,8 +106,7 @@ You don't have to change any code in the frontend at all: If you already have fu
 
 Gtbabel itself is based on PHP and only works for static pages or pages rendered via PHP.\
 The whole idea can be relatively easy implemented in js frameworks like Vue or React.\
-To get translations in JavaScript from your PHP application, use [wp_localize_script](https://codex.wordpress.org/Function_Reference/wp_localize_script) (in conjunction with `gtbabel__`) if inside WordPress. Gtbabel also provides a neat helper function to hotload your translations in the header that works in every environment.\
-Just execute the following function before you include your js-files:
+To get translations in JavaScript from your PHP application, Gtbabel provides a neat helper function to hotload your translations in the header that works in every environment. Just execute the following function before you include your js-files:
 
 ```php
 gtbabel_localize_js(['string', ['string', 'context']]);
@@ -119,6 +118,8 @@ Now you can access those strings easily inside JavaScript with:
 gtbabel__('string');
 gtbabel__('string', 'context');
 ```
+
+In WordPress environments you can also use [wp_localize_script](https://codex.wordpress.org/Function_Reference/wp_localize_script) (in conjunction with `gtbabel__`) instead.
 
 ## Modified nodes
 
