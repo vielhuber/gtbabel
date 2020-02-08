@@ -13,17 +13,17 @@ Gtbabel automatically translates your html/php pages – server sided!
 
 ## Features
 
--   Lightweight: only ~1500 lines of code
--   Embraces the power of [gettext](https://www.gnu.org/software/gettext/) (e.g. using contexts and template files)
--   Framework agnostic: works with nearly any php based cms or static site
--   Fast: once all translations are available, Gtbabel reaches a throughput of ~4000 words/s
--   Auto translation: use the power of [Google Translation API](https://cloud.google.com/translate/docs) or [Microsoft Azure Translation API](https://azure.microsoft.com/de-de/services/cognitive-services/translator-text-api/) to auto translate your pages and links into any language
--   Router included: spoof your request uri and let the magic happen, links are automatically converted
--   Helper functions for current language and all languages available
--   Basic seo considered: title tags, seo descriptions, html lang attribute, hreflang tags included
--   WordPress plugin available: configure your settings easily in your wp backend
--   Works seamlessly with caching/preloading plugins
--   PHPUnit e2e tests available
+-   Lightweight: only ~1500 lines of code.
+-   Embraces the power of [gettext](https://www.gnu.org/software/gettext/) (e.g. using contexts and template files).
+-   Framework agnostic: works with nearly any php based cms or static site.
+-   Fast: once all translations are available, Gtbabel reaches a throughput of ~4000 words/s.
+-   Auto translation: use the power of [Google Translation API](https://cloud.google.com/translate/docs) or [Microsoft Azure Translation API](https://azure.microsoft.com/de-de/services/cognitive-services/translator-text-api/) to auto translate your pages and links into any language.
+-   Router included: spoof your request uri and let the magic happen, links are automatically converted.
+-   Helper functions for current language and all languages available.
+-   Basic seo considered: title tags, seo descriptions, html lang attribute, hreflang tags included.
+-   WordPress plugin available: configure your settings easily in your wp backend.
+-   Works seamlessly with caching/preloading plugins.
+-   PHPUnit e2e tests available.
 
 ## Installation
 
@@ -89,16 +89,18 @@ $gtbabel->stop();
 
 [de.wordpress.org/plugins/gtbabel](https://de.wordpress.org/plugins/gtbabel/)
 
+You don't have to change anything at all: If you already have functions like `__()` in your code, just leave them (since WordPress internally only knows about the source language). Gtbabel acts on the output (like on any other page).
+
 ## Gettext
 
 -   The final html gets parsed and is split up in reasonable strings.
--   All new strings are appended to a template pot-file
+-   All new strings are appended to a template pot-file.
 -   If you disable auto translation:
-    -   The strings in the pot-file can be translated by hand (just put your mo-files inside the locales folder)
+    -   The strings in the pot-file can be translated by hand (just put your mo-files inside the locales folder).
 -   If you enable auto translation:
-    -   Po- and mo-files are automatically generated (and loaded on the next request)
-    -   New strings are automatically appended
-    -   You can modify these auto generated files afterwards, modified strings won't be overwritten
+    -   Po- and mo-files are automatically generated (and loaded on the next request).
+    -   New strings are automatically appended.
+    -   You can modify these auto generated files afterwards, modified strings won't be overwritten.
 
 ## JavaScript
 
