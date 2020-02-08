@@ -144,6 +144,8 @@ gtbabel__('Hallo') // 'Hi there'
 gtbabel__('Hi there', 'de', 'en') // 'Hello'
 ```
 
+Always surround these functions with `if( function_exists('...') ) { }`.
+
 ## Note on gtbabel\_\_()
 
 Don't use `gtbabel__()` for echoing strings, just output them in the source language. Gtbabel will take care of the rest.
