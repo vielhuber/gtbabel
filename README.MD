@@ -21,7 +21,7 @@ Gtbabel automatically translates your html/php pages – server sided!
 -   router included: spoof your request uri and let the magic happen, links are automatically converted
 -   helper functions for current language and all languages available
 -   basic seo considered: title tags, seo descriptions, html lang attribute, hreflang tags included
--   wordpress plugin available: configure your settings easily in your wp backend
+-   WordPress plugin available: configure your settings easily in your wp backend
 -   works seamlessly with caching/preloading plugins
 -   phpunit e2e tests available
 
@@ -85,7 +85,7 @@ require_once 'template.html';
 $gtbabel->stop();
 ```
 
-## wordpress plugin
+## WordPress plugin
 
 [de.wordpress.org/plugins/gtbabel](https://de.wordpress.org/plugins/gtbabel/)
 
@@ -103,8 +103,8 @@ $gtbabel->stop();
 ## javascript
 
 Gtbabel itself is based on php and only works for static pages or pages rendered via php.\
-the whole idea can be relatively easy implemented in js frameworks like Vue or React.
-to get translations in javascript from your php application, use ideas like [https://gist.github.com/vielhuber/f6294c31c3259fe2572dc557f584704f](this) or if inside wordpress [https://codex.wordpress.org/Function_Reference/wp_localize_script](this).
+the whole idea can be relatively easy implemented in js frameworks like Vue or React.\
+to get translations in javascript from your php application, use ideas like [this](https://gist.github.com/vielhuber/f6294c31c3259fe2572dc557f584704f) or if inside WordPress [this](https://codex.wordpress.org/Function_Reference/wp_localize_script).
 
 ## modified nodes
 
