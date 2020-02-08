@@ -106,8 +106,7 @@ You don't have to change any code in the frontend at all: If you already have fu
 
 Gtbabel itself is based on PHP and only works for static pages or pages rendered via PHP.\
 The whole idea can be relatively easy implemented in js frameworks like Vue or React.\
-To get translations in JavaScript from your PHP application, use [wp_localize_script](https://codex.wordpress.org/Function_Reference/wp_localize_script) (in conjunction with `gtbabel__`) if inside WordPress.\
-Gtbabel also provides a neat helper function to hotload your translations in the header that works in every environment.\
+To get translations in JavaScript from your PHP application, use [wp_localize_script](https://codex.wordpress.org/Function_Reference/wp_localize_script) (in conjunction with `gtbabel__`) if inside WordPress. Gtbabel also provides a neat helper function to hotload your translations in the header that works in every environment.\
 Just execute the following function before you include your js-files:
 
 ```php
@@ -153,6 +152,7 @@ gtbabel_default_languages() // ['de','en','fr','af','am','ar','az','be','bg','bn
 gtbabel_default_settings() // ['languages' => ['de', 'en', 'fr'], 'lng_folder' => '/locales', ...]
 gtbabel_default_settings(['lng_folder' => '/foo']) // ['languages' => ['de', 'en', 'fr'], 'lng_folder' => '/foo', ...]
 gtbabel_languagepicker() // [['lng' => 'de', 'url' => 'https://tld.com/de/nudel', 'active' => true], ['lng' => 'en', 'url' => 'https://tld.com/en/noodle', 'active' => false], ...]
+gtbabel_localize_js(['string', ['string', 'context']]) // hotload translations inside your javascript files
 gtbabel__('Hallo') // 'Hi there'
 gtbabel__('blog', 'slug') // 'blog-en'
 gtbabel__('Hi there', null, 'de', 'en') // 'Hello'
