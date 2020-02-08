@@ -9,14 +9,13 @@ Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Gtbabel automatically translates your html/php pages – server sided!
+Gtbabel automatically translates your HTML/PHP pages – server sided!
 
 == Description ==
-Gtbabel...
--   extracts on every page load any page into logical paragraph tokens.
--   static and dynamic content is deliberately treated the same.
--   all tokens are replaced (if available) by it\'s translation before rendered.
--   the tokens get dumped (if not available) into gettext, where they can be translated.
+-   Gtbabel extracts on every page load any page into logical paragraph tokens.
+-   Static and dynamic content is deliberately treated the same.
+-   All tokens are replaced (if available) by it\'s translation before rendered.
+-   The tokens get dumped (if not available) into gettext, where they can be translated.
 
 == Installation ==
 1. Make sure you are using WordPress 5.3 or later and that your server is running PHP 7.2 or later (same requirement as WordPress itself)

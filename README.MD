@@ -1,12 +1,12 @@
 # 🦜 Gtbabel 🦜
 
-Gtbabel automatically translates your html/php pages – server sided!
+Gtbabel automatically translates your HTML/PHP pages – server sided!
 
 # WORK IN PROGRESS /// WARNING: THIS IS EXPERIMENTAL
 
 ## Basic idea
 
--   Extracts on every page load any page into logical paragraph tokens.
+-   Gtbabel extracts on every page load any page into logical paragraph tokens.
 -   Static and dynamic content is deliberately treated the same.
 -   All tokens are replaced (if available) by it's translation before rendered.
 -   The tokens get dumped (if not available) into gettext, where they can be translated.
@@ -15,7 +15,7 @@ Gtbabel automatically translates your html/php pages – server sided!
 
 -   Lightweight: only ~1500 lines of code.
 -   Embraces the power of [gettext](https://www.gnu.org/software/gettext/) (e.g. using contexts and template files).
--   Framework agnostic: works with nearly any php based cms or static site.
+-   Framework agnostic: works with nearly any PHP based cms or static site.
 -   Fast: once all translations are available, Gtbabel reaches a throughput of ~4000 words/s.
 -   Auto translation: use the power of [Google Translation API](https://cloud.google.com/translate/docs) or [Microsoft Azure Translation API](https://azure.microsoft.com/de-de/services/cognitive-services/translator-text-api/) to auto translate your pages and links into any language.
 -   Router included: spoof your request uri and let the magic happen, links are automatically converted.
@@ -89,7 +89,7 @@ $gtbabel->stop();
 
 [de.wordpress.org/plugins/gtbabel](https://de.wordpress.org/plugins/gtbabel/)
 
-You don't have to change anything at all: If you already have functions like `__()` in your code, just leave them (since WordPress internally only knows about the source language). Gtbabel acts on the output (like on any other page).
+You don't have to change any code in the frontend at all: If you already have functions like `__()` in your code, just leave them (since WordPress internally only knows about the source language); if not, don't add them. Gtbabel acts on the output (like on any other page).
 
 ## Gettext
 
@@ -104,9 +104,9 @@ You don't have to change anything at all: If you already have functions like `__
 
 ## JavaScript
 
-Gtbabel itself is based on php and only works for static pages or pages rendered via php.\
+Gtbabel itself is based on PHP and only works for static pages or pages rendered via PHP.\
 The whole idea can be relatively easy implemented in js frameworks like Vue or React.\
-To get translations in javascript from your php application, use ideas like [this](https://gist.github.com/vielhuber/f6294c31c3259fe2572dc557f584704f) or if inside WordPress [this](https://codex.wordpress.org/Function_Reference/wp_localize_script).
+To get translations in JavaScript from your PHP application, use ideas like [this](https://gist.github.com/vielhuber/f6294c31c3259fe2572dc557f584704f) or if inside WordPress [this](https://codex.wordpress.org/Function_Reference/wp_localize_script).
 
 ## Modified nodes
 
