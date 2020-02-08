@@ -103,7 +103,8 @@ $gtbabel->stop();
 ## javascript
 
 Gtbabel itself is based on php and only works for static pages or pages rendered via php.\
-the idea can be relatively easy implemented in js frameworks like Vue or React.
+the whole idea can be relatively easy implemented in js frameworks like Vue or React.
+to get translations in javascript from your php application, use ideas like [https://gist.github.com/vielhuber/f6294c31c3259fe2572dc557f584704f](this) or if inside wordpress [https://codex.wordpress.org/Function_Reference/wp_localize_script](this).
 
 ## modified nodes
 
@@ -140,6 +141,10 @@ gtbabel_languagepicker() // [['lng' => 'de', 'url' => 'https://tld.com/de/nudel'
 gtbabel__('Hallo') // 'Hi there'
 gtbabel__('Hi there', 'de', 'en') // 'Hello'
 ```
+
+## note on gtbabel\_\_()
+
+don't use `gtbabel__()` for echoing strings, just output them in the source language. Gtbabel will take care of the rest.
 
 ## language codes
 
