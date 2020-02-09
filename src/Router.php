@@ -49,6 +49,21 @@ class Router
         die();
     }
 
+    function addTrailingSlash()
+    {
+        $args = $this->host->getCurrentArgs();
+        if ($args != '') {
+            return;
+        }
+        $url = $this->host->getCurrentUrl();
+        if (strrpos($url, '/') === mb_strlen($url) - 1) {
+            return;
+        }
+        $url = $url . '/';
+        header('Location: ' . $url, true, 301);
+        die();
+    }
+
     function initMagicRouter()
     {
         if ($this->gettext->sourceLngIsCurrentLng()) {

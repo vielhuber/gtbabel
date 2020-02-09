@@ -422,10 +422,9 @@ class Gettext
             }
             $link = implode('/', $url_parts);
         }
-
         $link = (strpos($link, '/') === 0 ? '/' : '') . $lng . '/' . ltrim($link, '/');
         if ($is_absolute_link === true) {
-            $link = $this->host->getCurrentHost() . $link;
+            $link = rtrim($this->host->getCurrentHost(), '/') . '/' . ltrim($link, '/');
         }
         return $link;
     }
@@ -682,7 +681,10 @@ class Gettext
                 continue;
             }
             $trans = $this->getTranslationInForeignLng($url_parts__value, $lng, null, 'slug');
-            // if translation is not yet available, also provide default translation (in case auto translation is disabled)
+            // links are discovered gradually by gtbabel:
+            // if one goes directly to a translated page that is not linked from the homepage,
+            // gtbabel cannot figure out it's source
+            // the following line is a convenience method when auto translation is disabled
             if ($trans === false && $this->settings->get('auto_translation') === false) {
                 $trans = $this->autoTranslateString($url_parts__value, $lng, 'slug', $this->getCurrentLng());
             }

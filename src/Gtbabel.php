@@ -42,6 +42,7 @@ class Gtbabel
         $this->router->redirectPrefixedSourceLng();
         $this->gettext->addCurrentUrlToTranslations();
         if (!$this->host->currentUrlIsExcluded()) {
+            $this->router->addTrailingSlash();
             $this->router->initMagicRouter();
         }
         ob_start();
