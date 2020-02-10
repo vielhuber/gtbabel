@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gtbabel-plugin\n"
-"POT-Creation-Date: 2020-02-07 03:45+0100\n"
+"POT-Creation-Date: 2020-02-11 00:22+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -37,28 +37,28 @@ msgid "Language folder"
 msgstr "Sprachenordner"
 
 #: gtbabel.php:249
+msgid "Enable debug mode"
+msgstr "Debug-Modus aktivieren"
+
+#: gtbabel.php:260
 msgid "Prefix source language urls"
 msgstr "Präfix für Quellsprachen-URLs"
 
-#: gtbabel.php:260
+#: gtbabel.php:271
 msgid "Translate text nodes"
 msgstr "Textknoten übersetzen"
 
-#: gtbabel.php:271
+#: gtbabel.php:282
 msgid "Translate additional nodes"
 msgstr "Zusätzliche Knoten übersetzen"
 
-#: gtbabel.php:282
+#: gtbabel.php:293
 msgid "Set html lang attribute"
 msgstr "HTML-Lang-Attribut setzen"
 
-#: gtbabel.php:293
+#: gtbabel.php:304
 msgid "Add html hreflang tags"
 msgstr "Hreflang-Tags setzen"
-
-#: gtbabel.php:304
-msgid "Enable debug mode"
-msgstr "Debug-Modus aktivieren"
 
 #: gtbabel.php:315
 msgid "Auto add translations to gettext"
@@ -93,29 +93,33 @@ msgid "Exclude dom nodes"
 msgstr "DOM-Knoten ausschließen"
 
 #: gtbabel.php:404
+msgid "Force tokenize"
+msgstr "Tokenisierung erzwingen"
+
+#: gtbabel.php:415
 msgid "Include dom nodes"
 msgstr "DOM-Knoten einschließen"
 
-#: gtbabel.php:424
+#: gtbabel.php:435
 msgid "Remove"
 msgstr "Entfernen"
 
-#: gtbabel.php:430
+#: gtbabel.php:441
 msgid "Add"
 msgstr "Hinzufügen"
 
-#: gtbabel.php:439
+#: gtbabel.php:450
 msgid "Save"
 msgstr "Speichern"
 
-#: gtbabel.php:442
+#: gtbabel.php:453
 msgid "Reset settings"
 msgstr "Einstellungen zurücksetzen"
 
-#: gtbabel.php:444 gtbabel.php:449
+#: gtbabel.php:455 gtbabel.php:460
 msgid "Reset"
 msgstr "Zurücksetzen"
 
-#: gtbabel.php:447
+#: gtbabel.php:458
 msgid "Reset translations"
 msgstr "Übersetzungen zurücksetzen"

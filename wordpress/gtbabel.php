@@ -401,7 +401,7 @@ class GtbabelWordPress
 
                     echo '<li class="gtbabel__field">';
                     echo '<label for="gtbabel_force_tokenize" class="gtbabel__label">';
-                    echo __('Exclude dom nodes', 'gtbabel-plugin');
+                    echo __('Force tokenize', 'gtbabel-plugin');
                     echo '</label>';
                     echo '<div class="gtbabel__inputbox">';
                     echo '<textarea class="gtbabel__input gtbabel__input--textarea" id="gtbabel_force_tokenize" name="gtbabel[force_tokenize]">' .
