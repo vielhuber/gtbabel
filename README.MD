@@ -141,9 +141,11 @@ To disable text/tag node transformation, provide the options:
 You can add your own tag node transformations via the `include_dom` option.
 
 Gtbabel automatically groups together reasonable parts.\
-This gets converted to 1 token (not 3):
+The following code gets converted to 1 token (not 3):
+
 `<p>This is a <a href="#">link</a> inside a text.</p>`
-If you want to incluence that behaviour, use the `force_tokenize` option (select the parent element to not tokenize its children).
+
+If you want to influence that behaviour, use the `force_tokenize` option and provide the selector of the parent element in order to not tokenize its children.
 
 ## Router
 
