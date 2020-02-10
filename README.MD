@@ -66,6 +66,7 @@ $gtbabel->start([
     'microsoft_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
     'exclude_urls' => ['/backend'],
     'exclude_dom' => ['.lngpicker'],
+    'force_tokenize' => ['.force-tokenize'],
     'include_dom' => [
         [
             'selector' => '.search-submit',
@@ -137,7 +138,12 @@ To disable text/tag node transformation, provide the options:
 -   `'translate_text_nodes' => false`
 -   `'translate_default_tag_nodes' => false`
 
-You can add your own tag node transformations via the `include` option.
+You can add your own tag node transformations via the `include_dom` option.
+
+Gtbabel automatically groups together reasonable parts.\
+This gets converted to 1 token (not 3):
+`<p>This is a <a href="#">link</a> inside a text.</p>`
+If you want to incluence that behaviour, use the `force_tokenize` option (select the parent element to not tokenize its children).
 
 ## Router
 

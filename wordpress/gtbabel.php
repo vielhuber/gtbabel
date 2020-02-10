@@ -138,7 +138,7 @@ class GtbabelWordPress
                                     $settings[$checkbox__value] = false;
                                 }
                             }
-                            foreach (['exclude_urls', 'exclude_dom'] as $exclude__value) {
+                            foreach (['exclude_urls', 'exclude_dom', 'force_tokenize'] as $exclude__value) {
                                 $post_data = $settings[$exclude__value];
                                 $settings[$exclude__value] = [];
                                 if (@$settings[$exclude__value] != '') {
@@ -400,6 +400,17 @@ class GtbabelWordPress
                     echo '</li>';
 
                     echo '<li class="gtbabel__field">';
+                    echo '<label for="gtbabel_force_tokenize" class="gtbabel__label">';
+                    echo __('Exclude dom nodes', 'gtbabel-plugin');
+                    echo '</label>';
+                    echo '<div class="gtbabel__inputbox">';
+                    echo '<textarea class="gtbabel__input gtbabel__input--textarea" id="gtbabel_force_tokenize" name="gtbabel[force_tokenize]">' .
+                        implode(PHP_EOL, $settings['force_tokenize']) .
+                        '</textarea>';
+                    echo '</div>';
+                    echo '</li>';
+
+                    echo '<li class="gtbabel__field">';
                     echo '<label class="gtbabel__label">';
                     echo __('Include dom nodes', 'gtbabel-plugin');
                     echo '</label>';
@@ -413,13 +424,13 @@ class GtbabelWordPress
                         echo '<li class="gtbabel__repeater-listitem">';
                         echo '<input class="gtbabel__input" type="text" name="gtbabel[include_dom][selector][]" value="' .
                             $include_dom__value['selector'] .
-                            '" />';
+                            '" placeholder="selector" />';
                         echo '<input class="gtbabel__input" type="text" name="gtbabel[include_dom][attribute][]" value="' .
                             $include_dom__value['attribute'] .
-                            '" />';
+                            '" placeholder="attribute" />';
                         echo '<input class="gtbabel__input" type="text" name="gtbabel[include_dom][context][]" value="' .
                             $include_dom__value['context'] .
-                            '" />';
+                            '" placeholder="context" />';
                         echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
                             __('Remove', 'gtbabel-plugin') .
                             '</a>';

@@ -7,6 +7,7 @@ class Dom
     public $DOMXpath;
 
     public $excluded_nodes;
+    public $force_tokenize;
     public $group_cache;
 
     public $utils;
@@ -33,6 +34,19 @@ class Dom
                     foreach ($this->getChildrenOfNode($nodes__value) as $nodes__value__value) {
                         $this->excluded_nodes[$this->getIdOfNode($nodes__value__value)] = true;
                     }
+                }
+            }
+        }
+    }
+
+    function preloadForceTokenize()
+    {
+        $this->force_tokenize = [];
+        if ($this->settings->get('force_tokenize') !== null) {
+            foreach ($this->settings->get('force_tokenize') as $tokenize__value) {
+                $nodes = $this->DOMXpath->query($this->transformSelectorToXpath($tokenize__value));
+                foreach ($nodes as $nodes__value) {
+                    $this->force_tokenize[] = $this->getIdOfNode($nodes__value);
                 }
             }
         }
@@ -219,6 +233,7 @@ class Dom
         $this->setupDomDocument($html);
         $this->setLangTags();
         $this->preloadExcludedNodes();
+        $this->preloadForceTokenize();
         $this->modifyTextNodes();
         $this->modifyTagNodes();
         $this->finishDomDocument();
@@ -402,6 +417,13 @@ class Dom
         $parent = $this->getParentNodeWithMoreThanOneChildren($node);
         if (!array_key_exists($this->getIdOfNode($parent), $this->group_cache)) {
             $this->group_cache[$this->getIdOfNode($parent)] = false;
+
+            // if the tokenization is forced
+            if (in_array($this->getIdOfNode($parent), $this->force_tokenize)) {
+                $this->group_cache[$this->getIdOfNode($parent)] = true;
+            }
+
+            // try to tokenize based on children
             foreach ($this->getChildrenOfNode($parent) as $nodes__value) {
                 // exclude empty text nodes
                 if ($this->isEmptyTextNode($nodes__value)) {
@@ -425,19 +447,19 @@ class Dom
         return $parent;
     }
 
-    function outputJsLocalizationHelper($registered_strings)
+    function outputJsLocalizationHelper($translated_strings)
     {
-        if (!empty($registered_strings)) {
-            $registered_strings_json = [];
-            foreach ($registered_strings as $registered_strings__value) {
-                if (!is_array($registered_strings__value)) {
+        if (!empty($translated_strings)) {
+            $translated_strings_json = [];
+            foreach ($translated_strings as $translated_strings__value) {
+                if (!is_array($translated_strings__value)) {
                     $context = '';
-                    $orig = $registered_strings__value;
-                    $trans = gtbabel__($registered_strings__value);
+                    $orig = $translated_strings__value;
+                    $trans = gtbabel__($translated_strings__value);
                 } else {
-                    $context = $registered_strings__value[1];
-                    $orig = $registered_strings__value[0];
-                    $trans = gtbabel__($registered_strings__value[0], $registered_strings__value[1]);
+                    $context = $translated_strings__value[1];
+                    $orig = $translated_strings__value[0];
+                    $trans = gtbabel__($translated_strings__value[0], $translated_strings__value[1]);
                 }
                 $orig = str_replace("\r", '', $orig);
                 $trans = str_replace("\r", '', $trans);
@@ -447,13 +469,13 @@ class Dom
                     $orig = addcslashes($orig, $to_escape__value);
                     $trans = addcslashes($trans, $to_escape__value);
                 }
-                $registered_strings_json[$context][$orig] = $trans;
+                $translated_strings_json[$context][$orig] = $trans;
             }
-            echo '<script>';
-            echo 'var registered_strings = JSON.parse(\'' .
-                json_encode($registered_strings_json, JSON_HEX_APOS) .
+            echo '<script data-type="translated-strings">';
+            echo 'var translated_strings = JSON.parse(\'' .
+                json_encode($translated_strings_json, JSON_HEX_APOS) .
                 '\');';
-            echo 'function gtbabel__(string, context = \'\') { if( registered_strings[context][string] !== undefined ) { return registered_strings[context][string]; } return string; }';
+            echo 'function gtbabel__(string, context = \'\') { if( translated_strings[context][string] !== undefined ) { return translated_strings[context][string]; } return string; }';
             echo '</script>';
         }
     }

@@ -37,6 +37,7 @@ class Settings
             'microsoft_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
             'exclude_urls' => ['/backend'],
             'exclude_dom' => ['.lngpicker'],
+            'force_tokenize' => ['.force-tokenize'],
             'include_dom' => [
                 [
                     'selector' => '.search-submit',

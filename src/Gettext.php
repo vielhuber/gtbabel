@@ -482,7 +482,7 @@ class Gettext
     function placeholderConversionIn($str)
     {
         $mappingTable = [];
-        preg_match_all('/<[a-zA-Z](.*?[^?])?>|<\/[^<>]*>/', $str, $matches);
+        preg_match_all('/<[a-zA-Z] (.*?[^?])?>|<\/[^<>]*>/', $str, $matches);
         if (!empty($matches[0])) {
             foreach ($matches[0] as $matches__value) {
                 $pos_begin = 1;
@@ -568,10 +568,15 @@ class Gettext
         if ($str == '') {
             return true;
         }
+        // numbers
         if (is_numeric($str)) {
             return true;
         }
         if (preg_match('/[a-zA-Z]/', $str) !== 1) {
+            return true;
+        }
+        // email adresses
+        if (substr_count($str, '@') === 1 && substr_count($str, '.') === 1) {
             return true;
         }
         foreach ($this->getLanguages() as $languages__value) {
@@ -588,6 +593,10 @@ class Gettext
         }
         // detect print_r outputs
         if (strpos($str, '(') === 0 && strrpos($str, ')') === mb_strlen($str) - 1 && strpos($str, '=') !== false) {
+            return true;
+        }
+        // detect mathjax/latex
+        if (strpos($str, '$$') === 0 && strrpos($str, '$$') === mb_strlen($str) - 2) {
             return true;
         }
         return false;
