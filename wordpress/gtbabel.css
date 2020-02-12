@@ -50,7 +50,7 @@
     align-content: flex-start;
 }
 .gtbabel__languagelist-item {
-    flex: 0 1 70px;
+    flex: 0 1 130px;
     line-height: 10px;
 }
 .gtbabel__languagelist-item .gtbabel__input--checkbox {

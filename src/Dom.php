@@ -276,7 +276,7 @@ class Dom
                 foreach ($data as $data__value) {
                     $tag = $this->DOMDocument->createElement('link', '');
                     $tag->setAttribute('rel', 'alternate');
-                    $tag->setAttribute('hreflang', $data__value['lng']);
+                    $tag->setAttribute('hreflang', $data__value['code']);
                     $tag->setAttribute('href', $data__value['url']);
                     $head_node->appendChild($tag);
                 }

@@ -197,15 +197,15 @@ class GtbabelWordPress
                     echo '</label>';
                     echo '<div class="gtbabel__inputbox">';
                     echo '<ul class="gtbabel__languagelist">';
-                    foreach (gtbabel_default_languages() as $languages__value) {
+                    foreach (gtbabel_default_languages() as $languages__key => $languages__value) {
                         echo '<li class="gtbabel__languagelist-item">';
                         echo '<label>';
                         echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" name="gtbabel[languages][' .
-                            $languages__value .
+                            $languages__key .
                             ']"' .
-                            (in_array($languages__value, $settings['languages']) == '1' ? ' checked="checked"' : '') .
+                            (in_array($languages__key, $settings['languages']) == '1' ? ' checked="checked"' : '') .
                             ' value="1" />';
-                        echo mb_strtoupper($languages__value);
+                        echo $languages__value;
                         echo '</label>';
                         echo '</li>';
                     }
@@ -220,13 +220,13 @@ class GtbabelWordPress
                     echo '<div class="gtbabel__inputbox">';
                     echo '<select class="gtbabel__input gtbabel__input--select" id="gtbabel_lng_source" name="gtbabel[lng_source]">';
                     echo '<option value="">&ndash;&ndash;</option>';
-                    foreach (gtbabel_default_languages() as $languages__value) {
+                    foreach (gtbabel_default_languages() as $languages__key => $languages__value) {
                         echo '<option value="' .
-                            $languages__value .
+                            $languages__key .
                             '"' .
-                            ($settings['lng_source'] == $languages__value ? ' selected="selected"' : '') .
+                            ($settings['lng_source'] == $languages__key ? ' selected="selected"' : '') .
                             '>' .
-                            mb_strtoupper($languages__value) .
+                            $languages__value .
                             '</option>';
                     }
                     echo '</select>';

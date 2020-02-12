@@ -16,7 +16,16 @@ function gtbabel_languages()
     if ($gtbabel === null) {
         $gtbabel = new Gtbabel();
     }
-    return $gtbabel->gettext->getLanguages();
+    return $gtbabel->gettext->getSelectedLanguageCodes();
+}
+
+function gtbabel_default_language_codes()
+{
+    global $gtbabel;
+    if ($gtbabel === null) {
+        $gtbabel = new Gtbabel();
+    }
+    return $gtbabel->gettext->getDefaultLanguageCodes();
 }
 
 function gtbabel_default_languages()

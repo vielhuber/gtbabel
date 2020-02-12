@@ -55,7 +55,7 @@ class Gettext
         }
 
         // po
-        foreach ($this->getLanguagesWithoutSource() as $languages__value) {
+        foreach ($this->getSelectedLanguageCodesWithoutSource() as $languages__value) {
             $this->gettext_save_counter['po'][$languages__value] = false;
             $this->gettext_cache[$languages__value] = [];
             $this->gettext_cache_reverse[$languages__value] = [];
@@ -89,7 +89,7 @@ class Gettext
             $poGenerator->generateFile($this->gettext_pot, $this->getLngFilename('pot', '_template'));
         }
 
-        foreach ($this->getLanguagesWithoutSource() as $languages__value) {
+        foreach ($this->getSelectedLanguageCodesWithoutSource() as $languages__value) {
             if ($this->gettext_save_counter['po'][$languages__value] === false) {
                 continue;
             }
@@ -189,126 +189,151 @@ class Gettext
         }
     }
 
-    function getLanguages()
+    function getSelectedLanguageCodes()
     {
         return $this->settings->get('languages');
+    }
+
+    function getSelectedLanguages()
+    {
+        $return = [];
+        $data = $this->settings->get('languages');
+        foreach ($data as $data__value) {
+            $return[$data__value] = $this->getLabelForLanguageCode($data__value);
+        }
+        return $return;
+    }
+
+    function getDefaultLanguageCodes()
+    {
+        return array_keys($this->getDefaultLanguages());
+    }
+
+    function getDefaultLanguageLabels()
+    {
+        return array_values($this->getDefaultLanguages());
+    }
+
+    function getLabelForLanguageCode($code)
+    {
+        $data = $this->getDefaultLanguages();
+        if (!array_key_exists($code, $data)) {
+            return '';
+        }
+        return $data[$code];
     }
 
     function getDefaultLanguages()
     {
         // https://cloud.google.com/translate/docs/languages?hl=de
         return [
-            'de',
-            'en',
-            'fr',
-            'af',
-            'am',
-            'ar',
-            'az',
-            'be',
-            'bg',
-            'bn',
-            'bs',
-            'ca',
-            'ceb',
-            'co',
-            'cs',
-            'cy',
-            'da',
-            'el',
-            'eo',
-            'es',
-            'et',
-            'eu',
-            'fa',
-            'fi',
-            'fy',
-            'ga',
-            'gd',
-            'gl',
-            'gu',
-            'ha',
-            'haw',
-            'he',
-            'hi',
-            'hmn',
-            'hr',
-            'ht',
-            'hu',
-            'hy',
-            'id',
-            'ig',
-            'is',
-            'it',
-            'ja',
-            'jw',
-            'ka',
-            'kk',
-            'km',
-            'kn',
-            'ko',
-            'ku',
-            'ky',
-            'la',
-            'lb',
-            'lo',
-            'lt',
-            'lv',
-            'mg',
-            'mi',
-            'mk',
-            'ml',
-            'mn',
-            'mr',
-            'ms',
-            'mt',
-            'my',
-            'ne',
-            'nl',
-            'no',
-            'ny',
-            'pa',
-            'pl',
-            'ps',
-            'pt',
-            'ro',
-            'ru',
-            'sd',
-            'si',
-            'sk',
-            'sl',
-            'sm',
-            'sn',
-            'so',
-            'sq',
-            'sr',
-            'st',
-            'su',
-            'sv',
-            'sw',
-            'ta',
-            'te',
-            'tg',
-            'th',
-            'tl',
-            'tr',
-            'uk',
-            'ur',
-            'uz',
-            'vi',
-            'xh',
-            'yi',
-            'yo',
-            'zh-cn',
-            'zh-tw',
-            'zu'
+            'de' => 'Deutsch',
+            'en' => 'English',
+            'fr' => 'Français',
+            'af' => 'Afrikaans',
+            'am' => 'አማርኛ',
+            'ar' => 'العربية',
+            'az' => 'Azərbaycan',
+            'be' => 'беларускі',
+            'bg' => 'български',
+            'bn' => 'বাঙালির',
+            'bs' => 'Bosanski',
+            'ca' => 'Català',
+            'ceb' => 'Cebuano',
+            'co' => 'Corsican',
+            'cs' => 'Český',
+            'cy' => 'Cymraeg',
+            'da' => 'Dansk',
+            'el' => 'ελληνικά',
+            'eo' => 'Esperanto',
+            'es' => 'Español',
+            'et' => 'Eesti',
+            'eu' => 'Euskal',
+            'fa' => 'فارسی',
+            'fi' => 'Suomalainen',
+            'ga' => 'Gaeilge',
+            'gd' => 'Gàidhlig',
+            'gl' => 'Galego',
+            'gu' => 'ગુજરાતી',
+            'ha' => 'Hausa',
+            'haw' => 'Hawaiian',
+            'he' => 'עברי',
+            'hi' => 'हिन्दी',
+            'hmn' => 'Hmong',
+            'hr' => 'Hrvatski',
+            'ht' => 'kreyòl ayisyen',
+            'hu' => 'Magyar',
+            'hy' => 'հայերեն',
+            'id' => 'Indonesia',
+            'ig' => 'Igbo',
+            'is' => 'Icelandic',
+            'it' => 'Italiano',
+            'ja' => '日本の',
+            'jv' => 'Jawa',
+            'ka' => 'ქართული',
+            'kk' => 'Қазақ',
+            'km' => 'ខ្មែរ',
+            'kn' => 'ಕನ್ನಡ',
+            'ko' => '한국의',
+            'ku' => 'Kurdî',
+            'ky' => 'Кыргыз',
+            'la' => 'Latine',
+            'lb' => 'Luxembourgeois',
+            'lo' => 'ລາວ',
+            'lt' => 'Lietuvos',
+            'lv' => 'Latvijas',
+            'mg' => 'Malagasy',
+            'mi' => 'Maori',
+            'mk' => 'македонски',
+            'ml' => 'മലയാളം',
+            'mn' => 'Монгол',
+            'mr' => 'मराठी',
+            'ms' => 'Malay',
+            'mt' => 'Malti',
+            'my' => 'မြန်မာ',
+            'ne' => 'नेपाली',
+            'nl' => 'Nederlands',
+            'no' => 'Norsk',
+            'ny' => 'Nyanja',
+            'pa' => 'ਪੰਜਾਬੀ',
+            'pl' => 'Polski',
+            'ps' => 'پښتو',
+            'pt' => 'Português',
+            'ro' => 'Românesc',
+            'ru' => 'русский',
+            'sd' => 'سنڌي',
+            'si' => 'සිංහලයන්',
+            'sk' => 'Slovenský',
+            'sl' => 'Slovenski',
+            'sm' => 'Samoa',
+            'sn' => 'Shona',
+            'so' => 'Soomaali',
+            'sq' => 'Shqiptar',
+            'sr' => 'Српски',
+            'su' => 'Sunda',
+            'sv' => 'Svenska',
+            'ta' => 'தமிழ்',
+            'te' => 'Telugu',
+            'tg' => 'Тоҷикистон',
+            'th' => 'ไทย',
+            'tr' => 'Türk',
+            'uk' => 'Український',
+            'ur' => 'اردو',
+            'uz' => 'O\'zbekiston',
+            'vi' => 'Tiếng việt',
+            'xh' => 'isiXhosa',
+            'yi' => 'ייִדיש',
+            'yo' => 'Yoruba',
+            'zh-cn' => '中文（简体）',
+            'zh-tw' => '中文（繁體）',
+            'zu' => 'Zulu'
         ];
     }
 
-    function getLanguagesWithoutSource()
+    function getSelectedLanguageCodesWithoutSource()
     {
         $lng = [];
-        foreach ($this->getLanguages() as $languages__value) {
+        foreach ($this->getSelectedLanguageCodes() as $languages__value) {
             if ($languages__value === $this->getSourceLng()) {
                 continue;
             }
@@ -319,7 +344,7 @@ class Gettext
 
     function getCurrentPrefix()
     {
-        foreach ($this->getLanguages() as $languages__value) {
+        foreach ($this->getSelectedLanguageCodes() as $languages__value) {
             if (strpos($this->host->getCurrentPath(), '/' . $languages__value) === 0) {
                 return $languages__value;
             }
@@ -338,10 +363,11 @@ class Gettext
     function getLanguagePickerData()
     {
         $data = [];
-        foreach ($this->getLanguages() as $languages__value) {
-            $url = $this->getCurrentUrlTranslationsInLanguage($languages__value);
+        foreach ($this->getSelectedLanguages() as $languages__key => $languages__value) {
+            $url = $this->getCurrentUrlTranslationsInLanguage($languages__key);
             $data[] = [
-                'lng' => $languages__value,
+                'code' => $languages__key,
+                'label' => $languages__value,
                 'url' => $url,
                 'active' => rtrim($url, '/') === rtrim($this->host->getCurrentUrl(), '/')
             ];
@@ -586,7 +612,7 @@ class Gettext
         if (substr_count($str, '@') === 1 && substr_count($str, '.') === 1) {
             return true;
         }
-        foreach ($this->getLanguages() as $languages__value) {
+        foreach ($this->getSelectedLanguageCodes() as $languages__value) {
             if ($languages__value === trim(strtolower($str))) {
                 return true;
             }
@@ -693,7 +719,7 @@ class Gettext
         }
 
         foreach ($url_parts as $url_parts__key => $url_parts__value) {
-            if (in_array($url_parts__value, $this->getLanguages())) {
+            if (in_array($url_parts__value, $this->getSelectedLanguageCodes())) {
                 continue;
             }
             $trans = $this->getTranslationInForeignLng($url_parts__value, $lng, null, 'slug');
@@ -717,7 +743,7 @@ class Gettext
         if (!$this->sourceLngIsCurrentLng()) {
             return;
         }
-        foreach ($this->getLanguagesWithoutSource() as $languages__value) {
+        foreach ($this->getSelectedLanguageCodesWithoutSource() as $languages__value) {
             $this->prepareTranslationAndAddDynamicallyIfNeeded($this->host->getCurrentUrl(), $languages__value, 'slug');
         }
     }

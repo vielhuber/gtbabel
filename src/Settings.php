@@ -20,7 +20,7 @@ class Settings
     function setupSettings($args = [])
     {
         $default_args = [
-            'languages' => gtbabel_default_languages(),
+            'languages' => gtbabel_default_language_codes(),
             'lng_source' => 'de',
             'lng_target' => null,
             'lng_folder' => '/locales',
