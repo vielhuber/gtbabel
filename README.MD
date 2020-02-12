@@ -147,7 +147,7 @@ The following code gets converted to 1 token (not 3):
 
 If you want to influence that behaviour, use the `force_tokenize` option and provide the selector of the parent element in order to not tokenize its children.
 
-If you want to incluence special tags NOT to be auto translated by the Google Translation API (but tokenized), use this class:
+If you want to influence that special tags should not be auto translated by the Google Translation API, use a special class:
 
 `<p>Das ist das <span class="notranslate">Haus</span> vom Nikolaus</p>`
 
