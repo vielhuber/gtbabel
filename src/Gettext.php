@@ -482,7 +482,7 @@ class Gettext
     function placeholderConversionIn($str)
     {
         $mappingTable = [];
-        preg_match_all('/<[a-zA-Z] (.*?[^?])?>|<\/[^<>]*>/', $str, $matches);
+        preg_match_all('/<[a-zA-Z]+(>|.*?[^?]>)|<\/[^<>]*>/', $str, $matches);
         if (!empty($matches[0])) {
             foreach ($matches[0] as $matches__value) {
                 $pos_begin = 1;
@@ -493,7 +493,14 @@ class Gettext
                         $pos_end = $pos_end_;
                     }
                 }
-                $placeholder = '<' . substr($matches__value, $pos_begin, $pos_end - $pos_begin) . '>';
+                $placeholder = '';
+                $placeholder .= '<';
+                $placeholder .= substr($matches__value, $pos_begin, $pos_end - $pos_begin);
+                // whitelist notranslate attribute
+                if (strpos($matches__value, 'notranslate') !== false) {
+                    $placeholder .= ' class="notranslate"';
+                }
+                $placeholder .= '>';
                 $str = __str_replace_first($matches__value, $placeholder, $str);
                 $mappingTable[] = [$placeholder, $matches__value];
             }

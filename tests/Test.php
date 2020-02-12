@@ -154,6 +154,16 @@ class Test extends \PHPUnit\Framework\TestCase
         ]);
     }
 
+    public function test26()
+    {
+        $this->runDiff('26.html', 3500, [
+            'debug_translations' => false,
+            'auto_translation' => true,
+            'auto_translation_service' => 'google',
+            'google_translation_api_key' => getenv('GOOGLE_TRANSLATION_API_KEY')
+        ]);
+    }
+
     public function getDefaultSettings()
     {
         return [
