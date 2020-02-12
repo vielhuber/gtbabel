@@ -100,7 +100,7 @@ class GtbabelWordPress
                     'languages' => $languages,
                     'lng_source' => $lng_source,
                     'lng_folder' => '/wp-content/plugins/gtbabel/locales',
-                    'exclude_urls' => ['/wp-admin', 'wp-login.php', 'wp-cron.php', 'wp-comments-post.php']
+                    'exclude_urls' => ['/wp-admin', '/wp-json', 'wp-login.php', 'wp-cron.php', 'wp-comments-post.php']
                 ])
             );
         }

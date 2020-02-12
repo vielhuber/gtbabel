@@ -11,12 +11,12 @@
         ]
     },
     "require": {
-        "gettext/gettext": "^5.2",
-        "vlucas/phpdotenv": "^4.0",
-        "cocur/slugify": "^4.0",
-        "vielhuber/stringhelper": "^3.0"
+        "gettext/gettext": "*",
+        "vlucas/phpdotenv": "*",
+        "cocur/slugify": "*",
+        "vielhuber/stringhelper": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "^8.5"
+        "phpunit/phpunit": "*"
     }
 }
