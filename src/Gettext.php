@@ -399,6 +399,7 @@ class Gettext
         }
         if ($context === 'title') {
             foreach (['-', '–', '—', ':', '·', '•', '*', '⋆', '|', '~', '«', '»', '<', '>'] as $delimiters__value) {
+                $orig = str_replace(' ', ' ', $orig); // replace hidden &nbsp; chars
                 if (strpos($orig, ' ' . $delimiters__value . ' ') !== false) {
                     $orig_parts = explode(' ' . $delimiters__value . ' ', $orig);
                     foreach ($orig_parts as $orig_parts__key => $orig_parts__value) {
