@@ -1,74 +1,106 @@
 <?php
 use vielhuber\gtbabel\Gtbabel;
 
-function gtbabel_current_lng()
-{
-    global $gtbabel;
-    if ($gtbabel === null) {
-        $gtbabel = new Gtbabel();
+if (!function_exists('gtbabel_current_lng')) {
+    function gtbabel_current_lng()
+    {
+        global $gtbabel;
+        if ($gtbabel === null) {
+            $gtbabel = new Gtbabel();
+        }
+        return $gtbabel->gettext->getCurrentLng();
     }
-    return $gtbabel->gettext->getCurrentLng();
 }
 
-function gtbabel_languages()
-{
-    global $gtbabel;
-    if ($gtbabel === null) {
-        $gtbabel = new Gtbabel();
+if (!function_exists('gtbabel_language_label')) {
+    function gtbabel_language_label($lng)
+    {
+        global $gtbabel;
+        if ($gtbabel === null) {
+            $gtbabel = new Gtbabel();
+        }
+        return $gtbabel->gettext->getLabelForLanguageCode($lng);
     }
-    return $gtbabel->gettext->getSelectedLanguageCodes();
 }
 
-function gtbabel_default_language_codes()
-{
-    global $gtbabel;
-    if ($gtbabel === null) {
-        $gtbabel = new Gtbabel();
+if (!function_exists('gtbabel_languages')) {
+    function gtbabel_languages()
+    {
+        global $gtbabel;
+        if ($gtbabel === null) {
+            $gtbabel = new Gtbabel();
+        }
+        return $gtbabel->gettext->getSelectedLanguageCodes();
     }
-    return $gtbabel->gettext->getDefaultLanguageCodes();
 }
 
-function gtbabel_default_languages()
-{
-    global $gtbabel;
-    if ($gtbabel === null) {
-        $gtbabel = new Gtbabel();
+if (!function_exists('gtbabel_default_language_codes')) {
+    function gtbabel_default_language_codes()
+    {
+        global $gtbabel;
+        if ($gtbabel === null) {
+            $gtbabel = new Gtbabel();
+        }
+        return $gtbabel->gettext->getDefaultLanguageCodes();
     }
-    return $gtbabel->gettext->getDefaultLanguages();
 }
 
-function gtbabel_default_settings($args = [])
-{
-    global $gtbabel;
-    if ($gtbabel === null) {
-        $gtbabel = new Gtbabel();
+if (!function_exists('gtbabel_default_languages')) {
+    function gtbabel_default_languages()
+    {
+        global $gtbabel;
+        if ($gtbabel === null) {
+            $gtbabel = new Gtbabel();
+        }
+        return $gtbabel->gettext->getDefaultLanguages();
     }
-    return $gtbabel->settings->setupSettings($args);
 }
 
-function gtbabel_languagepicker()
-{
-    global $gtbabel;
-    if ($gtbabel === null) {
-        $gtbabel = new Gtbabel();
+if (!function_exists('gtbabel_default_settings')) {
+    function gtbabel_default_settings($args = [])
+    {
+        global $gtbabel;
+        if ($gtbabel === null) {
+            $gtbabel = new Gtbabel();
+        }
+        return $gtbabel->settings->setupSettings($args);
     }
-    return $gtbabel->gettext->getLanguagePickerData();
 }
 
-function gtbabel__($str, $context = null, $to_lng = null, $from_lng = null)
-{
-    global $gtbabel;
-    if ($gtbabel === null) {
-        $gtbabel = new Gtbabel();
+if (!function_exists('gtbabel_languagepicker')) {
+    function gtbabel_languagepicker()
+    {
+        global $gtbabel;
+        if ($gtbabel === null) {
+            $gtbabel = new Gtbabel();
+        }
+        return $gtbabel->gettext->getLanguagePickerData();
     }
-    return $gtbabel->gettext->getTranslationInForeignLngAndAddDynamicallyIfNeeded($str, $to_lng, $from_lng, $context);
 }
 
-function gtbabel_localize_js($data)
-{
-    global $gtbabel;
-    if ($gtbabel === null) {
-        $gtbabel = new Gtbabel();
+if (!function_exists('gtbabel__')) {
+    function gtbabel__($str, $context = null, $to_lng = null, $from_lng = null)
+    {
+        global $gtbabel;
+        if ($gtbabel === null) {
+            $gtbabel = new Gtbabel();
+        }
+        return $gtbabel->gettext->getTranslationInForeignLngAndAddDynamicallyIfNeeded(
+            $str,
+            $to_lng,
+            $from_lng,
+            $context
+        );
     }
-    return $gtbabel->dom->outputJsLocalizationHelper($data);
+}
+
+if (!function_exists('gtbabel_localize_js')) {
+    function gtbabel_localize_js($data)
+    {
+        global $gtbabel;
+        if ($gtbabel === null) {
+            $gtbabel = new Gtbabel();
+        }
+        return $gtbabel->dom->outputJsLocalizationHelper($data);
+    }
 }
