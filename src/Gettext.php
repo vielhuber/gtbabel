@@ -686,8 +686,12 @@ class Gettext
         }
         $trans = $this->getTranslationInForeignLng($str, $to_lng, $from_lng, $context);
         if ($trans === false) {
-            $str_in_source = $this->autoTranslateString($str, $this->getSourceLng(), $context, $from_lng);
-            $trans = $this->autoTranslateString($str, $to_lng, $context);
+            if ($from_lng === $this->getSourceLng()) {
+                $str_in_source = $str;
+            } else {
+                $str_in_source = $this->autoTranslateString($str, $this->getSourceLng(), $context, $from_lng);
+            }
+            $trans = $this->autoTranslateString($str_in_source, $to_lng, $context, $from_lng);
             $this->addStringToPotFileAndToCache($str_in_source, $context);
             $this->addTranslationToPoFileAndToCache($str_in_source, $str, $from_lng, $context);
             $this->addTranslationToPoFileAndToCache($str_in_source, $trans, $to_lng, $context);

@@ -54,6 +54,7 @@ class Utils
         if (is_array($msg)) {
             $msg = print_r($msg, true);
         }
+        $msg = date('Y-m-d H:i:s') . ': ' . $msg;
         file_put_contents($filename, $msg . PHP_EOL . @file_get_contents($filename));
     }
 

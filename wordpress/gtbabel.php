@@ -120,6 +120,9 @@ class GtbabelWordPress
             __fetch($url);
             // now get all through the call added translations
             foreach ($this->gtbabel->gettext->getSelectedLanguageCodesWithoutSource() as $lngs__value) {
+                if (!in_array($lngs__value, ['en', 'fr'])) {
+                    //continue;
+                }
                 $trans = $this->gtbabel->gettext->getUrlTranslationInLanguage($lngs__value, $url);
                 // crawl the translation
                 echo 'crawling ' . $trans . '...<br/>';
@@ -534,7 +537,7 @@ class GtbabelWordPress
                     echo '</form>';
                     echo '</div>';
 
-                    $this->autoTranslateAllUrls();
+                    //$this->autoTranslateAllUrls();
                 },
                 'dashicons-admin-site-alt3',
                 100
