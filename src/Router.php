@@ -74,7 +74,7 @@ class Router
                 $path = substr($this->host->getCurrentPathWithArgs(), mb_strlen('/' . $this->gettext->getSourceLng()));
             }
         } else {
-            $path = $this->gettext->getCurrentPathTranslationsInLanguage($this->gettext->getSourceLng(), true);
+            $path = $this->gettext->getPathTranslationInLanguage($this->gettext->getSourceLng(), true);
             $path = trim($path, '/');
             $path = '/' . $path . ($path != '' ? '/' : '') . $this->host->getCurrentArgs();
         }

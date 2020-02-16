@@ -364,7 +364,7 @@ class Gettext
     {
         $data = [];
         foreach ($this->getSelectedLanguages() as $languages__key => $languages__value) {
-            $url = $this->getCurrentUrlTranslationsInLanguage($languages__key);
+            $url = $this->getUrlTranslationInLanguage($languages__key);
             $data[] = [
                 'code' => $languages__key,
                 'label' => $languages__value,
@@ -636,12 +636,16 @@ class Gettext
         return false;
     }
 
-    function getCurrentUrlTranslationsInLanguage($lng)
+    function getUrlTranslationInLanguage($lng, $url = null)
     {
+        $path = null;
+        if ($url !== null) {
+            $path = str_replace($this->host->getCurrentHost(), '', $url);
+        }
         return trim(
             trim($this->host->getCurrentHost(), '/') .
                 '/' .
-                trim($this->getCurrentPathTranslationsInLanguage($lng, false), '/'),
+                trim($this->getPathTranslationInLanguage($lng, false, $path), '/'),
             '/'
         ) . '/';
     }
@@ -689,54 +693,56 @@ class Gettext
         return $trans;
     }
 
-    function getCurrentPathTranslationsInLanguage($lng, $always_remove_prefix = false)
+    function getPathTranslationInLanguage($lng, $always_remove_prefix = false, $path = null)
     {
-        $url = $this->host->getCurrentPath();
-        if ($this->getCurrentLng() === $lng) {
-            return $url;
+        if ($path === null) {
+            $path = $this->host->getCurrentPath();
         }
-        $url_parts = explode('/', $url);
-        foreach ($url_parts as $url_parts__key => $url_parts__value) {
-            if ($url_parts[$url_parts__key] == '') {
-                unset($url_parts[$url_parts__key]);
+        if ($this->getCurrentLng() === $lng) {
+            return $path;
+        }
+        $path_parts = explode('/', $path);
+        foreach ($path_parts as $path_parts__key => $path_parts__value) {
+            if ($path_parts[$path_parts__key] == '') {
+                unset($path_parts[$path_parts__key]);
             }
         }
-        $url_parts = array_values($url_parts);
+        $path_parts = array_values($path_parts);
 
         // prefix
         if (
             $always_remove_prefix === true ||
             ($this->getSourceLng() === $lng && $this->settings->get('prefix_source_lng') === false)
         ) {
-            if (@$url_parts[0] === $this->getCurrentLng()) {
-                unset($url_parts[0]);
+            if (@$path_parts[0] === $this->getCurrentLng()) {
+                unset($path_parts[0]);
             }
         } else {
-            if (@$url_parts[0] === $this->getCurrentLng()) {
-                $url_parts[0] = $lng;
+            if (@$path_parts[0] === $this->getCurrentLng()) {
+                $path_parts[0] = $lng;
             } else {
-                array_unshift($url_parts, $lng);
+                array_unshift($path_parts, $lng);
             }
         }
 
-        foreach ($url_parts as $url_parts__key => $url_parts__value) {
-            if (in_array($url_parts__value, $this->getSelectedLanguageCodes())) {
+        foreach ($path_parts as $path_parts__key => $path_parts__value) {
+            if (in_array($path_parts__value, $this->getSelectedLanguageCodes())) {
                 continue;
             }
-            $trans = $this->getTranslationInForeignLng($url_parts__value, $lng, null, 'slug');
+            $trans = $this->getTranslationInForeignLng($path_parts__value, $lng, null, 'slug');
             // links are discovered gradually by gtbabel:
             // if one goes directly to a translated page that is not linked from the homepage,
             // gtbabel cannot figure out it's source
             // the following line is a convenience method when auto translation is disabled
             if ($trans === false && $this->settings->get('auto_translation') === false) {
-                $trans = $this->autoTranslateString($url_parts__value, $lng, 'slug', $this->getCurrentLng());
+                $trans = $this->autoTranslateString($path_parts__value, $lng, 'slug', $this->getCurrentLng());
             }
             if ($trans !== false) {
-                $url_parts[$url_parts__key] = $trans;
+                $path_parts[$path_parts__key] = $trans;
             }
         }
-        $url = implode('/', $url_parts);
-        return $url;
+        $path = implode('/', $path_parts);
+        return $path;
     }
 
     function addCurrentUrlToTranslations()

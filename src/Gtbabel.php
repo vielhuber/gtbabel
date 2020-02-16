@@ -34,11 +34,11 @@ class Gtbabel
         $this->utils->lb();
         $this->settings->set($args);
         $this->host->setup();
+        $this->gettext->createLngFolderIfNotExists();
+        $this->gettext->preloadGettextInCache();
         if ($this->host->currentUrlIsExcluded()) {
             return;
         }
-        $this->gettext->createLngFolderIfNotExists();
-        $this->gettext->preloadGettextInCache();
         $this->router->redirectPrefixedSourceLng();
         $this->gettext->addCurrentUrlToTranslations();
         if (!$this->host->currentUrlIsExcluded()) {

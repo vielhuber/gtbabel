@@ -106,6 +106,28 @@ class GtbabelWordPress
         }
     }
 
+    private function autoTranslateAllUrls()
+    {
+        $query = new \WP_Query(['post_type' => 'any', 'posts_per_page' => '-1', 'post_status' => 'publish']);
+        while ($query->have_posts()) {
+            $query->the_post();
+            $url = get_the_permalink();
+            if (strpos($url, 'impressum') === false) {
+                continue;
+            }
+            // crawl the url (this calls addCurrentUrlToTranslations())
+            echo 'crawling ' . $url . '...<br/>';
+            __fetch($url);
+            // now get all through the call added translations
+            foreach ($this->gtbabel->gettext->getSelectedLanguageCodesWithoutSource() as $lngs__value) {
+                $trans = $this->gtbabel->gettext->getUrlTranslationInLanguage($lngs__value, $url);
+                // crawl the translation
+                echo 'crawling ' . $trans . '...<br/>';
+                __fetch($trans);
+            }
+        }
+    }
+
     private function initBackend()
     {
         add_action('admin_menu', function () {
@@ -461,6 +483,8 @@ class GtbabelWordPress
                         '" type="submit" />';
                     echo '</form>';
                     echo '</div>';
+
+                    $this->autoTranslateAllUrls();
                 },
                 'dashicons-admin-site-alt3',
                 100
