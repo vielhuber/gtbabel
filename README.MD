@@ -122,7 +122,7 @@ gtbabel__('string');
 gtbabel__('string', 'context');
 ```
 
-In WordPress environments you can instead also use [wp_localize_script](https://codex.wordpress.org/Function_Reference/wp_localize_script) (in conjunction with `gtbabel__`).
+In WordPress environments Gtbabel gives you a backend interface to handle the strings more conveniently. Instead you can also can use [wp_localize_script](https://codex.wordpress.org/Function_Reference/wp_localize_script) (in conjunction with `gtbabel__`).
 
 ## Modified nodes
 

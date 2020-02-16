@@ -28,6 +28,7 @@ class GtbabelWordPress
         $this->localize();
         $this->initBackend();
         $this->disableAutoRedirect();
+        $this->localizeJs();
         $this->setDefaultSettingsToOption();
         $this->startHook();
         $this->stopHook();
@@ -36,6 +37,22 @@ class GtbabelWordPress
     private function disableAutoRedirect()
     {
         remove_action('template_redirect', 'redirect_canonical');
+    }
+
+    private function localizeJs()
+    {
+        $settings = get_option('gtbabel_settings');
+        if (!empty($settings['localize_js'])) {
+            add_action(
+                'wp_head',
+                function () use ($settings) {
+                    if (function_exists('gtbabel_localize_js')) {
+                        gtbabel_localize_js($settings['localize_js']);
+                    }
+                },
+                -1
+            );
+        }
     }
 
     private function startHook()
@@ -173,6 +190,7 @@ class GtbabelWordPress
                                     }
                                 }
                             }
+
                             $post_data = $settings['include_dom'];
                             $settings['include_dom'] = [];
                             if (!empty(@$post_data['selector'])) {
@@ -191,6 +209,26 @@ class GtbabelWordPress
                                     ];
                                 }
                             }
+
+                            $post_data = $settings['localize_js'];
+                            $settings['localize_js'] = [];
+                            if (!empty(@$post_data['string'])) {
+                                foreach ($post_data['string'] as $post_data__key => $post_data__value) {
+                                    if (
+                                        @$post_data['string'][$post_data__key] == '' &&
+                                        @$post_data['context'][$post_data__key] == ''
+                                    ) {
+                                        continue;
+                                    }
+                                    $settings['localize_js'][] = [
+                                        $post_data['string'][$post_data__key],
+                                        $post_data['context'][$post_data__key] != ''
+                                            ? $post_data['context'][$post_data__key]
+                                            : null
+                                    ];
+                                }
+                            }
+
                             $settings['languages'] = array_keys($settings['languages']);
                             update_option('gtbabel_settings', $settings);
                         }
@@ -469,7 +507,7 @@ class GtbabelWordPress
                         $settings['include_dom'] = [['selector' => '', 'attribute' => '', 'context' => '']];
                     }
                     foreach ($settings['include_dom'] as $include_dom__value) {
-                        echo '<li class="gtbabel__repeater-listitem">';
+                        echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-3">';
                         echo '<input class="gtbabel__input" type="text" name="gtbabel[include_dom][selector][]" value="' .
                             $include_dom__value['selector'] .
                             '" placeholder="selector" />';
@@ -478,6 +516,37 @@ class GtbabelWordPress
                             '" placeholder="attribute" />';
                         echo '<input class="gtbabel__input" type="text" name="gtbabel[include_dom][context][]" value="' .
                             $include_dom__value['context'] .
+                            '" placeholder="context" />';
+                        echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
+                            __('Remove', 'gtbabel-plugin') .
+                            '</a>';
+                        echo '</li>';
+                    }
+                    echo '</ul>';
+                    echo '<a href="#" class="gtbabel__repeater-add button button-secondary">' .
+                        __('Add', 'gtbabel-plugin') .
+                        '</a>';
+                    echo '</div>';
+                    echo '</div>';
+                    echo '</li>';
+
+                    echo '<li class="gtbabel__field">';
+                    echo '<label class="gtbabel__label">';
+                    echo __('Provide strings in JavaScript', 'gtbabel-plugin');
+                    echo '</label>';
+                    echo '<div class="gtbabel__inputbox">';
+                    echo '<div class="gtbabel__repeater">';
+                    echo '<ul class="gtbabel__repeater-list">';
+                    if (empty(@$settings['localize_js'])) {
+                        $settings['localize_js'] = [['', '']];
+                    }
+                    foreach ($settings['localize_js'] as $localize_js__value) {
+                        echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-2">';
+                        echo '<input class="gtbabel__input" type="text" name="gtbabel[localize_js][string][]" value="' .
+                            $localize_js__value[0] .
+                            '" placeholder="string" />';
+                        echo '<input class="gtbabel__input" type="text" name="gtbabel[localize_js][context][]" value="' .
+                            $localize_js__value[1] .
                             '" placeholder="context" />';
                         echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
                             __('Remove', 'gtbabel-plugin') .

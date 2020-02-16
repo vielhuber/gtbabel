@@ -36,7 +36,10 @@
     align-content: flex-start;
     margin-bottom: 3px;
 }
-.gtbabel__repeater-listitem .gtbabel__input {
+.gtbabel__repeater-listitem--count-2 .gtbabel__input {
+    flex: 0 1 calc((100% - 80px) / 2);
+}
+.gtbabel__repeater-listitem--count-3 .gtbabel__input {
     flex: 0 1 calc((100% - 80px) / 3);
 }
 .gtbabel__repeater-listitem .gtbabel__repeater-remove {
