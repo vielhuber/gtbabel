@@ -188,7 +188,7 @@ If you use the auto translation feature for example with the help of the Google 
 
 ## API Usage
 
-The translation apis of Google or Microsoft can be costly. Try to keep track of your current usage stats. Gtbabel helps you by tracking the total amount of translated chars in `/stats_api.txt`.
+The translation apis of Google or Microsoft can be costly. Try to keep track of your current usage stats. Gtbabel helps you by tracking the total amount of translated chars (see the `api_stats`-option).
 
 ## Credits
 
