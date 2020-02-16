@@ -7,6 +7,13 @@ class Utils
 {
     private $stats_cache = null;
 
+    public $settings;
+
+    function __construct(Settings $settings = null)
+    {
+        $this->settings = $settings ?: new Settings();
+    }
+
     function slugify($trans, $orig, $lng)
     {
         $slugify = new Slugify();
@@ -50,43 +57,14 @@ class Utils
         file_put_contents($filename, $msg . PHP_EOL . @file_get_contents($filename));
     }
 
-    function statsFilename()
+    function apiStatsFilename()
     {
-        return $_SERVER['DOCUMENT_ROOT'] . '/stats-api.txt';
+        return rtrim($_SERVER['DOCUMENT_ROOT'], '/') . '/' . ltrim($this->settings->get('api_stats_filename'), '/');
     }
 
-    function statsAdd($service, $count)
+    function apiStatsGet($service)
     {
-        $filename = $this->statsFilename();
-        if ($this->stats_cache === null) {
-            if (!file_exists($filename)) {
-                file_put_contents($filename, '');
-            }
-            $this->stats_cache = file_get_contents($filename);
-        }
-        $data = $this->stats_cache;
-        $data = explode(PHP_EOL, $data);
-        $avail = false;
-        foreach ($data as $data__key => $data__value) {
-            $line_parts = explode('=', $data__value);
-            if ($service !== $line_parts[0]) {
-                continue;
-            }
-            $avail = true;
-            $line_parts[1] = intval($line_parts[1]) + $count;
-            $data[$data__key] = implode('=', $line_parts);
-        }
-        if ($avail === false) {
-            $data[] = $service . '=' . $count;
-        }
-        $data = implode(PHP_EOL, $data);
-        file_put_contents($filename, $data);
-        $this->stats_cache = $data;
-    }
-
-    function statsGet($service)
-    {
-        $filename = $this->statsFilename();
+        $filename = $this->apiStatsFilename();
         if ($this->stats_cache === null) {
             if (!file_exists($filename)) {
                 return 0;
@@ -103,5 +81,52 @@ class Utils
             return intval($line_parts[1]);
         }
         return 0;
+    }
+
+    function apiStatsIsDisabled()
+    {
+        return !($this->settings->get('api_stats') == '1');
+    }
+
+    function apiStatsReset()
+    {
+        @unlink($this->apiStatsFilename());
+    }
+
+    function apiStatsAdd($service, $count)
+    {
+        if ($this->apiStatsIsDisabled()) {
+            return;
+        }
+        $filename = $this->apiStatsFilename();
+        if ($this->stats_cache === null) {
+            if (!file_exists($filename)) {
+                file_put_contents($filename, '');
+            }
+            $this->stats_cache = file_get_contents($filename);
+        }
+        $data = $this->stats_cache;
+        $data = explode(PHP_EOL, $data);
+        foreach ($data as $data__key => $data__value) {
+            if (trim($data__value) == '') {
+                unset($data[$data__key]);
+            }
+        }
+        $avail = false;
+        foreach ($data as $data__key => $data__value) {
+            $line_parts = explode('=', $data__value);
+            if ($service !== $line_parts[0]) {
+                continue;
+            }
+            $avail = true;
+            $line_parts[1] = intval($line_parts[1]) + $count;
+            $data[$data__key] = implode('=', $line_parts);
+        }
+        if ($avail === false) {
+            $data[] = $service . '=' . $count;
+        }
+        $data = implode(PHP_EOL, $data);
+        file_put_contents($filename, $data);
+        $this->stats_cache = $data;
     }
 }

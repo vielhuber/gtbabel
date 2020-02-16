@@ -148,9 +148,7 @@ class Test extends \PHPUnit\Framework\TestCase
     {
         $this->runDiff('25.html', 3500, [
             'debug_translations' => false,
-            'auto_translation' => true,
-            'auto_translation_service' => 'google',
-            'google_translation_api_key' => getenv('GOOGLE_TRANSLATION_API_KEY')
+            'auto_translation' => true
         ]);
     }
 
@@ -158,9 +156,7 @@ class Test extends \PHPUnit\Framework\TestCase
     {
         $this->runDiff('26.html', 3500, [
             'debug_translations' => false,
-            'auto_translation' => true,
-            'auto_translation_service' => 'google',
-            'google_translation_api_key' => getenv('GOOGLE_TRANSLATION_API_KEY')
+            'auto_translation' => true
         ]);
     }
 
@@ -171,10 +167,14 @@ class Test extends \PHPUnit\Framework\TestCase
             'prefix_source_lng' => false,
             'debug_translations' => true,
             'auto_add_translations_to_gettext' => false,
-            'auto_translation' => false,
             'exclude_urls' => null,
             'html_lang_attribute' => false,
-            'html_hreflang_tags' => false
+            'html_hreflang_tags' => false,
+            'auto_translation' => false,
+            'auto_translation_service' => 'google',
+            'google_translation_api_key' => getenv('GOOGLE_TRANSLATION_API_KEY'),
+            'api_stats' => true,
+            'api_stats_filename' => '/api_stats.txt'
         ];
     }
 

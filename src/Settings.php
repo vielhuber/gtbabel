@@ -35,6 +35,8 @@ class Settings
             'auto_translation_service' => 'google',
             'google_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
             'microsoft_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+            'api_stats' => true,
+            'api_stats_filename' => '/api_stats.txt',
             'exclude_urls' => ['/backend'],
             'exclude_dom' => ['.lngpicker'],
             'force_tokenize' => ['.force-tokenize'],

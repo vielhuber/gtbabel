@@ -479,7 +479,7 @@ class Gettext
                     $to_lng,
                     $this->settings->get('google_translation_api_key')
                 );
-                $this->utils->statsAdd('google', mb_strlen($orig));
+                $this->utils->apiStatsAdd('google', mb_strlen($orig));
             } elseif ($this->settings->get('auto_translation_service') === 'microsoft') {
                 $trans = __translate_microsoft(
                     $orig,
@@ -487,7 +487,7 @@ class Gettext
                     $to_lng,
                     $this->settings->get('microsoft_translation_api_key')
                 );
-                $this->utils->statsAdd('microsoft', mb_strlen($orig));
+                $this->utils->apiStatsAdd('microsoft', mb_strlen($orig));
             }
             if ($context === 'slug') {
                 $trans = $this->utils->slugify($trans, $orig, $to_lng);

@@ -150,7 +150,8 @@ class GtbabelWordPress
                                     'html_hreflang_tags',
                                     'debug_translations',
                                     'auto_add_translations_to_gettext',
-                                    'auto_translation'
+                                    'auto_translation',
+                                    'api_stats'
                                 ]
                                 as $checkbox__value
                             ) {
@@ -400,6 +401,28 @@ class GtbabelWordPress
                     echo '</li>';
 
                     echo '<li class="gtbabel__field">';
+                    echo '<label for="gtbabel_api_stats" class="gtbabel__label">';
+                    echo __('Enable translation api usage stats', 'gtbabel-plugin');
+                    echo '</label>';
+                    echo '<div class="gtbabel__inputbox">';
+                    echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_api_stats" name="gtbabel[api_stats]" value="1"' .
+                        ($settings['api_stats'] == '1' ? ' checked="checked"' : '') .
+                        ' />';
+                    echo '</div>';
+                    echo '</li>';
+
+                    echo '<li class="gtbabel__field">';
+                    echo '<label for="gtbabel_api_stats_filename" class="gtbabel__label">';
+                    echo __('Translation api usage stats file', 'gtbabel-plugin');
+                    echo '</label>';
+                    echo '<div class="gtbabel__inputbox">';
+                    echo '<input class="gtbabel__input" type="text" id="gtbabel_api_stats_filename" name="gtbabel[api_stats_filename]" value="' .
+                        $settings['api_stats_filename'] .
+                        '" />';
+                    echo '</div>';
+                    echo '</li>';
+
+                    echo '<li class="gtbabel__field">';
                     echo '<label for="gtbabel_exclude_urls" class="gtbabel__label">';
                     echo __('Exclude urls', 'gtbabel-plugin');
                     echo '</label>';
@@ -482,23 +505,36 @@ class GtbabelWordPress
                         __('Reset', 'gtbabel-plugin') .
                         '" type="submit" />';
 
-                    echo '<h2 class="gtbabel__subtitle">' . __('Translation API usage', 'gtbabel-plugin') . '</h2>';
-                    echo '<ul>';
-                    foreach (
-                        ['google' => 'Google Translation API', 'microsoft' => 'Microsoft Translation API']
-                        as $service__key => $service__value
-                    ) {
-                        echo '<li>';
-                        echo $service__value . ': ';
-                        echo $this->gtbabel->utils->statsGet($service__key);
-                        echo '</li>';
+                    if ($settings['api_stats'] == '1') {
+                        echo '<h2 class="gtbabel__subtitle">' .
+                            __('Translation api usage stats', 'gtbabel-plugin') .
+                            '</h2>';
+                        echo '<ul>';
+                        foreach (
+                            ['google' => 'Google Translation API', 'microsoft' => 'Microsoft Translation API']
+                            as $service__key => $service__value
+                        ) {
+                            echo '<li>';
+                            echo $service__value . ': ';
+                            $cur = $this->gtbabel->utils->apiStatsGet($service__key);
+                            echo $cur;
+                            $costs = 0;
+                            if ($service__key === 'google') {
+                                $costs = $cur * (20 / 1000000) * 0.92;
+                            }
+                            if ($service__value === 'microsoft') {
+                                $costs = $cur * (8.433 / 1000000);
+                            }
+                            echo ' (~' . round($costs, 2) . ' €)';
+                            echo '</li>';
+                        }
+                        echo '</ul>';
                     }
-                    echo '</ul>';
 
                     echo '</form>';
                     echo '</div>';
 
-                    //$this->autoTranslateAllUrls();
+                    $this->autoTranslateAllUrls();
                 },
                 'dashicons-admin-site-alt3',
                 100

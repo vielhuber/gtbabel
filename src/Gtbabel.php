@@ -22,7 +22,7 @@ class Gtbabel
         Settings $settings = null
     ) {
         $this->settings = $settings ?: new Settings();
-        $this->utils = $utils ?: new Utils();
+        $this->utils = $utils ?: new Utils($this->settings);
         $this->host = $host ?: new Host($this->utils, $this->settings);
         $this->gettext = $gettext ?: new Gettext($this->utils, $this->host, $this->settings);
         $this->dom = $dom ?: new Dom($this->utils, $this->gettext, $this->host, $this->settings);
@@ -64,5 +64,6 @@ class Gtbabel
     function reset()
     {
         $this->gettext->resetTranslations();
+        $this->utils->apiStatsReset();
     }
 }
