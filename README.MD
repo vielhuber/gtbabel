@@ -17,7 +17,7 @@ Gtbabel automatically translates your HTML/PHP pages – server sided!
 -   Embraces the power of [gettext](https://www.gnu.org/software/gettext/) (e.g. using contexts and template files).
 -   Framework agnostic: works with nearly any PHP based cms or static site.
 -   Fast: once all translations are available, Gtbabel reaches a throughput of ~4000 words/s.
--   Auto translation: use the power of [Google Translation API](https://cloud.google.com/translate/docs) or [Microsoft Azure Translation API](https://azure.microsoft.com/de-de/services/cognitive-services/translator-text-api/) to auto translate your pages and links into any language.
+-   Auto translation: use the power of [Google Translation API](https://cloud.google.com/translate/docs) or [Microsoft Translation API](https://azure.microsoft.com/de-de/services/cognitive-services/translator-text-api/) to auto translate your pages and links into any language.
 -   Router included: spoof your request uri and let the magic happen, links are automatically converted.
 -   Helper functions for current language and all languages available.
 -   Basic seo considered: title tags, seo descriptions, html lang attribute, hreflang tags included.
@@ -183,6 +183,10 @@ Don't use `gtbabel__()` for echoing strings, just output them in the source lang
 
 It is recommended to use iso language codes in lowercase. But you can use any language code you want (even i-klingon).\
 If you use the auto translation feature for example with the help of the Google Transpation API, you must use iso language codes.
+
+## API Usage
+
+The translation apis of Google or Microsoft can be costly. Try to keep track of your current usage stats. Gtbabel helps you by tracking the total amount of translated chars in `/stats_api.txt`.
 
 ## Credits
 

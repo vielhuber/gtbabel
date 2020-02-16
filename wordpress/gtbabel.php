@@ -481,10 +481,24 @@ class GtbabelWordPress
                     echo '<input class="gtbabel__submit button button-secondary" name="reset_translations" value="' .
                         __('Reset', 'gtbabel-plugin') .
                         '" type="submit" />';
+
+                    echo '<h2 class="gtbabel__subtitle">' . __('Translation API usage', 'gtbabel-plugin') . '</h2>';
+                    echo '<ul>';
+                    foreach (
+                        ['google' => 'Google Translation API', 'microsoft' => 'Microsoft Translation API']
+                        as $service__key => $service__value
+                    ) {
+                        echo '<li>';
+                        echo $service__value . ': ';
+                        echo $this->gtbabel->utils->statsGet($service__key);
+                        echo '</li>';
+                    }
+                    echo '</ul>';
+
                     echo '</form>';
                     echo '</div>';
 
-                    $this->autoTranslateAllUrls();
+                    //$this->autoTranslateAllUrls();
                 },
                 'dashicons-admin-site-alt3',
                 100
