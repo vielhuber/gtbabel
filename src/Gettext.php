@@ -191,26 +191,22 @@ class Gettext
 
     function getSelectedLanguageCodes()
     {
-        $data = $this->settings->get('languages');
-        $source_lng = $this->getSourceLng();
-        usort($data, function ($a, $b) use ($source_lng) {
-            if ($source_lng != '') {
-                if ($a === $source_lng) {
-                    return -1;
-                }
-                if ($b === $source_lng) {
-                    return 1;
-                }
-            }
-            return strnatcmp($a, $b);
-        });
-        return $data;
+        // ordering here is irrelevant (be careful, this function gets called >100 times)
+        return $this->settings->get('languages');
     }
 
     function getSelectedLanguages()
     {
         $return = [];
-        $data = $this->getSelectedLanguageCodes();
+        // use order of default languages
+        $selected = $this->getSelectedLanguageCodes();
+        $data = $this->getDefaultLanguageCodes();
+        foreach ($data as $data__key => $data__value) {
+            if (!in_array($data__value, $selected)) {
+                unset($data[$data__key]);
+            }
+        }
+        $data = array_values($data);
         foreach ($data as $data__value) {
             $return[$data__value] = $this->getLabelForLanguageCode($data__value);
         }
@@ -351,7 +347,7 @@ class Gettext
                     return 1;
                 }
             }
-            return strnatcmp($a, $b);
+            return strnatcmp($data[$a], $data[$b]);
         });
         return $data;
     }
