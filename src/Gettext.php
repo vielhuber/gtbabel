@@ -226,7 +226,7 @@ class Gettext
     function getDefaultLanguages()
     {
         // https://cloud.google.com/translate/docs/languages?hl=de
-        return [
+        $data = [
             'de' => 'Deutsch',
             'en' => 'English',
             'fr' => 'Français',
@@ -328,6 +328,19 @@ class Gettext
             'zh-tw' => '中文（繁體）',
             'zu' => 'Zulu'
         ];
+        $source_lng = $this->getSourceLng();
+        uksort($data, function ($a, $b) use ($data, $source_lng) {
+            if ($source_lng != '') {
+                if ($a === $source_lng) {
+                    return -1;
+                }
+                if ($b === $source_lng) {
+                    return 1;
+                }
+            }
+            return strnatcmp($data[$a], $data[$b]);
+        });
+        return $data;
     }
 
     function getSelectedLanguageCodesWithoutSource()

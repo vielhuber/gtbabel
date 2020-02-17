@@ -271,6 +271,8 @@ class GtbabelWordPress
 
                             $settings['languages'] = array_keys($settings['languages']);
                             update_option('gtbabel_settings', $settings);
+                            // restart gtbabel with new options
+                            $this->start();
                         }
                         if (isset($_POST['reset_settings'])) {
                             delete_option('gtbabel_settings');

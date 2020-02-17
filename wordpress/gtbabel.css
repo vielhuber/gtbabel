@@ -47,13 +47,12 @@
     text-align: center;
 }
 .gtbabel__languagelist {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    align-content: flex-start;
+    column-count: 20;
+    column-width: 130px;
+    column-gap: 0px;
 }
 .gtbabel__languagelist-item {
-    flex: 0 1 130px;
+    break-inside: avoid-column;
     line-height: 10px;
 }
 .gtbabel__languagelist-item .gtbabel__input--checkbox {
