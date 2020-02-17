@@ -640,6 +640,8 @@ class GtbabelWordPress
                             echo $service__value . ': ';
                             $cur = $this->gtbabel->utils->apiStatsGet($service__key);
                             echo $cur;
+                            echo ' ';
+                            echo __('Characters', 'gtbabel-plugin');
                             $costs = 0;
                             if ($service__key === 'google') {
                                 $costs = $cur * (20 / 1000000) * 0.92;
