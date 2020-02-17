@@ -351,7 +351,7 @@ class Gettext
                     return 1;
                 }
             }
-            return strnatcmp($data[$a], $data[$b]);
+            return strnatcmp($a, $b);
         });
         return $data;
     }
