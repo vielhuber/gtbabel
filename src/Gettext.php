@@ -469,6 +469,10 @@ class Gettext
 
     function autoTranslateString($orig, $to_lng, $context = null, $from_lng = null)
     {
+        if ($from_lng === null) {
+            $from_lng = $this->getSourceLng();
+        }
+
         $trans = null;
 
         if ($this->settings->get('auto_translation') === true) {

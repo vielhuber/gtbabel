@@ -123,29 +123,68 @@ class GtbabelWordPress
         }
     }
 
-    private function autoTranslateAllUrls()
+    private function autoTranslateAllUrls($chunk = 0, $chunk_size = 1)
     {
+        echo '<div class="gtbabel__auto-translate">';
+
+        // build general queue
+        $queue = [];
         $query = new \WP_Query(['post_type' => 'any', 'posts_per_page' => '-1', 'post_status' => 'publish']);
         while ($query->have_posts()) {
             $query->the_post();
             $url = get_the_permalink();
-            if (strpos($url, 'impressum') === false) {
-                continue;
-            }
-            // crawl the url (this calls addCurrentUrlToTranslations())
-            echo 'crawling ' . $url . '...<br/>';
-            __fetch($url);
-            // now get all through the call added translations
+            $queue[] = ['url' => $url, 'convert_to_lng' => null];
             foreach ($this->gtbabel->gettext->getSelectedLanguageCodesWithoutSource() as $lngs__value) {
-                if (!in_array($lngs__value, ['en', 'fr'])) {
-                    //continue;
-                }
-                $trans = $this->gtbabel->gettext->getUrlTranslationInLanguage($lngs__value, $url);
-                // crawl the translation
-                echo 'crawling ' . $trans . '...<br/>';
-                __fetch($trans);
+                $queue[] = ['url' => $url, 'convert_to_lng' => $lngs__value];
             }
         }
+
+        // do next chunk
+        for ($i = $chunk_size * $chunk; $i < $chunk_size * $chunk + $chunk_size; $i++) {
+            if (!isset($queue[$i])) {
+                break;
+            }
+            // this is important, that we fetch the url in the source language first (this calls addCurrentUrlToTranslations())
+            $url = $queue[$i]['url'];
+            if ($queue[$i]['convert_to_lng'] !== null) {
+                // we have called the source url, so now we can get the translations
+                // important: this has to be in a different session(!), because the host session does not know of the translation yet
+                // therefore we set the chunk size to 1 (so 1 url is processed at a time)
+                $url = $this->gtbabel->gettext->getUrlTranslationInLanguage($queue[$i]['convert_to_lng'], $url);
+            }
+            __fetch($url);
+            echo __('Loading', 'gtbabel-plugin');
+            echo '... ' . $url . '<br/>';
+        }
+
+        // progress
+        $progress = ($chunk_size * $chunk + $chunk_size) / count($queue);
+        if ($progress > 1) {
+            $progress = 1;
+        }
+        $progress *= 100;
+        $progress = round($progress, 2);
+        $progress = number_format($progress, 2, ',', '');
+        echo '<strong>';
+        echo __('Progress', 'gtbabel-plugin');
+        echo ': ' . $progress . '%';
+        echo '</strong>';
+        echo '<br/>';
+
+        // if finished
+        if ($chunk_size * $chunk + $chunk_size > count($queue) - 1) {
+            echo __('Finished', 'gtbabel-plugin');
+        }
+
+        // next
+        else {
+            $redirect_url = admin_url(
+                'admin.php?page=gtbabel&gtbabel_auto_translate=1&gtbabel_auto_translate_chunk=' . ($chunk + 1)
+            );
+            echo '<a href="' . $redirect_url . '" class="gtbabel__auto-translate-next"></a>';
+        }
+
+        echo '</div>';
     }
 
     private function initBackend()
@@ -158,6 +197,7 @@ class GtbabelWordPress
                 'gtbabel',
                 function () {
                     $message = '';
+
                     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         if (isset($_POST['save_settings'])) {
                             $settings = @$_POST['gtbabel'];
@@ -245,6 +285,7 @@ class GtbabelWordPress
                             __('Successfully edited', 'gtbabel-plugin') .
                             '</p></div>';
                     }
+
                     $settings = get_option('gtbabel_settings');
 
                     echo '<div class="gtbabel wrap">';
@@ -567,17 +608,26 @@ class GtbabelWordPress
                         __('Save', 'gtbabel-plugin') .
                         '" type="submit" />';
 
-                    echo '<h2 class="gtbabel__subtitle">' . __('Reset settings', 'gtbabel-plugin') . '</h2>';
-                    echo '<input class="gtbabel__submit button button-secondary" name="reset_settings" value="' .
-                        __('Reset', 'gtbabel-plugin') .
-                        '" type="submit" />';
-
-                    echo '<h2 class="gtbabel__subtitle">' . __('Reset translations', 'gtbabel-plugin') . '</h2>';
-                    echo '<input class="gtbabel__submit button button-secondary" name="reset_translations" value="' .
-                        __('Reset', 'gtbabel-plugin') .
-                        '" type="submit" />';
+                    echo '<h2 class="gtbabel__subtitle">' .
+                        __('Translate complete website', 'gtbabel-plugin') .
+                        '</h2>';
+                    echo '<a data-loading-text="' .
+                        __('Loading', 'gtbabel-plugin') .
+                        '..." href="' .
+                        admin_url('admin.php?page=gtbabel&gtbabel_auto_translate=1') .
+                        '" class="gtbabel__submit gtbabel__submit--auto-translate button button-secondary">' .
+                        __('Translate', 'gtbabel-plugin') .
+                        '</a>';
+                    if (@$_GET['gtbabel_auto_translate'] == '1') {
+                        $chunk = 0;
+                        if (@$_GET['gtbabel_auto_translate_chunk'] != '') {
+                            $chunk = intval($_GET['gtbabel_auto_translate_chunk']);
+                        }
+                        $this->autoTranslateAllUrls($chunk);
+                    }
 
                     if ($settings['api_stats'] == '1') {
+                        echo '<div class="gtbabel__api-stats">';
                         echo '<h2 class="gtbabel__subtitle">' .
                             __('Translation api usage stats', 'gtbabel-plugin') .
                             '</h2>';
@@ -597,16 +647,29 @@ class GtbabelWordPress
                             if ($service__value === 'microsoft') {
                                 $costs = $cur * (8.433 / 1000000);
                             }
-                            echo ' (~' . round($costs, 2) . ' €)';
+                            echo ' (~' . number_format(round($costs, 2), 2, ',', '.') . ' €)';
                             echo '</li>';
                         }
                         echo '</ul>';
+                        echo '</div>';
                     }
+
+                    echo '<h2 class="gtbabel__subtitle">' . __('Reset settings', 'gtbabel-plugin') . '</h2>';
+                    echo '<input data-question="' .
+                        __('Please enter REMOVE to confirm!', 'gtbabel-plugin') .
+                        '" class="gtbabel__submit gtbabel__submit--reset button button-secondary" name="reset_settings" value="' .
+                        __('Reset', 'gtbabel-plugin') .
+                        '" type="submit" />';
+
+                    echo '<h2 class="gtbabel__subtitle">' . __('Reset translations', 'gtbabel-plugin') . '</h2>';
+                    echo '<input data-question="' .
+                        __('Please enter REMOVE to confirm!', 'gtbabel-plugin') .
+                        '" class="gtbabel__submit gtbabel__submit--reset button button-secondary" name="reset_translations" value="' .
+                        __('Reset', 'gtbabel-plugin') .
+                        '" type="submit" />';
 
                     echo '</form>';
                     echo '</div>';
-
-                    //$this->autoTranslateAllUrls();
                 },
                 'dashicons-admin-site-alt3',
                 100
