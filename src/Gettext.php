@@ -134,6 +134,37 @@ class Gettext
         return $this->gettext_cache_reverse[$lng][$context ?? ''][$str];
     }
 
+    function getAllTranslationsFromFiles()
+    {
+        $data = [];
+        $poLoader = new PoLoader();
+        $moLoader = new MoLoader();
+        $filename = $this->getLngFilename('pot', '_template');
+        if (!file_exists($filename)) {
+            return null;
+        }
+        $pot = $poLoader->loadFile($filename);
+        foreach ($pot->getTranslations() as $gettext__value) {
+            $key = md5($gettext__value->getOriginal() . '#' . $gettext__value->getContext() ?? '');
+            $data[$key] = [
+                'orig' => $gettext__value->getOriginal(),
+                'context' => $gettext__value->getContext() ?? '',
+                'translations' => []
+            ];
+        }
+        foreach ($this->getSelectedLanguageCodesWithoutSource() as $languages__value) {
+            if (!file_exists($this->getLngFilename('mo', $languages__value))) {
+                continue;
+            }
+            $mo = $moLoader->loadFile($this->getLngFilename('mo', $languages__value));
+            foreach ($mo->getTranslations() as $gettext__value) {
+                $key = md5($gettext__value->getOriginal() . '#' . $gettext__value->getContext() ?? '');
+                $data[$key]['translations'][$languages__value] = $gettext__value->getTranslation();
+            }
+        }
+        return $data;
+    }
+
     function addStringToPotFileAndToCache($str, $context)
     {
         $translation = Translation::create($context, $str);

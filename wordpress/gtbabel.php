@@ -123,7 +123,7 @@ class GtbabelWordPress
         }
     }
 
-    private function autoTranslateAllUrls($chunk = 0, $chunk_size = 10)
+    private function autoTranslateAllUrls($chunk = 0, $chunk_size = 5)
     {
         echo '<div class="gtbabel__auto-translate">';
 
@@ -698,7 +698,8 @@ class GtbabelWordPress
                 'gtbabel-trans',
                 function () {
                     echo '<div class="gtbabel wrap">';
-                    echo 'FOOOOOOOOOOO';
+                    $translations = $this->gtbabel->gettext->getAllTranslationsFromFiles();
+                    var_dump($translations);
                     echo '</div>';
                 }
             );
