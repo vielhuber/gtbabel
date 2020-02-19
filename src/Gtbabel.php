@@ -13,6 +13,8 @@ class Gtbabel
     public $settings;
     public $translation;
 
+    public $started;
+
     function __construct(
         Dom $dom = null,
         Utils $utils = null,
@@ -31,6 +33,7 @@ class Gtbabel
 
     function start($args = [])
     {
+        $this->started = true;
         $this->utils->lb();
         $this->settings->set($args);
         $this->host->setup();
@@ -50,6 +53,9 @@ class Gtbabel
 
     function stop()
     {
+        if ($this->started !== true) {
+            return;
+        }
         if ($this->host->currentUrlIsExcluded()) {
             return;
         }

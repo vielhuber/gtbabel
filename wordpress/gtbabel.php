@@ -123,7 +123,7 @@ class GtbabelWordPress
         }
     }
 
-    private function autoTranslateAllUrls($chunk = 0, $chunk_size = 1)
+    private function autoTranslateAllUrls($chunk = 0, $chunk_size = 10)
     {
         echo '<div class="gtbabel__auto-translate">';
 
@@ -133,9 +133,9 @@ class GtbabelWordPress
         while ($query->have_posts()) {
             $query->the_post();
             $url = get_the_permalink();
-            $queue[] = ['url' => $url, 'convert_to_lng' => null];
+            $queue[] = ['url' => $url, 'convert_to_lng' => null, 'refresh_after' => true];
             foreach ($this->gtbabel->gettext->getSelectedLanguageCodesWithoutSource() as $lngs__value) {
-                $queue[] = ['url' => $url, 'convert_to_lng' => $lngs__value];
+                $queue[] = ['url' => $url, 'convert_to_lng' => $lngs__value, 'refresh_after' => false];
             }
         }
 
@@ -145,16 +145,20 @@ class GtbabelWordPress
                 break;
             }
             // this is important, that we fetch the url in the source language first (this calls addCurrentUrlToTranslations())
+            // if we call the source url, the translated urls are generated
+            // important: the main fetch happened in a different session (the current session does not know of the translated slugs yet)
+            // therefore we refresh gtbabel after every main url
             $url = $queue[$i]['url'];
             if ($queue[$i]['convert_to_lng'] !== null) {
-                // we have called the source url, so now we can get the translations
-                // important: this has to be in a different session(!), because the host session does not know of the translation yet
-                // therefore we set the chunk size to 1 (so 1 url is processed at a time)
                 $url = $this->gtbabel->gettext->getUrlTranslationInLanguage($queue[$i]['convert_to_lng'], $url);
             }
-            __fetch($url);
+            // append a pseudo get parameter, so that frontend cache plugins don't work
+            __fetch($url . '?no_cache=1');
             echo __('Loading', 'gtbabel-plugin');
             echo '... ' . $url . '<br/>';
+            if ($queue[$i]['refresh_after'] === true) {
+                $this->start();
+            }
         }
 
         // progress
@@ -271,7 +275,7 @@ class GtbabelWordPress
 
                             $settings['languages'] = array_keys($settings['languages']);
                             update_option('gtbabel_settings', $settings);
-                            // restart gtbabel with new options
+                            // refresh gtbabel with new options
                             $this->start();
                         }
                         if (isset($_POST['reset_settings'])) {
@@ -678,12 +682,37 @@ class GtbabelWordPress
                 'dashicons-admin-site-alt3',
                 100
             );
-            add_action('admin_print_styles-' . $menu, function () {
-                wp_enqueue_style('gtbabel-css', plugins_url('gtbabel.css', __FILE__));
-            });
-            add_action('admin_print_scripts-' . $menu, function () {
-                wp_enqueue_script('gtbabel-js', plugins_url('gtbabel.js', __FILE__));
-            });
+
+            add_submenu_page(
+                'gtbabel',
+                __('Settings', 'gtbabel-plugin'),
+                __('Settings', 'gtbabel-plugin'),
+                'manage_options',
+                'gtbabel'
+            );
+            $submenu = add_submenu_page(
+                'gtbabel',
+                __('String translation', 'gtbabel-plugin'),
+                __('String translation', 'gtbabel-plugin'),
+                'manage_options',
+                'gtbabel-trans',
+                function () {
+                    echo '<div class="gtbabel wrap">';
+                    echo 'FOOOOOOOOOOO';
+                    echo '</div>';
+                }
+            );
+            $menus = [];
+            $menus[] = $menu;
+            $menus[] = $submenu;
+            foreach ($menus as $menus__value) {
+                add_action('admin_print_styles-' . $menus__value, function () {
+                    wp_enqueue_style('gtbabel-css', plugins_url('gtbabel.css', __FILE__));
+                });
+                add_action('admin_print_scripts-' . $menus__value, function () {
+                    wp_enqueue_script('gtbabel-js', plugins_url('gtbabel.js', __FILE__));
+                });
+            }
         });
     }
 }
