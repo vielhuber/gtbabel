@@ -63,6 +63,10 @@ function fetchNextAutoTranslate(url) {
         .then(v => v.text())
         .catch(v => v)
         .then(response => {
+            // something went wrong, try again
+            if (response === null || response === undefined || response.trim() === '') {
+                fetchNextAutoTranslate(url);
+            }
             let html = new DOMParser().parseFromString(response, 'text/html');
             if (document.querySelector('.gtbabel__auto-translate') !== null) {
                 document.querySelector('.gtbabel__auto-translate').innerHTML = html.querySelector(

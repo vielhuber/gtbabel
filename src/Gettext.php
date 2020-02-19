@@ -139,14 +139,12 @@ class Gettext
         $data = [];
         $poLoader = new PoLoader();
         $moLoader = new MoLoader();
-        $filename = $this->getLngFilename('pot', '_template');
-        if (!file_exists($filename)) {
+        if (!file_exists($this->getLngFilename('pot', '_template'))) {
             return null;
         }
-        $pot = $poLoader->loadFile($filename);
+        $pot = $poLoader->loadFile($this->getLngFilename('pot', '_template'));
         foreach ($pot->getTranslations() as $gettext__value) {
-            $key = md5($gettext__value->getOriginal() . '#' . $gettext__value->getContext() ?? '');
-            $data[$key] = [
+            $data[$this->getTranslationHash($gettext__value)] = [
                 'orig' => $gettext__value->getOriginal(),
                 'context' => $gettext__value->getContext() ?? '',
                 'translations' => []
@@ -158,11 +156,89 @@ class Gettext
             }
             $mo = $moLoader->loadFile($this->getLngFilename('mo', $languages__value));
             foreach ($mo->getTranslations() as $gettext__value) {
-                $key = md5($gettext__value->getOriginal() . '#' . $gettext__value->getContext() ?? '');
-                $data[$key]['translations'][$languages__value] = $gettext__value->getTranslation();
+                $data[$this->getTranslationHash($gettext__value)]['translations'][
+                    $languages__value
+                ] = $gettext__value->getTranslation();
             }
         }
         return $data;
+    }
+
+    function getTranslationHash($gettext)
+    {
+        return md5($gettext->getOriginal() . '#' . $gettext->getContext() ?? '');
+    }
+
+    function editTranslationFromFiles($hash, $str, $lng)
+    {
+        $success = false;
+        $poLoader = new PoLoader();
+        $poGenerator = new PoGenerator();
+        $moGenerator = new MoGenerator();
+        if (!file_exists($this->getLngFilename('po', $lng))) {
+            return $success;
+        }
+        $po = $poLoader->loadFile($this->getLngFilename('po', $lng));
+        foreach ($po->getTranslations() as $gettext__value) {
+            if ($this->getTranslationHash($gettext__value) !== $hash) {
+                continue;
+            }
+            $gettext__value->translate($str);
+            $success = true;
+        }
+        if ($success === true) {
+            $poGenerator->generateFile($po, $this->getLngFilename('po', $lng));
+            $moGenerator->generateFile($po, $this->getLngFilename('mo', $lng));
+        }
+        return $success;
+    }
+
+    function deleteTranslationFromFiles($hash)
+    {
+        $success = false;
+        $poLoader = new PoLoader();
+        $poGenerator = new PoGenerator();
+        $moGenerator = new MoGenerator();
+        if (!file_exists($this->getLngFilename('pot', '_template'))) {
+            return $success;
+        }
+        $pot = $poLoader->loadFile($this->getLngFilename('pot', '_template'));
+        $to_remove = null;
+        foreach ($pot->getTranslations() as $gettext__value) {
+            if ($this->getTranslationHash($gettext__value) !== $hash) {
+                continue;
+            }
+            $to_remove = $gettext__value;
+            break;
+        }
+        if ($to_remove !== null) {
+            $pot->remove($to_remove);
+            $poGenerator->generateFile($pot, $this->getLngFilename('pot', '_template'));
+            $success = true;
+        }
+
+        foreach ($this->getSelectedLanguageCodesWithoutSource() as $languages__value) {
+            if (!file_exists($this->getLngFilename('po', $languages__value))) {
+                continue;
+            }
+            $po = $poLoader->loadFile($this->getLngFilename('po', $languages__value));
+            $to_remove = null;
+            foreach ($po->getTranslations() as $gettext__value) {
+                if ($this->getTranslationHash($gettext__value) !== $hash) {
+                    continue;
+                }
+                $to_remove = $gettext__value;
+                break;
+            }
+            if ($to_remove !== null) {
+                $po->remove($to_remove);
+                $poGenerator->generateFile($po, $this->getLngFilename('po', $languages__value));
+                $moGenerator->generateFile($po, $this->getLngFilename('mo', $languages__value));
+                $success = true;
+            }
+        }
+
+        return $success;
     }
 
     function addStringToPotFileAndToCache($str, $context)

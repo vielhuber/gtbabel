@@ -698,6 +698,13 @@ class GtbabelWordPress
                 'gtbabel-trans',
                 function () {
                     echo '<div class="gtbabel wrap">';
+
+                    $hash = '75681af8ed3e887ea4f973e3ebcfe68c';
+                    $str = 'This works!';
+                    $lng = 'en';
+                    var_dump($this->gtbabel->gettext->editTranslationFromFiles($hash, $str, $lng));
+                    var_dump($this->gtbabel->gettext->deleteTranslationFromFiles($hash));
+
                     $translations = $this->gtbabel->gettext->getAllTranslationsFromFiles();
                     var_dump($translations);
                     echo '</div>';
