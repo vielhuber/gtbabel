@@ -60,7 +60,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function fetchNextAutoTranslate(url) {
     fetch(url)
-        .then(v => v.text())
+        .then(response => {
+            if (response.status == 200 || response.status == 304) {
+                return response.text();
+            }
+            return null;
+        })
         .catch(v => v)
         .then(response => {
             // something went wrong, try again
