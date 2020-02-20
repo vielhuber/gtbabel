@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gtbabel-plugin\n"
-"POT-Creation-Date: 2020-02-20 02:07+0100\n"
+"POT-Creation-Date: 2020-02-20 22:33+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -28,7 +28,7 @@ msgstr "Fortschritt"
 msgid "Finished"
 msgstr "Erledigt"
 
-#: gtbabel.php:291 gtbabel.php:715
+#: gtbabel.php:291 gtbabel.php:726
 msgid "Successfully edited"
 msgstr "Erfolgreiche Bearbeitung"
 
@@ -132,7 +132,7 @@ msgstr "Hinzufügen"
 msgid "Provide strings in JavaScript"
 msgstr "Zeichenketten in JavaScript zur Verfügung stellen"
 
-#: gtbabel.php:614 gtbabel.php:776
+#: gtbabel.php:614 gtbabel.php:793
 msgid "Save"
 msgstr "Speichern"
 
@@ -168,29 +168,28 @@ msgstr "Zurücksetzen"
 msgid "Reset translations"
 msgstr "Übersetzungen zurücksetzen"
 
-#: gtbabel.php:695 gtbabel.php:696 gtbabel.php:725
+#: gtbabel.php:695 gtbabel.php:696 gtbabel.php:736
 msgid "String translation"
 msgstr "String-Übersetzung"
 
-#: gtbabel.php:730
+#: gtbabel.php:743
 msgid "String"
 msgstr "String"
 
-#: gtbabel.php:731
+#: gtbabel.php:744
 msgid "Context"
 msgstr "Kontext"
 
-#: gtbabel.php:735
+#: gtbabel.php:748
 msgid "Delete"
 msgstr "Löschen"
 
+#: gtbabel.php:796
+msgid "No translations available."
+msgstr "Keine Übersetzungen vorhanden."
+
 #~ msgid "Fetching"
 #~ msgstr "Lade"
-
-#, fuzzy
-#~| msgid "Translation service"
-#~ msgid "Translation api usage"
-#~ msgstr "Übersetzungsdienst"
 
 #, fuzzy
 #~| msgid "Google Translation API Key"

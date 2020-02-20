@@ -105,7 +105,7 @@ class GtbabelWordPress
     private function setDefaultSettingsToOption()
     {
         if (get_option('gtbabel_settings') === false || get_option('gtbabel_settings') == '') {
-            $lng_source = mb_strtolower(substr(get_locale(), 0, 2));
+            $lng_source = mb_strtolower(mb_substr(get_locale(), 0, 2));
             $languages = ['de', 'en'];
             if (!in_array($lng_source, $languages)) {
                 $languages[] = $lng_source;
@@ -134,7 +134,7 @@ class GtbabelWordPress
             $query->the_post();
             $url = get_the_permalink();
             $queue[] = ['url' => $url, 'convert_to_lng' => null, 'refresh_after' => true];
-            foreach ($this->gtbabel->gettext->getSelectedLanguageCodesWithoutSource() as $lngs__value) {
+            foreach ($this->gtbabel->settings->getSelectedLanguageCodesWithoutSource() as $lngs__value) {
                 $queue[] = ['url' => $url, 'convert_to_lng' => $lngs__value, 'refresh_after' => false];
             }
         }
@@ -735,62 +735,66 @@ class GtbabelWordPress
                     echo $message;
                     echo '<h2 class="gtbabel__subtitle">' . __('String translation', 'gtbabel-plugin') . '</h2>';
 
-                    echo '<table class="gtbabel__table">';
-                    echo '<thead class="gtbabel__table-head">';
-                    echo '<tr class="gtbabel__table-row">';
-                    echo '<td class="gtbabel__table-cell">' . __('String', 'gtbabel-plugin') . '</td>';
-                    echo '<td class="gtbabel__table-cell">' . __('Context', 'gtbabel-plugin') . '</td>';
-                    foreach ($this->gtbabel->gettext->getSelectedLanguagesWithoutSource() as $languages__value) {
-                        echo '<td class="gtbabel__table-cell">' . $languages__value . '</td>';
-                    }
-                    echo '<td class="gtbabel__table-cell">' . __('Delete', 'gtbabel-plugin') . '</td>';
-                    echo '</tr>';
-                    echo '</thead>';
-                    echo '<tbody class="gtbabel__table-body">';
                     $translations = $this->gtbabel->gettext->getAllTranslationsFromFiles();
-                    foreach ($translations as $translations__key => $translations__value) {
+                    if (!empty($translations)) {
+                        echo '<table class="gtbabel__table">';
+                        echo '<thead class="gtbabel__table-head">';
                         echo '<tr class="gtbabel__table-row">';
-                        echo '<td class="gtbabel__table-cell">';
-                        echo '<textarea class="gtbabel__input gtbabel__input--textarea" name="gtbabel[' .
-                            $translations__key .
-                            '][orig]" disabled="disabled">' .
-                            $translations__value['orig'] .
-                            '</textarea>';
-                        echo '</td>';
-                        echo '<td class="gtbabel__table-cell">';
-                        echo '<input class="gtbabel__input" type="text" name="gtbabel[' .
-                            $translations__key .
-                            '][context]" value="' .
-                            $translations__value['context'] .
-                            '" disabled="disabled" />';
-                        echo '</td>';
-                        foreach (
-                            $this->gtbabel->gettext->getSelectedLanguagesWithoutSource()
-                            as $languages__key => $languages__value
-                        ) {
+                        echo '<td class="gtbabel__table-cell">' . __('String', 'gtbabel-plugin') . '</td>';
+                        echo '<td class="gtbabel__table-cell">' . __('Context', 'gtbabel-plugin') . '</td>';
+                        foreach ($this->gtbabel->settings->getSelectedLanguagesWithoutSource() as $languages__value) {
+                            echo '<td class="gtbabel__table-cell">' . $languages__value . '</td>';
+                        }
+                        echo '<td class="gtbabel__table-cell">' . __('Delete', 'gtbabel-plugin') . '</td>';
+                        echo '</tr>';
+                        echo '</thead>';
+                        echo '<tbody class="gtbabel__table-body">';
+                        foreach ($translations as $translations__key => $translations__value) {
+                            echo '<tr class="gtbabel__table-row">';
                             echo '<td class="gtbabel__table-cell">';
-                            echo '<textarea class="gtbabel__input gtbabel__input--textarea gtbabel__input--on-change" data-name="gtbabel[' .
+                            echo '<textarea class="gtbabel__input gtbabel__input--textarea" name="gtbabel[' .
                                 $translations__key .
-                                '][translations][' .
-                                $languages__key .
-                                ']">' .
-                                @$translations__value['translations'][$languages__key] .
+                                '][orig]" disabled="disabled">' .
+                                $translations__value['orig'] .
                                 '</textarea>';
                             echo '</td>';
+                            echo '<td class="gtbabel__table-cell">';
+                            echo '<textarea class="gtbabel__input gtbabel__input--textarea" name="gtbabel[' .
+                                $translations__key .
+                                '][context]" disabled="disabled">' .
+                                $translations__value['context'] .
+                                '</textarea>';
+                            echo '</td>';
+                            foreach (
+                                $this->gtbabel->settings->getSelectedLanguagesWithoutSource()
+                                as $languages__key => $languages__value
+                            ) {
+                                echo '<td class="gtbabel__table-cell">';
+                                echo '<textarea class="gtbabel__input gtbabel__input--textarea gtbabel__input--on-change" data-name="gtbabel[' .
+                                    $translations__key .
+                                    '][translations][' .
+                                    $languages__key .
+                                    ']">' .
+                                    @$translations__value['translations'][$languages__key] .
+                                    '</textarea>';
+                                echo '</td>';
+                            }
+                            echo '<td class="gtbabel__table-cell">';
+                            echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" name="gtbabel[' .
+                                $translations__key .
+                                '][delete]" value="1" />';
+                            echo '</td>';
+                            echo '</tr>';
                         }
-                        echo '<td class="gtbabel__table-cell">';
-                        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" name="gtbabel[' .
-                            $translations__key .
-                            '][delete]" value="1" />';
-                        echo '</td>';
-                        echo '</tr>';
-                    }
-                    echo '</tbody>';
-                    echo '</table>';
+                        echo '</tbody>';
+                        echo '</table>';
 
-                    echo '<input class="gtbabel__submit button button-primary" name="save_settings" value="' .
-                        __('Save', 'gtbabel-plugin') .
-                        '" type="submit" />';
+                        echo '<input class="gtbabel__submit button button-primary" name="save_settings" value="' .
+                            __('Save', 'gtbabel-plugin') .
+                            '" type="submit" />';
+                    } else {
+                        echo '<p>' . __('No translations available.', 'gtbabel-plugin') . '</p>';
+                    }
 
                     echo '</form>';
                     echo '</div>';

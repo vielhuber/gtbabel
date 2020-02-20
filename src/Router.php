@@ -23,7 +23,7 @@ class Router
         }
         if (
             $this->settings->get('prefix_source_lng') === false &&
-            $this->gettext->getCurrentPrefix() !== $this->gettext->getSourceLng()
+            $this->gettext->getCurrentPrefix() !== $this->settings->getSourceLng()
         ) {
             return;
         }
@@ -34,7 +34,10 @@ class Router
             $url =
                 trim($this->host->getCurrentHost(), '/') .
                 '/' .
-                trim(str_replace($this->gettext->getSourceLng() . '/', '', $this->host->getCurrentPathWithArgs()), '/');
+                trim(
+                    str_replace($this->settings->getSourceLng() . '/', '', $this->host->getCurrentPathWithArgs()),
+                    '/'
+                );
         } else {
             $url = '';
             $url .= trim($this->host->getCurrentHost(), '/');
@@ -56,7 +59,7 @@ class Router
             return;
         }
         $url = $this->host->getCurrentUrl();
-        if (strrpos($url, '/') === mb_strlen($url) - 1) {
+        if (mb_strrpos($url, '/') === mb_strlen($url) - 1) {
             return;
         }
         $url = $url . '/';
@@ -70,11 +73,14 @@ class Router
             if ($this->settings->get('prefix_source_lng') === false) {
                 return;
             }
-            if (strpos($this->host->getCurrentPathWithArgs(), '/' . $this->gettext->getSourceLng()) === 0) {
-                $path = substr($this->host->getCurrentPathWithArgs(), mb_strlen('/' . $this->gettext->getSourceLng()));
+            if (mb_strpos($this->host->getCurrentPathWithArgs(), '/' . $this->settings->getSourceLng()) === 0) {
+                $path = mb_substr(
+                    $this->host->getCurrentPathWithArgs(),
+                    mb_strlen('/' . $this->settings->getSourceLng())
+                );
             }
         } else {
-            $path = $this->gettext->getPathTranslationInLanguage($this->gettext->getSourceLng(), true);
+            $path = $this->gettext->getPathTranslationInLanguage($this->settings->getSourceLng(), true);
             $path = trim($path, '/');
             $path = '/' . $path . ($path != '' ? '/' : '') . $this->host->getCurrentArgs();
         }

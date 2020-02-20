@@ -218,7 +218,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
         $html_target = file_get_contents(__DIR__ . '/files/out/' . $filename);
 
-        $extension = substr($filename, strrpos($filename, '.') + 1);
+        $extension = mb_substr($filename, mb_strrpos($filename, '.') + 1);
 
         $debug_filename = __DIR__ . '/files/out/' . str_replace('.' . $extension, '_expected.' . $extension, $filename);
 

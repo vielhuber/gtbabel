@@ -19,7 +19,7 @@ if (!function_exists('gtbabel_language_label')) {
         if ($gtbabel === null) {
             $gtbabel = new Gtbabel();
         }
-        return $gtbabel->gettext->getLabelForLanguageCode($lng);
+        return $gtbabel->settings->getLabelForLanguageCode($lng);
     }
 }
 
@@ -30,7 +30,7 @@ if (!function_exists('gtbabel_languages')) {
         if ($gtbabel === null) {
             $gtbabel = new Gtbabel();
         }
-        return $gtbabel->gettext->getSelectedLanguageCodes();
+        return $gtbabel->settings->getSelectedLanguageCodes();
     }
 }
 
@@ -41,7 +41,7 @@ if (!function_exists('gtbabel_default_language_codes')) {
         if ($gtbabel === null) {
             $gtbabel = new Gtbabel();
         }
-        return $gtbabel->gettext->getDefaultLanguageCodes();
+        return $gtbabel->settings->getDefaultLanguageCodes();
     }
 }
 
@@ -52,7 +52,7 @@ if (!function_exists('gtbabel_default_languages')) {
         if ($gtbabel === null) {
             $gtbabel = new Gtbabel();
         }
-        return $gtbabel->gettext->getDefaultLanguages();
+        return $gtbabel->settings->getDefaultLanguages();
     }
 }
 

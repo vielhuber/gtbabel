@@ -75,6 +75,15 @@ class Dom
             if (@$textnodes__value->parentNode->tagName === 'script') {
                 continue;
             }
+            if (@$textnodes__value->parentNode->tagName === 'style') {
+                continue;
+            }
+            if (@$textnodes__value->parentNode->tagName === 'pre') {
+                continue;
+            }
+            if (@$textnodes__value->parentNode->tagName === 'code') {
+                continue;
+            }
             if (array_key_exists($this->getIdOfNode($textnodes__value), $to_delete)) {
                 continue;
             }
@@ -188,7 +197,7 @@ class Dom
                         if ($include__value['selector'] === 'a' && $include__value['attribute'] === 'href') {
                             $context = 'slug';
                         }
-                        if (strpos($value, $this->host->getCurrentHost()) === 0) {
+                        if (mb_strpos($value, $this->host->getCurrentHost()) === 0) {
                             $context = 'slug';
                         }
 
@@ -291,11 +300,11 @@ class Dom
         $parts = explode(' ', $selector);
         foreach ($parts as $parts__key => $parts__value) {
             // input[placeholder] => input[@placeholder]
-            if (strpos($parts__value, '[') !== false) {
+            if (mb_strpos($parts__value, '[') !== false) {
                 $parts__value = str_replace('[', '[@', $parts__value);
             }
             // .foo => *[contains(concat(" ", normalize-space(@class), " "), " foo ")]
-            if (strpos($parts__value, '.') !== false) {
+            if (mb_strpos($parts__value, '.') !== false) {
                 $parts__value_parts = explode('.', $parts__value);
                 foreach ($parts__value_parts as $parts__value_parts__key => $parts__value_parts__value) {
                     if ($parts__value_parts__key === 0 && $parts__value_parts__value === '') {

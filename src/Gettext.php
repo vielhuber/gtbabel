@@ -55,7 +55,7 @@ class Gettext
         }
 
         // po
-        foreach ($this->getSelectedLanguageCodesWithoutSource() as $languages__value) {
+        foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
             $this->gettext_save_counter['po'][$languages__value] = false;
             $this->gettext_cache[$languages__value] = [];
             $this->gettext_cache_reverse[$languages__value] = [];
@@ -89,7 +89,7 @@ class Gettext
             $poGenerator->generateFile($this->gettext_pot, $this->getLngFilename('pot', '_template'));
         }
 
-        foreach ($this->getSelectedLanguageCodesWithoutSource() as $languages__value) {
+        foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
             if ($this->gettext_save_counter['po'][$languages__value] === false) {
                 continue;
             }
@@ -150,7 +150,7 @@ class Gettext
                 'translations' => []
             ];
         }
-        foreach ($this->getSelectedLanguageCodesWithoutSource() as $languages__value) {
+        foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
             if (!file_exists($this->getLngFilename('mo', $languages__value))) {
                 continue;
             }
@@ -223,7 +223,7 @@ class Gettext
             $success = true;
         }
 
-        foreach ($this->getSelectedLanguageCodesWithoutSource() as $languages__value) {
+        foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
             if (!file_exists($this->getLngFilename('po', $languages__value))) {
                 continue;
             }
@@ -258,7 +258,7 @@ class Gettext
 
     function addTranslationToPoFileAndToCache($orig, $trans, $lng, $context = null)
     {
-        if ($lng === $this->getSourceLng() || empty(@$this->gettext[$lng])) {
+        if ($lng === $this->settings->getSourceLng() || empty(@$this->gettext[$lng])) {
             return;
         }
         $translation = Translation::create($context, $orig);
@@ -285,9 +285,9 @@ class Gettext
         foreach ($files as $files__value) {
             if (is_file($files__value)) {
                 if (
-                    strpos($files__value, '.pot') !== false ||
-                    strpos($files__value, '.po') !== false ||
-                    strpos($files__value, '.mo') !== false
+                    mb_strpos($files__value, '.pot') !== false ||
+                    mb_strpos($files__value, '.po') !== false ||
+                    mb_strpos($files__value, '.mo') !== false
                 ) {
                     @unlink($files__value);
                 }
@@ -302,197 +302,10 @@ class Gettext
         }
     }
 
-    function getSelectedLanguageCodes()
-    {
-        // ordering here is irrelevant (be careful, this function gets called >100 times)
-        return $this->settings->get('languages');
-    }
-
-    function getSelectedLanguages()
-    {
-        $return = [];
-        // use order of default languages
-        $selected = $this->getSelectedLanguageCodes();
-        $data = $this->getDefaultLanguageCodes();
-        foreach ($data as $data__key => $data__value) {
-            if (!in_array($data__value, $selected)) {
-                unset($data[$data__key]);
-            }
-        }
-        $data = array_values($data);
-        foreach ($data as $data__value) {
-            $return[$data__value] = $this->getLabelForLanguageCode($data__value);
-        }
-        return $return;
-    }
-
-    function getDefaultLanguageCodes()
-    {
-        return array_keys($this->getDefaultLanguages());
-    }
-
-    function getDefaultLanguageLabels()
-    {
-        return array_values($this->getDefaultLanguages());
-    }
-
-    function getLabelForLanguageCode($code)
-    {
-        $data = $this->getDefaultLanguages();
-        if (!array_key_exists($code, $data)) {
-            return '';
-        }
-        return $data[$code];
-    }
-
-    function getDefaultLanguages()
-    {
-        // https://cloud.google.com/translate/docs/languages?hl=de
-        $data = [
-            'de' => 'Deutsch',
-            'en' => 'English',
-            'fr' => 'Français',
-            'af' => 'Afrikaans',
-            'am' => 'አማርኛ',
-            'ar' => 'العربية',
-            'az' => 'Azərbaycan',
-            'be' => 'беларускі',
-            'bg' => 'български',
-            'bn' => 'বাঙালির',
-            'bs' => 'Bosanski',
-            'ca' => 'Català',
-            'ceb' => 'Cebuano',
-            'co' => 'Corsican',
-            'cs' => 'Český',
-            'cy' => 'Cymraeg',
-            'da' => 'Dansk',
-            'el' => 'ελληνικά',
-            'eo' => 'Esperanto',
-            'es' => 'Español',
-            'et' => 'Eesti',
-            'eu' => 'Euskal',
-            'fa' => 'فارسی',
-            'fi' => 'Suomalainen',
-            'ga' => 'Gaeilge',
-            'gd' => 'Gàidhlig',
-            'gl' => 'Galego',
-            'gu' => 'ગુજરાતી',
-            'ha' => 'Hausa',
-            'haw' => 'Hawaiian',
-            'he' => 'עברי',
-            'hi' => 'हिन्दी',
-            'hmn' => 'Hmong',
-            'hr' => 'Hrvatski',
-            'ht' => 'Kreyòl',
-            'hu' => 'Magyar',
-            'hy' => 'հայերեն',
-            'id' => 'Indonesia',
-            'ig' => 'Igbo',
-            'is' => 'Icelandic',
-            'it' => 'Italiano',
-            'ja' => '日本の',
-            'jv' => 'Jawa',
-            'ka' => 'ქართული',
-            'kk' => 'Қазақ',
-            'km' => 'ខ្មែរ',
-            'kn' => 'ಕನ್ನಡ',
-            'ko' => '한국의',
-            'ku' => 'Kurdî',
-            'ky' => 'Кыргыз',
-            'la' => 'Latine',
-            'lb' => 'Lëtzebuergesch',
-            'lo' => 'ລາວ',
-            'lt' => 'Lietuvos',
-            'lv' => 'Latvijas',
-            'mg' => 'Malagasy',
-            'mi' => 'Maori',
-            'mk' => 'македонски',
-            'ml' => 'മലയാളം',
-            'mn' => 'Монгол',
-            'mr' => 'मराठी',
-            'ms' => 'Malay',
-            'mt' => 'Malti',
-            'my' => 'မြန်မာ',
-            'ne' => 'नेपाली',
-            'nl' => 'Nederlands',
-            'no' => 'Norsk',
-            'ny' => 'Nyanja',
-            'pa' => 'ਪੰਜਾਬੀ',
-            'pl' => 'Polski',
-            'ps' => 'پښتو',
-            'pt' => 'Português',
-            'ro' => 'Românesc',
-            'ru' => 'Русский',
-            'sd' => 'سنڌي',
-            'si' => 'සිංහලයන්',
-            'sk' => 'Slovenský',
-            'sl' => 'Slovenski',
-            'sm' => 'Samoa',
-            'sn' => 'Shona',
-            'so' => 'Soomaali',
-            'sq' => 'Shqiptar',
-            'sr' => 'Српски',
-            'su' => 'Sunda',
-            'sv' => 'Svenska',
-            'ta' => 'தமிழ்',
-            'te' => 'Telugu',
-            'tg' => 'Тоҷикистон',
-            'th' => 'ไทย',
-            'tr' => 'Türk',
-            'uk' => 'Український',
-            'ur' => 'اردو',
-            'uz' => 'O\'zbekiston',
-            'vi' => 'Tiếng việt',
-            'xh' => 'IsiXhosa',
-            'yi' => 'ייִדיש',
-            'yo' => 'Yoruba',
-            'zh-cn' => '中文（简体）',
-            'zh-tw' => '中文（繁體）',
-            'zu' => 'Zulu'
-        ];
-        $source_lng = $this->getSourceLng();
-        uksort($data, function ($a, $b) use ($data, $source_lng) {
-            if ($source_lng != '') {
-                if ($a === $source_lng) {
-                    return -1;
-                }
-                if ($b === $source_lng) {
-                    return 1;
-                }
-            }
-            return strnatcmp($data[$a], $data[$b]);
-        });
-        return $data;
-    }
-
-    function getSelectedLanguagesWithoutSource()
-    {
-        $lng = [];
-        foreach ($this->getSelectedLanguages() as $languages__key => $languages__value) {
-            if ($languages__key === $this->getSourceLng()) {
-                continue;
-            }
-            $lng[$languages__key] = $languages__value;
-        }
-        return $lng;
-    }
-
-    function getSelectedLanguageCodesWithoutSource()
-    {
-        $lng = [];
-        foreach ($this->getSelectedLanguageCodes() as $languages__value) {
-            if ($languages__value === $this->getSourceLng()) {
-                continue;
-            }
-            $lng[] = $languages__value;
-        }
-        return $lng;
-    }
-
     function getCurrentPrefix()
     {
-        foreach ($this->getSelectedLanguageCodes() as $languages__value) {
-            if (strpos($this->host->getCurrentPath(), '/' . $languages__value) === 0) {
+        foreach ($this->settings->getSelectedLanguageCodes() as $languages__value) {
+            if (mb_strpos($this->host->getCurrentPath(), '/' . $languages__value) === 0) {
                 return $languages__value;
             }
         }
@@ -510,7 +323,7 @@ class Gettext
     function getLanguagePickerData()
     {
         $data = [];
-        foreach ($this->getSelectedLanguages() as $languages__key => $languages__value) {
+        foreach ($this->settings->getSelectedLanguages() as $languages__key => $languages__value) {
             $url = $this->getUrlTranslationInLanguage($languages__key);
             $data[] = [
                 'code' => $languages__key,
@@ -524,15 +337,10 @@ class Gettext
 
     function sourceLngIsCurrentLng()
     {
-        if ($this->getCurrentLng() === $this->getSourceLng()) {
+        if ($this->getCurrentLng() === $this->settings->getSourceLng()) {
             return true;
         }
         return false;
-    }
-
-    function getSourceLng()
-    {
-        return $this->settings->get('lng_source');
     }
 
     function prepareTranslationAndAddDynamicallyIfNeeded($orig, $lng, $context = null)
@@ -547,7 +355,7 @@ class Gettext
         if ($context === 'title') {
             foreach (['-', '–', '—', ':', '·', '•', '*', '⋆', '|', '~', '«', '»', '<', '>'] as $delimiters__value) {
                 $orig = str_replace(' ', ' ', $orig); // replace hidden &nbsp; chars
-                if (strpos($orig, ' ' . $delimiters__value . ' ') !== false) {
+                if (mb_strpos($orig, ' ' . $delimiters__value . ' ') !== false) {
                     $orig_parts = explode(' ' . $delimiters__value . ' ', $orig);
                     foreach ($orig_parts as $orig_parts__key => $orig_parts__value) {
                         $trans = $this->getTranslationAndAddDynamicallyIfNeeded($orig_parts__value, $lng, $context);
@@ -566,18 +374,18 @@ class Gettext
         if ($link === null || trim($link) === '') {
             return $link;
         }
-        if (strpos(trim($link, '/'), '#') === 0) {
+        if (mb_strpos(trim($link, '/'), '#') === 0) {
             return $link;
         }
-        $is_absolute_link = strpos($link, $this->host->getCurrentHost()) === 0;
-        if (strpos($link, 'http') !== false && $is_absolute_link === false) {
+        $is_absolute_link = mb_strpos($link, $this->host->getCurrentHost()) === 0;
+        if (mb_strpos($link, 'http') !== false && $is_absolute_link === false) {
             return $link;
         }
-        if (strpos($link, 'http') === false && strpos($link, ':') !== false) {
+        if (mb_strpos($link, 'http') === false && mb_strpos($link, ':') !== false) {
             return $link;
         }
         $link = str_replace(
-            [$this->host->getCurrentHost() . '/' . $this->getSourceLng(), $this->host->getCurrentHost()],
+            [$this->host->getCurrentHost() . '/' . $this->settings->getSourceLng(), $this->host->getCurrentHost()],
             '',
             $link
         );
@@ -596,7 +404,7 @@ class Gettext
             }
             $link = implode('/', $url_parts);
         }
-        $link = (strpos($link, '/') === 0 ? '/' : '') . $lng . '/' . ltrim($link, '/');
+        $link = (mb_strpos($link, '/') === 0 ? '/' : '') . $lng . '/' . ltrim($link, '/');
         if ($is_absolute_link === true) {
             $link = rtrim($this->host->getCurrentHost(), '/') . '/' . ltrim($link, '/');
         }
@@ -617,7 +425,7 @@ class Gettext
     function autoTranslateString($orig, $to_lng, $context = null, $from_lng = null)
     {
         if ($from_lng === null) {
-            $from_lng = $this->getSourceLng();
+            $from_lng = $this->settings->getSourceLng();
         }
 
         $trans = null;
@@ -666,18 +474,18 @@ class Gettext
         if (!empty($matches[0])) {
             foreach ($matches[0] as $matches__value) {
                 $pos_begin = 1;
-                $pos_end = strrpos($matches__value, '>');
+                $pos_end = mb_strrpos($matches__value, '>');
                 foreach (['/', ' '] as $alt__value) {
-                    $pos_end_ = strpos($matches__value, $alt__value, $pos_begin + 1);
+                    $pos_end_ = mb_strpos($matches__value, $alt__value, $pos_begin + 1);
                     if ($pos_end_ !== false && $pos_end_ < $pos_end) {
                         $pos_end = $pos_end_;
                     }
                 }
                 $placeholder = '';
                 $placeholder .= '<';
-                $placeholder .= substr($matches__value, $pos_begin, $pos_end - $pos_begin);
+                $placeholder .= mb_substr($matches__value, $pos_begin, $pos_end - $pos_begin);
                 // whitelist notranslate attribute
-                if (strpos($matches__value, 'notranslate') !== false) {
+                if (mb_strpos($matches__value, 'notranslate') !== false) {
                     $placeholder .= ' class="notranslate"';
                 }
                 $placeholder .= '>';
@@ -732,14 +540,14 @@ class Gettext
     function translateStringMock($str, $to_lng, $context = null, $from_lng = null)
     {
         if ($from_lng === null) {
-            $from_lng = $this->getSourceLng();
+            $from_lng = $this->settings->getSourceLng();
         }
         if ($context === 'slug') {
             $pos = mb_strlen($str) - mb_strlen('-' . $from_lng);
-            if (strrpos($str, '-' . $from_lng) === $pos) {
-                $str = substr($str, 0, $pos);
+            if (mb_strrpos($str, '-' . $from_lng) === $pos) {
+                $str = mb_substr($str, 0, $pos);
             }
-            if ($to_lng === $this->getSourceLng()) {
+            if ($to_lng === $this->settings->getSourceLng()) {
                 return $str;
             }
             return $str . '-' . $to_lng;
@@ -766,24 +574,28 @@ class Gettext
         if (substr_count($str, '@') === 1 && substr_count($str, '.') === 1) {
             return true;
         }
-        foreach ($this->getSelectedLanguageCodes() as $languages__value) {
+        foreach ($this->settings->getSelectedLanguageCodes() as $languages__value) {
             if ($languages__value === trim(strtolower($str))) {
                 return true;
             }
         }
-        if ($context === 'slug' && strpos($str, '#') === 0) {
+        if ($context === 'slug' && mb_strpos($str, '#') === 0) {
             return true;
         }
         // detect paths to php scripts
-        if (strpos($str, ' ') === false && strpos($str, '.php') !== false) {
+        if (mb_strpos($str, ' ') === false && mb_strpos($str, '.php') !== false) {
             return true;
         }
         // detect print_r outputs
-        if (strpos($str, '(') === 0 && strrpos($str, ')') === mb_strlen($str) - 1 && strpos($str, '=') !== false) {
+        if (
+            mb_strpos($str, '(') === 0 &&
+            mb_strrpos($str, ')') === mb_strlen($str) - 1 &&
+            mb_strpos($str, '=') !== false
+        ) {
             return true;
         }
         // detect mathjax/latex
-        if (strpos($str, '$$') === 0 && strrpos($str, '$$') === mb_strlen($str) - 2) {
+        if (mb_strpos($str, '$$') === 0 && mb_strrpos($str, '$$') === mb_strlen($str) - 2) {
             return true;
         }
         return false;
@@ -808,7 +620,7 @@ class Gettext
         if ($from_lng === null) {
             $from_lng = $this->getCurrentLng();
         }
-        if ($from_lng === $this->getSourceLng()) {
+        if ($from_lng === $this->settings->getSourceLng()) {
             $str_in_source_lng = $str;
         } else {
             $str_in_source_lng = $this->getExistingTranslationReverseFromCache($str, $from_lng, $context); // str in source lng
@@ -816,7 +628,7 @@ class Gettext
         if ($str_in_source_lng === false) {
             return false;
         }
-        if ($to_lng === $this->getSourceLng()) {
+        if ($to_lng === $this->settings->getSourceLng()) {
             return $str_in_source_lng;
         }
         $trans = $this->getExistingTranslationFromCache($str_in_source_lng, $to_lng, $context);
@@ -833,14 +645,14 @@ class Gettext
             $to_lng = $this->getCurrentLng();
         }
         if ($from_lng === null) {
-            $from_lng = $this->getSourceLng();
+            $from_lng = $this->settings->getSourceLng();
         }
         $trans = $this->getTranslationInForeignLng($str, $to_lng, $from_lng, $context);
         if ($trans === false) {
-            if ($from_lng === $this->getSourceLng()) {
+            if ($from_lng === $this->settings->getSourceLng()) {
                 $str_in_source = $str;
             } else {
-                $str_in_source = $this->autoTranslateString($str, $this->getSourceLng(), $context, $from_lng);
+                $str_in_source = $this->autoTranslateString($str, $this->settings->getSourceLng(), $context, $from_lng);
             }
             $trans = $this->autoTranslateString($str_in_source, $to_lng, $context, $from_lng);
             $this->addStringToPotFileAndToCache($str_in_source, $context);
@@ -869,7 +681,7 @@ class Gettext
         // prefix
         if (
             $always_remove_prefix === true ||
-            ($this->getSourceLng() === $lng && $this->settings->get('prefix_source_lng') === false)
+            ($this->settings->getSourceLng() === $lng && $this->settings->get('prefix_source_lng') === false)
         ) {
             if (@$path_parts[0] === $this->getCurrentLng()) {
                 unset($path_parts[0]);
@@ -883,7 +695,7 @@ class Gettext
         }
 
         foreach ($path_parts as $path_parts__key => $path_parts__value) {
-            if (in_array($path_parts__value, $this->getSelectedLanguageCodes())) {
+            if (in_array($path_parts__value, $this->settings->getSelectedLanguageCodes())) {
                 continue;
             }
             $trans = $this->getTranslationInForeignLng($path_parts__value, $lng, null, 'slug');
@@ -907,7 +719,7 @@ class Gettext
         if (!$this->sourceLngIsCurrentLng()) {
             return;
         }
-        foreach ($this->getSelectedLanguageCodesWithoutSource() as $languages__value) {
+        foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
             $this->prepareTranslationAndAddDynamicallyIfNeeded($this->host->getCurrentUrl(), $languages__value, 'slug');
         }
     }

@@ -82,7 +82,7 @@ class Host
     {
         if ($this->settings->get('exclude_urls') !== null && is_array($this->settings->get('exclude_urls'))) {
             foreach ($this->settings->get('exclude_urls') as $exclude__value) {
-                if (strpos(trim($url, '/'), trim($exclude__value, '/')) !== false) {
+                if (mb_strpos(trim($url, '/'), trim($exclude__value, '/')) !== false) {
                     return true;
                 }
             }
