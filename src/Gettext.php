@@ -161,6 +161,12 @@ class Gettext
                 ] = $gettext__value->getTranslation();
             }
         }
+        uasort($data, function ($a, $b) {
+            if ($a['context'] != $b['context']) {
+                return strcmp($a['context'], $b['context']);
+            }
+            return strcmp($a['orig'], $b['orig']);
+        });
         return $data;
     }
 
@@ -457,6 +463,18 @@ class Gettext
             return strnatcmp($data[$a], $data[$b]);
         });
         return $data;
+    }
+
+    function getSelectedLanguagesWithoutSource()
+    {
+        $lng = [];
+        foreach ($this->getSelectedLanguages() as $languages__key => $languages__value) {
+            if ($languages__key === $this->getSourceLng()) {
+                continue;
+            }
+            $lng[$languages__key] = $languages__value;
+        }
+        return $lng;
     }
 
     function getSelectedLanguageCodesWithoutSource()
