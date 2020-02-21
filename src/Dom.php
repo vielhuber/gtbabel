@@ -113,6 +113,11 @@ class Dom
 
             $originalText = $this->gettext->removeLineBreaks($originalTextRaw);
 
+            // do this check again on the whole group
+            if ($this->gettext->stringShouldNotBeTranslated($originalText)) {
+                continue;
+            }
+
             [$originalTextWithPlaceholders, $mappingTable] = $this->gettext->placeholderConversionIn($originalText);
 
             $translatedTextWithPlaceholders = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
@@ -170,7 +175,7 @@ class Dom
                 [
                     'selector' => 'head meta[name="description"]',
                     'attribute' => 'content',
-                    'context' => null
+                    'context' => 'description'
                 ]
             ]);
         }

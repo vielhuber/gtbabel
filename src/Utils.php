@@ -24,6 +24,11 @@ class Utils
         return $suggestion;
     }
 
+    function getDocRoot()
+    {
+        return @$_SERVER['DOCUMENT_ROOT'] == '' ? './' : $_SERVER['DOCUMENT_ROOT'];
+    }
+
     function lb($message = '')
     {
         if (!isset($GLOBALS['performance'])) {
@@ -50,7 +55,7 @@ class Utils
 
     function log($msg)
     {
-        $filename = $_SERVER['DOCUMENT_ROOT'] . '/log.txt';
+        $filename = $this->getDocRoot() . '/log.txt';
         if (is_array($msg)) {
             $msg = print_r($msg, true);
         }
@@ -60,7 +65,7 @@ class Utils
 
     function apiStatsFilename()
     {
-        return rtrim($_SERVER['DOCUMENT_ROOT'], '/') . '/' . ltrim($this->settings->get('api_stats_filename'), '/');
+        return rtrim($this->getDocRoot(), '/') . '/' . ltrim($this->settings->get('api_stats_filename'), '/');
     }
 
     function apiStatsGet($service)

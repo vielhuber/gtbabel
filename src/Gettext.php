@@ -140,7 +140,7 @@ class Gettext
         $poLoader = new PoLoader();
         $moLoader = new MoLoader();
         if (!file_exists($this->getLngFilename('pot', '_template'))) {
-            return null;
+            return $data;
         }
         $pot = $poLoader->loadFile($this->getLngFilename('pot', '_template'));
         foreach ($pot->getTranslations() as $gettext__value) {
@@ -271,7 +271,7 @@ class Gettext
 
     function getLngFolder()
     {
-        return $_SERVER['DOCUMENT_ROOT'] . '/' . trim($this->settings->get('lng_folder'), '/');
+        return $this->utils->getDocRoot() . '/' . trim($this->settings->get('lng_folder'), '/');
     }
 
     function getLngFilename($type, $lng)
@@ -575,7 +575,7 @@ class Gettext
             return true;
         }
         foreach ($this->settings->getSelectedLanguageCodes() as $languages__value) {
-            if ($languages__value === trim(strtolower($str))) {
+            if ($languages__value === trim(mb_strtolower($str))) {
                 return true;
             }
         }
@@ -596,6 +596,9 @@ class Gettext
         }
         // detect mathjax/latex
         if (mb_strpos($str, '$$') === 0 && mb_strrpos($str, '$$') === mb_strlen($str) - 2) {
+            return true;
+        }
+        if (mb_strpos($str, '\\(') === 0 && mb_strrpos($str, '\\)') === mb_strlen($str) - 2) {
             return true;
         }
         return false;

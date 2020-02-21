@@ -98,3 +98,29 @@
 .gtbabel--trans .gtbabel__table .gtbabel__input--textarea::-webkit-scrollbar-thumb {
     background-color: #c7c7c7;
 }
+
+.gtbabel__pagination {
+    display: flex;
+    align-items: flex-start;
+    align-content: flex-start;
+}
+.gtbabel__pagination-item {
+    flex: 0 1 auto;
+    margin-right: 10px;
+}
+.gtbabel__search {
+    width: 300px;
+    margin-bottom: 20px;
+}
+.gtbabel__search .gtbabel__form {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    align-content: flex-start;
+}
+.gtbabel__search .gtbabel__input {
+    flex: 0 1 calc(100% - 80px);
+}
+.gtbabel__search .gtbabel__submit {
+    flex: 0 1 80px;
+}

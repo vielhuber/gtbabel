@@ -112,7 +112,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test19()
     {
-        $this->runDiff('19.html', 500);
+        $this->runDiff('19.html', 900);
     }
 
     public function test20()
@@ -126,7 +126,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test21()
     {
-        $this->runDiff('21.php', 2000);
+        $this->runDiff('21.php', 3500);
     }
 
     public function test22()
@@ -136,7 +136,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test23()
     {
-        $this->runDiff('23.php', 3500);
+        $this->runDiff('23.php', 4000);
     }
 
     public function test24()
@@ -158,6 +158,11 @@ class Test extends \PHPUnit\Framework\TestCase
             'debug_translations' => false,
             'auto_translation' => true
         ]);
+    }
+
+    public function test27()
+    {
+        $this->runDiff('27.html', 3500);
     }
 
     public function getDefaultSettings()
