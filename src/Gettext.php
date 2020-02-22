@@ -454,20 +454,18 @@ class Gettext
 
         if ($this->settings->get('auto_translation') === true) {
             if ($this->settings->get('auto_translation_service') === 'google') {
-                $trans = __translate_google(
-                    $orig,
-                    $from_lng,
-                    $to_lng,
-                    $this->settings->get('google_translation_api_key')
-                );
+                $api_key = $this->settings->get('google_translation_api_key');
+                if (is_array($api_key)) {
+                    $api_key = $api_key[array_rand($api_key)];
+                }
+                $trans = __translate_google($orig, $from_lng, $to_lng, $api_key);
                 $this->utils->apiStatsAdd('google', mb_strlen($orig));
             } elseif ($this->settings->get('auto_translation_service') === 'microsoft') {
-                $trans = __translate_microsoft(
-                    $orig,
-                    $from_lng,
-                    $to_lng,
-                    $this->settings->get('microsoft_translation_api_key')
-                );
+                $api_key = $this->settings->get('microsoft_translation_api_key');
+                if (is_array($api_key)) {
+                    $api_key = $api_key[array_rand($api_key)];
+                }
+                $trans = __translate_microsoft($orig, $from_lng, $to_lng, $api_key);
                 $this->utils->apiStatsAdd('microsoft', mb_strlen($orig));
             }
             if ($context === 'slug') {

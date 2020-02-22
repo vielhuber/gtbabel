@@ -211,7 +211,16 @@ class GtbabelWordPress
                         $settings[$checkbox__value] = false;
                     }
                 }
-                foreach (['exclude_urls', 'exclude_dom', 'force_tokenize'] as $exclude__value) {
+                foreach (
+                    [
+                        'exclude_urls',
+                        'exclude_dom',
+                        'force_tokenize',
+                        'google_translation_api_key',
+                        'microsoft_translation_api_key'
+                    ]
+                    as $exclude__value
+                ) {
                     $post_data = $settings[$exclude__value];
                     $settings[$exclude__value] = [];
                     if (@$settings[$exclude__value] != '') {
@@ -450,9 +459,11 @@ class GtbabelWordPress
             '</a>)';
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input" type="text" id="gtbabel_google_translation_api_key" name="gtbabel[google_translation_api_key]" value="' .
-            $settings['google_translation_api_key'] .
-            '" />';
+        echo '<textarea class="gtbabel__input gtbabel__input--textarea" id="gtbabel_google_translation_api_key" name="gtbabel[google_translation_api_key]">' .
+            (is_array($settings['google_translation_api_key'])
+                ? implode(PHP_EOL, $settings['google_translation_api_key'])
+                : $settings['google_translation_api_key']) .
+            '</textarea>';
         echo '</div>';
         echo '</li>';
 
@@ -464,9 +475,11 @@ class GtbabelWordPress
             '</a>)';
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input" type="text" id="gtbabel_microsoft_translation_api_key" name="gtbabel[microsoft_translation_api_key]" value="' .
-            $settings['microsoft_translation_api_key'] .
-            '" />';
+        echo '<textarea class="gtbabel__input gtbabel__input--textarea" id="gtbabel_microsoft_translation_api_key" name="gtbabel[microsoft_translation_api_key]">' .
+            (is_array($settings['microsoft_translation_api_key'])
+                ? implode(PHP_EOL, $settings['microsoft_translation_api_key'])
+                : $settings['microsoft_translation_api_key']) .
+            '</textarea>';
         echo '</div>';
         echo '</li>';
 

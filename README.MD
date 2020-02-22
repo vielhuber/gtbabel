@@ -62,8 +62,8 @@ $gtbabel->start([
     'auto_add_translations_to_gettext' => true,
     'auto_translation' => true,
     'auto_translation_service' => 'google', // google|microsoft
-    'google_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-    'microsoft_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+    'google_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', // you can also use an array here to provide multiple keys at once
+    'microsoft_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', // you can also use an array here to provide multiple keys at once
     'api_stats' => true,
     'api_stats_filename' => '/api_stats.txt',
     'exclude_urls' => ['/backend'],
@@ -187,9 +187,16 @@ Don't use `gtbabel__()` for echoing strings, just output them in the source lang
 It is recommended to use iso language codes in lowercase. But you can use any language code you want (even i-klingon).\
 If you use the auto translation feature for example with the help of the Google Transpation API, you must use iso language codes.
 
-## API Usage
+## Google Translation API
 
-The translation apis of Google or Microsoft can be costly. Try to keep track of your current usage stats. Gtbabel helps you by tracking the total amount of translated chars (see the `api_stats` option).
+-   Go to [Google API Console](https://console.cloud.google.com/apis)
+-   Create a new project
+-   Marketplace > Enable "Cloud Translation API" (this requires you to setup a billing account)
+-   APIs and services > API credentials > Add a new api key
+
+## API usage costs
+
+The translation apis of Google or Microsoft can be costly. Try to keep track of your current usage stats. Gtbabel helps you by tracking the total amount of translated chars (see the `api_stats` option). You can also provide multiple api keys, Gtbabel then distributes the calls uniformly.
 
 ## Credits
 
