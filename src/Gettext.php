@@ -50,8 +50,7 @@ class Gettext
         }
         foreach ($this->gettext_pot->getTranslations() as $gettext__value) {
             $context = $gettext__value->getContext() ?? '';
-            $str = $gettext__value->getOriginal();
-            $this->gettext_pot_cache[$context][$str] = null;
+            $this->gettext_pot_cache[$context][$gettext__value->getOriginal()] = null;
         }
 
         // po
@@ -59,10 +58,10 @@ class Gettext
             $this->gettext_save_counter['po'][$languages__value] = false;
             $this->gettext_cache[$languages__value] = [];
             $this->gettext_cache_reverse[$languages__value] = [];
-            if (!file_exists($this->getLngFilename('mo', $languages__value))) {
+            if (!file_exists($this->getLngFilename('po', $languages__value))) {
                 $this->gettext[$languages__value] = Translations::create('gtbabel');
             } else {
-                $this->gettext[$languages__value] = $moLoader->loadFile($this->getLngFilename('mo', $languages__value));
+                $this->gettext[$languages__value] = $poLoader->loadFile($this->getLngFilename('po', $languages__value));
             }
             foreach ($this->gettext[$languages__value]->getTranslations() as $gettext__value) {
                 $context = $gettext__value->getContext() ?? '';
@@ -259,22 +258,30 @@ class Gettext
         return $success;
     }
 
-    function addStringToPotFileAndToCache($str, $context)
+    function addStringToPotFileAndToCache($str, $context, $comment = null)
     {
         $translation = Translation::create($context, $str);
         $translation->translate('');
+        $translation->getExtractedComments()->add('added: ' . date('Y-m-d H:i:s'));
+        if ($comment !== null) {
+            $translation->getComments()->add($comment);
+        }
         $this->gettext_pot->add($translation);
         $this->gettext_pot_cache[$context][$str] = null;
         $this->gettext_save_counter['pot'] = true;
     }
 
-    function addTranslationToPoFileAndToCache($orig, $trans, $lng, $context = null)
+    function addTranslationToPoFileAndToCache($orig, $trans, $lng, $context = null, $comment = null)
     {
         if ($lng === $this->settings->getSourceLng() || empty(@$this->gettext[$lng])) {
             return;
         }
         $translation = Translation::create($context, $orig);
         $translation->translate($trans);
+        $translation->getExtractedComments()->add('added: ' . date('Y-m-d H:i:s'));
+        if ($comment !== null) {
+            $translation->getComments()->add($comment);
+        }
         $this->gettext[$lng]->add($translation);
         $this->gettext_cache[$lng][$context ?? ''][$orig] = $trans;
         $this->gettext_cache_reverse[$lng][$context ?? ''][$trans] = $orig;
