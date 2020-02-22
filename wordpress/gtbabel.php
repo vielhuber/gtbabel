@@ -970,13 +970,28 @@ class GtbabelWordPress
 
         // build general queue
         $queue = [];
+        $urls = [];
         $query = new \WP_Query(['post_type' => 'any', 'posts_per_page' => '-1', 'post_status' => 'publish']);
         while ($query->have_posts()) {
             $query->the_post();
             $url = get_the_permalink();
-            $queue[] = ['url' => $url, 'convert_to_lng' => null, 'refresh_after' => true];
+            $urls[] = $url;
+        }
+        $query = new \WP_Term_Query(['hide_empty' => false]);
+        if (!empty($query->terms)) {
+            foreach ($query->terms as $terms__value) {
+                $url = get_term_link($terms__value);
+                // exclude non-public
+                if (strpos($url, '?') !== false) {
+                    continue;
+                }
+                $urls[] = $url;
+            }
+        }
+        foreach ($urls as $urls__value) {
+            $queue[] = ['url' => $urls__value, 'convert_to_lng' => null, 'refresh_after' => true];
             foreach ($this->gtbabel->settings->getSelectedLanguageCodesWithoutSource() as $lngs__value) {
-                $queue[] = ['url' => $url, 'convert_to_lng' => $lngs__value, 'refresh_after' => false];
+                $queue[] = ['url' => $urls__value, 'convert_to_lng' => $lngs__value, 'refresh_after' => false];
             }
         }
 
