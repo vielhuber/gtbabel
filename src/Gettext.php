@@ -104,6 +104,18 @@ class Gettext
         }
     }
 
+    function convertPoToMo($filename)
+    {
+        if (!file_exists($filename)) {
+            return false;
+        }
+        $loader = new PoLoader();
+        $translations = $loader->loadFile($filename);
+        $generator = new MoGenerator();
+        $generator->generateFile($translations, str_replace('.po', '.mo', $filename));
+        return true;
+    }
+
     function getExistingTranslationFromCache($str, $lng, $context = null)
     {
         if (
@@ -277,6 +289,16 @@ class Gettext
     function getLngFilename($type, $lng)
     {
         return $this->getLngFolder() . '/' . $lng . '.' . $type;
+    }
+
+    function getLngFolderPublic()
+    {
+        return $this->host->getCurrentHost() . '/' . trim($this->settings->get('lng_folder'), '/');
+    }
+
+    function getLngFilenamePublic($type, $lng)
+    {
+        return $this->getLngFolderPublic() . '/' . $lng . '.' . $type;
     }
 
     function resetTranslations()

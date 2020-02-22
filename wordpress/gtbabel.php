@@ -126,6 +126,8 @@ class GtbabelWordPress
     private function initBackend()
     {
         add_action('admin_menu', function () {
+            $menus = [];
+
             $menu = add_menu_page(
                 'Gtbabel',
                 'Gtbabel',
@@ -137,6 +139,7 @@ class GtbabelWordPress
                 'dashicons-admin-site-alt3',
                 100
             );
+            $menus[] = $menu;
 
             add_submenu_page(
                 'gtbabel-settings',
@@ -145,6 +148,7 @@ class GtbabelWordPress
                 'manage_options',
                 'gtbabel-settings'
             );
+
             $submenu = add_submenu_page(
                 'gtbabel-settings',
                 __('String translation', 'gtbabel-plugin'),
@@ -155,9 +159,20 @@ class GtbabelWordPress
                     $this->initBackendStringTranslation();
                 }
             );
-            $menus = [];
-            $menus[] = $menu;
             $menus[] = $submenu;
+
+            $submenu = add_submenu_page(
+                'gtbabel-settings',
+                __('Translation services', 'gtbabel-plugin'),
+                __('Translation services', 'gtbabel-plugin'),
+                'manage_options',
+                'gtbabel-services',
+                function () {
+                    $this->initBackendTranslationServices();
+                }
+            );
+            $menus[] = $submenu;
+
             foreach ($menus as $menus__value) {
                 add_action('admin_print_styles-' . $menus__value, function () {
                     wp_enqueue_style('gtbabel-css', plugins_url('gtbabel.css', __FILE__));
@@ -777,6 +792,133 @@ class GtbabelWordPress
             echo '<p>' . __('No translations available.', 'gtbabel-plugin') . '</p>';
         }
 
+        echo '</div>';
+    }
+
+    private function initBackendTranslationServices()
+    {
+        $message = '';
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (isset($_POST['upload_file'])) {
+                if (@$_POST['gtbabel']['language'] != '' && @$_FILES['gtbabel']['name']['file'] != '') {
+                    $extension = strtolower(end(explode('.', $_FILES['gtbabel']['name']['file'])));
+                    $allowed_extension = [
+                        'po' => ['application/octet-stream']
+                    ];
+                    if (
+                        array_key_exists($extension, $allowed_extension) &&
+                        in_array($_FILES['gtbabel']['type']['file'], $allowed_extension[$extension]) &&
+                        $_FILES['gtbabel']['size']['file'] < 4000 * 1024 &&
+                        $_FILES['gtbabel']['error']['file'] == 0
+                    ) {
+                        move_uploaded_file(
+                            $_FILES['gtbabel']['tmp_name']['file'],
+                            $this->gtbabel->gettext->getLngFilename('po', $_POST['gtbabel']['language'])
+                        );
+                        $this->gtbabel->gettext->convertPoToMo(
+                            $this->gtbabel->gettext->getLngFilename('po', $_POST['gtbabel']['language'])
+                        );
+                        $message =
+                            '<div class="gtbabel__notice notice notice-success is-dismissible"><p>' .
+                            __('Successfully uploaded', 'gtbabel-plugin') .
+                            '</p></div>';
+                    } else {
+                        $message =
+                            '<div class="gtbabel__notice notice notice-error is-dismissible"><p>' .
+                            __('An error occured', 'gtbabel-plugin') .
+                            '</p></div>';
+                    }
+                }
+            }
+        }
+
+        echo '<div class="gtbabel gtbabel--services wrap">';
+        echo '<h1 class="gtbabel__title">🦜 Gtbabel 🦜</h1>';
+        echo $message;
+        echo '<h2 class="gtbabel__subtitle">' . __('Translation services', 'gtbabel-plugin') . '</h2>';
+
+        echo '<ol class="gtbabel__steps">';
+        echo '<li class="gtbabel__step">';
+        echo sprintf(
+            __('Register and login at %sICanLocalize%s.', 'gtbabel-plugin'),
+            '<a href="https://www.icanlocalize.com" target="_blank">',
+            '</a>'
+        );
+        echo '</li>';
+        echo '<li class="gtbabel__step">';
+        echo sprintf(
+            __(
+                'Create a new %sSoftware localization project%s and pick the same original / target languages as in Gtbabel.',
+                'gtbabel-plugin'
+            ),
+            '<a href="https://www.icanlocalize.com/text_resources/new" target="_blank">',
+            '</a>'
+        );
+        echo '</li>';
+        echo '<li class="gtbabel__step">';
+        echo sprintf(
+            __('Upload your current .pot-Template file, which can be downloaded %shere%s.', 'gtbabel-plugin'),
+            '<a download="template_' .
+                date('Y-m-d_H-i-s') .
+                '.pot" href="' .
+                $this->gtbabel->gettext->getLngFilenamePublic('pot', '_template') .
+                '" target="_blank">',
+            '</a>'
+        );
+        echo '</li>';
+        echo '<li class="gtbabel__step">';
+        echo __('Add all strings for translation.', 'gtbabel-plugin');
+        echo '</li>';
+        echo '<li class="gtbabel__step">';
+        echo __('Review and place the translation order.', 'gtbabel-plugin');
+        echo '</li>';
+        echo '<li class="gtbabel__step">';
+        echo __('Wait for the job to finish and get back individual .po-files.', 'gtbabel-plugin');
+        echo '</li>';
+        echo '<li class="gtbabel__step">';
+        echo __('Reupload the .po-files via the following upload-form.', 'gtbabel-plugin');
+        echo '</li>';
+        echo '</ol>';
+
+        echo '<h2 class="gtbabel__subtitle">' . __('File upload', 'gtbabel-plugin') . '</h2>';
+
+        echo '<form enctype="multipart/form-data" class="gtbabel__form" method="post" action="' .
+            admin_url('admin.php?page=gtbabel-services') .
+            '">';
+
+        echo '<ul class="gtbabel__fields">';
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_language" class="gtbabel__label">';
+        echo __('Language', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<select required="required" class="gtbabel__input gtbabel__input--select" id="gtbabel_language" name="gtbabel[language]">';
+        echo '<option value="">&ndash;&ndash;</option>';
+        foreach (
+            $this->gtbabel->settings->getSelectedLanguagesWithoutSource()
+            as $languages__key => $languages__value
+        ) {
+            echo '<option value="' . $languages__key . '">' . $languages__value . '</option>';
+        }
+        echo '</select>';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_file" class="gtbabel__label">';
+        echo __('.po-File', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input required="required" class="gtbabel__input gtbabel__input--file" type="file" name="gtbabel[file]" id="gtbabel_file" accept=".po" />';
+        echo '</div>';
+        echo '</li>';
+        echo '</ul>';
+
+        echo '<input class="gtbabel__submit button button-primary" name="upload_file" value="' .
+            __('Upload', 'gtbabel-plugin') .
+            '" type="submit" />';
+        echo '</form>';
         echo '</div>';
     }
 
