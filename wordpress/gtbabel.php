@@ -653,6 +653,12 @@ class GtbabelWordPress
             echo '</div>';
         }
 
+        echo '<h2 class="gtbabel__subtitle">' . __('Backup / restore settings', 'gtbabel-plugin') . '</h2>';
+        echo '<p>TODO</p>';
+
+        echo '<h2 class="gtbabel__subtitle">' . __('Remove unused translations', 'gtbabel-plugin') . '</h2>';
+        echo '<p>TODO</p>';
+
         echo '<h2 class="gtbabel__subtitle">' . __('Reset settings', 'gtbabel-plugin') . '</h2>';
         echo '<input data-question="' .
             __('Please enter REMOVE to confirm!', 'gtbabel-plugin') .
