@@ -493,4 +493,10 @@ class Dom
             echo '</script>';
         }
     }
+
+    function modifyJson($json)
+    {
+        $json = str_replace('foo', 'bar', $json);
+        return $json;
+    }
 }

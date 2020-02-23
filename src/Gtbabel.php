@@ -3,8 +3,6 @@ namespace vielhuber\gtbabel;
 
 class Gtbabel
 {
-    public $html;
-
     public $dom;
     public $utils;
     public $host;
@@ -58,10 +56,14 @@ class Gtbabel
         if ($this->host->currentUrlIsExcluded()) {
             return;
         }
-        $html = ob_get_contents();
-        $html = $this->dom->modifyHtml($html);
+        $content = ob_get_contents();
+        if ($this->utils->getContentType($content) === 'html') {
+            $content = $this->dom->modifyHtml($content);
+        } elseif ($this->utils->getContentType($content) === 'json') {
+            $content = $this->dom->modifyJson($content);
+        }
         ob_end_clean();
-        echo $html;
+        echo $content;
         $this->gettext->generateGettextFiles();
     }
 

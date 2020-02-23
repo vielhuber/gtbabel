@@ -165,6 +165,16 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->runDiff('27.html', 3500);
     }
 
+    public function test28()
+    {
+        $this->runDiff('28.html', 200);
+    }
+
+    public function test29()
+    {
+        $this->runDiff('29.json', 200);
+    }
+
     public function getDefaultSettings()
     {
         return [

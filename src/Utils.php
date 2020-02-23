@@ -135,4 +135,21 @@ class Utils
         file_put_contents($filename, $data);
         $this->stats_cache = $data;
     }
+
+    function getContentType($response)
+    {
+        if (mb_stripos($response, '<!DOCTYPE') === 0) {
+            return 'html';
+        }
+        if (mb_stripos($response, '<html') === 0) {
+            return 'html';
+        }
+        if (__string_is_json($response)) {
+            return 'json';
+        }
+        if (strip_tags($response) !== $response) {
+            return 'html';
+        }
+        return null;
+    }
 }

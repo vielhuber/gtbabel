@@ -48,7 +48,7 @@ class Router
                 $url .= trim($this->host->getCurrentPath(), '/') . '/';
             }
         }
-        header('Location: ' . $url, true, 301);
+        header('Location: ' . $url, true, @$_SERVER['REQUEST_METHOD'] === 'POST' ? 307 : 301); // 307 forces the browser to repost to the new url
         die();
     }
 
@@ -63,7 +63,7 @@ class Router
             return;
         }
         $url = $url . '/';
-        header('Location: ' . $url, true, 301);
+        header('Location: ' . $url, true, @$_SERVER['REQUEST_METHOD'] === 'POST' ? 307 : 301);
         die();
     }
 
