@@ -34,7 +34,6 @@ class Gtbabel
     function start($args = [])
     {
         $this->started = true;
-        $this->utils->lb();
         $this->settings->set($args);
         $this->host->setup();
         $this->gettext->createLngFolderIfNotExists();
@@ -64,7 +63,6 @@ class Gtbabel
         ob_end_clean();
         echo $html;
         $this->gettext->generateGettextFiles();
-        $this->utils->le();
     }
 
     function reset()

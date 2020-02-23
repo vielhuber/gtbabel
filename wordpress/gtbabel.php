@@ -610,11 +610,23 @@ class GtbabelWordPress
             '" type="submit" />';
 
         echo '<h2 class="gtbabel__subtitle">' . __('Translate complete website', 'gtbabel-plugin') . '</h2>';
+        echo '<p class="gtbabel__paragraph">' . __('Only new strings are translated.', 'gtbabel-plugin') . '</p>';
+        echo '<ul class="gtbabel__fields">';
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_delete_unused" class="gtbabel__label">';
+        echo __('Delete unused translations', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" id="gtbabel_delete_unused" type="checkbox" value="1" />';
+        echo '</div>';
+        echo '</li>';
+        echo '</ul>';
+
         echo '<a data-loading-text="' .
             __('Loading', 'gtbabel-plugin') .
-            '..." href="' .
+            '..." data-href="' .
             admin_url('admin.php?page=gtbabel-settings&gtbabel_auto_translate=1') .
-            '" class="gtbabel__submit gtbabel__submit--auto-translate button button-secondary">' .
+            '" href="#" class="gtbabel__submit gtbabel__submit--auto-translate button button-secondary">' .
             __('Translate', 'gtbabel-plugin') .
             '</a>';
         if (@$_GET['gtbabel_auto_translate'] == '1') {
@@ -622,7 +634,11 @@ class GtbabelWordPress
             if (@$_GET['gtbabel_auto_translate_chunk'] != '') {
                 $chunk = intval($_GET['gtbabel_auto_translate_chunk']);
             }
-            $this->initBackendAutoTranslate($chunk);
+            $delete_unused = false;
+            if (@$_GET['gtbabel_delete_unused'] == '1') {
+                $delete_unused = true;
+            }
+            $this->initBackendAutoTranslate($chunk, $delete_unused);
         }
 
         if ($settings['api_stats'] == '1') {
@@ -652,12 +668,6 @@ class GtbabelWordPress
             echo '</ul>';
             echo '</div>';
         }
-
-        echo '<h2 class="gtbabel__subtitle">' . __('Backup / restore settings', 'gtbabel-plugin') . '</h2>';
-        echo '<p>TODO</p>';
-
-        echo '<h2 class="gtbabel__subtitle">' . __('Remove unused translations', 'gtbabel-plugin') . '</h2>';
-        echo '<p>TODO</p>';
 
         echo '<h2 class="gtbabel__subtitle">' . __('Reset settings', 'gtbabel-plugin') . '</h2>';
         echo '<input data-question="' .
@@ -970,8 +980,17 @@ class GtbabelWordPress
         return $pagination;
     }
 
-    private function initBackendAutoTranslate($chunk = 0, $chunk_size = 5)
+    private function changeSetting($key, $value)
     {
+        $settings = get_option('gtbabel_settings');
+        $settings[$key] = $value;
+        update_option('gtbabel_settings', $settings);
+    }
+
+    private function initBackendAutoTranslate($chunk = 0, $delete_unused = false)
+    {
+        $chunk_size = 5;
+
         echo '<div class="gtbabel__auto-translate">';
 
         // build general queue
@@ -1014,10 +1033,21 @@ class GtbabelWordPress
             if ($queue[$i]['convert_to_lng'] !== null) {
                 $url = $this->gtbabel->gettext->getUrlTranslationInLanguage($queue[$i]['convert_to_lng'], $url);
             }
+
+            if ($delete_unused === true) {
+                $this->changeSetting('auto_add_last_seen_date_to_gettext', true);
+            }
+
             // append a pseudo get parameter, so that frontend cache plugins don't work
             __fetch($url . '?no_cache=1');
+
+            if ($delete_unused === true) {
+                $this->changeSetting('auto_add_last_seen_date_to_gettext', false);
+            }
+
             echo __('Loading', 'gtbabel-plugin');
             echo '... ' . $url . '<br/>';
+
             if ($queue[$i]['refresh_after'] === true) {
                 $this->start();
             }
@@ -1039,13 +1069,21 @@ class GtbabelWordPress
 
         // if finished
         if ($chunk_size * $chunk + $chunk_size > count($queue) - 1) {
+            if ($delete_unused === true) {
+                $deleted = $this->gtbabel->gettext->deleteUnusedTranslations();
+                echo __('Deleted strings', 'gtbabel-plugin') . ': ' . $deleted;
+                echo '<br/>';
+            }
+
             echo __('Finished', 'gtbabel-plugin');
         }
 
         // next
         else {
             $redirect_url = admin_url(
-                'admin.php?page=gtbabel-settings&gtbabel_auto_translate=1&gtbabel_auto_translate_chunk=' . ($chunk + 1)
+                'admin.php?page=gtbabel-settings&gtbabel_auto_translate=1&gtbabel_auto_translate_chunk=' .
+                    ($chunk + 1) .
+                    ($delete_unused === true ? '&gtbabel_delete_unused=1' : '')
             );
             echo '<a href="' . $redirect_url . '" class="gtbabel__auto-translate-next"></a>';
         }

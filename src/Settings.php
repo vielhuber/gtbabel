@@ -34,6 +34,8 @@ class Settings
             'html_hreflang_tags' => true,
             'debug_translations' => false,
             'auto_add_translations_to_gettext' => false,
+            'auto_add_added_date_to_gettext' => true,
+            'auto_add_last_seen_date_to_gettext' => false,
             'auto_translation' => true,
             'auto_translation_service' => 'google',
             'google_translation_api_key' => [

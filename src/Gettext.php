@@ -117,6 +117,10 @@ class Gettext
 
     function getExistingTranslationFromCache($str, $lng, $context = null)
     {
+        // if last-seen attribute should be added
+        if ($this->settings->get('auto_add_last_seen_date_to_gettext') === true) {
+            $this->addLastSeenDateToString($str, $lng, $context);
+        }
         if (
             $str === '' ||
             $str === null ||
@@ -143,6 +147,33 @@ class Gettext
             return false;
         }
         return $this->gettext_cache_reverse[$lng][$context ?? ''][$str];
+    }
+
+    function addLastSeenDateToString($str, $lng, $context = null)
+    {
+        foreach (['pot', 'po'] as $type) {
+            if ($type === 'pot') {
+                $translation = $this->gettext[$lng]->find($context, $str);
+            }
+            if ($type === 'po') {
+                $translation = $this->gettext_pot->find($context, $str);
+            }
+            if ($translation !== null) {
+                $comments = $translation->getExtractedComments();
+                foreach ($comments as $comments__value) {
+                    if (strpos($comments__value, 'last-seen') === 0) {
+                        $comments->delete($comments__value);
+                    }
+                }
+                $comments->add('last-seen: ' . date('Y-m-d H:i:s'));
+                if ($type === 'pot') {
+                    $this->gettext_save_counter['pot'] = true;
+                }
+                if ($type === 'po') {
+                    $this->gettext_save_counter['po'][$lng] = true;
+                }
+            }
+        }
     }
 
     function getAllTranslationsFromFiles()
@@ -258,11 +289,80 @@ class Gettext
         return $success;
     }
 
+    function deleteUnusedTranslations()
+    {
+        $deleted = 0;
+
+        $poLoader = new PoLoader();
+        $poGenerator = new PoGenerator();
+        $moGenerator = new MoGenerator();
+        if (!file_exists($this->getLngFilename('pot', '_template'))) {
+            return $deleted;
+        }
+        $pot = $poLoader->loadFile($this->getLngFilename('pot', '_template'));
+        $to_remove = null;
+        foreach ($pot->getTranslations() as $gettext__value) {
+            if (!$this->isUnusedTranslation($gettext__value)) {
+                continue;
+            }
+            $to_remove = $gettext__value;
+            break;
+        }
+        if ($to_remove !== null) {
+            $pot->remove($to_remove);
+            $poGenerator->generateFile($pot, $this->getLngFilename('pot', '_template'));
+            $deleted++;
+        }
+
+        foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
+            if (!file_exists($this->getLngFilename('po', $languages__value))) {
+                continue;
+            }
+            $po = $poLoader->loadFile($this->getLngFilename('po', $languages__value));
+            $to_remove = null;
+            foreach ($po->getTranslations() as $gettext__value) {
+                if (!$this->isUnusedTranslation($gettext__value)) {
+                    continue;
+                }
+                $to_remove = $gettext__value;
+                break;
+            }
+            if ($to_remove !== null) {
+                $po->remove($to_remove);
+                $poGenerator->generateFile($po, $this->getLngFilename('po', $languages__value));
+                $moGenerator->generateFile($po, $this->getLngFilename('mo', $languages__value));
+                $deleted++;
+            }
+        }
+
+        return $deleted;
+    }
+
+    function isUnusedTranslation($gettext)
+    {
+        $comments = $gettext->getExtractedComments();
+        foreach ($comments as $comments__value) {
+            if (strpos($comments__value, 'last-seen') !== 0) {
+                continue;
+            }
+            $date = trim(substr($comments__value, strpos($comments__value, ':') + 1));
+            if ($date == '') {
+                continue;
+            }
+            if (strtotime($date) >= strtotime('now - 1 hour')) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     function addStringToPotFileAndToCache($str, $context, $comment = null)
     {
         $translation = Translation::create($context, $str);
         $translation->translate('');
-        $translation->getExtractedComments()->add('added: ' . date('Y-m-d H:i:s'));
+        if ($this->settings->get('auto_add_added_date_to_gettext') === true) {
+            $translation->getExtractedComments()->add('added: ' . date('Y-m-d H:i:s'));
+        }
         if ($comment !== null) {
             $translation->getComments()->add($comment);
         }
@@ -278,7 +378,9 @@ class Gettext
         }
         $translation = Translation::create($context, $orig);
         $translation->translate($trans);
-        $translation->getExtractedComments()->add('added: ' . date('Y-m-d H:i:s'));
+        if ($this->settings->get('auto_add_added_date_to_gettext') === true) {
+            $translation->getExtractedComments()->add('added: ' . date('Y-m-d H:i:s'));
+        }
         if ($comment !== null) {
             $translation->getComments()->add($comment);
         }

@@ -60,6 +60,8 @@ $gtbabel->start([
     'html_hreflang_tags' => true,
     'debug_translations' => false, // surround outputted translations with "%|%" to see borders
     'auto_add_translations_to_gettext' => true,
+    'auto_add_added_date_to_gettext' => true,
+    'auto_add_last_seen_date_to_gettext' => false,
     'auto_translation' => true,
     'auto_translation_service' => 'google', // google|microsoft
     'google_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', // you can also use an array here to provide multiple keys at once

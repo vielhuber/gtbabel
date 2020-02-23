@@ -172,6 +172,8 @@ class Test extends \PHPUnit\Framework\TestCase
             'prefix_source_lng' => false,
             'debug_translations' => true,
             'auto_add_translations_to_gettext' => false,
+            'auto_add_added_date_to_gettext' => true,
+            'auto_add_last_seen_date_to_gettext' => false,
             'exclude_urls' => null,
             'html_lang_attribute' => false,
             'html_hreflang_tags' => false,

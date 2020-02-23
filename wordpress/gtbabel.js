@@ -43,8 +43,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     'afterend',
                     '<div class="gtbabel__auto-translate">' + el.getAttribute('data-loading-text') + '</div>'
                 );
+                let href = el.getAttribute('data-href');
+                if (document.querySelector('#gtbabel_delete_unused').checked === true) {
+                    href += '&gtbabel_delete_unused=1';
+                }
                 el.remove();
-                fetchNextAutoTranslate(el.getAttribute('href'));
+                fetchNextAutoTranslate(href);
                 e.preventDefault();
             }
         });
@@ -70,7 +74,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-function fetchNextAutoTranslate(url) {
+function fetchNextAutoTranslate(url, tries = 0) {
+    if (tries > 10) {
+        return;
+    }
     fetch(url)
         .then(response => {
             if (response.status == 200 || response.status == 304) {
@@ -82,7 +89,7 @@ function fetchNextAutoTranslate(url) {
         .then(response => {
             // something went wrong, try again
             if (response === null || response === undefined || response.trim() === '') {
-                fetchNextAutoTranslate(url);
+                fetchNextAutoTranslate(url, tries + 1);
             }
             let html = new DOMParser().parseFromString(response, 'text/html');
             if (document.querySelector('.gtbabel__auto-translate') !== null) {
