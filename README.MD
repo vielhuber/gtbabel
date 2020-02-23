@@ -21,7 +21,7 @@ Gtbabel automatically translates your HTML/PHP pages – server sided!
 -   Router included: spoof your request uri and let the magic happen, links are automatically converted.
 -   Helper functions for current language and all languages available.
 -   Basic seo considered: title tags, seo descriptions, html lang attribute, hreflang tags included.
--   WordPress plugin available: configuration gui, preloading, auto translation / deletion, manual string translation, translation services included, support for plugins like [Contact Form 7](https://de.wordpress.org/plugins/contact-form-7/)
+-   WordPress plugin available: configuration gui, preloading, auto translation / deletion, manual string translation, translation services included, support for plugins like [Contact Form 7](https://de.wordpress.org/plugins/contact-form-7/).
 -   Works seamlessly with caching/preloading plugins.
 -   Besides plain html does also handle and translate json responses
 -   PHPUnit e2e tests available.
