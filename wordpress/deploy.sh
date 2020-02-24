@@ -12,6 +12,7 @@ composer install
 composer update
 
 # do the prefixing with php-scoper
+composer require ua1-labs/php-scoper-wp-patch
 wget https://github.com/humbug/php-scoper/releases/download/0.13.1/php-scoper.phar
 rm -f ./gtbabel.zip
 php ./php-scoper.phar add-prefix --config scoper.inc.php
