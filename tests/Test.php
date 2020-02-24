@@ -185,6 +185,7 @@ class Test extends \PHPUnit\Framework\TestCase
         return [
             'lng_target' => 'en',
             'prefix_source_lng' => false,
+            'redirect_root_domain' => 'browser',
             'debug_translations' => true,
             'auto_add_translations_to_gettext' => false,
             'auto_add_added_date_to_gettext' => true,

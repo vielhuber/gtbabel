@@ -28,6 +28,7 @@ class Settings
             'lng_target' => null,
             'lng_folder' => '/locales',
             'prefix_source_lng' => true,
+            'redirect_root_domain' => 'browser',
             'translate_text_nodes' => true,
             'translate_default_tag_nodes' => true,
             'html_lang_attribute' => true,

@@ -45,7 +45,11 @@ class Router
             if ($this->host->isAjaxRequest() && @$_SERVER['HTTP_REFERER'] != '') {
                 $url .= $this->gettext->getLngFromUrl($_SERVER['HTTP_REFERER']);
             } else {
-                $url .= $this->gettext->getCurrentLng();
+                if ($this->settings->get('redirect_root_domain') === 'browser') {
+                    $url .= $this->gettext->getBrowserLng();
+                } else {
+                    $url .= $this->settings->getSourceLng();
+                }
             }
             $url .= '/';
             if (trim($this->host->getCurrentPath(), '/') != '') {

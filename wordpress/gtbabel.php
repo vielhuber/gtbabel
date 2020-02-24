@@ -369,6 +369,26 @@ class GtbabelWordPress
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_redirect_root_domain" class="gtbabel__label">';
+        echo __('Redirect root domain to', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<select class="gtbabel__input gtbabel__input--select" id="gtbabel_redirect_root_domain" name="gtbabel[redirect_root_domain]">';
+        echo '<option value="browser"' .
+            ($settings['redirect_root_domain'] == 'browser' ? ' selected="selected"' : '') .
+            '>' .
+            __('Browser language', 'gtbabel-plugin') .
+            '</option>';
+        echo '<option value="source"' .
+            ($settings['redirect_root_domain'] == 'source' ? ' selected="selected"' : '') .
+            '>' .
+            __('Source language', 'gtbabel-plugin') .
+            '</option>';
+        echo '</select>';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
         echo '<label for="gtbabel_translate_text_nodes" class="gtbabel__label">';
         echo __('Translate text nodes', 'gtbabel-plugin');
         echo '</label>';

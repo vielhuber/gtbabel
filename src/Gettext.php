@@ -448,7 +448,19 @@ class Gettext
         if ($this->settings->get('lng_target') !== null) {
             return $this->settings->get('lng_target');
         }
-        return $this->getCurrentPrefix() ?? $this->settings->get('lng_source');
+        return $this->getCurrentPrefix() ?? $this->settings->getSourceLng();
+    }
+
+    function getBrowserLng()
+    {
+        if (@$_SERVER['HTTP_ACCEPT_LANGUAGE'] != '') {
+            foreach ($this->settings->getSelectedLanguageCodes() as $languages__value) {
+                if (mb_strpos($_SERVER['HTTP_ACCEPT_LANGUAGE'], $languages__value) === 0) {
+                    return $languages__value;
+                }
+            }
+        }
+        return $this->settings->getSourceLng();
     }
 
     function getPrefixFromUrl($url)
@@ -464,7 +476,7 @@ class Gettext
 
     function getLngFromUrl($url)
     {
-        return $this->getPrefixFromUrl($url) ?? $this->settings->get('lng_source');
+        return $this->getPrefixFromUrl($url) ?? $this->settings->getSourceLng();
     }
 
     function getLanguagePickerData()

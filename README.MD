@@ -55,6 +55,7 @@ $gtbabel->start([
     'lng_target' => 'en',
     'lng_folder' => '/locales',
     'prefix_source_lng' => true,
+    'redirect_root_domain' => 'browser', // 'browser'|'source' (only relevant if prefix_source_lng=true)
     'translate_text_nodes' => true,
     'translate_default_tag_nodes' => true,
     'html_lang_attribute' => true,
