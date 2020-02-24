@@ -49,7 +49,11 @@ class Router
             }
             $url .= '/';
             if (trim($this->host->getCurrentPath(), '/') != '') {
-                $url .= trim($this->host->getCurrentPath(), '/') . '/';
+                $url .= trim($this->host->getCurrentPath(), '/');
+                $url .= '/';
+            }
+            if ($this->host->getCurrentArgs() != '') {
+                $url .= $this->host->getCurrentArgs();
             }
         }
         header('Location: ' . $url, true, @$_SERVER['REQUEST_METHOD'] === 'POST' ? 307 : 301); // 307 forces the browser to repost to the new url
