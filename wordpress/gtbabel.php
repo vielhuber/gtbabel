@@ -761,6 +761,12 @@ class GtbabelWordPress
         echo $message;
         echo '<h2 class="gtbabel__subtitle">' . __('String translation', 'gtbabel-plugin') . '</h2>';
 
+        echo '<p class="gtbabel__paragraph">' .
+            __('Translations available', 'gtbabel-plugin') .
+            ': ' .
+            $pagination->count .
+            '</p>';
+
         echo '<div class="gtbabel__search">';
         echo '<form class="gtbabel__form" method="get" action="' . admin_url('admin.php') . '">';
         echo '<input type="hidden" name="page" value="gtbabel-trans" />';
