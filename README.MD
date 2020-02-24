@@ -160,7 +160,8 @@ If you want to influence that special tags should not be auto translated by the 
 
 ## HTML in gettext
 
-Gtbabel preserves inline HTML-tags and leaves them inside your gettext strings. However, attributes are automatically stripped. So
+Gtbabel preserves inline HTML-tags and leaves them inside your gettext strings.\
+However, attributes are automatically stripped. So
 
 `<a href="https://tld.com" class="foo" data-bar="baz">Hello</a> world!`
 
