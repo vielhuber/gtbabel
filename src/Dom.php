@@ -496,7 +496,32 @@ class Dom
 
     function modifyJson($json)
     {
-        $json = str_replace('foo', 'bar', $json);
+        if ($this->settings->get('translate_text_nodes') === false) {
+            return $json;
+        }
+        if ($this->gettext->sourceLngIsCurrentLng()) {
+            return $json;
+        }
+        $json = json_decode($json);
+        $this->traverseJson($json);
+        $json = json_encode($json);
         return $json;
+    }
+
+    function traverseJson(&$json)
+    {
+        if (is_array($json) || is_object($json) || $json instanceof \Traversable) {
+            foreach ($json as $json__key => &$json__value) {
+                if (is_array($json__value) || is_object($json__value) || $json__value instanceof \Traversable) {
+                    $this->traverseJson($json__value);
+                } elseif (is_string($json__value) && in_array($json__key, ['message'], true)) {
+                    $json__value = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
+                        $json__value,
+                        $this->gettext->getCurrentLng(),
+                        null
+                    );
+                }
+            }
+        }
     }
 }

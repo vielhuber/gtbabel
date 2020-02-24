@@ -451,6 +451,22 @@ class Gettext
         return $this->getCurrentPrefix() ?? $this->settings->get('lng_source');
     }
 
+    function getPrefixFromUrl($url)
+    {
+        $path = str_replace($this->host->getCurrentHost(), '', $url);
+        foreach ($this->settings->getSelectedLanguageCodes() as $languages__value) {
+            if (mb_strpos($path, '/' . $languages__value) === 0) {
+                return $languages__value;
+            }
+        }
+        return null;
+    }
+
+    function getLngFromUrl($url)
+    {
+        return $this->getPrefixFromUrl($url) ?? $this->settings->get('lng_source');
+    }
+
     function getLanguagePickerData()
     {
         $data = [];
@@ -849,6 +865,9 @@ class Gettext
     function addCurrentUrlToTranslations()
     {
         if (!$this->sourceLngIsCurrentLng()) {
+            return;
+        }
+        if ($this->host->isAjaxRequest()) {
             return;
         }
         foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
