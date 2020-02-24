@@ -166,7 +166,7 @@ These urls are automatically added to gettext (ajax requested urls are excluded)
 ## JSON Responses
 
 JSON responses are also automatically parsed by Gtbabel.\
-Currently only string values of key `message` are automatically translated.
+Currently only string values with the key `message` are automatically translated.
 
 ## Helper functions
 
