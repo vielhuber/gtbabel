@@ -159,7 +159,7 @@ If you want to influence that special tags should not be auto translated by the 
 `<p>Das ist das <span class="notranslate">Haus</span> vom Nikolaus</p>`
 
 The part before and after the span-tag gets translated (and added to gettext).\
-If you want to exclude a complete node of being translated (and not added to gettext), add the notranslate-class to the parent node:
+If you want to exclude a complete node of being translated (and not added to gettext), add a class with the value `notranslate` (or any other value defined in `exclude_dom`) to the parent node:
 
 `<p class="notranslate">Das ist das <span>Haus</span> vom Nikolaus</p>`
 
