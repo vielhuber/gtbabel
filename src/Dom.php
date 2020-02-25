@@ -118,14 +118,14 @@ class Dom
                 continue;
             }
 
-            [$originalTextWithPlaceholders, $mappingTable] = $this->gettext->placeholderConversionIn($originalText);
+            //[$originalTextWithPlaceholders, $mappingTable] = $this->gettext->placeholderConversionIn($originalText);
 
-            $translatedTextWithPlaceholders = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
-                $originalTextWithPlaceholders,
+            $translatedText = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
+                $originalText,
                 $this->gettext->getCurrentLng()
             );
 
-            $translatedText = $this->gettext->placeholderConversionOut($translatedTextWithPlaceholders, $mappingTable);
+            //$translatedText = $this->gettext->placeholderConversionOut($translatedTextWithPlaceholders, $mappingTable);
 
             $translatedText = $this->gettext->reintroduceLineBreaks($translatedText, $originalText, $originalTextRaw);
 

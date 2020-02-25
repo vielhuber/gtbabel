@@ -180,6 +180,14 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->runDiff('30.json', 200);
     }
 
+    public function test31()
+    {
+        $this->runDiff('31.html', 500, [
+            'debug_translations' => false,
+            'auto_translation' => true
+        ]);
+    }
+
     public function getDefaultSettings()
     {
         return [

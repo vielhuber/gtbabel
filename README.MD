@@ -163,35 +163,39 @@ If you want to influence that special tags should not be auto translated by the 
 Gtbabel preserves inline HTML-tags and leaves them inside your gettext strings.\
 However, attributes are automatically stripped. So
 
-`<a href="https://tld.com" class="foo" data-bar="baz">Hello</a> world!`
+`<a href="https://tld.com" class="foo" data-bar="baz">Hallo</a> Welt!`
 
 gets converted to
 
-`<a>Hello</a> world!`
+`<a>Hallo</a> Welt!`
 
 and that string is e.g. stored in a translation as
 
-`<a>Hallo</a> Welt!`
+`<a>Hello</a> world!`
 
-so that your translators are not confused.\
+so that your translators are not confused with unnecessary clutter.\
 The translated version has of course the attributes back again:
 
-`<a href="https://tld.com" class="foo" data-bar="baz">Hallo</a> Welt!`
+`<a href="https://tld.com" class="foo" data-bar="baz">Hello</a> world!`
 
 However, if ordering is crucial, Gtbabel provides a mechanism to determine order (and duplication).\
 So for example
 
-`Das deutsche <a href="https://tld.com">Brot</a> <a href="https://tld.com">vermisse</a> ich am meisten.`
+`Das deutsche <a href="https://1.com">Brot</a> <a href="https://2.com">vermisse</a> ich am meisten.`
 
 is stored in your gettext files as
 
 `Das deutsche <a>Brot</a> <a>vermisse</a> ich am meisten.`
 
-If your translations don't reflect the original order, they include hints like
+If your translations don't reflect the original order, in gettext they include hints like
 
 `I <a p="2">miss</a> German <a p="1">bread</a> the most.`
 
 where "2" stands for the second tag of the original string.
+
+The string then finally gets correctly translated to
+
+`I <a href="https://2.com">miss</a> German <a href="https://1.com">bread</a> the most.`
 
 ## Router
 

@@ -572,12 +572,46 @@ class Gettext
 
     function getTranslationAndAddDynamicallyIfNeeded($orig, $lng, $context = null)
     {
-        $trans = $this->getExistingTranslationFromCache($orig, $lng, $context);
-        if ($trans === false) {
-            $trans = $this->autoTranslateString($orig, $lng, $context);
-            $this->addStringToPotFileAndToCache($orig, $context);
-            $this->addTranslationToPoFileAndToCache($orig, $trans, $lng, $context);
+        /*
+        $orig
+        - simple: <a href="https://tld.com" class="foo" data-bar="baz">Hallo</a> Welt!
+        - complex: Das deutsche <a href="https://1.com">Brot</a> <a href="https://2.com">vermisse</a> ich am meisten.
+
+        $origWithoutAttributes
+        - simple: <a>Hallo</a> Welt!
+        - complex: Das deutsche <a>Brot</a> <a>vermisse</a> ich am meisten.
+
+        $origWithIds
+        - simple: <a href="https://tld.com" class="foo" data-bar="baz" p="1">Hallo</a> Welt!
+        - complex: Das deutsche <a href="https://1.com" p="1">Brot</a> <a href="https://2.com" p="2">vermisse</a> ich am meisten.
+
+        $transWithIds
+        - simple: <a href="https://tld.com" class="foo" data-bar="baz" p="1">Hello</a> world!
+        - complex: I <a href="https://2.com" p="2">miss</a> German <a href="https://1.com" p="1">bread</a> the most.
+
+        $transWithoutAttributes
+        - simple: <a>Hello</a> world!
+        - complex: I <a p="2">miss</a> German <a p="1">bread</a> the most.
+
+        $trans
+        - simple: <a href="https://tld.com" class="foo" data-bar="baz">Hello</a> world!
+        - complex: I <a href="https://2.com">miss</a> German <a href="https://1.com">bread</a> the most.
+        */
+
+        [$origWithoutAttributes, $mappingTable] = $this->tagManagementRemoveAttributes($orig);
+
+        $transWithoutAttributes = $this->getExistingTranslationFromCache($origWithoutAttributes, $lng, $context);
+
+        if ($transWithoutAttributes === false) {
+            $origWithIds = $this->tagManagementAddIds($orig);
+            $transWithIds = $this->autoTranslateString($origWithIds, $lng, $context);
+            $transWithoutAttributes = $this->tagManagementRemoveAttributesExceptIrregularIds($transWithIds);
+            $this->addStringToPotFileAndToCache($origWithoutAttributes, $context);
+            $this->addTranslationToPoFileAndToCache($origWithoutAttributes, $transWithoutAttributes, $lng, $context);
         }
+
+        $trans = $this->tagManagementAddAttributesAndRemoveIds($transWithoutAttributes, $mappingTable);
+
         return $trans;
     }
 
@@ -622,6 +656,40 @@ class Gettext
         }
 
         return $trans;
+    }
+
+    function tagManagementAddIds($str)
+    {
+        preg_match_all('/<[a-zA-Z]+(>|.*?[^?]>)/', $str, $matches);
+        if (!empty($matches[0])) {
+            foreach ($matches[0] as $matches__key => $matches__value) {
+                $id = $matches__key + 1;
+                $pos = mb_strrpos($matches__value, '>');
+                $new = mb_substr($matches__value, 0, $pos) . ' p="' . $id . '"' . mb_substr($matches__value, $pos);
+                $str = __str_replace_first($matches__value, $new, $str);
+            }
+        }
+        return $str;
+    }
+
+    function tagManagementRemoveIds($str)
+    {
+        preg_match_all('/<[a-zA-Z]+(>|.*?[^?]>)/', $str, $matches);
+        if (!empty($matches[0])) {
+            foreach ($matches[0] as $matches__value) {
+                $pos1 = mb_strpos($matches__value, ' p="');
+                if ($pos1 === false) {
+                    continue;
+                }
+                $pos2 = mb_strpos($matches__value, '"', $pos1);
+                if ($pos2 === false) {
+                    continue;
+                }
+                $new = mb_substr($matches__value, 0, $pos1) . mb_substr($matches__value, $pos2 + 1);
+                $str = __str_replace_first($matches__value, $new, $str);
+            }
+        }
+        return $str;
     }
 
     function placeholderConversionIn($str)
