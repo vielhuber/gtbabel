@@ -20,12 +20,14 @@ class Gettext
     public $utils;
     public $host;
     public $settings;
+    public $tags;
 
-    function __construct(Utils $utils = null, Host $host = null, Settings $settings = null)
+    function __construct(Utils $utils = null, Host $host = null, Settings $settings = null, Tags $tags = null)
     {
         $this->utils = $utils ?: new Utils();
         $this->host = $host ?: new Host();
         $this->settings = $settings ?: new Settings();
+        $this->tags = $tags ?: new Tags();
     }
 
     function preloadGettextInCache()
@@ -574,43 +576,49 @@ class Gettext
     {
         /*
         $orig
-        - simple: <a href="https://tld.com" class="foo" data-bar="baz">Hallo</a> Welt!
-        - complex: Das deutsche <a href="https://1.com">Brot</a> <a href="https://2.com">vermisse</a> ich am meisten.
+        - <a href="https://tld.com" class="foo" data-bar="baz">Hallo</a> Welt!
+        - Das deutsche <a href="https://1.com">Brot</a> <a href="https://2.com">vermisse</a> ich am meisten.
+        - <a class="notranslate foo">Hallo</a> Welt!
 
         $origWithoutAttributes
-        - simple: <a>Hallo</a> Welt!
-        - complex: Das deutsche <a>Brot</a> <a>vermisse</a> ich am meisten.
+        - <a>Hallo</a> Welt!
+        - Das deutsche <a>Brot</a> <a>vermisse</a> ich am meisten.
+        - <a class="notranslate">Hallo</a> Welt!
 
         $origWithIds
-        - simple: <a href="https://tld.com" class="foo" data-bar="baz" p="1">Hallo</a> Welt!
-        - complex: Das deutsche <a href="https://1.com" p="1">Brot</a> <a href="https://2.com" p="2">vermisse</a> ich am meisten.
+        - <a href="https://tld.com" class="foo" data-bar="baz" p="1">Hallo</a> Welt!
+        - Das deutsche <a href="https://1.com" p="1">Brot</a> <a href="https://2.com" p="2">vermisse</a> ich am meisten.
+        - <a class="notranslate foo" p="1">Hallo</a> Welt!
 
         $transWithIds
-        - simple: <a href="https://tld.com" class="foo" data-bar="baz" p="1">Hello</a> world!
-        - complex: I <a href="https://2.com" p="2">miss</a> German <a href="https://1.com" p="1">bread</a> the most.
+        - <a href="https://tld.com" class="foo" data-bar="baz" p="1">Hello</a> world!
+        - I <a href="https://2.com" p="2">miss</a> German <a href="https://1.com" p="1">bread</a> the most.
+        - <a class="notranslate foo" p="1">Hallo</a> world!
 
         $transWithoutAttributes
-        - simple: <a>Hello</a> world!
-        - complex: I <a p="2">miss</a> German <a p="1">bread</a> the most.
+        - <a>Hello</a> world!
+        - I <a p="2">miss</a> German <a p="1">bread</a> the most.
+        - <a class="notranslate">Hallo</a> world!
 
         $trans
-        - simple: <a href="https://tld.com" class="foo" data-bar="baz">Hello</a> world!
-        - complex: I <a href="https://2.com">miss</a> German <a href="https://1.com">bread</a> the most.
+        - <a href="https://tld.com" class="foo" data-bar="baz">Hello</a> world!
+        - I <a href="https://2.com">miss</a> German <a href="https://1.com">bread</a> the most.
+        - <a class="notranslate foo">Hallo</a> world!
         */
 
-        [$origWithoutAttributes, $mappingTable] = $this->tagManagementRemoveAttributes($orig);
+        [$origWithoutAttributes, $mappingTable] = $this->tags->removeAttributesAndSaveMapping($orig);
 
         $transWithoutAttributes = $this->getExistingTranslationFromCache($origWithoutAttributes, $lng, $context);
 
         if ($transWithoutAttributes === false) {
-            $origWithIds = $this->tagManagementAddIds($orig);
+            $origWithIds = $this->tags->addIds($orig);
             $transWithIds = $this->autoTranslateString($origWithIds, $lng, $context);
-            $transWithoutAttributes = $this->tagManagementRemoveAttributesExceptIrregularIds($transWithIds);
+            $transWithoutAttributes = $this->tags->removeAttributesExceptIrregularIds($transWithIds);
             $this->addStringToPotFileAndToCache($origWithoutAttributes, $context);
             $this->addTranslationToPoFileAndToCache($origWithoutAttributes, $transWithoutAttributes, $lng, $context);
         }
 
-        $trans = $this->tagManagementAddAttributesAndRemoveIds($transWithoutAttributes, $mappingTable);
+        $trans = $this->tags->addAttributesAndRemoveIds($transWithoutAttributes, $mappingTable);
 
         return $trans;
     }
@@ -656,77 +664,6 @@ class Gettext
         }
 
         return $trans;
-    }
-
-    function tagManagementAddIds($str)
-    {
-        preg_match_all('/<[a-zA-Z]+(>|.*?[^?]>)/', $str, $matches);
-        if (!empty($matches[0])) {
-            foreach ($matches[0] as $matches__key => $matches__value) {
-                $id = $matches__key + 1;
-                $pos = mb_strrpos($matches__value, '>');
-                $new = mb_substr($matches__value, 0, $pos) . ' p="' . $id . '"' . mb_substr($matches__value, $pos);
-                $str = __str_replace_first($matches__value, $new, $str);
-            }
-        }
-        return $str;
-    }
-
-    function tagManagementRemoveIds($str)
-    {
-        preg_match_all('/<[a-zA-Z]+(>|.*?[^?]>)/', $str, $matches);
-        if (!empty($matches[0])) {
-            foreach ($matches[0] as $matches__value) {
-                $pos1 = mb_strpos($matches__value, ' p="');
-                if ($pos1 === false) {
-                    continue;
-                }
-                $pos2 = mb_strpos($matches__value, '"', $pos1);
-                if ($pos2 === false) {
-                    continue;
-                }
-                $new = mb_substr($matches__value, 0, $pos1) . mb_substr($matches__value, $pos2 + 1);
-                $str = __str_replace_first($matches__value, $new, $str);
-            }
-        }
-        return $str;
-    }
-
-    function placeholderConversionIn($str)
-    {
-        $mappingTable = [];
-        preg_match_all('/<[a-zA-Z]+(>|.*?[^?]>)|<\/[^<>]*>/', $str, $matches);
-        if (!empty($matches[0])) {
-            foreach ($matches[0] as $matches__value) {
-                $pos_begin = 1;
-                $pos_end = mb_strrpos($matches__value, '>');
-                foreach (['/', ' '] as $alt__value) {
-                    $pos_end_ = mb_strpos($matches__value, $alt__value, $pos_begin + 1);
-                    if ($pos_end_ !== false && $pos_end_ < $pos_end) {
-                        $pos_end = $pos_end_;
-                    }
-                }
-                $placeholder = '';
-                $placeholder .= '<';
-                $placeholder .= mb_substr($matches__value, $pos_begin, $pos_end - $pos_begin);
-                // whitelist notranslate attribute
-                if (mb_strpos($matches__value, 'notranslate') !== false) {
-                    $placeholder .= ' class="notranslate"';
-                }
-                $placeholder .= '>';
-                $str = __str_replace_first($matches__value, $placeholder, $str);
-                $mappingTable[] = [$placeholder, $matches__value];
-            }
-        }
-        return [$str, $mappingTable];
-    }
-
-    function placeholderConversionOut($str, $mappingTable)
-    {
-        foreach ($mappingTable as $mappingTable__value) {
-            $str = __str_replace_first($mappingTable__value[0], $mappingTable__value[1], $str);
-        }
-        return $str;
     }
 
     function removeLineBreaks($orig)

@@ -7,13 +7,20 @@ class Router
     public $gettext;
     public $host;
     public $settings;
+    public $tags;
 
-    function __construct(Utils $utils = null, Gettext $gettext = null, Host $host = null, Settings $settings = null)
-    {
+    function __construct(
+        Utils $utils = null,
+        Gettext $gettext = null,
+        Host $host = null,
+        Settings $settings = null,
+        Tags $tags = null
+    ) {
         $this->utils = $utils ?: new Utils();
         $this->gettext = $gettext ?: new Gettext();
         $this->host = $host ?: new Host();
         $this->settings = $settings ?: new Settings();
+        $this->tags = $tags ?: new Tags();
     }
 
     function redirectPrefixedSourceLng()

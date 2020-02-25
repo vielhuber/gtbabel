@@ -71,7 +71,7 @@ $gtbabel->start([
     'api_stats' => true,
     'api_stats_filename' => '/api_stats.txt',
     'exclude_urls' => ['/backend'],
-    'exclude_dom' => ['.lngpicker'],
+    'exclude_dom' => ['.notranslate', '.lngpicker'],
     'force_tokenize' => ['.force-tokenize'],
     'include_dom' => [
         [
@@ -154,9 +154,14 @@ The following code gets converted to 1 token (not 3):
 
 If you want to influence that behaviour, use the `force_tokenize` option and provide the selector of the parent element in order to not tokenize its children.
 
-If you want to influence that special tags should not be auto translated by the Google Translation API, use a special class:
+If you want to influence that special tags should not be auto translated by the Google/Microsoft Translation API, use a special class:
 
 `<p>Das ist das <span class="notranslate">Haus</span> vom Nikolaus</p>`
+
+The part before and after the span-tag gets translated (and added to gettext).\
+If you want to exclude a complete node of being translated (and not added to gettext), add the notranslate-class to the parent node:
+
+`<p class="notranslate">Das ist das <span>Haus</span> vom Nikolaus</p>`
 
 ## HTML in gettext
 

@@ -188,6 +188,14 @@ class Test extends \PHPUnit\Framework\TestCase
         ]);
     }
 
+    public function test32()
+    {
+        $this->runDiff('32.html', 500, [
+            'debug_translations' => false,
+            'auto_translation' => true
+        ]);
+    }
+
     public function getDefaultSettings()
     {
         return [

@@ -47,7 +47,7 @@ class Settings
             'api_stats' => true,
             'api_stats_filename' => '/api_stats.txt',
             'exclude_urls' => ['/backend'],
-            'exclude_dom' => ['.lngpicker'],
+            'exclude_dom' => ['.notranslate', '.lngpicker'],
             'force_tokenize' => ['.force-tokenize'],
             'include_dom' => [
                 [

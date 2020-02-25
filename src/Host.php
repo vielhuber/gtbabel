@@ -12,11 +12,13 @@ class Host
 
     public $utils;
     public $settings;
+    public $tags;
 
-    function __construct(Utils $utils = null, Settings $settings = null)
+    function __construct(Utils $utils = null, Settings $settings = null, Tags $tags = null)
     {
         $this->utils = $utils ?: new Utils();
         $this->settings = $settings ?: new Settings();
+        $this->tags = $tags ?: new Tags();
     }
 
     function setup()

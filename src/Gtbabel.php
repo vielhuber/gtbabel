@@ -9,6 +9,7 @@ class Gtbabel
     public $gettext;
     public $router;
     public $settings;
+    public $tags;
     public $translation;
 
     public $started;
@@ -19,14 +20,16 @@ class Gtbabel
         Host $host = null,
         Gettext $gettext = null,
         Router $router = null,
-        Settings $settings = null
+        Settings $settings = null,
+        Tags $tags = null
     ) {
         $this->settings = $settings ?: new Settings();
         $this->utils = $utils ?: new Utils($this->settings);
-        $this->host = $host ?: new Host($this->utils, $this->settings);
-        $this->gettext = $gettext ?: new Gettext($this->utils, $this->host, $this->settings);
-        $this->dom = $dom ?: new Dom($this->utils, $this->gettext, $this->host, $this->settings);
-        $this->router = $router ?: new Router($this->utils, $this->gettext, $this->host, $this->settings);
+        $this->tags = $tags ?: new Tags($this->utils, $this->settings);
+        $this->host = $host ?: new Host($this->utils, $this->settings, $this->tags);
+        $this->gettext = $gettext ?: new Gettext($this->utils, $this->host, $this->settings, $this->tags);
+        $this->dom = $dom ?: new Dom($this->utils, $this->gettext, $this->host, $this->settings, $this->tags);
+        $this->router = $router ?: new Router($this->utils, $this->gettext, $this->host, $this->settings, $this->tags);
     }
 
     function start($args = [])
