@@ -196,6 +196,11 @@ class Test extends \PHPUnit\Framework\TestCase
         ]);
     }
 
+    public function test33()
+    {
+        $this->runDiff('33.html', 500);
+    }
+
     public function getDefaultSettings()
     {
         return [

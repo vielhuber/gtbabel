@@ -740,7 +740,7 @@ class GtbabelWordPress
 
         if (@$_GET['s'] != '') {
             foreach ($translations as $translations__key => $translations__value) {
-                if (mb_strpos($translations__value['orig'], @$_GET['s']) === false) {
+                if (mb_stripos($translations__value['orig'], @$_GET['s']) === false) {
                     unset($translations[$translations__key]);
                 }
             }

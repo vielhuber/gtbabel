@@ -514,7 +514,7 @@ class Gettext
             return $trans;
         }
         if ($context === 'title') {
-            foreach (['-', '–', '—', ':', '·', '•', '*', '⋆', '|', '~', '«', '»', '<', '>'] as $delimiters__value) {
+            foreach (['|', '·', '•', '>', '-', '–', '—', ':', '*', '⋆', '~', '«', '»', '<'] as $delimiters__value) {
                 $orig = str_replace(' ', ' ', $orig); // replace hidden &nbsp; chars
                 if (mb_strpos($orig, ' ' . $delimiters__value . ' ') !== false) {
                     $orig_parts = explode(' ' . $delimiters__value . ' ', $orig);
