@@ -506,6 +506,13 @@ class Gettext
 
     function prepareTranslationAndAddDynamicallyIfNeeded($orig, $lng, $context = null)
     {
+        // auto determine context
+        if ($context === null || $context == '') {
+            if (mb_strpos($orig, 'http') === 0 && mb_strpos($orig, ' ') === false) {
+                $context = 'slug';
+            }
+        }
+
         if ($context === 'slug') {
             $trans = $this->getTranslationOfLinkHrefAndAddDynamicallyIfNeeded($orig, $lng, true);
             if ($trans === null) {

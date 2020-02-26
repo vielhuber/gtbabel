@@ -127,7 +127,8 @@ class Dom
 
             $translatedText = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
                 $originalText,
-                $this->gettext->getCurrentLng()
+                $this->gettext->getCurrentLng(),
+                null
             );
 
             $translatedText = $this->gettext->reintroduceLineBreaks($translatedText, $originalText, $originalTextRaw);
