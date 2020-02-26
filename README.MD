@@ -94,16 +94,18 @@ $gtbabel->stop();
 
 ## Other usage
 
-Gtbabel catches the content between `start()` and `stop()` with [https://www.php.net/manual/de/function.ob-start.php](output buffering).\
+Gtbabel catches the content between `start()` and `stop()` with [output buffering](https://www.php.net/manual/de/function.ob-start.php).\
 However, you can also use Gtbabel more directly:
 
 ```php
 $gtbabel = new Gtbabel();
+
 $gtbabel->translate('<p>Dies ist ein Test!</p>', [
     'lng_source' => 'de',
     'lng_target' => 'en',
     'google_translation_api_key' => '...'
 ]); // <p>This is a test!</p>
+
 $gtbabel->tokenize('<p>Dies ist ein Test!</p>'); // [['string' => 'This is a test!', 'context' => null]]
 ```
 
