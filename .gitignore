@@ -8,3 +8,5 @@ log.txt
 /wordpress/vendor/
 /.phpunit.result.cache
 /tests/files/**/*_expected
+gtbabel-api-stats.txt
+gtbabel-discovery-log.txt

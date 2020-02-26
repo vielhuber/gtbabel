@@ -249,7 +249,6 @@ class Test extends \PHPUnit\Framework\TestCase
             'debug_translations' => true,
             'auto_add_translations_to_gettext' => false,
             'auto_add_added_date_to_gettext' => true,
-            'auto_add_last_seen_date_to_gettext' => false,
             'exclude_urls' => null,
             'html_lang_attribute' => false,
             'html_hreflang_tags' => false,
@@ -257,7 +256,9 @@ class Test extends \PHPUnit\Framework\TestCase
             'auto_translation_service' => 'google',
             'google_translation_api_key' => getenv('GOOGLE_TRANSLATION_API_KEY'),
             'api_stats' => true,
-            'api_stats_filename' => '/api_stats.txt'
+            'api_stats_filename' => '/gtbabel-api-stats.txt',
+            'discovery_log' => false,
+            'discovery_log_filename' => '/gtbabel-discovery-log.txt'
         ];
     }
 

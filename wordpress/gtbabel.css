@@ -124,3 +124,8 @@
 .gtbabel__search .gtbabel__submit {
     flex: 0 1 80px;
 }
+
+.gtbabel__highlight {
+    color: red;
+    font-weight: bold;
+}

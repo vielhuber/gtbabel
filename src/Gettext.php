@@ -16,19 +16,25 @@ class Gettext
     public $gettext_pot;
     public $gettext_pot_cache;
     public $gettext_save_counter;
-    public $gettext_discovered;
 
     public $utils;
     public $host;
     public $settings;
     public $tags;
+    public $log;
 
-    function __construct(Utils $utils = null, Host $host = null, Settings $settings = null, Tags $tags = null)
-    {
+    function __construct(
+        Utils $utils = null,
+        Host $host = null,
+        Settings $settings = null,
+        Tags $tags = null,
+        Log $log = null
+    ) {
         $this->utils = $utils ?: new Utils();
         $this->host = $host ?: new Host();
         $this->settings = $settings ?: new Settings();
         $this->tags = $tags ?: new Tags();
+        $this->log = $log ?: new Log();
     }
 
     function preloadGettextInCache()
@@ -39,10 +45,8 @@ class Gettext
         $this->gettext_pot = [];
         $this->gettext_pot_cache = [];
         $this->gettext_save_counter = [];
-        $this->gettext_discovered = [];
 
         $poLoader = new PoLoader();
-        $moLoader = new MoLoader();
 
         // pot
         $filename = $this->getLngFilename('pot', '_template');
@@ -121,16 +125,8 @@ class Gettext
 
     function getExistingTranslationFromCache($str, $lng, $context = null)
     {
-        // if last-seen attribute should be added
-        if ($this->settings->get('auto_add_last_seen_date_to_gettext') === true) {
-            $this->addLastSeenDateToString($str, $lng, $context);
-        }
-
         // track discovery
-        $this->gettext_discovered[] = [
-            'string' => $str,
-            'context' => $context
-        ];
+        $this->log->discoveryLogAdd($this->host->getCurrentUrlWithArgs(), $str, $context);
 
         if (
             $str === '' ||
@@ -158,33 +154,6 @@ class Gettext
             return false;
         }
         return $this->gettext_cache_reverse[$lng][$context ?? ''][$str];
-    }
-
-    function addLastSeenDateToString($str, $lng, $context = null)
-    {
-        foreach (['pot', 'po'] as $type) {
-            if ($type === 'pot') {
-                $translation = $this->gettext[$lng]->find($context, $str);
-            }
-            if ($type === 'po') {
-                $translation = $this->gettext_pot->find($context, $str);
-            }
-            if ($translation !== null) {
-                $comments = $translation->getExtractedComments();
-                foreach ($comments as $comments__value) {
-                    if (strpos($comments__value, 'last-seen') === 0) {
-                        $comments->delete($comments__value);
-                    }
-                }
-                $comments->add('last-seen: ' . date('Y-m-d H:i:s'));
-                if ($type === 'pot') {
-                    $this->gettext_save_counter['pot'] = true;
-                }
-                if ($type === 'po') {
-                    $this->gettext_save_counter['po'][$lng] = true;
-                }
-            }
-        }
     }
 
     function getAllTranslationsFromFiles()
@@ -304,6 +273,10 @@ class Gettext
     {
         $deleted = 0;
 
+        $discovery_strings = array_map(function ($a) {
+            return $a['string'] . '#' . $a['context'];
+        }, $this->log->discoveryLogGet());
+
         $poLoader = new PoLoader();
         $poGenerator = new PoGenerator();
         $moGenerator = new MoGenerator();
@@ -313,7 +286,7 @@ class Gettext
         $pot = $poLoader->loadFile($this->getLngFilename('pot', '_template'));
         $to_remove = null;
         foreach ($pot->getTranslations() as $gettext__value) {
-            if (!$this->isUnusedTranslation($gettext__value)) {
+            if (in_array($gettext__value->getOriginal() . '#' . $gettext__value->getContext(), $discovery_strings)) {
                 continue;
             }
             $to_remove = $gettext__value;
@@ -332,7 +305,9 @@ class Gettext
             $po = $poLoader->loadFile($this->getLngFilename('po', $languages__value));
             $to_remove = null;
             foreach ($po->getTranslations() as $gettext__value) {
-                if (!$this->isUnusedTranslation($gettext__value)) {
+                if (
+                    in_array($gettext__value->getOriginal() . '#' . $gettext__value->getContext(), $discovery_strings)
+                ) {
                     continue;
                 }
                 $to_remove = $gettext__value;
@@ -347,24 +322,6 @@ class Gettext
         }
 
         return $deleted;
-    }
-
-    function isUnusedTranslation($gettext)
-    {
-        $comments = $gettext->getExtractedComments();
-        foreach ($comments as $comments__value) {
-            if (strpos($comments__value, 'last-seen') !== 0) {
-                continue;
-            }
-            $date = trim(substr($comments__value, strpos($comments__value, ':') + 1));
-            if ($date == '') {
-                continue;
-            }
-            if (strtotime($date) >= strtotime('now - 1 hour')) {
-                return false;
-            }
-        }
-        return true;
     }
 
     function addStringToPotFileAndToCache($str, $context, $comment = null)
@@ -654,14 +611,14 @@ class Gettext
                     $api_key = $api_key[array_rand($api_key)];
                 }
                 $trans = __translate_google($orig, $from_lng, $to_lng, $api_key);
-                $this->utils->apiStatsAdd('google', mb_strlen($orig));
+                $this->log->apiStatsIncrease('google', mb_strlen($orig));
             } elseif ($this->settings->get('auto_translation_service') === 'microsoft') {
                 $api_key = $this->settings->get('microsoft_translation_api_key');
                 if (is_array($api_key)) {
                     $api_key = $api_key[array_rand($api_key)];
                 }
                 $trans = __translate_microsoft($orig, $from_lng, $to_lng, $api_key);
-                $this->utils->apiStatsAdd('microsoft', mb_strlen($orig));
+                $this->log->apiStatsIncrease('microsoft', mb_strlen($orig));
             }
             if ($context === 'slug') {
                 $trans = $this->utils->slugify($trans, $orig, $to_lng);
@@ -906,18 +863,5 @@ class Gettext
         foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
             $this->prepareTranslationAndAddDynamicallyIfNeeded($this->host->getCurrentUrl(), $languages__value, 'slug');
         }
-    }
-
-    function getDiscoveredStrings()
-    {
-        $data = $this->gettext_discovered;
-        $data = __array_unique($data);
-        uasort($data, function ($a, $b) {
-            if ($a['context'] != $b['context']) {
-                return strcmp($a['context'], $b['context']);
-            }
-            return strcmp($a['string'], $b['string']);
-        });
-        return $data;
     }
 }

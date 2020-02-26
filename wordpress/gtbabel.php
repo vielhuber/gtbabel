@@ -201,7 +201,8 @@ class GtbabelWordPress
                         'debug_translations',
                         'auto_add_translations_to_gettext',
                         'auto_translation',
-                        'api_stats'
+                        'api_stats',
+                        'discovery_log'
                     ]
                     as $checkbox__value
                 ) {
@@ -526,6 +527,28 @@ class GtbabelWordPress
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_discovery_log" class="gtbabel__label">';
+        echo __('Enable discovery log', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_discovery_log" name="gtbabel[discovery_log]" value="1"' .
+            ($settings['discovery_log'] == '1' ? ' checked="checked"' : '') .
+            ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_discovery_log_filename" class="gtbabel__label">';
+        echo __('Discovery log file', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input" type="text" id="gtbabel_discovery_log_filename" name="gtbabel[discovery_log_filename]" value="' .
+            $settings['discovery_log_filename'] .
+            '" />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
         echo '<label for="gtbabel_exclude_urls" class="gtbabel__label">';
         echo __('Exclude urls', 'gtbabel-plugin');
         echo '</label>';
@@ -671,7 +694,7 @@ class GtbabelWordPress
             ) {
                 echo '<li>';
                 echo $service__value . ': ';
-                $cur = $this->gtbabel->utils->apiStatsGet($service__key);
+                $cur = $this->gtbabel->log->apiStatsGet($service__key);
                 echo $cur;
                 echo ' ';
                 echo __('Characters', 'gtbabel-plugin');
@@ -739,25 +762,31 @@ class GtbabelWordPress
         $translations = $this->gtbabel->gettext->getAllTranslationsFromFiles();
 
         if (@$_GET['url'] != '') {
-            /*
-            TODO
-            - Wir müssen das komplett anders machen
-            - fetch muss für ALLE urls (auch für die Übersetzungen! ausgeführt werden)
-            - die übersetzten urls erhalten wir: 1. fetch, dann get_lngpicker!
-            - vorher aktivieren wir das setting "discovery_log_enable" => true
-            - danach deaktivieren wir das setting wieder und löschen die log datei
-            - anschließend sammeln wir uns die übersetzten strings aus der log
-            - was auch getan werden muss: last-seen komplett entfernen und preloader komplett umbauen auf discovery log!
-            */
-            $html = __fetch($_GET['url'] . '?no_cache=1');
-            $gtbabel_tokenizer = new Gtbabel();
-            $discovered_strings = $gtbabel_tokenizer->tokenize($html, get_option('gtbabel_settings'));
-            $discovered_strings = array_map(function ($a) {
+            $url = $_GET['url'];
+            $urls = [];
+            $urls[] = $url . '?no_cache=1';
+            $discovery_log_prev = $this->getSetting('discovery_log');
+            if ($discovery_log_prev === false) {
+                $this->changeSetting('discovery_log', true);
+            }
+            __fetch($url . '?no_cache=1');
+            // subsequent urls are now available (we need to refresh the current session)
+            $this->start();
+            foreach ($this->gtbabel->settings->getSelectedLanguageCodesWithoutSource() as $lngs__value) {
+                $url_trans = $this->gtbabel->gettext->getUrlTranslationInLanguage($lngs__value, $url);
+                __fetch($url_trans . '?no_cache=1');
+                $urls[] = $url_trans . '?no_cache=1';
+            }
+            if ($discovery_log_prev === false) {
+                $this->changeSetting('discovery_log', false);
+            }
+            $discovery_strings = array_map(function ($a) {
                 return $a['string'] . '#' . $a['context'];
-            }, $discovered_strings);
+            }, $this->gtbabel->log->discoveryLogGet($urls));
+            $this->gtbabel->log->discoveryLogReset();
             foreach ($translations as $translations__key => $translations__value) {
                 if (
-                    !in_array($translations__value['orig'] . '#' . $translations__value['context'], $discovered_strings)
+                    !in_array($translations__value['orig'] . '#' . $translations__value['context'], $discovery_strings)
                 ) {
                     unset($translations[$translations__key]);
                 }
@@ -807,6 +836,12 @@ class GtbabelWordPress
         echo '</div>';
 
         if (!empty($translations)) {
+            if (@$_GET['url'] != '') {
+                echo '<p class="gtbabel__paragraph gtbabel__highlight">' .
+                    __('Warning: The strings below could also be used on other pages.', 'gtbabel-plugin') .
+                    '</p>';
+            }
+
             echo '<form class="gtbabel__form" method="post" action="' .
                 admin_url('admin.php?page=gtbabel-trans&p=' . $pagination->cur) .
                 '">';
@@ -1039,6 +1074,15 @@ class GtbabelWordPress
         update_option('gtbabel_settings', $settings);
     }
 
+    private function getSetting($key)
+    {
+        $settings = get_option('gtbabel_settings');
+        if (!array_key_exists($key, $settings)) {
+            return null;
+        }
+        return $settings[$key];
+    }
+
     private function initBackendAutoTranslate($chunk = 0, $delete_unused = false)
     {
         $chunk_size = 5;
@@ -1072,6 +1116,14 @@ class GtbabelWordPress
             }
         }
 
+        // prepare delete unused
+        $discovery_log_prev = $this->getSetting('discovery_log');
+        if ($delete_unused === true) {
+            if ($discovery_log_prev === false) {
+                $this->changeSetting('discovery_log', true);
+            }
+        }
+
         // do next chunk
         for ($i = $chunk_size * $chunk; $i < $chunk_size * $chunk + $chunk_size; $i++) {
             if (!isset($queue[$i])) {
@@ -1086,16 +1138,8 @@ class GtbabelWordPress
                 $url = $this->gtbabel->gettext->getUrlTranslationInLanguage($queue[$i]['convert_to_lng'], $url);
             }
 
-            if ($delete_unused === true) {
-                $this->changeSetting('auto_add_last_seen_date_to_gettext', true);
-            }
-
             // append a pseudo get parameter, so that frontend cache plugins don't work
             __fetch($url . '?no_cache=1');
-
-            if ($delete_unused === true) {
-                $this->changeSetting('auto_add_last_seen_date_to_gettext', false);
-            }
 
             echo __('Loading', 'gtbabel-plugin');
             echo '... ' . $url . '<br/>';
@@ -1119,10 +1163,17 @@ class GtbabelWordPress
         echo '</strong>';
         echo '<br/>';
 
+        if ($delete_unused === true) {
+            if ($discovery_log_prev === false) {
+                $this->changeSetting('discovery_log', false);
+            }
+        }
+
         // if finished
         if ($chunk_size * $chunk + $chunk_size > count($queue) - 1) {
             if ($delete_unused === true) {
                 $deleted = $this->gtbabel->gettext->deleteUnusedTranslations();
+                $this->gtbabel->log->discoveryLogReset();
                 echo __('Deleted strings', 'gtbabel-plugin') . ': ' . $deleted;
                 echo '<br/>';
             }

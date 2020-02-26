@@ -9,6 +9,7 @@ class Gtbabel
     public $gettext;
     public $router;
     public $settings;
+    public $log;
     public $tags;
     public $translation;
 
@@ -21,15 +22,19 @@ class Gtbabel
         Gettext $gettext = null,
         Router $router = null,
         Settings $settings = null,
+        Log $log = null,
         Tags $tags = null
     ) {
         $this->settings = $settings ?: new Settings();
         $this->utils = $utils ?: new Utils($this->settings);
         $this->tags = $tags ?: new Tags($this->utils, $this->settings);
         $this->host = $host ?: new Host($this->utils, $this->settings, $this->tags);
-        $this->gettext = $gettext ?: new Gettext($this->utils, $this->host, $this->settings, $this->tags);
-        $this->dom = $dom ?: new Dom($this->utils, $this->gettext, $this->host, $this->settings, $this->tags);
-        $this->router = $router ?: new Router($this->utils, $this->gettext, $this->host, $this->settings, $this->tags);
+        $this->log = $log ?: new Log($this->utils, $this->settings, $this->host);
+        $this->gettext = $gettext ?: new Gettext($this->utils, $this->host, $this->settings, $this->tags, $this->log);
+        $this->dom =
+            $dom ?: new Dom($this->utils, $this->gettext, $this->host, $this->settings, $this->tags, $this->log);
+        $this->router =
+            $router ?: new Router($this->utils, $this->gettext, $this->host, $this->settings, $this->tags, $this->log);
     }
 
     function start($args = [])
@@ -69,7 +74,7 @@ class Gtbabel
     function reset()
     {
         $this->gettext->resetTranslations();
-        $this->utils->apiStatsReset();
+        $this->log->apiStatsReset();
     }
 
     function translate($content, $args = [])
@@ -83,13 +88,17 @@ class Gtbabel
 
     function tokenize($content, $args = [])
     {
-        // set fixed source and target (important: they just need to be different
+        // set fixed source and target (important: they just need to be different)
         $args['lng_source'] = 'de';
         $args['lng_target'] = 'en';
+        $args['discovery_log'] = true;
         $this->settings->set($args);
         $this->host->setup();
         $this->gettext->preloadGettextInCache();
+        $this->log->discoveryLogReset();
         $content = $this->dom->modifyContent($content);
-        return $this->gettext->getDiscoveredStrings();
+        $data = $this->log->discoveryLogGet();
+        $this->log->discoveryLogReset();
+        return $data;
     }
 }

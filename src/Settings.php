@@ -36,7 +36,6 @@ class Settings
             'debug_translations' => false,
             'auto_add_translations_to_gettext' => false,
             'auto_add_added_date_to_gettext' => true,
-            'auto_add_last_seen_date_to_gettext' => false,
             'auto_translation' => true,
             'auto_translation_service' => 'google',
             'google_translation_api_key' => [
@@ -45,7 +44,9 @@ class Settings
             ],
             'microsoft_translation_api_key' => ['xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'],
             'api_stats' => true,
-            'api_stats_filename' => '/api_stats.txt',
+            'api_stats_filename' => '/gtbabel-api-stats.txt',
+            'discovery_log' => false,
+            'discovery_log_filename' => '/gtbabel-discovery-log.txt',
             'exclude_urls' => ['/backend'],
             'exclude_dom' => ['.notranslate', '.lngpicker'],
             'force_tokenize' => ['.force-tokenize'],
