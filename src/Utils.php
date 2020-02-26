@@ -150,6 +150,6 @@ class Utils
         if (strip_tags($response) !== $response) {
             return 'html';
         }
-        return null;
+        return 'html';
     }
 }

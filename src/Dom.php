@@ -246,6 +246,16 @@ class Dom
         }
     }
 
+    function modifyContent($content)
+    {
+        if ($this->utils->getContentType($content) === 'html') {
+            $content = $this->modifyHtml($content);
+        } elseif ($this->utils->getContentType($content) === 'json') {
+            $content = $this->modifyJson($content);
+        }
+        return $content;
+    }
+
     function modifyHtml($html)
     {
         $this->setupDomDocument($html);
@@ -254,15 +264,13 @@ class Dom
         $this->preloadForceTokenize();
         $this->modifyTextNodes();
         $this->modifyTagNodes();
-        $this->finishDomDocument();
-        $html = $this->finishDomDocument();
+        $html = $this->finishDomDocument($html);
         return $html;
     }
 
     function setupDomDocument($html)
     {
         $this->DOMDocument = new \DOMDocument();
-
         // if the html source doesn't contain a valid utf8 header, domdocument interprets is as iso
         // we circumvent this with mb_convert_encoding
         //@$this->DOMDocument->loadHTML($html);
@@ -270,12 +278,28 @@ class Dom
         $this->DOMXpath = new \DOMXpath($this->DOMDocument);
     }
 
-    function finishDomDocument()
+    function finishDomDocument($htmlOriginal)
     {
-        $html = $this->DOMDocument->saveHTML();
+        $htmlModified = $this->DOMDocument->saveHTML();
         // since domdocument converts all umlauts to html entities, we revert that completely
-        $html = html_entity_decode($html);
-        return $html;
+        $htmlModified = html_entity_decode($htmlModified);
+        // if domdocument added previously a default header, we squish that
+        if (
+            mb_stripos($htmlOriginal, '<!DOCTYPE') !== 0 &&
+            mb_stripos($htmlOriginal, '<html') !== 0 &&
+            mb_stripos($htmlModified, '<body>') !== false &&
+            mb_stripos($htmlModified, '</body>') !== false
+        ) {
+            $pos1 = mb_strpos($htmlModified, '<body>') + mb_strlen('<body>');
+            $pos2 = mb_strpos($htmlModified, '</body>');
+            $htmlModified = mb_substr($htmlModified, $pos1, $pos2 - $pos1);
+            if (mb_stripos($htmlOriginal, '<p') !== 0 && mb_stripos($htmlModified, '<p') === 0) {
+                $pos1 = mb_strpos($htmlModified, '<p>') + mb_strlen('<p>');
+                $pos2 = mb_strpos($htmlModified, '</p>');
+                $htmlModified = mb_substr($htmlModified, $pos1, $pos2 - $pos1);
+            }
+        }
+        return $htmlModified;
     }
 
     function setLangTags()

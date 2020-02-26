@@ -16,6 +16,7 @@ class Gettext
     public $gettext_pot;
     public $gettext_pot_cache;
     public $gettext_save_counter;
+    public $gettext_discovered;
 
     public $utils;
     public $host;
@@ -38,6 +39,7 @@ class Gettext
         $this->gettext_pot = [];
         $this->gettext_pot_cache = [];
         $this->gettext_save_counter = [];
+        $this->gettext_discovered = [];
 
         $poLoader = new PoLoader();
         $moLoader = new MoLoader();
@@ -123,6 +125,13 @@ class Gettext
         if ($this->settings->get('auto_add_last_seen_date_to_gettext') === true) {
             $this->addLastSeenDateToString($str, $lng, $context);
         }
+
+        // track discovery
+        $this->gettext_discovered[] = [
+            'string' => $str,
+            'context' => $context
+        ];
+
         if (
             $str === '' ||
             $str === null ||
@@ -897,5 +906,18 @@ class Gettext
         foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
             $this->prepareTranslationAndAddDynamicallyIfNeeded($this->host->getCurrentUrl(), $languages__value, 'slug');
         }
+    }
+
+    function getDiscoveredStrings()
+    {
+        $data = $this->gettext_discovered;
+        $data = __array_unique($data);
+        uasort($data, function ($a, $b) {
+            if ($a['context'] != $b['context']) {
+                return strcmp($a['context'], $b['context']);
+            }
+            return strcmp($a['string'], $b['string']);
+        });
+        return $data;
     }
 }

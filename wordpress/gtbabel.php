@@ -738,6 +738,32 @@ class GtbabelWordPress
 
         $translations = $this->gtbabel->gettext->getAllTranslationsFromFiles();
 
+        if (@$_GET['url'] != '') {
+            /*
+            TODO
+            - Wir müssen das komplett anders machen
+            - fetch muss für ALLE urls (auch für die Übersetzungen! ausgeführt werden)
+            - die übersetzten urls erhalten wir: 1. fetch, dann get_lngpicker!
+            - vorher aktivieren wir das setting "discovery_log_enable" => true
+            - danach deaktivieren wir das setting wieder und löschen die log datei
+            - anschließend sammeln wir uns die übersetzten strings aus der log
+            - was auch getan werden muss: last-seen komplett entfernen und preloader komplett umbauen auf discovery log!
+            */
+            $html = __fetch($_GET['url'] . '?no_cache=1');
+            $gtbabel_tokenizer = new Gtbabel();
+            $discovered_strings = $gtbabel_tokenizer->tokenize($html, get_option('gtbabel_settings'));
+            $discovered_strings = array_map(function ($a) {
+                return $a['string'] . '#' . $a['context'];
+            }, $discovered_strings);
+            foreach ($translations as $translations__key => $translations__value) {
+                if (
+                    !in_array($translations__value['orig'] . '#' . $translations__value['context'], $discovered_strings)
+                ) {
+                    unset($translations[$translations__key]);
+                }
+            }
+        }
+
         if (@$_GET['s'] != '') {
             foreach ($translations as $translations__key => $translations__value) {
                 if (mb_stripos($translations__value['orig'], @$_GET['s']) === false) {

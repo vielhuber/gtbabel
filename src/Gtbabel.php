@@ -60,11 +60,7 @@ class Gtbabel
             return;
         }
         $content = ob_get_contents();
-        if ($this->utils->getContentType($content) === 'html') {
-            $content = $this->dom->modifyHtml($content);
-        } elseif ($this->utils->getContentType($content) === 'json') {
-            $content = $this->dom->modifyJson($content);
-        }
+        $content = $this->dom->modifyContent($content);
         ob_end_clean();
         echo $content;
         $this->gettext->generateGettextFiles();
@@ -74,5 +70,26 @@ class Gtbabel
     {
         $this->gettext->resetTranslations();
         $this->utils->apiStatsReset();
+    }
+
+    function translate($content, $args = [])
+    {
+        $this->settings->set($args);
+        $this->host->setup();
+        $this->gettext->preloadGettextInCache();
+        $content = $this->dom->modifyContent($content);
+        return $content;
+    }
+
+    function tokenize($content, $args = [])
+    {
+        // set fixed source and target (important: they just need to be different
+        $args['lng_source'] = 'de';
+        $args['lng_target'] = 'en';
+        $this->settings->set($args);
+        $this->host->setup();
+        $this->gettext->preloadGettextInCache();
+        $content = $this->dom->modifyContent($content);
+        return $this->gettext->getDiscoveredStrings();
     }
 }

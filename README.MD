@@ -52,7 +52,7 @@ $gtbabel->start();
 $gtbabel->start([
     'languages' => ['de', 'en', 'fr'],
     'lng_source' => 'de',
-    'lng_target' => 'en',
+    'lng_target' => null, // this gets automatically determined by the current url
     'lng_folder' => '/locales',
     'prefix_source_lng' => true,
     'redirect_root_domain' => 'browser', // 'browser'|'source' (only relevant if prefix_source_lng=true)
@@ -90,6 +90,21 @@ $gtbabel->start([
 require_once 'template.html';
 
 $gtbabel->stop();
+```
+
+## Other usage
+
+Gtbabel catches the content between `start()` and `stop()` with [https://www.php.net/manual/de/function.ob-start.php](output buffering).\
+However, you can also use Gtbabel more directly:
+
+```php
+$gtbabel = new Gtbabel();
+$gtbabel->translate('<p>Dies ist ein Test!</p>', [
+    'lng_source' => 'de',
+    'lng_target' => 'en',
+    'google_translation_api_key' => '...'
+]); // <p>This is a test!</p>
+$gtbabel->tokenize('<p>Dies ist ein Test!</p>'); // [['string' => 'This is a test!', 'context' => null]]
 ```
 
 ## WordPress plugin

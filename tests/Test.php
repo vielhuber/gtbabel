@@ -206,9 +206,43 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->runDiff('34.html', 500);
     }
 
+    public function test35()
+    {
+        $this->runDiff('35.html', 500);
+    }
+
+    public function test_translate()
+    {
+        $this->gtbabel = new Gtbabel();
+        $output = $this->gtbabel->translate('<p>Dies ist ein Test!</p>', [
+            'lng_source' => 'de',
+            'lng_target' => 'en',
+            'auto_translation' => true,
+            'auto_translation_service' => 'google',
+            'google_translation_api_key' => getenv('GOOGLE_TRANSLATION_API_KEY')
+        ]);
+        $this->assertEquals($output, '<p>This is a test!</p>');
+    }
+
+    public function test_tokenize()
+    {
+        $this->gtbabel = new Gtbabel();
+        $this->assertEquals($this->gtbabel->tokenize('<p>Dies ist ein Test!</p>'), [
+            ['string' => 'Dies ist ein Test!', 'context' => null]
+        ]);
+        $this->assertEquals($this->gtbabel->tokenize('<div><p>Dies ist ein Test!</p><p>1</p></div>'), [
+            ['string' => 'Dies ist ein Test!', 'context' => null]
+        ]);
+        $this->assertEquals($this->gtbabel->tokenize('<div><p>Dies ist ein Test!</p><p>Wow!</p></div>'), [
+            ['string' => 'Dies ist ein Test!', 'context' => null],
+            ['string' => 'Wow!', 'context' => null]
+        ]);
+    }
+
     public function getDefaultSettings()
     {
         return [
+            'lng_source' => 'de',
             'lng_target' => 'en',
             'prefix_source_lng' => false,
             'redirect_root_domain' => 'browser',
