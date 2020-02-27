@@ -198,17 +198,25 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test33()
     {
-        $this->runDiff('33.html', 500);
+        $this->runDiff('33.html', 200);
     }
 
     public function test34()
     {
-        $this->runDiff('34.html', 500);
+        $this->runDiff('34.html', 200);
     }
 
     public function test35()
     {
-        $this->runDiff('35.html', 500);
+        $this->runDiff('35.html', 200);
+    }
+
+    public function test36()
+    {
+        $this->runDiff('36.html', 500, [
+            'debug_translations' => false,
+            'auto_translation' => true
+        ]);
     }
 
     public function test_translate()

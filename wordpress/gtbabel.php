@@ -894,7 +894,12 @@ class GtbabelWordPress
             }
 
             echo '<form class="gtbabel__form" method="post" action="' .
-                admin_url('admin.php?page=gtbabel-trans&p=' . $pagination->cur) .
+                admin_url(
+                    'admin.php?page=gtbabel-trans' .
+                        ($pagination->cur != '' ? '&p=' . $pagination->cur : '') .
+                        (isset($_GET['s']) != '' ? '&s=' . $_GET['s'] : '') .
+                        (isset($_GET['url']) != '' ? '&url=' . $_GET['url'] : '')
+                ) .
                 '">';
 
             echo '<table class="gtbabel__table">';
