@@ -21,7 +21,7 @@ Gtbabel automatically translates your HTML/PHP pages – server sided!
 -   Router included: spoof your request uri and let the magic happen, links are automatically converted.
 -   Helper functions for current language and all languages available.
 -   Basic seo considered: title tags, seo descriptions, html lang attribute, hreflang tags included.
--   WordPress plugin available: configuration gui, preloading, auto translation / deletion, manual string translation, translation services included, support for plugins like [Contact Form 7](https://de.wordpress.org/plugins/contact-form-7/).
+-   WordPress plugin available
 -   Works seamlessly with caching/preloading plugins.
 -   Besides plain html does also handle and translate json responses.
 -   PHPUnit e2e tests available.
@@ -71,6 +71,9 @@ $gtbabel->start([
     'api_stats_filename' => '/gtbabel-api-stats.txt',
     'discovery_log' => false,
     'discovery_log_filename' => '/gtbabel-discovery-log.txt',
+    'prevent_publish' => [
+        '/path/in/source/lng/to/specific/page' => ['en', 'fr']
+    ],
     'exclude_urls' => ['/backend'],
     'exclude_dom' => ['.notranslate', '.lngpicker'],
     'force_tokenize' => ['.force-tokenize'],
@@ -115,6 +118,16 @@ $gtbabel->tokenize('<p>Dies ist ein Test!</p>'); // [['string' => 'This is a tes
 [de.wordpress.org/plugins/gtbabel](https://de.wordpress.org/plugins/gtbabel/)
 
 You don't have to change any code in the frontend at all: If you already have functions like `__()` in your code, just leave them (since WordPress internally only knows about the source language); if not, don't add them. Gtbabel acts on the output (like on any other page).
+
+The following features are included:
+
+-   Configuration gui
+-   Preloading & auto translation / deletion
+-   Manual string translation (search and filter by url)
+-   Translation services
+-   Support for plugins like [Contact Form 7](https://de.wordpress.org/plugins/contact-form-7/)
+-   Translate specific posts/pages or any other url
+-   Control publish status of posts/pages
 
 ## Gettext
 

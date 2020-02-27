@@ -219,6 +219,13 @@ class Test extends \PHPUnit\Framework\TestCase
         ]);
     }
 
+    public function test37()
+    {
+        $this->runDiff('37.html', 200, [
+            'exclude_dom' => ['.foo', '#bar']
+        ]);
+    }
+
     public function test_translate()
     {
         $this->gtbabel = new Gtbabel();

@@ -27,6 +27,7 @@ class GtbabelWordPress
         $this->installHook();
         $this->localizePlugin();
         $this->initBackend();
+        $this->catchSlugChanges();
         $this->addTopBarItem();
         $this->disableAutoRedirect();
         $this->localizeJs();
@@ -118,10 +119,29 @@ class GtbabelWordPress
                     'languages' => $languages,
                     'lng_source' => $lng_source,
                     'lng_folder' => '/wp-content/plugins/gtbabel/locales',
-                    'exclude_urls' => ['/wp-admin', '/wp-json', 'wp-login.php', 'wp-cron.php', 'wp-comments-post.php']
+                    'exclude_urls' => ['/wp-admin', 'wp-login.php', 'wp-cron.php', 'wp-comments-post.php'],
+                    'exclude_dom' => ['.notranslate', '.lngpicker', '#wpadminbar']
                 ])
             );
         }
+    }
+
+    private function catchSlugChanges()
+    {
+        add_action(
+            'post_updated',
+            function ($post_ID, $post_after, $post_before) {
+                if (get_the_permalink($post_before) != get_the_permalink($post_after)) {
+                    $this->gtbabel->utils->log([
+                        'slug changed from ' . $post_before->post_name . ' to ' . $post_after->post_name,
+                        get_the_permalink($post_before),
+                        get_the_permalink($post_after)
+                    ]);
+                }
+            },
+            10,
+            3
+        );
     }
 
     private function addTopBarItem()

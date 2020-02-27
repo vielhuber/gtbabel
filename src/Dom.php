@@ -355,6 +355,10 @@ class Dom
                 }
                 $parts__value = implode('', $parts__value_parts);
             }
+            // #foo => *[@id="foo"]
+            if (mb_strpos($parts__value, '#') === 0) {
+                $parts__value = '*[@id="' . str_replace('#', '', $parts__value) . '"]';
+            }
             $parts[$parts__key] = $parts__value;
         }
         $xpath .= implode('//', $parts);
