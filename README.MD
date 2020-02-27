@@ -28,7 +28,7 @@ Gtbabel automatically translates your HTML/PHP pages – server sided!
 
 ## Caveats
 
--   Gtbabel is good at translating whole pages. If you want to provide different content for different languages, Gtbabel might be the wrong tool (however you _can_ use `if( get_current_lng() == '...' ) { }` in your templates to achieve that)
+-   Gtbabel is good at translating whole pages. If you want to provide different content for different languages, Gtbabel might be the wrong tool (however you _can_ use `if( gtbabel_current_lng() == '...' ) { }` in your templates to achieve that)
 
 ## Installation
 
