@@ -116,10 +116,6 @@ $gtbabel->tokenize('<p>Dies ist ein Test!</p>'); // [['string' => 'This is a tes
 
 You don't have to change any code in the frontend at all: If you already have functions like `__()` in your code, just leave them (since WordPress internally only knows about the source language); if not, don't add them. Gtbabel acts on the output (like on any other page).
 
-## Caveats
-
--   Gtbabel is good at translating whole pages. If you want to provide different content for different languages, Gtbabel might be the wrong tool (however you _can_ use `if( gtbabel_current_lng() === '...' ) { }` in your templates to achieve that)
-
 ## Gettext
 
 -   The final html gets parsed and is split up in reasonable strings.
@@ -273,6 +269,10 @@ If you use the auto translation feature for example with the help of the Google 
 ## API usage costs
 
 The translation apis of Google or Microsoft can be costly. Try to keep track of your current usage stats. Gtbabel helps you by tracking the total amount of translated chars (see the `api_stats` option). You can also provide multiple api keys, Gtbabel then distributes the calls uniformly.
+
+## Caveats
+
+-   Gtbabel is good at translating whole pages. If you want to provide different content for different languages, Gtbabel might be the wrong tool (however you _can_ use `if( gtbabel_current_lng() === '...' ) { }` in your templates to achieve that)
 
 ## Credits
 
