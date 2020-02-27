@@ -26,10 +26,6 @@ Gtbabel automatically translates your HTML/PHP pages – server sided!
 -   Besides plain html does also handle and translate json responses.
 -   PHPUnit e2e tests available.
 
-## Caveats
-
--   Gtbabel is good at translating whole pages. If you want to provide different content for different languages, Gtbabel might be the wrong tool (however you _can_ use `if( gtbabel_current_lng() == '...' ) { }` in your templates to achieve that)
-
 ## Installation
 
 Install once with [composer](https://getcomposer.org/):
@@ -119,6 +115,10 @@ $gtbabel->tokenize('<p>Dies ist ein Test!</p>'); // [['string' => 'This is a tes
 [de.wordpress.org/plugins/gtbabel](https://de.wordpress.org/plugins/gtbabel/)
 
 You don't have to change any code in the frontend at all: If you already have functions like `__()` in your code, just leave them (since WordPress internally only knows about the source language); if not, don't add them. Gtbabel acts on the output (like on any other page).
+
+## Caveats
+
+-   Gtbabel is good at translating whole pages. If you want to provide different content for different languages, Gtbabel might be the wrong tool (however you _can_ use `if( gtbabel_current_lng() === '...' ) { }` in your templates to achieve that)
 
 ## Gettext
 
