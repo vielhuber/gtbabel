@@ -109,7 +109,7 @@
     margin-right: 10px;
 }
 .gtbabel__search {
-    width: 300px;
+    width: 50%;
     margin-bottom: 20px;
 }
 .gtbabel__search .gtbabel__form {
@@ -119,10 +119,10 @@
     align-content: flex-start;
 }
 .gtbabel__search .gtbabel__input {
-    flex: 0 1 calc(100% - 80px);
+    flex: 0 0 calc((100% - 80px) / 2);
 }
 .gtbabel__search .gtbabel__submit {
-    flex: 0 1 80px;
+    flex: 0 0 80px;
 }
 
 .gtbabel__highlight {

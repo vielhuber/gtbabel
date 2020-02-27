@@ -759,8 +759,6 @@ class GtbabelWordPress
                 '</p></div>';
         }
 
-        $translations = $this->gtbabel->gettext->getAllTranslationsFromFiles();
-
         if (@$_GET['url'] != '') {
             $url = $_GET['url'];
             $urls = [];
@@ -769,21 +767,28 @@ class GtbabelWordPress
             if ($discovery_log_prev === false) {
                 $this->changeSetting('discovery_log', true);
             }
-            __fetch($url . '?no_cache=1');
+            $this->fetch($url . '?no_cache=1');
             // subsequent urls are now available (we need to refresh the current session)
             $this->start();
             foreach ($this->gtbabel->settings->getSelectedLanguageCodesWithoutSource() as $lngs__value) {
                 $url_trans = $this->gtbabel->gettext->getUrlTranslationInLanguage($lngs__value, $url);
-                __fetch($url_trans . '?no_cache=1');
+                $this->fetch($url_trans . '?no_cache=1');
                 $urls[] = $url_trans . '?no_cache=1';
             }
             if ($discovery_log_prev === false) {
                 $this->changeSetting('discovery_log', false);
             }
+            // restart again
+            $this->start();
             $discovery_strings = array_map(function ($a) {
                 return $a['string'] . '#' . $a['context'];
             }, $this->gtbabel->log->discoveryLogGet($urls));
             $this->gtbabel->log->discoveryLogReset();
+        }
+
+        $translations = $this->gtbabel->gettext->getAllTranslationsFromFiles();
+
+        if (@$_GET['url'] != '') {
             foreach ($translations as $translations__key => $translations__value) {
                 if (
                     !in_array($translations__value['orig'] . '#' . $translations__value['context'], $discovery_strings)
@@ -828,6 +833,9 @@ class GtbabelWordPress
         echo '<input type="hidden" name="p" value="1" />';
         echo '<input class="gtbabel__input" type="text" name="s" value="' .
             @$_GET['s'] . '" placeholder="' . __('Search term', 'gtbabel-plugin') .
+            '" />';
+        echo '<input class="gtbabel__input" type="text" name="url" value="' .
+            @$_GET['url'] . '" placeholder="' . __('URL', 'gtbabel-plugin') .
             '" />';
         echo '<input class="gtbabel__submit button button-secondary" value="' .
             __('Search', 'gtbabel-plugin') .
@@ -1083,6 +1091,11 @@ class GtbabelWordPress
         return $settings[$key];
     }
 
+    private function fetch($url)
+    {
+        return __curl($url, null, 'GET', null, false, false, 60, null, $_COOKIE);
+    }
+
     private function initBackendAutoTranslate($chunk = 0, $delete_unused = false)
     {
         $chunk_size = 5;
@@ -1139,7 +1152,7 @@ class GtbabelWordPress
             }
 
             // append a pseudo get parameter, so that frontend cache plugins don't work
-            __fetch($url . '?no_cache=1');
+            $this->fetch($url . '?no_cache=1');
 
             echo __('Loading', 'gtbabel-plugin');
             echo '... ' . $url . '<br/>';
