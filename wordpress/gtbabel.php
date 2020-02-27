@@ -27,6 +27,7 @@ class GtbabelWordPress
         $this->installHook();
         $this->localizePlugin();
         $this->initBackend();
+        $this->addTopBarItem();
         $this->disableAutoRedirect();
         $this->localizeJs();
         $this->setDefaultSettingsToOption();
@@ -121,6 +122,48 @@ class GtbabelWordPress
                 ])
             );
         }
+    }
+
+    private function addTopBarItem()
+    {
+        add_action(
+            'admin_bar_menu',
+            function ($admin_bar) {
+                global $pagenow;
+                if ($pagenow == 'post.php') {
+                    $url = get_the_permalink((int) $_GET['post']);
+                    if ($url == '') {
+                        return;
+                    }
+                } elseif ($pagenow == 'term.php') {
+                    $url = get_term_link((int) $_GET['tag_ID'], $_GET['taxonomy']);
+                    if ($url == '') {
+                        return;
+                    }
+                } else {
+                    return;
+                }
+
+                $admin_bar->add_menu([
+                    'id' => 'gtbabel-translate',
+                    'parent' => null,
+                    'group' => null,
+                    'title' => '<span class="ab-icon"></span>' . __('Translate now', 'gtbabel-plugin'),
+                    'href' => admin_url('admin.php?page=gtbabel-trans&url=' . urlencode($url)),
+                    'meta' => []
+                ]);
+            },
+            500
+        );
+        add_action(
+            'admin_head',
+            function () {
+                echo '<style>
+                    #wpadminbar #wp-admin-bar-gtbabel-translate .ab-icon:before { content: "\f11f"; top: 3px; }
+                </style>';
+            },
+            100
+        );
     }
 
     private function initBackend()
