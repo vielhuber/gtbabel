@@ -26,6 +26,10 @@ Gtbabel automatically translates your HTML/PHP pages – server sided!
 -   Besides plain html does also handle and translate json responses.
 -   PHPUnit e2e tests available.
 
+## Caveats
+
+-   Gtbabel is good at translating whole pages. If you want to provide different content for different languages, Gtbabel might be the wrong tool (however you _can_ use `if( get_current_lng() == '...' ) { }` in your templates to achieve that)
+
 ## Installation
 
 Install once with [composer](https://getcomposer.org/):
