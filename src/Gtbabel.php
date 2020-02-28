@@ -3,44 +3,46 @@ namespace vielhuber\gtbabel;
 
 class Gtbabel
 {
-    public $dom;
-    public $utils;
-    public $host;
-    public $gettext;
-    public $router;
     public $settings;
-    public $log;
+    public $utils;
     public $tags;
-    public $translation;
+    public $host;
+    public $publish;
+    public $log;
+    public $dom;
+    public $router;
+    public $gettext;
 
     public $started;
 
     function __construct(
-        Dom $dom = null,
-        Utils $utils = null,
-        Host $host = null,
-        Gettext $gettext = null,
-        Router $router = null,
         Settings $settings = null,
+        Utils $utils = null,
+        Tags $tags = null,
+        Host $host = null,
+        Publish $publish = null,
         Log $log = null,
-        Tags $tags = null
+        Dom $dom = null,
+        Router $router = null,
+        Gettext $gettext = null
     ) {
         $this->settings = $settings ?: new Settings();
-        $this->utils = $utils ?: new Utils($this->settings);
-        $this->tags = $tags ?: new Tags($this->utils, $this->settings);
-        $this->host = $host ?: new Host($this->utils, $this->settings, $this->tags);
+        $this->utils = $utils ?: new Utils();
+        $this->tags = $tags ?: new Tags($this->utils);
+        $this->host = $host ?: new Host($this->settings);
+        $this->publish = $publish ?: new Publish($this->settings, $this->host);
         $this->log = $log ?: new Log($this->utils, $this->settings, $this->host);
-        $this->gettext = $gettext ?: new Gettext($this->utils, $this->host, $this->settings, $this->tags, $this->log);
-        $this->dom =
-            $dom ?: new Dom($this->utils, $this->gettext, $this->host, $this->settings, $this->tags, $this->log);
-        $this->router =
-            $router ?: new Router($this->utils, $this->gettext, $this->host, $this->settings, $this->tags, $this->log);
+        $this->gettext =
+            $gettext ?:
+            new Gettext($this->utils, $this->host, $this->settings, $this->tags, $this->log, $this->publish);
+        $this->dom = $dom ?: new Dom($this->utils, $this->gettext, $this->host, $this->settings);
+        $this->router = $router ?: new Router($this->gettext, $this->host, $this->settings, $this->publish);
     }
 
     function start($args = [])
     {
         $this->started = true;
-        $this->settings->set($args);
+        $this->settings->setup($args);
         $this->host->setup();
         $this->gettext->createLngFolderIfNotExists();
         $this->gettext->preloadGettextInCache();
@@ -49,10 +51,9 @@ class Gtbabel
         }
         $this->router->redirectPrefixedSourceLng();
         $this->gettext->addCurrentUrlToTranslations();
-        if (!$this->host->currentUrlIsExcluded()) {
-            $this->router->addTrailingSlash();
-            $this->router->initMagicRouter();
-        }
+        $this->router->addTrailingSlash();
+        $this->router->redirectUnpublished();
+        $this->router->initMagicRouter();
         ob_start();
     }
 
@@ -79,7 +80,7 @@ class Gtbabel
 
     function translate($content, $args = [])
     {
-        $this->settings->set($args);
+        $this->settings->setup($args);
         $this->host->setup();
         $this->gettext->preloadGettextInCache();
         $content = $this->dom->modifyContent($content);
@@ -92,7 +93,7 @@ class Gtbabel
         $args['lng_source'] = 'de';
         $args['lng_target'] = 'en';
         $args['discovery_log'] = true;
-        $this->settings->set($args);
+        $this->settings->setup($args);
         $this->host->setup();
         $this->gettext->preloadGettextInCache();
         $this->log->discoveryLogReset();

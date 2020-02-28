@@ -5,15 +5,6 @@ use Cocur\Slugify\Slugify;
 
 class Utils
 {
-    private $stats_cache = null;
-
-    public $settings;
-
-    function __construct(Settings $settings = null)
-    {
-        $this->settings = $settings ?: new Settings();
-    }
-
     function slugify($trans, $orig, $lng)
     {
         $slugify = new Slugify();

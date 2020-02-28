@@ -4,12 +4,10 @@ namespace vielhuber\gtbabel;
 class Tags
 {
     public $utils;
-    public $settings;
 
     function __construct(Utils $utils = null, Settings $settings = null)
     {
         $this->utils = $utils ?: new Utils();
-        $this->settings = $settings ?: new Settings();
     }
 
     function catchOpeningTags($str)

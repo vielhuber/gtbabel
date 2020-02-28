@@ -22,19 +22,22 @@ class Gettext
     public $settings;
     public $tags;
     public $log;
+    public $publish;
 
     function __construct(
         Utils $utils = null,
         Host $host = null,
         Settings $settings = null,
         Tags $tags = null,
-        Log $log = null
+        Log $log = null,
+        Publish $publish = null
     ) {
         $this->utils = $utils ?: new Utils();
         $this->host = $host ?: new Host();
         $this->settings = $settings ?: new Settings();
         $this->tags = $tags ?: new Tags();
         $this->log = $log ?: new Log();
+        $this->publish = $publish ?: new Publish();
     }
 
     function preloadGettextInCache()
@@ -452,6 +455,9 @@ class Gettext
         $data = [];
         foreach ($this->settings->getSelectedLanguages() as $languages__key => $languages__value) {
             $url = $this->getUrlTranslationInLanguage($languages__key);
+            if ($this->publish->isActive($this->host->getCurrentUrl(), $languages__key)) {
+                continue;
+            }
             $data[] = [
                 'code' => $languages__key,
                 'label' => $languages__value,

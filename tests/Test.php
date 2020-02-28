@@ -273,7 +273,8 @@ class Test extends \PHPUnit\Framework\TestCase
             'api_stats' => true,
             'api_stats_filename' => '/gtbabel-api-stats.txt',
             'discovery_log' => false,
-            'discovery_log_filename' => '/gtbabel-discovery-log.txt'
+            'discovery_log_filename' => '/gtbabel-discovery-log.txt',
+            'prevent_publish' => []
         ];
     }
 

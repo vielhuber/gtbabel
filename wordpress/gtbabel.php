@@ -27,7 +27,7 @@ class GtbabelWordPress
         $this->installHook();
         $this->localizePlugin();
         $this->initBackend();
-        $this->catchSlugChanges();
+        $this->triggerPreventPublish();
         $this->addTopBarItem();
         $this->disableAutoRedirect();
         $this->localizeJs();
@@ -126,17 +126,34 @@ class GtbabelWordPress
         }
     }
 
-    private function catchSlugChanges()
+    private function triggerPreventPublish()
     {
         add_action(
             'post_updated',
             function ($post_ID, $post_after, $post_before) {
-                if (get_the_permalink($post_before) != get_the_permalink($post_after)) {
-                    $this->gtbabel->utils->log([
-                        'slug changed from ' . $post_before->post_name . ' to ' . $post_after->post_name,
-                        get_the_permalink($post_before),
-                        get_the_permalink($post_after)
-                    ]);
+                $post_before_status = get_post_status($post_before);
+                $post_after_status = get_post_status($post_after);
+                $post_before_url = get_the_permalink($post_before);
+                $post_after_url = get_the_permalink($post_after);
+                $this->gtbabel->utils->log([
+                    $post_before_status,
+                    $post_after_status,
+                    $post_before_url,
+                    $post_after_url
+                ]);
+                if ($post_after_status === 'draft' || $post_before_url != $post_after_url) {
+                    // by default any post has prevent publish on for all languages
+                    if ($post_after_status === 'draft') {
+                        $this->gtbabel->publish->edit(
+                            $post_after_url,
+                            $this->gtbabel->settings->getSelectedLanguageCodesWithoutSource()
+                        );
+                    }
+                    // if a slug is changed, preserve settings
+                    if ($post_before_url != $post_after_url) {
+                        $this->gtbabel->publish->change($post_before_url, $post_after_url);
+                    }
+                    $this->changeSetting('prevent_publish', $this->gtbabel->settings->get('prevent_publish'));
                 }
             },
             10,
@@ -150,25 +167,27 @@ class GtbabelWordPress
             'admin_bar_menu',
             function ($admin_bar) {
                 global $pagenow;
+                // we always add the menu item (in case of ajax url requests we can replace it easily)
+                $html = '<span class="ab-icon"></span>' . __('Translate now', 'gtbabel-plugin');
                 if ($pagenow == 'post.php') {
                     $url = get_the_permalink((int) $_GET['post']);
                     if ($url == '') {
-                        return;
+                        $html = '';
                     }
                 } elseif ($pagenow == 'term.php') {
                     $url = get_term_link((int) $_GET['tag_ID'], $_GET['taxonomy']);
                     if ($url == '') {
-                        return;
+                        $html = '';
                     }
                 } else {
-                    return;
+                    $html = '';
                 }
 
                 $admin_bar->add_menu([
                     'id' => 'gtbabel-translate',
                     'parent' => null,
                     'group' => null,
-                    'title' => '<span class="ab-icon"></span>' . __('Translate now', 'gtbabel-plugin'),
+                    'title' => $html,
                     'href' => admin_url('admin.php?page=gtbabel-trans&url=' . urlencode($url)),
                     'meta' => []
                 ]);
@@ -178,9 +197,39 @@ class GtbabelWordPress
         add_action(
             'admin_head',
             function () {
-                echo '<style>
-                    #wpadminbar #wp-admin-bar-gtbabel-translate .ab-icon:before { content: "\f11f"; top: 3px; }
-                </style>';
+                ?>
+                <style>
+                /* add icon */
+                #wpadminbar #wp-admin-bar-gtbabel-translate .ab-icon:before { content: "\f11f"; top: 3px; }
+                /* hide placeholder */
+                #wpadminbar #wp-admin-bar-gtbabel-translate a:empty { display:none; }
+                </style>
+                <script>
+                /* reflect url changes in gutenberg */
+                document.addEventListener('DOMContentLoaded', function() {
+                    if( wp !== undefined && wp.data !== undefined ) {
+                        if( window.location.href.indexOf('post-new.php') > -1 || window.location.href.indexOf('post.php') > -1 ) {
+                            let prev = wp.data.select('core/editor').getEditedPostAttribute('status');
+                            wp.data.subscribe(function () {
+                                let isSavingPost = wp.data.select('core/editor').isSavingPost(),
+                                    isAutosavingPost = wp.data.select('core/editor').isAutosavingPost();
+                                if (isSavingPost && !isAutosavingPost) {
+                                    let cur = wp.data.select('core/editor').getEditedPostAttribute('status');
+                                    if( prev === cur ) { prev = cur; return; }
+                                    prev = cur;
+                                    fetch(window.location.href).then(v=>v.text()).catch(v=>v).then(data => {
+                                        let dom = new DOMParser().parseFromString(data, 'text/html').querySelector('#wp-admin-bar-gtbabel-translate');
+                                        if( dom !== null ) {
+                                            document.querySelector('#wp-admin-bar-gtbabel-translate').innerHTML = dom.innerHTML;
+                                        }
+                                    }); 
+                                }
+                            });
+                        }
+                    }
+                });
+                </script>
+                <?php
             },
             100
         );
@@ -287,9 +336,23 @@ class GtbabelWordPress
                 ) {
                     $post_data = $settings[$exclude__value];
                     $settings[$exclude__value] = [];
-                    if (@$settings[$exclude__value] != '') {
+                    if ($post_data != '') {
                         foreach (explode(PHP_EOL, $post_data) as $post_data__value) {
                             $settings[$exclude__value][] = trim($post_data__value);
+                        }
+                    }
+                }
+
+                $post_data = $settings['prevent_publish'];
+                $settings['prevent_publish'] = [];
+                if ($post_data != '') {
+                    foreach (explode(PHP_EOL, $post_data) as $post_data__value) {
+                        $post_data__value_parts = explode(':', $post_data__value);
+                        if (!empty($post_data__value_parts)) {
+                            $settings['prevent_publish'][$post_data__value_parts[0]] = explode(
+                                ',',
+                                $post_data__value_parts[1]
+                            );
                         }
                     }
                 }
@@ -608,6 +671,28 @@ class GtbabelWordPress
         echo '<input class="gtbabel__input" type="text" id="gtbabel_discovery_log_filename" name="gtbabel[discovery_log_filename]" value="' .
             $settings['discovery_log_filename'] .
             '" />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_prevent_publish" class="gtbabel__label">';
+        echo __('Prevent publish of pages', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<textarea class="gtbabel__input gtbabel__input--textarea" id="gtbabel_prevent_publish" name="gtbabel[prevent_publish]">';
+        if (!empty($settings['prevent_publish'])) {
+            echo implode(
+                PHP_EOL,
+                array_map(
+                    function ($prevent_publish__value, $prevent_publish__key) {
+                        return $prevent_publish__key . ':' . implode(',', $prevent_publish__value);
+                    },
+                    $settings['prevent_publish'],
+                    array_keys($settings['prevent_publish'])
+                )
+            );
+        }
+        echo '</textarea>';
         echo '</div>';
         echo '</li>';
 

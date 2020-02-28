@@ -73,6 +73,9 @@ $gtbabel->start([
     'discovery_log_filename' => '/gtbabel-discovery-log.txt',
     'prevent_publish' => [
         '/path/in/source/lng/to/specific/page' => ['en', 'fr']
+        // you can also use wildcards here
+        '/slug1/*' => ['en'],
+        '/slug1/*/slug2' => ['fr']
     ],
     'exclude_urls' => ['/backend'],
     'exclude_dom' => ['.notranslate', '.lngpicker'],
@@ -127,7 +130,7 @@ The following features are included:
 -   Translation services
 -   Support for plugins like [Contact Form 7](https://de.wordpress.org/plugins/contact-form-7/)
 -   Translate specific posts/pages or any other url
--   Control publish status of posts/pages
+-   Control publish status of posts/pages (slug changes are auto-reflected in the `prevent_publish`-option)
 
 ## Gettext
 
@@ -285,8 +288,9 @@ The translation apis of Google or Microsoft can be costly. Try to keep track of 
 
 ## Caveats
 
--   The source language acts as a base for every other language. It's content must be always present (one cannot publish content only in a different language
--   Gtbabel is good at translating whole pages. If you want to provide different content for different languages, Gtbabel might be the wrong tool (however you _can_ use `if( gtbabel_current_lng() === 'other-lng' ) { echo 'content in source language'; }` in your templates to achieve that)
+-   The source language acts as a base for every other language. It's content must be always present (one cannot publish content only in a different language.
+-   Gtbabel is good at translating whole pages. If you want to provide different content for different languages, Gtbabel might be the wrong tool (however you _can_ use `if( gtbabel_current_lng() === 'other-lng' ) { echo 'content in source language'; }` in your templates to achieve that).
+-   Gtbabel is designed to translate every part of the page without code changes (however you can exclude translations with the `exclude_dom`-option). It is not designed for mainly translating only certain parts of the page.
 
 ## Credits
 

@@ -3,27 +3,17 @@ namespace vielhuber\gtbabel;
 
 class Router
 {
-    public $utils;
     public $gettext;
     public $host;
     public $settings;
-    public $tags;
-    public $log;
+    public $publish;
 
-    function __construct(
-        Utils $utils = null,
-        Gettext $gettext = null,
-        Host $host = null,
-        Settings $settings = null,
-        Tags $tags = null,
-        Log $log = null
-    ) {
-        $this->utils = $utils ?: new Utils();
+    function __construct(Gettext $gettext = null, Host $host = null, Settings $settings = null, Publish $publish = null)
+    {
         $this->gettext = $gettext ?: new Gettext();
         $this->host = $host ?: new Host();
         $this->settings = $settings ?: new Settings();
-        $this->tags = $tags ?: new Tags();
-        $this->log = $log ?: new Log();
+        $this->publish = $publish ?: new Publish();
     }
 
     function redirectPrefixedSourceLng()
@@ -107,5 +97,19 @@ class Router
             $path = '/' . $path . ($path != '' ? '/' : '') . $this->host->getCurrentArgs();
         }
         $_SERVER['REQUEST_URI'] = $path;
+    }
+
+    function redirectUnpublished()
+    {
+        if ($this->gettext->sourceLngIsCurrentLng()) {
+            return;
+        }
+        $url = $this->host->getCurrentUrl();
+        $source_url = $this->gettext->getUrlTranslationInLanguage($this->settings->getSourceLng(), $url);
+        if (!$this->publish->isActive($source_url, $this->gettext->getCurrentLng())) {
+            return;
+        }
+        header('Location: ' . $source_url, true, 302);
+        die();
     }
 }

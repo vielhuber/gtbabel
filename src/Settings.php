@@ -5,11 +5,16 @@ class Settings
 {
     public $args;
 
-    function set($args = [])
+    function setup($args = [])
     {
         $args = $this->setupSettings($args);
         $args = (object) $args;
         $this->args = $args;
+    }
+
+    function set($prop, $value)
+    {
+        $this->args->{$prop} = $value;
     }
 
     function get($prop)
@@ -47,6 +52,11 @@ class Settings
             'api_stats_filename' => '/gtbabel-api-stats.txt',
             'discovery_log' => false,
             'discovery_log_filename' => '/gtbabel-discovery-log.txt',
+            'prevent_publish' => [
+                '/path/in/source/lng/to/specific/page' => ['en', 'fr'],
+                '/slug1/*' => ['en'],
+                '/slug1/*/slug2' => ['fr']
+            ],
             'exclude_urls' => ['/backend'],
             'exclude_dom' => ['.notranslate', '.lngpicker'],
             'force_tokenize' => ['.force-tokenize'],

@@ -10,15 +10,11 @@ class Host
     public $original_url_with_args;
     public $original_host;
 
-    public $utils;
     public $settings;
-    public $tags;
 
-    function __construct(Utils $utils = null, Settings $settings = null, Tags $tags = null)
+    function __construct(Settings $settings = null)
     {
-        $this->utils = $utils ?: new Utils();
         $this->settings = $settings ?: new Settings();
-        $this->tags = $tags ?: new Tags();
     }
 
     function setup()
