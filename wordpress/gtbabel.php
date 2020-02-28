@@ -910,18 +910,18 @@ class GtbabelWordPress
         if (@$_GET['url'] != '') {
             $url = $_GET['url'];
             $urls = [];
-            $urls[] = $url . '?no_cache=1';
+            $urls[] = $this->getNoCacheUrl($url);
             $discovery_log_prev = $this->getSetting('discovery_log');
             if ($discovery_log_prev === false) {
                 $this->changeSetting('discovery_log', true);
             }
-            $this->fetch($url . '?no_cache=1');
+            $this->fetch($this->getNoCacheUrl($url));
             // subsequent urls are now available (we need to refresh the current session)
             $this->start();
             foreach ($this->gtbabel->settings->getSelectedLanguageCodesWithoutSource() as $lngs__value) {
                 $url_trans = $this->gtbabel->gettext->getUrlTranslationInLanguage($lngs__value, $url);
-                $this->fetch($url_trans . '?no_cache=1');
-                $urls[] = $url_trans . '?no_cache=1';
+                $this->fetch($this->getNoCacheUrl($url_trans));
+                $urls[] = $this->getNoCacheUrl($url_trans);
             }
             if ($discovery_log_prev === false) {
                 $this->changeSetting('discovery_log', false);
@@ -983,13 +983,55 @@ class GtbabelWordPress
             @$_GET['s'] . '" placeholder="' . __('Search term', 'gtbabel-plugin') .
             '" />';
         echo '<input class="gtbabel__input" type="text" name="url" value="' .
-            @$_GET['url'] . '" placeholder="' . __('URL', 'gtbabel-plugin') .
+            @$_GET['url'] . '" placeholder="' . __('URL in source language', 'gtbabel-plugin') .
             '" />';
         echo '<input class="gtbabel__submit button button-secondary" value="' .
             __('Search', 'gtbabel-plugin') .
             '" type="submit" />';
         echo '</form>';
         echo '</div>';
+
+        if (@$_GET['url'] != '') {
+            /*
+            TODO
+            - poedit translations
+            - dom syntax
+            - save form
+            - check logic if really viable
+            - test slug changes
+            */
+            $url_published = $this->isUrlPublished($_GET['url']);
+            echo '<p class="gtbabel__paragraph">';
+            echo __('Status', 'gtbabel-plugin') . ': ';
+            if ($url_published === true) {
+                echo __('Published', 'gtbabel-plugin');
+            } else {
+                echo __('Unpublished', 'gtbabel-plugin');
+            }
+            echo '</p>';
+            echo '<ul>';
+            foreach ($this->gtbabel->settings->getSelectedLanguages() as $lng__key => $lng__value) {
+                echo '<li>';
+                echo $lng__value . ': ';
+                echo '<input' .
+                    ($this->gtbabel->settings->getSourceLng() === $lng__key || $url_published === false
+                        ? ' disabled="disabled"'
+                        : '') .
+                    (($this->gtbabel->settings->getSourceLng() === $lng__key && $url_published === true) ||
+                    ($this->gtbabel->settings->getSourceLng() !== $lng__key &&
+                        !$this->gtbabel->publish->isPrevented($_GET['url'], $lng__key))
+                        ? ' checked="checked"'
+                        : '') .
+                    ' class="gtbabel__input gtbabel__input--checkbox" type="checkbox" />';
+                echo '<input type="hidden" name="gtbabel[prevent_publish][' .
+                    $lng__key .
+                    ']" value="' .
+                    $_GET['url'] .
+                    '" />';
+                echo '</li>';
+            }
+            echo '</ul>';
+        }
 
         if (!empty($translations)) {
             if (@$_GET['url'] != '') {
@@ -1244,9 +1286,47 @@ class GtbabelWordPress
         return $settings[$key];
     }
 
-    private function fetch($url)
+    private function isUrlPublished($url)
     {
-        return __curl($url, null, 'GET', null, false, false, 60, null, $_COOKIE);
+        /*
+        - first we try to get the status via url_to_postid()
+        - if that doesn't succeed, we try to get the status via fetch
+        */
+        $published = true;
+        $post = url_to_postid($url);
+        if ($post == 0) {
+            $response = $this->fetch($url, false);
+            if ($response->status == 404) {
+                $published = false;
+            }
+        } else {
+            if (get_post_status($post) !== 'publish') {
+                $published = false;
+            }
+        }
+        return $published;
+    }
+
+    private function getNoCacheUrl($url)
+    {
+        $url .= mb_strpos($url, '?') === false ? '?' : '&';
+        $url .= 'no_cache=1';
+        return $url;
+    }
+
+    private function fetch($url, $with_current_session = true)
+    {
+        return __curl(
+            $url,
+            null,
+            'GET',
+            null,
+            false,
+            false,
+            60,
+            null,
+            $with_current_session === true ? $_COOKIE : null
+        );
     }
 
     private function initBackendAutoTranslate($chunk = 0, $delete_unused = false)
@@ -1305,7 +1385,7 @@ class GtbabelWordPress
             }
 
             // append a pseudo get parameter, so that frontend cache plugins don't work
-            $this->fetch($url . '?no_cache=1');
+            $this->fetch($this->getNoCacheUrl($url));
 
             echo __('Loading', 'gtbabel-plugin');
             echo '... ' . $url . '<br/>';

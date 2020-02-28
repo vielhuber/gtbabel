@@ -41,7 +41,7 @@ class Publish
         $this->settings->set('prevent_publish', $prevent_publish);
     }
 
-    function isActive($url, $lng)
+    function isPrevented($url, $lng)
     {
         $prevent_publish = $this->settings->get('prevent_publish');
         foreach ($prevent_publish as $prevent_publish__key => $prevent_publish__value) {

@@ -455,7 +455,7 @@ class Gettext
         $data = [];
         foreach ($this->settings->getSelectedLanguages() as $languages__key => $languages__value) {
             $url = $this->getUrlTranslationInLanguage($languages__key);
-            if ($this->publish->isActive($this->host->getCurrentUrl(), $languages__key)) {
+            if ($this->publish->isPrevented($this->host->getCurrentUrl(), $languages__key)) {
                 continue;
             }
             $data[] = [
@@ -515,6 +515,12 @@ class Gettext
             return $link;
         }
         if (mb_strpos(trim($link, '/'), '#') === 0) {
+            return $link;
+        }
+        if (mb_strpos(trim($link, '/'), '?') === 0) {
+            return $link;
+        }
+        if (mb_strpos(trim($link, '/'), '&') === 0) {
             return $link;
         }
         $is_absolute_link = mb_strpos($link, $this->host->getCurrentHost()) === 0;
@@ -720,8 +726,16 @@ class Gettext
                 return true;
             }
         }
-        if ($context === 'slug' && mb_strpos($str, '#') === 0) {
-            return true;
+        if ($context === 'slug') {
+            if (mb_strpos($str, '#') === 0) {
+                return true;
+            }
+            if (mb_strpos($str, '?') === 0) {
+                return true;
+            }
+            if (mb_strpos($str, '&') === 0) {
+                return true;
+            }
         }
         // detect paths to php scripts
         if (mb_strpos($str, ' ') === false && mb_strpos($str, '.php') !== false) {

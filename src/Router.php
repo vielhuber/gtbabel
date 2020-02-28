@@ -106,7 +106,7 @@ class Router
         }
         $url = $this->host->getCurrentUrl();
         $source_url = $this->gettext->getUrlTranslationInLanguage($this->settings->getSourceLng(), $url);
-        if (!$this->publish->isActive($source_url, $this->gettext->getCurrentLng())) {
+        if (!$this->publish->isPrevented($source_url, $this->gettext->getCurrentLng())) {
             return;
         }
         header('Location: ' . $source_url, true, 302);
