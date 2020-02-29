@@ -52,7 +52,8 @@ class Settings
             'api_stats_filename' => '/gtbabel-api-stats.txt',
             'discovery_log' => false,
             'discovery_log_filename' => '/gtbabel-discovery-log.txt',
-            'prevent_publish' => [
+            'prevent_publish' => true,
+            'prevent_publish_urls' => [
                 '/path/in/source/lng/to/specific/page' => ['en', 'fr'],
                 '/slug1/*' => ['en'],
                 '/slug1/*/slug2' => ['fr']

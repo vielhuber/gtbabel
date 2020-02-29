@@ -71,6 +71,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.target.setAttribute('name', e.target.getAttribute('data-name'));
             }
         });
+        document.addEventListener('change', e => {
+            let el = e.target.closest('.gtbabel__input--inverse');
+            if (el) {
+                e.target.nextElementSibling.value = e.target.checked === true ? '0' : '1';
+            }
+        });
     }
 });
 

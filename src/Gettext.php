@@ -455,7 +455,10 @@ class Gettext
         $data = [];
         foreach ($this->settings->getSelectedLanguages() as $languages__key => $languages__value) {
             $url = $this->getUrlTranslationInLanguage($languages__key);
-            if ($this->publish->isPrevented($this->host->getCurrentUrl(), $languages__key)) {
+            if (
+                $this->publish->isActive() &&
+                $this->publish->isPrevented($this->host->getCurrentUrl(), $languages__key)
+            ) {
                 continue;
             }
             $data[] = [
@@ -764,13 +767,15 @@ class Gettext
         $path = null;
         if ($url !== null) {
             $path = str_replace($this->host->getCurrentHost(), '', $url);
+        } else {
+            $path = $this->host->getCurrentPathWithArgs();
         }
         return trim(
             trim($this->host->getCurrentHost(), '/') .
                 '/' .
                 trim($this->getPathTranslationInLanguage($lng, false, $path), '/'),
             '/'
-        ) . '/';
+        ) . (mb_strpos($path, '?') === false ? '/' : '');
     }
 
     function getTranslationInForeignLng($str, $to_lng, $from_lng = null, $context = null)
@@ -823,7 +828,7 @@ class Gettext
     function getPathTranslationInLanguage($lng, $always_remove_prefix = false, $path = null)
     {
         if ($path === null) {
-            $path = $this->host->getCurrentPath();
+            $path = $this->host->getCurrentPathWithArgs();
         }
         if ($this->getCurrentLng() === $lng) {
             return $path;

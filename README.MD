@@ -71,7 +71,8 @@ $gtbabel->start([
     'api_stats_filename' => '/gtbabel-api-stats.txt',
     'discovery_log' => false,
     'discovery_log_filename' => '/gtbabel-discovery-log.txt',
-    'prevent_publish' => [
+    'prevent_publish' => true,
+    'prevent_publish_urls' => [
         '/path/in/source/lng/to/specific/page' => ['en', 'fr']
         // you can also use wildcards here
         '/slug1/*' => ['en'],
@@ -130,7 +131,7 @@ The following features are included:
 -   Translation services
 -   Support for plugins like [Contact Form 7](https://de.wordpress.org/plugins/contact-form-7/)
 -   Translate specific posts/pages or any other url
--   Control publish status of posts/pages (slug changes are auto-reflected in the `prevent_publish`-option)
+-   Control publish status of posts/pages (slug changes are auto-reflected in the `prevent_publish_urls`-option)
 
 ## Gettext
 
