@@ -76,6 +76,7 @@ class Gtbabel
     {
         $this->gettext->resetTranslations();
         $this->log->apiStatsReset();
+        $this->log->discoveryLogReset();
     }
 
     function translate($content, $args = [])
@@ -96,10 +97,9 @@ class Gtbabel
         $this->settings->setup($args);
         $this->host->setup();
         $this->gettext->preloadGettextInCache();
-        $this->log->discoveryLogReset();
+        $since_date = date('Y-m-d H:i:s');
         $content = $this->dom->modifyContent($content);
-        $data = $this->log->discoveryLogGet();
-        $this->log->discoveryLogReset();
+        $data = $this->log->discoveryLogGet($since_date);
         return $data;
     }
 }

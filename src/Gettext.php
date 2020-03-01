@@ -197,7 +197,7 @@ class Gettext
 
     function getTranslationHash($gettext)
     {
-        return md5($gettext->getOriginal() . '#' . $gettext->getContext() ?? '');
+        return md5($gettext->getOriginal() . '#' . ($gettext->getContext() ?? ''));
     }
 
     function editTranslationFromFiles($hash, $str, $lng)
@@ -272,13 +272,13 @@ class Gettext
         return $success;
     }
 
-    function deleteUnusedTranslations()
+    function deleteUnusedTranslations($since_date)
     {
         $deleted = 0;
 
         $discovery_strings = array_map(function ($a) {
             return $a['string'] . '#' . $a['context'];
-        }, $this->log->discoveryLogGet());
+        }, $this->log->discoveryLogGet($since_date));
 
         $poLoader = new PoLoader();
         $poGenerator = new PoGenerator();
@@ -465,7 +465,7 @@ class Gettext
                 'code' => $languages__key,
                 'label' => $languages__value,
                 'url' => $url,
-                'active' => rtrim($url, '/') === rtrim($this->host->getCurrentUrl(), '/')
+                'active' => rtrim($url, '/') === rtrim($this->host->getCurrentUrlWithArgs(), '/')
             ];
         }
         return $data;
@@ -707,6 +707,9 @@ class Gettext
 
     function stringShouldNotBeTranslated($str, $context = null)
     {
+        if ($str === null || $str === true || $str === false || $str === '') {
+            return true;
+        }
         $str = trim($str);
         $str = trim($str, '"');
         $str = trim($str, '\'');
@@ -730,13 +733,13 @@ class Gettext
             }
         }
         if ($context === 'slug') {
-            if (mb_strpos($str, '#') === 0) {
+            if (mb_strpos(trim($str, '/'), '#') === 0) {
                 return true;
             }
-            if (mb_strpos($str, '?') === 0) {
+            if (mb_strpos(trim($str, '/'), '?') === 0) {
                 return true;
             }
-            if (mb_strpos($str, '&') === 0) {
+            if (mb_strpos(trim($str, '/'), '&') === 0) {
                 return true;
             }
         }
@@ -792,6 +795,9 @@ class Gettext
             return false;
         }
         if ($to_lng === $this->settings->getSourceLng()) {
+            return $str_in_source_lng;
+        }
+        if ($this->stringShouldNotBeTranslated($str_in_source_lng, $context)) {
             return $str_in_source_lng;
         }
         $trans = $this->getExistingTranslationFromCache($str_in_source_lng, $to_lng, $context);

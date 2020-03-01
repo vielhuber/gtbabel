@@ -271,9 +271,7 @@ class Test extends \PHPUnit\Framework\TestCase
             'auto_translation_service' => 'google',
             'google_translation_api_key' => getenv('GOOGLE_TRANSLATION_API_KEY'),
             'api_stats' => true,
-            'api_stats_filename' => '/gtbabel-api-stats.txt',
-            'discovery_log' => false,
-            'discovery_log_filename' => '/gtbabel-discovery-log.txt'
+            'discovery_log' => false
         ];
     }
 

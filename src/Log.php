@@ -17,9 +17,24 @@ class Log
         $this->host = $host ?: new Host();
     }
 
+    function getLogFolder()
+    {
+        return rtrim($this->utils->getDocRoot(), '/') . '/' . trim($this->settings->get('log_folder'), '/');
+    }
+
+    function setupLogFolder()
+    {
+        if (!is_dir($this->getLogFolder())) {
+            mkdir($this->getLogFolder());
+        }
+        if (!file_exists($this->getLogFolder() . '/.gitignore')) {
+            file_put_contents($this->getLogFolder() . '/.gitignore', '*');
+        }
+    }
+
     function apiStatsFilename()
     {
-        return rtrim($this->utils->getDocRoot(), '/') . '/' . ltrim($this->settings->get('api_stats_filename'), '/');
+        return $this->getLogFolder() . '/api-stats.txt';
     }
 
     function apiStatsGet($service)
@@ -58,6 +73,7 @@ class Log
         $filename = $this->apiStatsFilename();
         // we use a cache on writing (not reading, because this has to be live)
         if ($this->api_stats_cache === null) {
+            $this->setupLogFolder();
             if (!file_exists($filename)) {
                 file_put_contents($filename, '');
             }
@@ -90,44 +106,63 @@ class Log
 
     function discoveryLogFilename()
     {
-        return rtrim($this->utils->getDocRoot(), '/') .
-            '/' .
-            ltrim($this->settings->get('discovery_log_filename'), '/');
+        return $this->getLogFolder() . '/discovery-log.txt';
     }
 
-    function discoveryLogGet($url = null)
+    function discoveryLogGet($since_date = null, $url = null)
     {
+        $strings = [];
+
         $filename = $this->discoveryLogFilename();
         if (!file_exists($filename)) {
-            return [];
+            return $strings;
         }
+
+        $urls = null;
+        if ($url !== null) {
+            if (is_array($url)) {
+                $urls = $url;
+            }
+            if (is_string($url)) {
+                $urls = [$url];
+            }
+        }
+
         $data = file_get_contents($filename);
         $data = explode(PHP_EOL, $data);
 
-        $strings = [];
         foreach ($data as $data__value) {
             $line_parts = explode("\t", $data__value);
-            if ($url !== null) {
-                if (is_array($url) && !in_array($line_parts[0], $url)) {
-                    continue;
-                }
-                if (is_string($url) && $line_parts[0] != $url) {
-                    continue;
-                }
+            if ($urls !== null && !in_array($line_parts[0], $urls)) {
+                continue;
             }
-            $strings[] = [
-                'string' => $line_parts[1],
-                'context' => $line_parts[2]
-            ];
+            if ($since_date !== null && strtotime($since_date) > strtotime($line_parts[3])) {
+                continue;
+            }
+            if (!array_key_exists($line_parts[1] . '#' . $line_parts[2], $strings)) {
+                $strings[$line_parts[1] . '#' . $line_parts[2]] = [
+                    'string' => $line_parts[1],
+                    'context' => $line_parts[2],
+                    'date' => $line_parts[3],
+                    'order' => count($strings) + 1
+                ];
+            }
         }
 
+        $strings = array_values($strings);
         $strings = __array_unique($strings);
+
         usort($strings, function ($a, $b) {
             if ($a['context'] != $b['context']) {
                 return strcmp($a['context'], $b['context']);
             }
-            return strcmp($a['string'], $b['string']);
+            return $a['order'] - $b['order'];
         });
+
+        foreach ($strings as $strings__key => $strings__value) {
+            unset($strings[$strings__key]['date']);
+            unset($strings[$strings__key]['order']);
+        }
 
         return $strings;
     }
@@ -153,6 +188,7 @@ class Log
         $filename = $this->discoveryLogFilename();
         // we use a cache on writing (not reading, because this has to be live)
         if ($this->discovery_log_cache === null) {
+            $this->setupLogFolder();
             if (!file_exists($filename)) {
                 file_put_contents($filename, '');
             }
@@ -165,7 +201,7 @@ class Log
                 unset($data[$data__key]);
             }
         }
-        array_unshift($data, $url . "\t" . $str . "\t" . $context);
+        $data[] = $url . "\t" . $str . "\t" . $context . "\t" . date('Y-m-d H:i:s');
         $data = implode(PHP_EOL, $data);
         file_put_contents($filename, $data);
         $this->discovery_log_cache = $data;

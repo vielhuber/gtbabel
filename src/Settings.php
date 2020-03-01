@@ -32,6 +32,7 @@ class Settings
             'lng_source' => 'de',
             'lng_target' => null,
             'lng_folder' => '/locales',
+            'log_folder' => '/logs',
             'prefix_source_lng' => true,
             'redirect_root_domain' => 'browser',
             'translate_text_nodes' => true,
@@ -49,9 +50,7 @@ class Settings
             ],
             'microsoft_translation_api_key' => ['xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'],
             'api_stats' => true,
-            'api_stats_filename' => '/gtbabel-api-stats.txt',
             'discovery_log' => false,
-            'discovery_log_filename' => '/gtbabel-discovery-log.txt',
             'prevent_publish' => true,
             'prevent_publish_urls' => [
                 '/path/in/source/lng/to/specific/page' => ['en', 'fr'],
