@@ -886,6 +886,9 @@ class GtbabelWordPress
                         if (@$post__value['delete'] == '1') {
                             $this->gtbabel->gettext->deleteTranslationFromFiles($post__key);
                         }
+                        if (array_key_exists('shared', $post__value)) {
+                            $this->gtbabel->gettext->editSharedValueFromFiles($post__key, $post__value['shared']);
+                        }
                     }
                 }
             }
@@ -972,10 +975,10 @@ class GtbabelWordPress
             echo '<ul class="gtbabel__publish-list">';
             foreach ($this->gtbabel->settings->getSelectedLanguages() as $lng__key => $lng__value) {
                 echo '<li class="gtbabel__publish-listitem">';
-                $disabled = $this->gtbabel->settings->getSourceLng() === $lng__key || $url_published === false;
+                $disabled = $this->gtbabel->settings->getSourceLanguageCode() === $lng__key || $url_published === false;
                 $checked =
-                    ($this->gtbabel->settings->getSourceLng() === $lng__key && $url_published === true) ||
-                    ($this->gtbabel->settings->getSourceLng() !== $lng__key &&
+                    ($this->gtbabel->settings->getSourceLanguageCode() === $lng__key && $url_published === true) ||
+                    ($this->gtbabel->settings->getSourceLanguageCode() !== $lng__key &&
                         !$this->gtbabel->publish->isPrevented($_GET['url'], $lng__key, false));
                 echo '<input' .
                     ($disabled ? ' disabled="disabled"' : '') .
@@ -983,7 +986,7 @@ class GtbabelWordPress
                     ' class="gtbabel__input gtbabel__input--checkbox gtbabel__input--inverse" type="checkbox" id="gtbabel_publish_' .
                     $lng__key .
                     '" />';
-                if ($this->gtbabel->settings->getSourceLng() !== $lng__key) {
+                if ($this->gtbabel->settings->getSourceLanguageCode() !== $lng__key) {
                     echo '<input type="hidden" name="gtbabel[' .
                         $_GET['url'] .
                         '][' .
@@ -996,7 +999,7 @@ class GtbabelWordPress
                 echo $lng__value;
                 echo '</label>';
                 $link = $_GET['url'];
-                if ($this->gtbabel->settings->getSourceLng() !== $lng__key) {
+                if ($this->gtbabel->settings->getSourceLanguageCode() !== $lng__key) {
                     $link = $this->gtbabel->gettext->getUrlTranslationInLanguage($lng__key, $_GET['url']);
                 }
                 echo '<a class="gtbabel__publish-listitem-link" href="' . $link . '" target="_blank">' . $link . '</a>';
@@ -1033,11 +1036,12 @@ class GtbabelWordPress
             echo '<table class="gtbabel__table">';
             echo '<thead class="gtbabel__table-head">';
             echo '<tr class="gtbabel__table-row">';
-            echo '<td class="gtbabel__table-cell">' . __('String', 'gtbabel-plugin') . '</td>';
+            echo '<td class="gtbabel__table-cell">' . $this->gtbabel->settings->getSourceLanguageLabel() . '</td>';
             foreach ($this->gtbabel->settings->getSelectedLanguagesWithoutSource() as $languages__value) {
                 echo '<td class="gtbabel__table-cell">' . $languages__value . '</td>';
             }
             echo '<td class="gtbabel__table-cell">' . __('Context', 'gtbabel-plugin') . '</td>';
+            echo '<td class="gtbabel__table-cell">' . __('Shared', 'gtbabel-plugin') . '</td>';
             echo '<td class="gtbabel__table-cell">' . __('Delete', 'gtbabel-plugin') . '</td>';
             echo '</tr>';
             echo '</thead>';
@@ -1071,6 +1075,13 @@ class GtbabelWordPress
                     '][context]" disabled="disabled">' .
                     $translations__value['context'] .
                     '</textarea>';
+                echo '</td>';
+                echo '<td class="gtbabel__table-cell">';
+                echo '<input class="gtbabel__input gtbabel__input--checkbox gtbabel__input--on-change gtbabel__input--submit-unchecked" type="checkbox" data-name="gtbabel[' .
+                    $translations__key .
+                    '][shared]" value="1"' .
+                    ($translations__value['shared'] == '1' ? ' checked="checked"' : '') .
+                    ' />';
                 echo '</td>';
                 echo '<td class="gtbabel__table-cell">';
                 echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" name="gtbabel[' .
@@ -1227,11 +1238,11 @@ class GtbabelWordPress
         $translations = [];
 
         if (@$_GET['url'] != '') {
+            $this->changeSetting('discovery_log', true);
             $url = $_GET['url'];
             $urls = [];
             $urls[] = $this->getNoCacheUrl($url);
             $since_date = date('Y-m-d H:i:s');
-            $this->changeSetting('discovery_log', true);
             $this->fetch($this->getNoCacheUrl($url));
             // subsequent urls are now available (we need to refresh the current session)
             $this->start();
@@ -1240,30 +1251,62 @@ class GtbabelWordPress
                 $this->fetch($this->getNoCacheUrl($url_trans));
                 $urls[] = $this->getNoCacheUrl($url_trans);
             }
-            $this->changeSetting('discovery_log', false);
             // restart again
             $this->start();
-            $discovery_strings = array_map(function ($a) {
-                return md5($a['string'] . '#' . ($a['context'] ?? ''));
-            }, $this->gtbabel->log->discoveryLogGet($since_date, $urls));
+            $discovery_strings = $this->gtbabel->log->discoveryLogGet($since_date, $urls);
+            $discovery_strings_map = [];
+            foreach ($discovery_strings as $discovery_strings__key => $discovery_strings__value) {
+                $discovery_strings_map[
+                    md5($discovery_strings__value['string'] . '#' . ($discovery_strings__value['context'] ?? ''))
+                ] = $discovery_strings__key;
+            }
+            // now auto set shared values
+            // we now do a cool trick here: we fetch the homepage first to feed discovery url
+            $home_url = get_home_url();
+            $this->fetch($this->getNoCacheUrl($home_url));
+            $this->start();
+            foreach ($this->gtbabel->settings->getSelectedLanguageCodesWithoutSource() as $lngs__value) {
+                $this->fetch(
+                    $this->getNoCacheUrl($this->gtbabel->gettext->getUrlTranslationInLanguage($lngs__value, $home_url))
+                );
+            }
+            $this->start();
+            $this->gtbabel->gettext->autoEditSharedValueFromFiles($discovery_strings, $urls);
+            $this->changeSetting('discovery_log', false);
         }
 
         $translations = $this->gtbabel->gettext->getAllTranslationsFromFiles();
 
         if (@$_GET['url'] != '') {
             // filter
-            $translations = array_filter(
-                $translations,
-                function ($translations__key) use ($discovery_strings) {
-                    return in_array($translations__key, $discovery_strings);
-                },
-                ARRAY_FILTER_USE_KEY
-            );
+            foreach ($translations as $translations__key => $translations__value) {
+                if (!array_key_exists($translations__key, $discovery_strings_map)) {
+                    unset($translations[$translations__key]);
+                }
+            }
             // sort
-            $translations = array_merge(array_flip($discovery_strings), $translations);
+            foreach ($translations as $translations__key => $translations__value) {
+                $translations[$translations__key]['order'] = $discovery_strings_map[$translations__key];
+            }
+            uasort($translations, function ($a, $b) {
+                if ($a['shared'] === true) {
+                    $a['shared'] = $a['shared'] === true ? 1 : 0;
+                }
+                if ($b['shared'] === true) {
+                    $b['shared'] = $b['shared'] === true ? 1 : 0;
+                }
+                if ($a['shared'] !== $b['shared']) {
+                    return $a['shared'] < $b['shared'] ? -1 : 1;
+                }
+                if ($a['context'] != $b['context']) {
+                    return strcmp($a['context'], $b['context']);
+                }
+                return $a['order'] < $b['order'] ? -1 : 1;
+            });
         }
 
         if (@$_GET['s'] != '') {
+            // filter
             foreach ($translations as $translations__key => $translations__value) {
                 if (mb_stripos($translations__value['orig'], @$_GET['s']) === false) {
                     unset($translations[$translations__key]);

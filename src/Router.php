@@ -23,7 +23,7 @@ class Router
         }
         if (
             $this->settings->get('prefix_source_lng') === false &&
-            $this->gettext->getCurrentPrefix() !== $this->settings->getSourceLng()
+            $this->gettext->getCurrentPrefix() !== $this->settings->getSourceLanguageCode()
         ) {
             return;
         }
@@ -35,7 +35,7 @@ class Router
                 trim($this->host->getCurrentHost(), '/') .
                 '/' .
                 trim(
-                    str_replace($this->settings->getSourceLng() . '/', '', $this->host->getCurrentPathWithArgs()),
+                    str_replace($this->settings->getSourceLanguageCode() . '/', '', $this->host->getCurrentPathWithArgs()),
                     '/'
                 );
         } else {
@@ -48,7 +48,7 @@ class Router
                 if ($this->settings->get('redirect_root_domain') === 'browser') {
                     $url .= $this->gettext->getBrowserLng();
                 } else {
-                    $url .= $this->settings->getSourceLng();
+                    $url .= $this->settings->getSourceLanguageCode();
                 }
             }
             $url .= '/';
@@ -85,14 +85,14 @@ class Router
             if ($this->settings->get('prefix_source_lng') === false) {
                 return;
             }
-            if (mb_strpos($this->host->getCurrentPathWithArgs(), '/' . $this->settings->getSourceLng()) === 0) {
+            if (mb_strpos($this->host->getCurrentPathWithArgs(), '/' . $this->settings->getSourceLanguageCode()) === 0) {
                 $path = mb_substr(
                     $this->host->getCurrentPathWithArgs(),
-                    mb_strlen('/' . $this->settings->getSourceLng())
+                    mb_strlen('/' . $this->settings->getSourceLanguageCode())
                 );
             }
         } else {
-            $path = $this->gettext->getPathTranslationInLanguage($this->settings->getSourceLng(), true);
+            $path = $this->gettext->getPathTranslationInLanguage($this->settings->getSourceLanguageCode(), true);
             $path = trim($path, '/');
             $path = '/' . $path . ($path != '' ? '/' : '') . $this->host->getCurrentArgs();
         }
@@ -105,7 +105,7 @@ class Router
             return;
         }
         $url = $this->host->getCurrentUrl();
-        $source_url = $this->gettext->getUrlTranslationInLanguage($this->settings->getSourceLng(), $url);
+        $source_url = $this->gettext->getUrlTranslationInLanguage($this->settings->getSourceLanguageCode(), $url);
         if (!$this->publish->isActive() || !$this->publish->isPrevented($source_url, $this->gettext->getCurrentLng())) {
             return;
         }

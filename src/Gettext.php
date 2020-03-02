@@ -129,7 +129,7 @@ class Gettext
     function getExistingTranslationFromCache($str, $lng, $context = null)
     {
         // track discovery
-        $this->log->discoveryLogAdd($this->host->getCurrentUrlWithArgs(), $str, $context);
+        $this->log->discoveryLogAdd($this->host->getCurrentUrlWithArgs(), $str, $context, $lng);
 
         if (
             $str === '' ||
@@ -169,9 +169,11 @@ class Gettext
         }
         $pot = $poLoader->loadFile($this->getLngFilename('pot', '_template'));
         foreach ($pot->getTranslations() as $gettext__value) {
+            $shared = $this->getSharedValueFromTranslation($gettext__value);
             $data[$this->getTranslationHash($gettext__value)] = [
                 'orig' => $gettext__value->getOriginal(),
                 'context' => $gettext__value->getContext() ?? '',
+                'shared' => $shared,
                 'translations' => []
             ];
         }
@@ -195,9 +197,42 @@ class Gettext
         return $data;
     }
 
-    function getTranslationHash($gettext)
+    function getTranslationHash($gettext, $context = null)
     {
-        return md5($gettext->getOriginal() . '#' . ($gettext->getContext() ?? ''));
+        if ($context === null) {
+            $string = $gettext->getOriginal();
+            $context = $gettext->getContext();
+        } else {
+            $string = $gettext;
+            $context = $context;
+        }
+        return md5($string . '#' . ($context ?? ''));
+    }
+
+    function getSharedValueFromTranslation($gettext)
+    {
+        $shared = null;
+        foreach ($gettext->getExtractedComments() as $comments__value) {
+            if (mb_strpos($comments__value, 'shared') !== 0) {
+                continue;
+            }
+            $shared = trim(explode(':', $comments__value)[1]) == '1' ? true : false;
+            break;
+        }
+        return $shared;
+    }
+
+    function getSharedCommentFromTranslation($gettext)
+    {
+        $shared = null;
+        foreach ($gettext->getExtractedComments() as $comments__value) {
+            if (mb_strpos($comments__value, 'shared') !== 0) {
+                continue;
+            }
+            $shared = $comments__value;
+            break;
+        }
+        return $shared;
     }
 
     function editTranslationFromFiles($hash, $str, $lng)
@@ -220,6 +255,80 @@ class Gettext
         if ($success === true) {
             $poGenerator->generateFile($po, $this->getLngFilename('po', $lng));
             $moGenerator->generateFile($po, $this->getLngFilename('mo', $lng));
+        }
+        return $success;
+    }
+
+    function editSharedValueFromFiles($hash, $shared)
+    {
+        $success = false;
+        $poLoader = new PoLoader();
+        $poGenerator = new PoGenerator();
+        if (!file_exists($this->getLngFilename('pot', '_template'))) {
+            return $success;
+        }
+        $pot = $poLoader->loadFile($this->getLngFilename('pot', '_template'));
+        foreach ($pot->getTranslations() as $gettext__value) {
+            if ($this->getTranslationHash($gettext__value) !== $hash) {
+                continue;
+            }
+            $comment = $this->getSharedCommentFromTranslation($gettext__value);
+            if ($comment !== null) {
+                $gettext__value->getExtractedComments()->delete($comment);
+            }
+            $gettext__value->getExtractedComments()->add('shared: ' . $shared);
+            $success = true;
+        }
+        if ($success === true) {
+            $poGenerator->generateFile($pot, $this->getLngFilename('pot', '_template'));
+        }
+        return $success;
+    }
+
+    function autoEditSharedValueFromFiles($strings, $not_in_urls)
+    {
+        $success = false;
+        $poLoader = new PoLoader();
+        $poGenerator = new PoGenerator();
+        if (!file_exists($this->getLngFilename('pot', '_template'))) {
+            return $success;
+        }
+        $pot = $poLoader->loadFile($this->getLngFilename('pot', '_template'));
+        $data = [];
+        $discovery_log = $this->log->discoveryLogGet(null, null, false);
+        foreach ($strings as $strings__value) {
+            $shared = null;
+            // auto determine shared
+            foreach ($discovery_log as $discovery_log__value) {
+                if (
+                    $discovery_log__value['string'] == $strings__value['string'] &&
+                    $discovery_log__value['context'] == $strings__value['context'] &&
+                    !in_array($discovery_log__value['url'], $not_in_urls)
+                ) {
+                    $shared = true;
+                    break;
+                }
+            }
+            $data[$this->getTranslationHash($strings__value['string'], $strings__value['context'])] = $shared;
+        }
+        foreach ($pot->getTranslations() as $gettext__value) {
+            $hash = $this->getTranslationHash($gettext__value);
+            if (!array_key_exists($hash, $data)) {
+                continue;
+            }
+            // never overwrite manually set value
+            if ($this->getSharedValueFromTranslation($gettext__value) !== null) {
+                continue;
+            }
+            // only write not null values
+            if ($data[$hash] === null) {
+                continue;
+            }
+            $gettext__value->getExtractedComments()->add('shared: ' . ($data[$hash] === true ? '1' : '0'));
+            $success = true;
+        }
+        if ($success === true) {
+            $poGenerator->generateFile($pot, $this->getLngFilename('pot', '_template'));
         }
         return $success;
     }
@@ -344,7 +453,7 @@ class Gettext
 
     function addTranslationToPoFileAndToCache($orig, $trans, $lng, $context = null, $comment = null)
     {
-        if ($lng === $this->settings->getSourceLng() || empty(@$this->gettext[$lng])) {
+        if ($lng === $this->settings->getSourceLanguageCode() || empty(@$this->gettext[$lng])) {
             return;
         }
         $translation = Translation::create($context, $orig);
@@ -419,7 +528,7 @@ class Gettext
         if ($this->settings->get('lng_target') !== null) {
             return $this->settings->get('lng_target');
         }
-        return $this->getCurrentPrefix() ?? $this->settings->getSourceLng();
+        return $this->getCurrentPrefix() ?? $this->settings->getSourceLanguageCode();
     }
 
     function getBrowserLng()
@@ -431,7 +540,7 @@ class Gettext
                 }
             }
         }
-        return $this->settings->getSourceLng();
+        return $this->settings->getSourceLanguageCode();
     }
 
     function getPrefixFromUrl($url)
@@ -447,7 +556,7 @@ class Gettext
 
     function getLngFromUrl($url)
     {
-        return $this->getPrefixFromUrl($url) ?? $this->settings->getSourceLng();
+        return $this->getPrefixFromUrl($url) ?? $this->settings->getSourceLanguageCode();
     }
 
     function getLanguagePickerData()
@@ -473,7 +582,7 @@ class Gettext
 
     function sourceLngIsCurrentLng()
     {
-        if ($this->getCurrentLng() === $this->settings->getSourceLng()) {
+        if ($this->getCurrentLng() === $this->settings->getSourceLanguageCode()) {
             return true;
         }
         return false;
@@ -534,7 +643,10 @@ class Gettext
             return $link;
         }
         $link = str_replace(
-            [$this->host->getCurrentHost() . '/' . $this->settings->getSourceLng(), $this->host->getCurrentHost()],
+            [
+                $this->host->getCurrentHost() . '/' . $this->settings->getSourceLanguageCode(),
+                $this->host->getCurrentHost()
+            ],
             '',
             $link
         );
@@ -614,7 +726,7 @@ class Gettext
     function autoTranslateString($orig, $to_lng, $context = null, $from_lng = null)
     {
         if ($from_lng === null) {
-            $from_lng = $this->settings->getSourceLng();
+            $from_lng = $this->settings->getSourceLanguageCode();
         }
 
         $trans = null;
@@ -690,14 +802,14 @@ class Gettext
     function translateStringMock($str, $to_lng, $context = null, $from_lng = null)
     {
         if ($from_lng === null) {
-            $from_lng = $this->settings->getSourceLng();
+            $from_lng = $this->settings->getSourceLanguageCode();
         }
         if ($context === 'slug') {
             $pos = mb_strlen($str) - mb_strlen('-' . $from_lng);
             if (mb_strrpos($str, '-' . $from_lng) === $pos) {
                 $str = mb_substr($str, 0, $pos);
             }
-            if ($to_lng === $this->settings->getSourceLng()) {
+            if ($to_lng === $this->settings->getSourceLanguageCode()) {
                 return $str;
             }
             return $str . '-' . $to_lng;
@@ -786,7 +898,7 @@ class Gettext
         if ($from_lng === null) {
             $from_lng = $this->getCurrentLng();
         }
-        if ($from_lng === $this->settings->getSourceLng()) {
+        if ($from_lng === $this->settings->getSourceLanguageCode()) {
             $str_in_source_lng = $str;
         } else {
             $str_in_source_lng = $this->getExistingTranslationReverseFromCache($str, $from_lng, $context); // str in source lng
@@ -794,7 +906,7 @@ class Gettext
         if ($str_in_source_lng === false) {
             return false;
         }
-        if ($to_lng === $this->settings->getSourceLng()) {
+        if ($to_lng === $this->settings->getSourceLanguageCode()) {
             return $str_in_source_lng;
         }
         if ($this->stringShouldNotBeTranslated($str_in_source_lng, $context)) {
@@ -814,14 +926,19 @@ class Gettext
             $to_lng = $this->getCurrentLng();
         }
         if ($from_lng === null) {
-            $from_lng = $this->settings->getSourceLng();
+            $from_lng = $this->settings->getSourceLanguageCode();
         }
         $trans = $this->getTranslationInForeignLng($str, $to_lng, $from_lng, $context);
         if ($trans === false) {
-            if ($from_lng === $this->settings->getSourceLng()) {
+            if ($from_lng === $this->settings->getSourceLanguageCode()) {
                 $str_in_source = $str;
             } else {
-                $str_in_source = $this->autoTranslateString($str, $this->settings->getSourceLng(), $context, $from_lng);
+                $str_in_source = $this->autoTranslateString(
+                    $str,
+                    $this->settings->getSourceLanguageCode(),
+                    $context,
+                    $from_lng
+                );
             }
             $trans = $this->autoTranslateString($str_in_source, $to_lng, $context, $from_lng);
             $this->addStringToPotFileAndToCache($str_in_source, $context);
@@ -850,7 +967,7 @@ class Gettext
         // prefix
         if (
             $always_remove_prefix === true ||
-            ($this->settings->getSourceLng() === $lng && $this->settings->get('prefix_source_lng') === false)
+            ($this->settings->getSourceLanguageCode() === $lng && $this->settings->get('prefix_source_lng') === false)
         ) {
             if (@$path_parts[0] === $this->getCurrentLng()) {
                 unset($path_parts[0]);

@@ -70,8 +70,11 @@
     width: auto;
     border: 1px solid gainsboro;
 }
-.gtbabel--trans .gtbabel__table-cell:nth-last-child(2) {
+.gtbabel--trans .gtbabel__table-cell:nth-last-child(3) {
     width: 10%;
+}
+.gtbabel--trans .gtbabel__table-cell:nth-last-child(2) {
+    width: 8%;
 }
 .gtbabel--trans .gtbabel__table-cell:nth-last-child(1) {
     width: 8%;

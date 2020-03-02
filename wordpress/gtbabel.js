@@ -77,6 +77,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.target.nextElementSibling.value = e.target.checked === true ? '0' : '1';
             }
         });
+        document.addEventListener('submit', e => {
+            if (e.target.closest('form')) {
+                let form = e.target.closest('form'),
+                    els = null;
+                els = form.querySelectorAll(
+                    '.gtbabel__input--submit-unchecked:not(:checked)[name]:not([name$=\'[]\']):not([disabled="disabled"])'
+                );
+                if (els.length > 0) {
+                    els.forEach(el => {
+                        if (
+                            el.previousElementSibling === null ||
+                            el.previousElementSibling.getAttribute('type') !== 'hidden' ||
+                            el.previousElementSibling.value != '0'
+                        ) {
+                            el.insertAdjacentHTML(
+                                'beforebegin',
+                                '<input type="hidden" value="0" name="' + el.getAttribute('name') + '" />'
+                            );
+                        }
+                    });
+                }
+            }
+        });
     }
 });
 

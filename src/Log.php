@@ -109,7 +109,7 @@ class Log
         return $this->getLogFolder() . '/discovery-log.txt';
     }
 
-    function discoveryLogGet($since_date = null, $url = null)
+    function discoveryLogGet($since_date = null, $url = null, $slim_output = true)
     {
         $strings = [];
 
@@ -136,21 +136,18 @@ class Log
             if ($urls !== null && !in_array($line_parts[0], $urls)) {
                 continue;
             }
-            if ($since_date !== null && strtotime($since_date) > strtotime($line_parts[3])) {
+            if ($since_date !== null && strtotime($since_date) > strtotime($line_parts[4])) {
                 continue;
             }
-            if (!array_key_exists($line_parts[1] . '#' . $line_parts[2], $strings)) {
-                $strings[$line_parts[1] . '#' . $line_parts[2]] = [
-                    'string' => $line_parts[1],
-                    'context' => $line_parts[2],
-                    'date' => $line_parts[3],
-                    'order' => count($strings) + 1
-                ];
-            }
+            $strings[] = [
+                'string' => $line_parts[1],
+                'context' => $line_parts[2],
+                'url' => $line_parts[0],
+                'lng' => $line_parts[3],
+                'date' => $line_parts[4],
+                'order' => count($strings) + 1
+            ];
         }
-
-        $strings = array_values($strings);
-        $strings = __array_unique($strings);
 
         usort($strings, function ($a, $b) {
             if ($a['context'] != $b['context']) {
@@ -159,9 +156,15 @@ class Log
             return $a['order'] - $b['order'];
         });
 
-        foreach ($strings as $strings__key => $strings__value) {
-            unset($strings[$strings__key]['date']);
-            unset($strings[$strings__key]['order']);
+        if ($slim_output === true) {
+            foreach ($strings as $strings__key => $strings__value) {
+                unset($strings[$strings__key]['url']);
+                unset($strings[$strings__key]['lng']);
+                unset($strings[$strings__key]['date']);
+                unset($strings[$strings__key]['order']);
+            }
+            $strings = __array_unique($strings);
+            $strings = array_values($strings);
         }
 
         return $strings;
@@ -177,7 +180,7 @@ class Log
         @unlink($this->discoveryLogFilename());
     }
 
-    function discoveryLogAdd($url, $str, $context)
+    function discoveryLogAdd($url, $str, $context, $lng)
     {
         if ($this->discoveryLogIsDisabled()) {
             return;
@@ -201,7 +204,7 @@ class Log
                 unset($data[$data__key]);
             }
         }
-        $data[] = $url . "\t" . $str . "\t" . $context . "\t" . date('Y-m-d H:i:s');
+        $data[] = $url . "\t" . $str . "\t" . $context . "\t" . $lng . "\t" . date('Y-m-d H:i:s');
         $data = implode(PHP_EOL, $data);
         file_put_contents($filename, $data);
         $this->discovery_log_cache = $data;

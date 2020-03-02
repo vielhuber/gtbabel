@@ -192,8 +192,8 @@ class Settings
             'zu' => 'Zulu'
         ];
         // if this already set (this is not the case on init, but we don't need the ordering)
-        if ($this->getSourceLng() !== null) {
-            $source_lng = $this->getSourceLng();
+        if ($this->getSourceLanguageCode() !== null) {
+            $source_lng = $this->getSourceLanguageCode();
             uksort($data, function ($a, $b) use ($data, $source_lng) {
                 if ($source_lng != '') {
                     if ($a === $source_lng) {
@@ -256,7 +256,7 @@ class Settings
     {
         $lng = [];
         foreach ($this->getSelectedLanguages() as $languages__key => $languages__value) {
-            if ($languages__key === $this->getSourceLng()) {
+            if ($languages__key === $this->getSourceLanguageCode()) {
                 continue;
             }
             $lng[$languages__key] = $languages__value;
@@ -264,16 +264,21 @@ class Settings
         return $lng;
     }
 
-    function getSourceLng()
+    function getSourceLanguageCode()
     {
         return $this->get('lng_source');
+    }
+
+    function getSourceLanguageLabel()
+    {
+        return $this->getLabelForLanguageCode($this->getSourceLanguageCode());
     }
 
     function getSelectedLanguageCodesWithoutSource()
     {
         $lng = [];
         foreach ($this->getSelectedLanguageCodes() as $languages__value) {
-            if ($languages__value === $this->getSourceLng()) {
+            if ($languages__value === $this->getSourceLanguageCode()) {
                 continue;
             }
             $lng[] = $languages__value;
