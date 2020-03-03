@@ -523,7 +523,7 @@ class Gettext
         return null;
     }
 
-    function getCurrentLng()
+    function getCurrentLanguageCode()
     {
         if ($this->settings->get('lng_target') !== null) {
             return $this->settings->get('lng_target');
@@ -582,7 +582,7 @@ class Gettext
 
     function sourceLngIsCurrentLng()
     {
-        if ($this->getCurrentLng() === $this->settings->getSourceLanguageCode()) {
+        if ($this->getCurrentLanguageCode() === $this->settings->getSourceLanguageCode()) {
             return true;
         }
         return false;
@@ -896,7 +896,7 @@ class Gettext
     function getTranslationInForeignLng($str, $to_lng, $from_lng = null, $context = null)
     {
         if ($from_lng === null) {
-            $from_lng = $this->getCurrentLng();
+            $from_lng = $this->getCurrentLanguageCode();
         }
         if ($from_lng === $this->settings->getSourceLanguageCode()) {
             $str_in_source_lng = $str;
@@ -923,7 +923,7 @@ class Gettext
         $context = null
     ) {
         if ($to_lng === null) {
-            $to_lng = $this->getCurrentLng();
+            $to_lng = $this->getCurrentLanguageCode();
         }
         if ($from_lng === null) {
             $from_lng = $this->settings->getSourceLanguageCode();
@@ -953,7 +953,7 @@ class Gettext
         if ($path === null) {
             $path = $this->host->getCurrentPathWithArgs();
         }
-        if ($this->getCurrentLng() === $lng) {
+        if ($this->getCurrentLanguageCode() === $lng) {
             return $path;
         }
         $path_parts = explode('/', $path);
@@ -969,11 +969,11 @@ class Gettext
             $always_remove_prefix === true ||
             ($this->settings->getSourceLanguageCode() === $lng && $this->settings->get('prefix_source_lng') === false)
         ) {
-            if (@$path_parts[0] === $this->getCurrentLng()) {
+            if (@$path_parts[0] === $this->getCurrentLanguageCode()) {
                 unset($path_parts[0]);
             }
         } else {
-            if (@$path_parts[0] === $this->getCurrentLng()) {
+            if (@$path_parts[0] === $this->getCurrentLanguageCode()) {
                 $path_parts[0] = $lng;
             } else {
                 array_unshift($path_parts, $lng);
@@ -990,7 +990,7 @@ class Gettext
             // gtbabel cannot figure out it's source
             // the following line is a convenience method when auto translation is disabled
             if ($trans === false && $this->settings->get('auto_translation') === false) {
-                $trans = $this->autoTranslateString($path_parts__value, $lng, 'slug', $this->getCurrentLng());
+                $trans = $this->autoTranslateString($path_parts__value, $lng, 'slug', $this->getCurrentLanguageCode());
             }
             if ($trans !== false) {
                 $path_parts[$path_parts__key] = $trans;

@@ -35,7 +35,11 @@ class Router
                 trim($this->host->getCurrentHost(), '/') .
                 '/' .
                 trim(
-                    str_replace($this->settings->getSourceLanguageCode() . '/', '', $this->host->getCurrentPathWithArgs()),
+                    str_replace(
+                        $this->settings->getSourceLanguageCode() . '/',
+                        '',
+                        $this->host->getCurrentPathWithArgs()
+                    ),
                     '/'
                 );
         } else {
@@ -85,7 +89,9 @@ class Router
             if ($this->settings->get('prefix_source_lng') === false) {
                 return;
             }
-            if (mb_strpos($this->host->getCurrentPathWithArgs(), '/' . $this->settings->getSourceLanguageCode()) === 0) {
+            if (
+                mb_strpos($this->host->getCurrentPathWithArgs(), '/' . $this->settings->getSourceLanguageCode()) === 0
+            ) {
                 $path = mb_substr(
                     $this->host->getCurrentPathWithArgs(),
                     mb_strlen('/' . $this->settings->getSourceLanguageCode())
@@ -106,7 +112,10 @@ class Router
         }
         $url = $this->host->getCurrentUrl();
         $source_url = $this->gettext->getUrlTranslationInLanguage($this->settings->getSourceLanguageCode(), $url);
-        if (!$this->publish->isActive() || !$this->publish->isPrevented($source_url, $this->gettext->getCurrentLng())) {
+        if (
+            !$this->publish->isActive() ||
+            !$this->publish->isPrevented($source_url, $this->gettext->getCurrentLanguageCode())
+        ) {
             return;
         }
         header('Location: ' . $source_url, true, 302);

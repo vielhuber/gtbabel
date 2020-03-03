@@ -120,7 +120,7 @@ class Dom
 
             $translatedText = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
                 $originalText,
-                $this->gettext->getCurrentLng(),
+                $this->gettext->getCurrentLanguageCode(),
                 null
             );
 
@@ -211,7 +211,7 @@ class Dom
                             if ($context === 'slug') {
                                 $trans = $this->gettext->getTranslationOfLinkHrefAndAddDynamicallyIfNeeded(
                                     $value,
-                                    $this->gettext->getCurrentLng(),
+                                    $this->gettext->getCurrentLanguageCode(),
                                     false
                                 );
                                 if ($trans === null) {
@@ -223,7 +223,7 @@ class Dom
                         } else {
                             $trans = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
                                 $value,
-                                $this->gettext->getCurrentLng(),
+                                $this->gettext->getCurrentLanguageCode(),
                                 $context
                             );
                         }
@@ -253,6 +253,7 @@ class Dom
     {
         $this->setupDomDocument($html);
         $this->setLangTags();
+        $this->setRtlAttr();
         $this->preloadExcludedNodes();
         $this->preloadForceTokenize();
         $this->modifyTextNodes();
@@ -300,7 +301,7 @@ class Dom
         if ($this->settings->get('html_lang_attribute') === true) {
             $html_node = $this->DOMXpath->query('/html')[0];
             if ($html_node !== null) {
-                $html_node->setAttribute('lang', $this->gettext->getCurrentLng());
+                $html_node->setAttribute('lang', $this->gettext->getCurrentLanguageCode());
             }
         }
 
@@ -315,6 +316,16 @@ class Dom
                     $tag->setAttribute('href', $data__value['url']);
                     $head_node->appendChild($tag);
                 }
+            }
+        }
+    }
+
+    function setRtlAttr()
+    {
+        if ($this->settings->isLanguageDirectionRtl($this->gettext->getCurrentLanguageCode())) {
+            $html_node = $this->DOMXpath->query('/html')[0];
+            if ($html_node !== null) {
+                $html_node->setAttribute('dir', 'rtl');
             }
         }
     }
@@ -542,7 +553,7 @@ class Dom
                 } elseif (is_string($json__value) && in_array($json__key, ['message'], true)) {
                     $json__value = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
                         $json__value,
-                        $this->gettext->getCurrentLng(),
+                        $this->gettext->getCurrentLanguageCode(),
                         null
                     );
                 }

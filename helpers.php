@@ -8,7 +8,7 @@ if (!function_exists('gtbabel_current_lng')) {
         if ($gtbabel === null) {
             $gtbabel = new Gtbabel();
         }
-        return $gtbabel->gettext->getCurrentLng();
+        return $gtbabel->gettext->getCurrentLanguageCode();
     }
 }
 

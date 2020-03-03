@@ -209,6 +209,40 @@ class Settings
         return $data;
     }
 
+    function isLanguageDirectionRtl($lng)
+    {
+        // some codes are not in the default languages array but one can provide custom codes (this array should match all)
+        return in_array($lng, [
+            'ae',
+            'ar',
+            'ara',
+            'arc',
+            'ave',
+            'dv',
+            'egy',
+            'fa',
+            'fas',
+            'ha',
+            'he',
+            'heb',
+            'khw',
+            'ks',
+            'ku',
+            'kur',
+            'nqo',
+            'pal',
+            'per',
+            'phn',
+            'ps',
+            'sam',
+            'syc',
+            'syr',
+            'ur',
+            'urd',
+            'yi'
+        ]);
+    }
+
     function getDefaultLanguageCodes()
     {
         return array_keys($this->getDefaultLanguages());
