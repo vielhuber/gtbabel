@@ -46,13 +46,20 @@ class Publish
         return $this->settings->get('prevent_publish');
     }
 
-    function isPrevented($url, $lng)
+    function isPrevented($url, $lng, $allow_regex = true)
     {
+        $url = str_replace($this->host->getCurrentHost(), '', $url);
         $prevent_publish_urls = $this->settings->get('prevent_publish_urls');
         foreach ($prevent_publish_urls as $prevent_publish_urls__key => $prevent_publish_urls__value) {
-            $regex = str_replace('\*', '.*', preg_quote(trim($prevent_publish_urls__key, '/'), '/'));
-            if (preg_match('/' . $regex . '/', trim($url, '/')) == 0) {
-                continue;
+            if ($allow_regex === true) {
+                $regex = str_replace('\*', '.*', preg_quote(trim($prevent_publish_urls__key, '/'), '/'));
+                if (preg_match('/' . $regex . '/', trim($url, '/')) == 0) {
+                    continue;
+                }
+            } else {
+                if (mb_strpos(trim($url, '/'), trim($prevent_publish_urls__key, '/')) === false) {
+                    continue;
+                }
             }
             return in_array($lng, $prevent_publish_urls__value);
         }

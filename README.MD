@@ -75,7 +75,9 @@ $gtbabel->start([
         '/path/in/source/lng/to/specific/page' => ['en', 'fr']
         // you can also use wildcards here
         '/slug1/*' => ['en'],
-        '/slug1/*/slug2' => ['fr']
+        '/slug1/*/slug2' => ['fr'],
+         // disable whole languages
+        '/*' => ['en','fr']
     ],
     'exclude_urls' => ['/backend'],
     'exclude_dom' => ['.notranslate', '.lngpicker'],

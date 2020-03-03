@@ -361,11 +361,33 @@ class GtbabelWordPress
                         if (!empty($post_data__value_parts)) {
                             $settings['prevent_publish_urls'][$post_data__value_parts[0]] = explode(
                                 ',',
-                                $post_data__value_parts[1]
+                                __trim_whitespace($post_data__value_parts[1])
                             );
                         }
                     }
                 }
+
+                $post_data = $settings['hide_languages'];
+                if (array_key_exists('/*', $settings['prevent_publish_urls'])) {
+                    unset($settings['prevent_publish_urls']['/*']);
+                }
+                if (!empty($post_data)) {
+                    $settings['prevent_publish_urls']['/*'] = [];
+                    foreach ($post_data as $post_data__key => $post_data__value) {
+                        foreach (
+                            $settings['prevent_publish_urls']
+                            as $prevent_publish_urls__key => $prevent_publish_urls__value
+                        ) {
+                            if ($prevent_publish_urls__key !== '/*') {
+                                continue;
+                            }
+                            if (!in_array($post_data__key, $prevent_publish_urls__value)) {
+                                $settings['prevent_publish_urls'][$prevent_publish_urls__key][] = $post_data__key;
+                            }
+                        }
+                    }
+                }
+                unset($settings['hide_languages']);
 
                 $post_data = $settings['include_dom'];
                 $settings['include_dom'] = [];
@@ -436,7 +458,7 @@ class GtbabelWordPress
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
         echo '<ul class="gtbabel__languagelist">';
-        foreach (gtbabel_default_languages() as $languages__key => $languages__value) {
+        foreach ($this->gtbabel->settings->getDefaultLanguages() as $languages__key => $languages__value) {
             echo '<li class="gtbabel__languagelist-item">';
             echo '<label>';
             echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" name="gtbabel[languages][' .
@@ -459,7 +481,7 @@ class GtbabelWordPress
         echo '<div class="gtbabel__inputbox">';
         echo '<select class="gtbabel__input gtbabel__input--select" id="gtbabel_lng_source" name="gtbabel[lng_source]">';
         echo '<option value="">&ndash;&ndash;</option>';
-        foreach (gtbabel_default_languages() as $languages__key => $languages__value) {
+        foreach ($this->gtbabel->settings->getDefaultLanguages() as $languages__key => $languages__value) {
             echo '<option value="' .
                 $languages__key .
                 '"' .
@@ -502,6 +524,46 @@ class GtbabelWordPress
         echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_debug_translations" name="gtbabel[debug_translations]" value="1"' .
             ($settings['debug_translations'] == '1' ? ' checked="checked"' : '') .
             ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_hide_languages" class="gtbabel__label">';
+        echo __('Hide languages', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<ul class="gtbabel__languagelist">';
+        foreach (
+            $this->gtbabel->settings->getSelectedLanguagesWithoutSource()
+            as $languages__key => $languages__value
+        ) {
+            $checked = false;
+            if (!empty($settings['prevent_publish_urls'])) {
+                foreach (
+                    $settings['prevent_publish_urls']
+                    as $prevent_publish_urls__key => $prevent_publish_urls__value
+                ) {
+                    if (
+                        $prevent_publish_urls__key === '/*' &&
+                        in_array($languages__key, $prevent_publish_urls__value)
+                    ) {
+                        $checked = true;
+                        break;
+                    }
+                }
+            }
+            echo '<li class="gtbabel__languagelist-item">';
+            echo '<label>';
+            echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" name="gtbabel[hide_languages][' .
+                $languages__key .
+                ']"' .
+                ($checked === true ? ' checked="checked"' : '') .
+                ' value="1" />';
+            echo $languages__value;
+            echo '</label>';
+            echo '</li>';
+        }
+        echo '</ul>';
         echo '</div>';
         echo '</li>';
 

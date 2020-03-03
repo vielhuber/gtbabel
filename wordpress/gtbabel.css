@@ -49,6 +49,7 @@
     column-count: 20;
     column-width: 130px;
     column-gap: 0px;
+    margin-top: 7px;
 }
 .gtbabel__languagelist-item {
     break-inside: avoid-column;
