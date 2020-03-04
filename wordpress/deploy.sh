@@ -8,11 +8,10 @@ unlink vendor
 cp ../composer.json ./composer.json
 cp -r ../src ./src
 cp ../helpers.php ./helpers.php
-composer install
-composer update
+composer install --no-dev
+composer update --no-dev
 
 # do the prefixing with php-scoper
-composer require ua1-labs/php-scoper-wp-patch
 wget https://github.com/humbug/php-scoper/releases/download/0.13.1/php-scoper.phar
 rm -f ./gtbabel.zip
 php ./php-scoper.phar add-prefix --config scoper.inc.php
@@ -23,7 +22,7 @@ sleep 3
 
 # rename and zip the build directory
 mv ./build/ ./gtbabel/
-zip -r ./gtbabel.zip ./gtbabel -x "gtbabel/composer.lock" -x "gtbabel/php-scoper.phar" -x "gtbabel/deploy.sh" -x "gtbabel/composer.json" -x "gtbabel/scoper.inc.php"
+zip -r ./gtbabel.zip ./gtbabel -x "gtbabel/composer.lock" -x "gtbabel/php-scoper.phar" -x "gtbabel/deploy.sh" -x "gtbabel/composer.json" -x "gtbabel/scoper.inc.php" -x \*"gtbabel/locales/"\* -x \*"gtbabel/logs/"\*
 rm -rf ./gtbabel
 
 # increase version number

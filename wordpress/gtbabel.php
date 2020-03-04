@@ -8,8 +8,6 @@
  * Author URI: https://vielhuber.de
  * License: free
  */
-namespace GtbabelWordPress;
-
 if (file_exists(__DIR__ . '/vendor/scoper-autoload.php')) {
     require_once __DIR__ . '/vendor/scoper-autoload.php';
 } else {
@@ -137,8 +135,8 @@ class GtbabelWordPress
             function ($post_ID, $post_after, $post_before) {
                 $post_before_status = get_post_status($post_before);
                 $post_after_status = get_post_status($post_after);
-                $post_before_url = get_the_permalink($post_before);
-                $post_after_url = get_the_permalink($post_after);
+                $post_before_url = get_permalink($post_before);
+                $post_after_url = get_permalink($post_after);
                 if (
                     $post_after_status === 'trash' ||
                     $post_after_status === 'draft' ||
@@ -176,7 +174,7 @@ class GtbabelWordPress
                 // we always add the menu item (in case of ajax url requests we can replace it easily)
                 $html = '<span class="ab-icon"></span>' . __('Translate now', 'gtbabel-plugin');
                 if ($pagenow == 'post.php') {
-                    $url = get_the_permalink((int) $_GET['post']);
+                    $url = get_permalink((int) $_GET['post']);
                     if ($url == '') {
                         $html = '';
                     }
@@ -879,7 +877,11 @@ class GtbabelWordPress
             if (@$_GET['gtbabel_delete_unused'] == '1') {
                 $delete_unused = true;
             }
-            $this->initBackendAutoTranslate($chunk, $delete_unused);
+            $delete_unused_since_date = null;
+            if (__x(@$_GET['gtbabel_delete_unused_since_date'])) {
+                $delete_unused_since_date = $_GET['gtbabel_delete_unused_since_date'];
+            }
+            $this->initBackendAutoTranslate($chunk, $delete_unused, $delete_unused_since_date);
         }
 
         if ($settings['api_stats'] == '1') {
@@ -1467,7 +1469,7 @@ class GtbabelWordPress
         );
     }
 
-    private function initBackendAutoTranslate($chunk = 0, $delete_unused = false)
+    private function initBackendAutoTranslate($chunk = 0, $delete_unused = false, $delete_unused_since_date = null)
     {
         $chunk_size = 5;
 
@@ -1479,7 +1481,7 @@ class GtbabelWordPress
         $query = new \WP_Query(['post_type' => 'any', 'posts_per_page' => '-1', 'post_status' => 'publish']);
         while ($query->have_posts()) {
             $query->the_post();
-            $url = get_the_permalink();
+            $url = get_permalink();
             $urls[] = $url;
         }
         $query = new \WP_Term_Query(['hide_empty' => false]);
@@ -1502,7 +1504,9 @@ class GtbabelWordPress
 
         // prepare delete unused
         if ($delete_unused === true) {
-            $since_date = date('Y-m-d H:i:s');
+            if ($delete_unused_since_date === null) {
+                $delete_unused_since_date = date('Y-m-d H:i:s');
+            }
             $this->changeSetting('discovery_log', true);
         }
 
@@ -1552,7 +1556,7 @@ class GtbabelWordPress
         // if finished
         if ($chunk_size * $chunk + $chunk_size > count($queue) - 1) {
             if ($delete_unused === true) {
-                $deleted = $this->gtbabel->gettext->deleteUnusedTranslations($since_date);
+                $deleted = $this->gtbabel->gettext->deleteUnusedTranslations($delete_unused_since_date);
                 echo __('Deleted strings', 'gtbabel-plugin') . ': ' . $deleted;
                 echo '<br/>';
             }
@@ -1565,7 +1569,10 @@ class GtbabelWordPress
             $redirect_url = admin_url(
                 'admin.php?page=gtbabel-settings&gtbabel_auto_translate=1&gtbabel_auto_translate_chunk=' .
                     ($chunk + 1) .
-                    ($delete_unused === true ? '&gtbabel_delete_unused=1' : '')
+                    ($delete_unused === true ? '&gtbabel_delete_unused=1' : '') .
+                    (__x($delete_unused_since_date)
+                        ? '&gtbabel_delete_unused_since_date=' . $delete_unused_since_date
+                        : '')
             );
             echo '<a href="' . $redirect_url . '" class="gtbabel__auto-translate-next"></a>';
         }
