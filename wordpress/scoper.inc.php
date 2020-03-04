@@ -6,7 +6,7 @@ declare(strict_types=1);
 /* globally declared helpers that are hotloaded via composer.json must NOT be included! */
 $functions = [
     /* stringhelper global functions */
-    'stringhelper' => ['__x','__nx','__v','__e','__i','__empty','__x_all','__nx_all','__x_one','__true_one','__false_one','__true_all','__false_all','__nx_one','__true','__false','__cookie_exists','__cookie_get','__cookie_set','__cookie_delete','__strip','__strip_numeric','__strip_nonnumeric','__strip_digit','__strip_nondigit','__strip_nonchars','__strip_whitespace','__strip_whitespace_collapsed','__split_newline','__split_whitespace','__remove_emptylines','__remove_newlines','__trim_whitespace','__atrim','__o','__d','__validate_date','__validate_url','__validate_email','__phone_tokenize','__phone_normalize','__phone_country_codes','__phone_area_codes','__phone_area_codes_landline','__phone_area_codes_mobile','__phone_is_landline','__phone_is_mobile','__url_normalize','__remove_emoji','__minify_html','__translate_google','__translate_microsoft','__first_char_is_uppercase','__set_first_char_uppercase','__slug','__random_string','__shuffle_assoc','__array_multisort','__array_multisort_get_order','__array_group_by','__array_unique','__ask','__is_serialized','__is_integer','__extract','__strposx','__strposnth','__remove_empty','__remove','__remove_by_key','__remove_by_value','__arr_append','__arr_prepend','__can_be_looped','__array','__object','__object_to_array','__array_to_object','__highlight','__clean_up_get','__clean_up_post','__clean_up','__get','__post','__expl','__prg','__redirect_to','__date','__validate_date_format','__validate_date_mod','__datetime','__date_reset_time','__age_from_date','__remove_zero_decimals','__flatten_keys','__flatten_values','__inside_out_values','__arrays_to_objects','__fkey','__lkey','__last','__first','__first_key','__rand','__remove_first','__remove_last','__string_is_json','__fetch','__curl','__exception','__success','__error','__os','__uuid','__url','__urlWithoutArgs','__baseurl','__char_to_int','__int_to_char','__inc_char','__dec_char','__str_replace_first','__str_replace_last','__csv2array','__array2csv','__sed_replace','__sed_prepend','__sed_append','__sed_escape','__line_endings_convert','__line_endings_weak_equals','__log_begin','__log_end','__image_compress','__image_orientate','__encrypt','__decrypt','__encrypt_poor','__decrypt_poor','__files_in_folder','__rrmdir','__is_base64_encoded','__is_external','__pushId','__redirect','__f','__swap','__mx','__ox','__aox','__amx','__xe','__eq','__neq','clean_up_get','clean_up_post','clean_up'],
+    //'stringhelper' => ['__x','__nx','__v','__e','__i','__empty','__x_all','__nx_all','__x_one','__true_one','__false_one','__true_all','__false_all','__nx_one','__true','__false','__cookie_exists','__cookie_get','__cookie_set','__cookie_delete','__strip','__strip_numeric','__strip_nonnumeric','__strip_digit','__strip_nondigit','__strip_nonchars','__strip_whitespace','__strip_whitespace_collapsed','__split_newline','__split_whitespace','__remove_emptylines','__remove_newlines','__trim_whitespace','__atrim','__o','__d','__validate_date','__validate_url','__validate_email','__phone_tokenize','__phone_normalize','__phone_country_codes','__phone_area_codes','__phone_area_codes_landline','__phone_area_codes_mobile','__phone_is_landline','__phone_is_mobile','__url_normalize','__remove_emoji','__minify_html','__translate_google','__translate_microsoft','__first_char_is_uppercase','__set_first_char_uppercase','__slug','__random_string','__shuffle_assoc','__array_multisort','__array_multisort_get_order','__array_group_by','__array_unique','__ask','__is_serialized','__is_integer','__extract','__strposx','__strposnth','__remove_empty','__remove','__remove_by_key','__remove_by_value','__arr_append','__arr_prepend','__can_be_looped','__array','__object','__object_to_array','__array_to_object','__highlight','__clean_up_get','__clean_up_post','__clean_up','__get','__post','__expl','__prg','__redirect_to','__date','__validate_date_format','__validate_date_mod','__datetime','__date_reset_time','__age_from_date','__remove_zero_decimals','__flatten_keys','__flatten_values','__inside_out_values','__arrays_to_objects','__fkey','__lkey','__last','__first','__first_key','__rand','__remove_first','__remove_last','__string_is_json','__fetch','__curl','__exception','__success','__error','__os','__uuid','__url','__urlWithoutArgs','__baseurl','__char_to_int','__int_to_char','__inc_char','__dec_char','__str_replace_first','__str_replace_last','__csv2array','__array2csv','__sed_replace','__sed_prepend','__sed_append','__sed_escape','__line_endings_convert','__line_endings_weak_equals','__log_begin','__log_end','__image_compress','__image_orientate','__encrypt','__decrypt','__encrypt_poor','__decrypt_poor','__files_in_folder','__rrmdir','__is_base64_encoded','__is_external','__pushId','__redirect','__f','__swap','__mx','__ox','__aox','__amx','__xe','__eq','__neq','clean_up_get','clean_up_post','clean_up'],
     /* helpers */
     'helpers' => ['gtbabel_current_lng','gtbabel_language_label','gtbabel_languages','gtbabel_default_language_codes','gtbabel_default_languages','gtbabel_default_settings','gtbabel_languagepicker','gtbabel__','gtbabel_localize_js'],
     /* native wp functions (https://codex.wordpress.org/Function_Reference) */
@@ -14,6 +14,7 @@ $functions = [
 ];
 
 return [
+    'prefix' => 'ScopedGtbabel',
     // this is not needed anymore
     /*
     'whitelist' => [
@@ -28,8 +29,8 @@ return [
     */
     // all global functions/classes should NOT be prefixed
     'files-whitelist' => [
-        //'helpers.php', // all hotloaded global functions by the composer package itself
-        'vendor/vielhuber/stringhelper/stringhelper.php', // all libraries with global functions that are hotloaded
+        //'helpers.php', // all hotloaded global functions by the composer package itself should not get a namespace(!)
+        //'vendor/vielhuber/stringhelper/stringhelper.php', // all dependencies with global functions that are hotloaded and used should not get a namespace(!)
     ],
     'whitelist-global-functions' => false,
     'whitelist-global-constants' => false,
@@ -48,6 +49,10 @@ return [
                     $content = str_replace('\\'.$prefix.'\\'.$functions__value__value.'(', '\\'.$functions__value__value.'(', $content); // "\PREFIX\foo()"
                     $content = str_replace($prefix.'\\\\'.$functions__value__value, $functions__value__value, $content); // "if( function_exists('PREFIX\\foo') )"
                 }
+            }
+            // TODO
+            if (strpos($filePath,'helpers.php') !== false) {
+                $content = str_replace('namespace '.$prefix.';','',$content);
             }
             return $content;
         }

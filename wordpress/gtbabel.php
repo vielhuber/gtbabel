@@ -101,7 +101,7 @@ class GtbabelWordPress
     private function localizePlugin()
     {
         add_action('plugins_loaded', function () {
-            $jo = load_plugin_textdomain('gtbabel-plugin', false, dirname(plugin_basename(__FILE__)) . '/languages');
+            load_plugin_textdomain('gtbabel-plugin', false, dirname(plugin_basename(__FILE__)) . '/languages');
         });
     }
 
@@ -458,7 +458,7 @@ class GtbabelWordPress
         echo '<ul class="gtbabel__languagelist">';
         foreach ($this->gtbabel->settings->getDefaultLanguages() as $languages__key => $languages__value) {
             echo '<li class="gtbabel__languagelist-item">';
-            echo '<label>';
+            echo '<label class="gtbabel__languagelist-label">';
             echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" name="gtbabel[languages][' .
                 $languages__key .
                 ']"' .
@@ -551,7 +551,7 @@ class GtbabelWordPress
                 }
             }
             echo '<li class="gtbabel__languagelist-item">';
-            echo '<label>';
+            echo '<label class="gtbabel__languagelist-label">';
             echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" name="gtbabel[hide_languages][' .
                 $languages__key .
                 ']"' .
