@@ -14,6 +14,7 @@ if (file_exists(__DIR__ . '/vendor/scoper-autoload.php')) {
     require_once __DIR__ . '/vendor/autoload.php';
 }
 use vielhuber\gtbabel\Gtbabel;
+use vielhuber\stringhelper\__;
 
 class GtbabelWordPress
 {
@@ -46,9 +47,7 @@ class GtbabelWordPress
             add_action(
                 'wp_head',
                 function () use ($settings) {
-                    if (function_exists('gtbabel_localize_js')) {
-                        gtbabel_localize_js($settings['localize_js']);
-                    }
+                    $this->gtbabel->dom->outputJsLocalizationHelper($settings['localize_js']);
                 },
                 -1
             );
@@ -116,7 +115,7 @@ class GtbabelWordPress
             delete_option('gtbabel_settings'); // this is needed, because sometimes the option exists (with the value '')
             add_option(
                 'gtbabel_settings',
-                gtbabel_default_settings([
+                $this->gtbabel->settings->setupSettings([
                     'languages' => $languages,
                     'lng_source' => $lng_source,
                     'lng_folder' => '/wp-content/plugins/gtbabel/locales',
@@ -359,7 +358,7 @@ class GtbabelWordPress
                         if (!empty($post_data__value_parts)) {
                             $settings['prevent_publish_urls'][$post_data__value_parts[0]] = explode(
                                 ',',
-                                __trim_whitespace($post_data__value_parts[1])
+                                __::trim_whitespace($post_data__value_parts[1])
                             );
                         }
                     }
@@ -878,7 +877,7 @@ class GtbabelWordPress
                 $delete_unused = true;
             }
             $delete_unused_since_date = null;
-            if (__x(@$_GET['gtbabel_delete_unused_since_date'])) {
+            if (__::x(@$_GET['gtbabel_delete_unused_since_date'])) {
                 $delete_unused_since_date = $_GET['gtbabel_delete_unused_since_date'];
             }
             $this->initBackendAutoTranslate($chunk, $delete_unused, $delete_unused_since_date);
@@ -1456,7 +1455,7 @@ class GtbabelWordPress
 
     private function fetch($url, $with_current_session = true)
     {
-        return __curl(
+        return __::curl(
             $url,
             null,
             'GET',
@@ -1570,7 +1569,7 @@ class GtbabelWordPress
                 'admin.php?page=gtbabel-settings&gtbabel_auto_translate=1&gtbabel_auto_translate_chunk=' .
                     ($chunk + 1) .
                     ($delete_unused === true ? '&gtbabel_delete_unused=1' : '') .
-                    (__x($delete_unused_since_date)
+                    (__::x($delete_unused_since_date)
                         ? '&gtbabel_delete_unused_since_date=' . $delete_unused_since_date
                         : '')
             );

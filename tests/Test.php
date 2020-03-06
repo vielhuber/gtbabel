@@ -1,5 +1,6 @@
 <?php
 use vielhuber\gtbabel\Gtbabel;
+use vielhuber\stringhelper\__;
 use Dotenv\Dotenv;
 
 class Test extends \PHPUnit\Framework\TestCase
@@ -328,7 +329,8 @@ class Test extends \PHPUnit\Framework\TestCase
 
         $debug_filename = __DIR__ . '/files/out/' . str_replace('.' . $extension, '_expected.' . $extension, $filename);
 
-        $passed = __minify_html($this->normalize($html_translated)) === __minify_html($this->normalize($html_target));
+        $passed =
+            __::minify_html($this->normalize($html_translated)) === __::minify_html($this->normalize($html_target));
 
         if ($passed === false) {
             file_put_contents(
@@ -336,10 +338,10 @@ class Test extends \PHPUnit\Framework\TestCase
                 $html_translated .
                     PHP_EOL .
                     PHP_EOL .
-                    __minify_html($this->normalize($html_translated)) .
+                    __::minify_html($this->normalize($html_translated)) .
                     PHP_EOL .
                     PHP_EOL .
-                    __minify_html($this->normalize($html_target))
+                    __::minify_html($this->normalize($html_target))
             );
         } else {
             @unlink($debug_filename);

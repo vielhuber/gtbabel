@@ -1,6 +1,8 @@
 <?php
 namespace vielhuber\gtbabel;
 
+use vielhuber\stringhelper\__;
+
 class Tags
 {
     public $utils;
@@ -28,7 +30,7 @@ class Tags
             $id = $matches__key + 1;
             $pos = mb_strrpos($matches__value, '>');
             $new = mb_substr($matches__value, 0, $pos) . ' p="' . $id . '"' . mb_substr($matches__value, $pos);
-            $str = __str_replace_first($matches__value, $new, $str);
+            $str = __::str_replace_first($matches__value, $new, $str);
         }
         return $str;
     }
@@ -67,7 +69,7 @@ class Tags
                 $attributes = '';
             }
             $new = str_replace($attributes_cur, $attributes, $matches__value);
-            $str = __str_replace_first($matches__value, $new, $str);
+            $str = __::str_replace_first($matches__value, $new, $str);
         }
         return $str;
     }
@@ -99,7 +101,7 @@ class Tags
                 $replacement = ' class="notranslate"';
             }
             $new = str_replace($attributes, $replacement, $matches__value);
-            $str = __str_replace_first($matches__value, $new, $str);
+            $str = __::str_replace_first($matches__value, $new, $str);
         }
         return [$str, $mappingTable];
     }
@@ -134,7 +136,7 @@ class Tags
                 $new = mb_substr($new, 0, $pos) . ' ' . $attributes_restored . mb_substr($new, $pos);
             }
 
-            $str = __str_replace_first($matches__value, $new, $str);
+            $str = __::str_replace_first($matches__value, $new, $str);
         }
         return $str;
     }

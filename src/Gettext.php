@@ -8,6 +8,8 @@ use Gettext\Loader\MoLoader;
 use Gettext\Translations;
 use Gettext\Translation;
 
+use vielhuber\stringhelper\__;
+
 class Gettext
 {
     public $gettext;
@@ -737,14 +739,14 @@ class Gettext
                 if (is_array($api_key)) {
                     $api_key = $api_key[array_rand($api_key)];
                 }
-                $trans = __translate_google($orig, $from_lng, $to_lng, $api_key);
+                $trans = __::translate_google($orig, $from_lng, $to_lng, $api_key);
                 $this->log->apiStatsIncrease('google', mb_strlen($orig));
             } elseif ($this->settings->get('auto_translation_service') === 'microsoft') {
                 $api_key = $this->settings->get('microsoft_translation_api_key');
                 if (is_array($api_key)) {
                     $api_key = $api_key[array_rand($api_key)];
                 }
-                $trans = __translate_microsoft($orig, $from_lng, $to_lng, $api_key);
+                $trans = __::translate_microsoft($orig, $from_lng, $to_lng, $api_key);
                 $this->log->apiStatsIncrease('microsoft', mb_strlen($orig));
             }
             if ($context === 'slug') {

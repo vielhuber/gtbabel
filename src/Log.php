@@ -1,6 +1,8 @@
 <?php
 namespace vielhuber\gtbabel;
 
+use vielhuber\stringhelper\__;
+
 class Log
 {
     public $api_stats_cache;
@@ -163,7 +165,7 @@ class Log
                 unset($strings[$strings__key]['date']);
                 unset($strings[$strings__key]['order']);
             }
-            $strings = __array_unique($strings);
+            $strings = __::array_unique($strings);
             $strings = array_values($strings);
         }
 

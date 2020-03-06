@@ -1,12 +1,10 @@
 <?php
-use vielhuber\gtbabel\Gtbabel;
-
 if (!function_exists('gtbabel_current_lng')) {
     function gtbabel_current_lng()
     {
         global $gtbabel;
         if ($gtbabel === null) {
-            $gtbabel = new Gtbabel();
+            $gtbabel = new \vielhuber\gtbabel\Gtbabel();
         }
         return $gtbabel->gettext->getCurrentLanguageCode();
     }
@@ -17,7 +15,7 @@ if (!function_exists('gtbabel_language_label')) {
     {
         global $gtbabel;
         if ($gtbabel === null) {
-            $gtbabel = new Gtbabel();
+            $gtbabel = new \vielhuber\gtbabel\Gtbabel();
         }
         return $gtbabel->settings->getLabelForLanguageCode($lng);
     }
@@ -28,7 +26,7 @@ if (!function_exists('gtbabel_languages')) {
     {
         global $gtbabel;
         if ($gtbabel === null) {
-            $gtbabel = new Gtbabel();
+            $gtbabel = new \vielhuber\gtbabel\Gtbabel();
         }
         return $gtbabel->settings->getSelectedLanguageCodes();
     }
@@ -39,7 +37,7 @@ if (!function_exists('gtbabel_default_language_codes')) {
     {
         global $gtbabel;
         if ($gtbabel === null) {
-            $gtbabel = new Gtbabel();
+            $gtbabel = new \vielhuber\gtbabel\Gtbabel();
         }
         return $gtbabel->settings->getDefaultLanguageCodes();
     }
@@ -50,7 +48,7 @@ if (!function_exists('gtbabel_default_languages')) {
     {
         global $gtbabel;
         if ($gtbabel === null) {
-            $gtbabel = new Gtbabel();
+            $gtbabel = new \vielhuber\gtbabel\Gtbabel();
         }
         return $gtbabel->settings->getDefaultLanguages();
     }
@@ -61,7 +59,7 @@ if (!function_exists('gtbabel_default_settings')) {
     {
         global $gtbabel;
         if ($gtbabel === null) {
-            $gtbabel = new Gtbabel();
+            $gtbabel = new \vielhuber\gtbabel\Gtbabel();
         }
         return $gtbabel->settings->setupSettings($args);
     }
@@ -72,7 +70,7 @@ if (!function_exists('gtbabel_languagepicker')) {
     {
         global $gtbabel;
         if ($gtbabel === null) {
-            $gtbabel = new Gtbabel();
+            $gtbabel = new \vielhuber\gtbabel\Gtbabel();
         }
         return $gtbabel->gettext->getLanguagePickerData();
     }
@@ -83,7 +81,7 @@ if (!function_exists('gtbabel__')) {
     {
         global $gtbabel;
         if ($gtbabel === null) {
-            $gtbabel = new Gtbabel();
+            $gtbabel = new \vielhuber\gtbabel\Gtbabel();
         }
         return $gtbabel->gettext->getTranslationInForeignLngAndAddDynamicallyIfNeeded(
             $str,
@@ -99,7 +97,7 @@ if (!function_exists('gtbabel_localize_js')) {
     {
         global $gtbabel;
         if ($gtbabel === null) {
-            $gtbabel = new Gtbabel();
+            $gtbabel = new \vielhuber\gtbabel\Gtbabel();
         }
         return $gtbabel->dom->outputJsLocalizationHelper($data);
     }

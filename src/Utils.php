@@ -3,6 +3,8 @@ namespace vielhuber\gtbabel;
 
 use Cocur\Slugify\Slugify;
 
+use vielhuber\stringhelper\__;
+
 class Utils
 {
     function slugify($trans, $orig, $lng)
@@ -62,7 +64,7 @@ class Utils
         if (mb_stripos($response, '<html') === 0) {
             return 'html';
         }
-        if (__string_is_json($response)) {
+        if (__::string_is_json($response)) {
             return 'json';
         }
         if (strip_tags($response) !== $response) {

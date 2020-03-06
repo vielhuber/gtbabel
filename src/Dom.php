@@ -505,11 +505,18 @@ class Dom
                 if (!is_array($translated_strings__value)) {
                     $context = '';
                     $orig = $translated_strings__value;
-                    $trans = gtbabel__($translated_strings__value);
+                    $trans = $this->gettext->getTranslationInForeignLngAndAddDynamicallyIfNeeded(
+                        $translated_strings__value
+                    );
                 } else {
                     $context = $translated_strings__value[1];
                     $orig = $translated_strings__value[0];
-                    $trans = gtbabel__($translated_strings__value[0], $translated_strings__value[1]);
+                    $trans = $this->gettext->getTranslationInForeignLngAndAddDynamicallyIfNeeded(
+                        $translated_strings__value[0],
+                        null,
+                        null,
+                        $translated_strings__value[1]
+                    );
                 }
                 $orig = str_replace("\r", '', $orig);
                 $trans = str_replace("\r", '', $trans);
