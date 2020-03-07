@@ -310,131 +310,182 @@ class GtbabelWordPress
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (isset($_POST['save_settings'])) {
-                $settings = @$_POST['gtbabel'];
-                foreach (
-                    [
-                        'prefix_source_lng',
-                        'translate_text_nodes',
-                        'translate_default_tag_nodes',
-                        'html_lang_attribute',
-                        'html_hreflang_tags',
-                        'debug_translations',
-                        'auto_add_translations_to_gettext',
-                        'auto_translation',
-                        'api_stats'
-                    ]
-                    as $checkbox__value
-                ) {
-                    if (@$settings[$checkbox__value] == '1') {
-                        $settings[$checkbox__value] = true;
-                    } else {
-                        $settings[$checkbox__value] = false;
+                check_admin_referer('gtbabel-settings');
+                if (!empty($_POST['gtbabel'])) {
+                    $settings = [];
+
+                    // only accept whitelisted
+                    foreach (
+                        [
+                            'languages',
+                            'lng_source',
+                            'lng_folder',
+                            'log_folder',
+                            'debug_translations',
+                            'hide_languages',
+                            'prefix_source_lng',
+                            'redirect_root_domain',
+                            'translate_text_nodes',
+                            'translate_default_tag_nodes',
+                            'html_lang_attribute',
+                            'html_hreflang_tags',
+                            'auto_add_translations_to_gettext',
+                            'auto_translation',
+                            'auto_translation_service',
+                            'google_translation_api_key',
+                            'microsoft_translation_api_key',
+                            'api_stats',
+                            'prevent_publish_urls',
+                            'exclude_urls',
+                            'exclude_dom',
+                            'force_tokenize',
+                            'include_dom',
+                            'localize_js'
+                        ]
+                        as $fields__value
+                    ) {
+                        if (!isset($_POST['gtbabel'][$fields__value])) {
+                            continue;
+                        }
+                        $settings[$fields__value] = $_POST['gtbabel'][$fields__value];
                     }
-                }
-                foreach (
-                    [
-                        'exclude_urls',
-                        'exclude_dom',
-                        'force_tokenize',
-                        'google_translation_api_key',
-                        'microsoft_translation_api_key'
-                    ]
-                    as $exclude__value
-                ) {
-                    $post_data = $settings[$exclude__value];
-                    $settings[$exclude__value] = [];
+
+                    foreach (
+                        [
+                            'prefix_source_lng',
+                            'translate_text_nodes',
+                            'translate_default_tag_nodes',
+                            'html_lang_attribute',
+                            'html_hreflang_tags',
+                            'debug_translations',
+                            'auto_add_translations_to_gettext',
+                            'auto_translation',
+                            'api_stats'
+                        ]
+                        as $checkbox__value
+                    ) {
+                        if (@$settings[$checkbox__value] == '1') {
+                            $settings[$checkbox__value] = true;
+                        } else {
+                            $settings[$checkbox__value] = false;
+                        }
+                    }
+                    foreach (
+                        [
+                            'exclude_urls',
+                            'exclude_dom',
+                            'force_tokenize',
+                            'google_translation_api_key',
+                            'microsoft_translation_api_key'
+                        ]
+                        as $exclude__value
+                    ) {
+                        $post_data = $settings[$exclude__value];
+                        $settings[$exclude__value] = [];
+                        if ($post_data != '') {
+                            foreach (explode(PHP_EOL, $post_data) as $post_data__value) {
+                                $settings[$exclude__value][] = trim($post_data__value);
+                            }
+                        }
+                    }
+
+                    $post_data = $settings['prevent_publish_urls'];
+                    $settings['prevent_publish_urls'] = [];
                     if ($post_data != '') {
                         foreach (explode(PHP_EOL, $post_data) as $post_data__value) {
-                            $settings[$exclude__value][] = trim($post_data__value);
+                            $post_data__value_parts = explode(':', $post_data__value);
+                            if (!empty($post_data__value_parts)) {
+                                $settings['prevent_publish_urls'][$post_data__value_parts[0]] = explode(
+                                    ',',
+                                    __::trim_whitespace($post_data__value_parts[1])
+                                );
+                            }
                         }
                     }
-                }
 
-                $post_data = $settings['prevent_publish_urls'];
-                $settings['prevent_publish_urls'] = [];
-                if ($post_data != '') {
-                    foreach (explode(PHP_EOL, $post_data) as $post_data__value) {
-                        $post_data__value_parts = explode(':', $post_data__value);
-                        if (!empty($post_data__value_parts)) {
-                            $settings['prevent_publish_urls'][$post_data__value_parts[0]] = explode(
-                                ',',
-                                __::trim_whitespace($post_data__value_parts[1])
-                            );
+                    $post_data = $settings['hide_languages'];
+                    if (array_key_exists('/*', $settings['prevent_publish_urls'])) {
+                        unset($settings['prevent_publish_urls']['/*']);
+                    }
+                    if (!empty($post_data)) {
+                        $settings['prevent_publish_urls']['/*'] = [];
+                        foreach ($post_data as $post_data__key => $post_data__value) {
+                            foreach (
+                                $settings['prevent_publish_urls']
+                                as $prevent_publish_urls__key => $prevent_publish_urls__value
+                            ) {
+                                if ($prevent_publish_urls__key !== '/*') {
+                                    continue;
+                                }
+                                if (!in_array($post_data__key, $prevent_publish_urls__value)) {
+                                    $settings['prevent_publish_urls'][$prevent_publish_urls__key][] = $post_data__key;
+                                }
+                            }
                         }
                     }
-                }
+                    unset($settings['hide_languages']);
 
-                $post_data = $settings['hide_languages'];
-                if (array_key_exists('/*', $settings['prevent_publish_urls'])) {
-                    unset($settings['prevent_publish_urls']['/*']);
-                }
-                if (!empty($post_data)) {
-                    $settings['prevent_publish_urls']['/*'] = [];
-                    foreach ($post_data as $post_data__key => $post_data__value) {
-                        foreach (
-                            $settings['prevent_publish_urls']
-                            as $prevent_publish_urls__key => $prevent_publish_urls__value
-                        ) {
-                            if ($prevent_publish_urls__key !== '/*') {
+                    $post_data = $settings['include_dom'];
+                    $settings['include_dom'] = [];
+                    if (!empty(@$post_data['selector'])) {
+                        foreach ($post_data['selector'] as $post_data__key => $post_data__value) {
+                            if (
+                                @$post_data['selector'][$post_data__key] == '' &&
+                                    @$post_data['attribute'][$post_data__key] == '' &&
+                                @$post_data['context'][$post_data__key] == ''
+                            ) {
                                 continue;
                             }
-                            if (!in_array($post_data__key, $prevent_publish_urls__value)) {
-                                $settings['prevent_publish_urls'][$prevent_publish_urls__key][] = $post_data__key;
+                            $settings['include_dom'][] = [
+                                'selector' => $post_data['selector'][$post_data__key],
+                                'attribute' => $post_data['attribute'][$post_data__key],
+                                'context' => $post_data['context'][$post_data__key]
+                            ];
+                        }
+                    }
+
+                    $post_data = $settings['localize_js'];
+                    $settings['localize_js'] = [];
+                    if (!empty(@$post_data['string'])) {
+                        foreach ($post_data['string'] as $post_data__key => $post_data__value) {
+                            if (
+                                @$post_data['string'][$post_data__key] == '' &&
+                                @$post_data['context'][$post_data__key] == ''
+                            ) {
+                                continue;
                             }
+                            $settings['localize_js'][] = [
+                                $post_data['string'][$post_data__key],
+                                $post_data['context'][$post_data__key] != ''
+                                    ? sanitize_text_field($post_data['context'][$post_data__key])
+                                    : null
+                            ];
                         }
                     }
-                }
-                unset($settings['hide_languages']);
 
-                $post_data = $settings['include_dom'];
-                $settings['include_dom'] = [];
-                if (!empty(@$post_data['selector'])) {
-                    foreach ($post_data['selector'] as $post_data__key => $post_data__value) {
-                        if (
-                            @$post_data['selector'][$post_data__key] == '' &&
-                                @$post_data['attribute'][$post_data__key] == '' &&
-                            @$post_data['context'][$post_data__key] == ''
-                        ) {
-                            continue;
-                        }
-                        $settings['include_dom'][] = [
-                            'selector' => $post_data['selector'][$post_data__key],
-                            'attribute' => $post_data['attribute'][$post_data__key],
-                            'context' => $post_data['context'][$post_data__key]
-                        ];
-                    }
-                }
+                    $settings['languages'] = array_keys($settings['languages']);
 
-                $post_data = $settings['localize_js'];
-                $settings['localize_js'] = [];
-                if (!empty(@$post_data['string'])) {
-                    foreach ($post_data['string'] as $post_data__key => $post_data__value) {
-                        if (
-                            @$post_data['string'][$post_data__key] == '' &&
-                            @$post_data['context'][$post_data__key] == ''
-                        ) {
-                            continue;
-                        }
-                        $settings['localize_js'][] = [
-                            $post_data['string'][$post_data__key],
-                            $post_data['context'][$post_data__key] != '' ? $post_data['context'][$post_data__key] : null
-                        ];
-                    }
-                }
+                    // sanitize all
+                    $settings = __array_map_deep($settings, function ($settings__value) {
+                        return sanitize_text_field($settings__value);
+                    });
 
-                $settings['languages'] = array_keys($settings['languages']);
-                update_option('gtbabel_settings', $settings);
-                // refresh gtbabel with new options
-                $this->start();
+                    update_option('gtbabel_settings', $settings);
+                    // refresh gtbabel with new options
+                    $this->start();
+                }
             }
+
             if (isset($_POST['reset_settings'])) {
                 delete_option('gtbabel_settings');
                 $this->setDefaultSettingsToOption();
                 $this->start();
             }
+
             if (isset($_POST['reset_translations'])) {
                 $this->reset();
             }
+
             $message =
                 '<div class="gtbabel__notice notice notice-success is-dismissible"><p>' .
                 __('Successfully edited', 'gtbabel-plugin') .
@@ -445,6 +496,7 @@ class GtbabelWordPress
 
         echo '<div class="gtbabel gtbabel--settings wrap">';
         echo '<form class="gtbabel__form" method="post" action="' . admin_url('admin.php?page=gtbabel-settings') . '">';
+        wp_nonce_field('gtbabel-settings');
         echo '<h1 class="gtbabel__title">🦜 Gtbabel 🦜</h1>';
         echo $message;
         echo '<h2 class="gtbabel__subtitle">' . __('Settings', 'gtbabel-plugin') . '</h2>';
@@ -463,7 +515,7 @@ class GtbabelWordPress
                 ']"' .
                 (in_array($languages__key, $settings['languages']) == '1' ? ' checked="checked"' : '') .
                 ' value="1" />';
-            echo $languages__value;
+            echo '<span class="gtbabel__languagelist-label-inner">' . $languages__value . '</span>';
             echo '</label>';
             echo '</li>';
         }
@@ -556,7 +608,7 @@ class GtbabelWordPress
                 ']"' .
                 ($checked === true ? ' checked="checked"' : '') .
                 ' value="1" />';
-            echo $languages__value;
+            echo '<span class="gtbabel__languagelist-label-inner">' . $languages__value . '</span>';
             echo '</label>';
             echo '</li>';
         }
@@ -935,6 +987,7 @@ class GtbabelWordPress
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (isset($_POST['save_translations'])) {
+                wp_nonce_field('gtbabel-trans-save-translations');
                 if (!empty(@$_POST['gtbabel'])) {
                     foreach ($_POST['gtbabel'] as $post__key => $post__value) {
                         if (!empty(@$post__value['translations'])) {
@@ -956,7 +1009,8 @@ class GtbabelWordPress
                 }
             }
             if (isset($_POST['save_publish'])) {
-                if (!empty(@$_POST['gtbabel'])) {
+                check_admin_referer('gtbabel-trans-save-publish');
+                if (!empty($_POST['gtbabel'])) {
                     foreach ($_POST['gtbabel'] as $post__key => $post__value) {
                         $url = $post__key;
                         $lngs = [];
@@ -1026,6 +1080,7 @@ class GtbabelWordPress
                         (isset($_GET['url']) != '' ? '&url=' . $_GET['url'] : '')
                 ) .
                 '">';
+            wp_nonce_field('gtbabel-trans-save-publish');
             echo '<p class="gtbabel__paragraph">';
             echo __('Status of source url', 'gtbabel-plugin') . ': ';
             $url_published = $this->isUrlPublished($_GET['url']);
@@ -1095,6 +1150,7 @@ class GtbabelWordPress
                         (isset($_GET['url']) != '' ? '&url=' . $_GET['url'] : '')
                 ) .
                 '">';
+            wp_nonce_field('gtbabel-trans-save-translations');
 
             echo '<table class="gtbabel__table">';
             echo '<thead class="gtbabel__table-head">';
@@ -1175,6 +1231,7 @@ class GtbabelWordPress
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (isset($_POST['upload_file'])) {
+                check_admin_referer('gtbabel-services-upload-file');
                 if (@$_POST['gtbabel']['language'] != '' && @$_FILES['gtbabel']['name']['file'] != '') {
                     $extension = strtolower(end(explode('.', $_FILES['gtbabel']['name']['file'])));
                     $allowed_extension = [
@@ -1260,7 +1317,7 @@ class GtbabelWordPress
         echo '<form enctype="multipart/form-data" class="gtbabel__form" method="post" action="' .
             admin_url('admin.php?page=gtbabel-services') .
             '">';
-
+        wp_nonce_field('gtbabel-services-upload-file');
         echo '<ul class="gtbabel__fields">';
         echo '<li class="gtbabel__field">';
         echo '<label for="gtbabel_language" class="gtbabel__label">';

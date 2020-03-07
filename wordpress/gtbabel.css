@@ -49,19 +49,25 @@
     column-count: 20;
     column-width: 130px;
     column-gap: 0px;
-    margin-top: 7px;
+    margin-top: 3px;
+    margin-bottom: 2px;
 }
 .gtbabel__languagelist-item {
     break-inside: avoid-column;
-    line-height: 10px;
+    line-height: 1rem;
+    padding: 3px 0;
+    margin-bottom: 0;
+}
+.gtbabel__languagelist-item .gtbabel__input--checkbox:checked::before {
+    overflow: hidden;
 }
 .gtbabel__languagelist-item .gtbabel__input--checkbox {
-    position: relative;
-    top: 3px;
     margin-top: 0;
+    vertical-align: top;
 }
-.gtbabel__languagelist-label {
-    vertical-align: bottom;
+.gtbabel__languagelist-label-inner {
+    vertical-align: top;
+    line-height: 1rem;
 }
 .gtbabel--trans .gtbabel__table {
     width: 100%;
