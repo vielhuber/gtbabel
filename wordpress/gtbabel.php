@@ -28,6 +28,8 @@ class GtbabelWordPress
         $this->initBackend();
         $this->triggerPreventPublish();
         $this->addTopBarItem();
+        $this->languagePickerWidget();
+        $this->languagePickerShortcode();
         $this->disableAutoRedirect();
         $this->localizeJs();
         $this->setDefaultSettingsToOption();
@@ -243,6 +245,34 @@ class GtbabelWordPress
         );
     }
 
+    private function languagePickerWidget()
+    {
+        add_action('widgets_init', function () {
+            register_widget(new gtbabel_lngpicker_widget());
+        });
+    }
+    private function languagePickerShortcode()
+    {
+        add_shortcode('gtbabel_languagepicker', function () {
+            $html = '';
+            $html .= '<ul class="lngpicker">';
+            foreach ($this->gtbabel->gettext->getLanguagePickerData() as $languagepicker__value) {
+                $html .= '<li>';
+                $html .=
+                    '<a href="' .
+                    $languagepicker__value['url'] .
+                    '"' .
+                    ($languagepicker__value['active'] ? ' class="active"' : '') .
+                    '>';
+                $html .= $languagepicker__value['label'];
+                $html .= '</a>';
+                $html .= '</li>';
+            }
+            $html .= '</ul>';
+            return $html;
+        });
+    }
+
     private function initBackend()
     {
         add_action('admin_menu', function () {
@@ -277,6 +307,18 @@ class GtbabelWordPress
                 'gtbabel-trans',
                 function () {
                     $this->initBackendStringTranslation();
+                }
+            );
+            $menus[] = $submenu;
+
+            $submenu = add_submenu_page(
+                'gtbabel-settings',
+                __('Language picker', 'gtbabel-plugin'),
+                __('Language picker', 'gtbabel-plugin'),
+                'manage_options',
+                'gtbabel-lngpicker',
+                function () {
+                    $this->initBackendLanguagePicker();
                 }
             );
             $menus[] = $submenu;
@@ -1367,6 +1409,63 @@ class GtbabelWordPress
         echo '</div>';
     }
 
+    private function initBackendLanguagePicker()
+    {
+        echo '<div class="gtbabel gtbabel--lngpicker wrap">';
+        echo '<h1 class="gtbabel__title">🦜 Gtbabel 🦜</h1>';
+
+        echo '<p class="gtbabel__paragraph">';
+        echo __(
+            'Essentially, there are 3 different ways of adding a language picker to your website.',
+            'gtbabel-plugin'
+        );
+        echo '</p>';
+
+        echo '<h2 class="gtbabel__subtitle">' . __('Widget', 'gtbabel-plugin') . '</h2>';
+        echo '<p class="gtbabel__paragraph">';
+        if (count(wp_get_sidebars_widgets()) > 1) {
+            echo sprintf(
+                __('Simply add the %sLanguage picker widget%s to one of your sidebars.', 'gtbabel-plugin'),
+                '<a href="' . admin_url('widgets.php') . '">',
+                '</a>'
+            );
+        } else {
+            echo __(
+                'Your theme does not have any sidebars. Register one first in order to use the Language picker widget.',
+                'gtbabel-plugin'
+            );
+        }
+        echo '</p>';
+
+        echo '<h2 class="gtbabel__subtitle">' . __('Shortcode', 'gtbabel-plugin') . '</h2>';
+        echo '<p class="gtbabel__paragraph">';
+        echo sprintf(__('Just add %s to your code.', 'gtbabel-plugin'), '<code>[gtbabel_languagepicker]</code>');
+        echo '</p>';
+
+        echo '<h2 class="gtbabel__subtitle">' . __('Template', 'gtbabel-plugin') . '</h2>';
+        echo '<p class="gtbabel__paragraph">';
+        echo __('If you need more control, use the following php-code:', 'gtbabel-plugin');
+        echo '</p>';
+        echo '<code class="gtbabel__code">';
+        $code = <<<'EOD'
+if( function_exists('gtbabel_languagepicker') ) {
+    echo '<ul class="lngpicker">';
+    foreach(gtbabel_languagepicker() as $languagepicker__value) {
+        echo '<li>';
+            echo '<a href="'.$languagepicker__value['url'].'"'.($languagepicker__value['active']?' class="active"':'').'>';
+                echo $languagepicker__value['label'];
+            echo '</a>';
+        echo '</li>';
+    }
+    echo '</ul>';
+}
+EOD;
+        echo htmlentities($code);
+        echo '</code>';
+
+        echo '</div>';
+    }
+
     private function initBackendTranslations()
     {
         $translations = [];
@@ -1648,6 +1747,63 @@ class GtbabelWordPress
         }
 
         echo '</div>';
+    }
+}
+
+class gtbabel_lngpicker_widget extends \WP_Widget
+{
+    function __construct()
+    {
+        parent::__construct('gtbabel_lngpicker_widget', __('Language picker', 'gtbabel-plugin'), [
+            'description' => __('A language picker of Gtbabel.', 'gtbabel-plugin')
+        ]);
+    }
+    public function widget($args, $instance)
+    {
+        $title = apply_filters('widget_title', $instance['title']);
+        echo $args['before_widget'];
+        if (!empty($title)) {
+            echo $args['before_title'] . $title . $args['after_title'];
+        }
+        if (function_exists('gtbabel_languagepicker')) {
+            echo '<ul class="lngpicker">';
+            foreach (gtbabel_languagepicker() as $languagepicker__value) {
+                echo '<li>';
+                echo '<a href="' .
+                    $languagepicker__value['url'] .
+                    '"' .
+                    ($languagepicker__value['active'] ? ' class="active"' : '') .
+                    '>';
+                echo $languagepicker__value['label'];
+                echo '</a>';
+                echo '</li>';
+            }
+            echo '</ul>';
+        }
+        echo $args['after_widget'];
+    }
+    public function form($instance)
+    {
+        $title = '';
+        if (isset($instance['title'])) {
+            $title = $instance['title'];
+        }
+        echo '<p>';
+        echo '<label for="' . $this->get_field_id('title') . '">' . __('Title', 'gtbabel-plugin') . ':</label>';
+        echo '<input class="widefat" id="' .
+            $this->get_field_id('title') .
+            '" name="' .
+            $this->get_field_name('title') .
+            '" type="text" value="' .
+            esc_attr($title) .
+            '" />';
+        echo '</p>';
+    }
+    public function update($new_instance, $old_instance)
+    {
+        $instance = [];
+        $instance['title'] = !empty($new_instance['title']) ? strip_tags($new_instance['title']) : '';
+        return $instance;
     }
 }
 
