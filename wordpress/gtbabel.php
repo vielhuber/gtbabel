@@ -314,7 +314,7 @@ class GtbabelWordPress
                 if (!empty($_POST['gtbabel'])) {
                     $settings = [];
 
-                    // only accept whitelisted
+                    // whitelist
                     foreach (
                         [
                             'languages',
@@ -349,6 +349,11 @@ class GtbabelWordPress
                         }
                         $settings[$fields__value] = $_POST['gtbabel'][$fields__value];
                     }
+
+                    // sanitize
+                    $settings = __array_map_deep($settings, function ($settings__value) {
+                        return sanitize_textarea_field($settings__value);
+                    });
 
                     foreach (
                         [
@@ -457,18 +462,13 @@ class GtbabelWordPress
                             $settings['localize_js'][] = [
                                 $post_data['string'][$post_data__key],
                                 $post_data['context'][$post_data__key] != ''
-                                    ? sanitize_text_field($post_data['context'][$post_data__key])
+                                    ? $post_data['context'][$post_data__key]
                                     : null
                             ];
                         }
                     }
 
                     $settings['languages'] = array_keys($settings['languages']);
-
-                    // sanitize all
-                    $settings = __array_map_deep($settings, function ($settings__value) {
-                        return sanitize_text_field($settings__value);
-                    });
 
                     update_option('gtbabel_settings', $settings);
                     // refresh gtbabel with new options
@@ -1011,6 +1011,10 @@ class GtbabelWordPress
             if (isset($_POST['save_publish'])) {
                 check_admin_referer('gtbabel-trans-save-publish');
                 if (!empty($_POST['gtbabel'])) {
+                    // sanitize
+                    $_POST['gtbabel'] = __array_map_deep($_POST['gtbabel'], function ($settings__value) {
+                        return sanitize_textarea_field($settings__value);
+                    });
                     foreach ($_POST['gtbabel'] as $post__key => $post__value) {
                         $url = $post__key;
                         $lngs = [];
@@ -1058,10 +1062,14 @@ class GtbabelWordPress
         echo '<input type="hidden" name="page" value="gtbabel-trans" />';
         echo '<input type="hidden" name="p" value="1" />';
         echo '<input class="gtbabel__input" type="text" name="url" value="' .
-            @$_GET['url'] . '" placeholder="' . __('URL in source language', 'gtbabel-plugin') .
+            (isset($_GET['url']) ? esc_url($_GET['url']) : '') .
+            '" placeholder="' .
+            __('URL in source language', 'gtbabel-plugin') .
             '" />';
         echo '<input class="gtbabel__input" type="text" name="s" value="' .
-            @$_GET['s'] . '" placeholder="' . __('Search term', 'gtbabel-plugin') .
+            (isset($_GET['s']) ? esc_html($_GET['s']) : '') .
+            '" placeholder="' .
+            __('Search term', 'gtbabel-plugin') .
             '" />';
         echo '<input class="gtbabel__submit button button-secondary" value="' .
             __('Search', 'gtbabel-plugin') .
@@ -1076,8 +1084,8 @@ class GtbabelWordPress
                 admin_url(
                     'admin.php?page=gtbabel-trans' .
                         ($pagination->cur != '' ? '&p=' . $pagination->cur : '') .
-                        (isset($_GET['s']) != '' ? '&s=' . $_GET['s'] : '') .
-                        (isset($_GET['url']) != '' ? '&url=' . $_GET['url'] : '')
+                        (isset($_GET['s']) != '' ? '&s=' . esc_html($_GET['s']) : '') .
+                        (isset($_GET['url']) != '' ? '&url=' . esc_url($_GET['url']) : '')
                 ) .
                 '">';
             wp_nonce_field('gtbabel-trans-save-publish');
@@ -1106,7 +1114,7 @@ class GtbabelWordPress
                     '" />';
                 if ($this->gtbabel->settings->getSourceLanguageCode() !== $lng__key) {
                     echo '<input type="hidden" name="gtbabel[' .
-                        $_GET['url'] .
+                        esc_url($_GET['url']) .
                         '][' .
                         $lng__key .
                         ']" value="' .
@@ -1146,8 +1154,8 @@ class GtbabelWordPress
                 admin_url(
                     'admin.php?page=gtbabel-trans' .
                         ($pagination->cur != '' ? '&p=' . $pagination->cur : '') .
-                        (isset($_GET['s']) != '' ? '&s=' . $_GET['s'] : '') .
-                        (isset($_GET['url']) != '' ? '&url=' . $_GET['url'] : '')
+                        (isset($_GET['s']) != '' ? '&s=' . esc_html($_GET['s']) : '') .
+                        (isset($_GET['url']) != '' ? '&url=' . esc_url($_GET['url']) : '')
                 ) .
                 '">';
             wp_nonce_field('gtbabel-trans-save-translations');
@@ -1232,6 +1240,12 @@ class GtbabelWordPress
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (isset($_POST['upload_file'])) {
                 check_admin_referer('gtbabel-services-upload-file');
+                $_POST['gtbabel'] = __array_map_deep($_POST['gtbabel'], function ($settings__value) {
+                    return sanitize_textarea_field($settings__value);
+                });
+                $_FILES['gtbabel'] = __array_map_deep($_FILES['gtbabel'], function ($settings__value) {
+                    return sanitize_textarea_field($settings__value);
+                });
                 if (@$_POST['gtbabel']['language'] != '' && @$_FILES['gtbabel']['name']['file'] != '') {
                     $extension = strtolower(end(explode('.', $_FILES['gtbabel']['name']['file'])));
                     $allowed_extension = [
@@ -1428,7 +1442,7 @@ class GtbabelWordPress
         if (@$_GET['s'] != '') {
             // filter
             foreach ($translations as $translations__key => $translations__value) {
-                if (mb_stripos($translations__value['orig'], @$_GET['s']) === false) {
+                if (mb_stripos($translations__value['orig'], $_GET['s']) === false) {
                     unset($translations[$translations__key]);
                 }
             }
