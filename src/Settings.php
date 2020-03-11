@@ -44,11 +44,8 @@ class Settings
             'auto_add_added_date_to_gettext' => true,
             'auto_translation' => false,
             'auto_translation_service' => 'google',
-            'google_translation_api_key' => [
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-            ],
-            'microsoft_translation_api_key' => ['xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'],
+            'google_translation_api_key' => [],
+            'microsoft_translation_api_key' => [],
             'api_stats' => true,
             'discovery_log' => false,
             'prevent_publish' => true,

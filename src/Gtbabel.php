@@ -97,9 +97,9 @@ class Gtbabel
         $this->settings->setup($args);
         $this->host->setup();
         $this->gettext->preloadGettextInCache();
-        $since_date = date('Y-m-d H:i:s');
+        $since_time = microtime(true);
         $content = $this->dom->modifyContent($content);
-        $data = $this->log->discoveryLogGet($since_date);
+        $data = $this->log->discoveryLogGet($since_time);
         return $data;
     }
 }

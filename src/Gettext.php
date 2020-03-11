@@ -383,13 +383,13 @@ class Gettext
         return $success;
     }
 
-    function deleteUnusedTranslations($since_date)
+    function deleteUnusedTranslations($since_time)
     {
         $deleted = 0;
 
         $discovery_strings = array_map(function ($a) {
             return $a['string'] . '#' . $a['context'];
-        }, $this->log->discoveryLogGet($since_date));
+        }, $this->log->discoveryLogGet($since_time));
 
         $poLoader = new PoLoader();
         $poGenerator = new PoGenerator();
@@ -773,12 +773,14 @@ class Gettext
         $str = $orig;
         $str = trim($str);
         $str = str_replace(['&#13;', "\r"], '', $str); // replace nasty carriage returns \r
+        $str = preg_replace('/[\t]+/', ' ', $str); // replace multiple tab spaces with one tab space
         $parts = explode(PHP_EOL, $str);
         foreach ($parts as $parts__key => $parts__value) {
-            if (trim($parts__value) == '') {
+            $parts__value = trim($parts__value);
+            if ($parts__value == '') {
                 unset($parts[$parts__key]);
             } else {
-                $parts[$parts__key] = trim($parts__value);
+                $parts[$parts__key] = $parts__value;
             }
         }
         $str = implode(' ', $parts);

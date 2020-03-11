@@ -262,6 +262,23 @@ class Test extends \PHPUnit\Framework\TestCase
             ['string' => 'Dies ist ein Test!', 'context' => null],
             ['string' => 'Wow!', 'context' => null]
         ]);
+        $this->assertEquals(
+            $this->gtbabel->tokenize(
+                '<p class="footer-copyright">
+            ©' .
+                    "\t\t\t" .
+                    'Vorname' .
+                    "\t\t\t" .
+                    'Nachname' .
+                    '</p>'
+            ),
+            [
+                [
+                    'string' => '© Vorname Nachname',
+                    'context' => null
+                ]
+            ]
+        );
     }
 
     public function getDefaultSettings()

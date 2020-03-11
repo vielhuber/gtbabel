@@ -111,7 +111,7 @@ class Log
         return $this->getLogFolder() . '/discovery-log.txt';
     }
 
-    function discoveryLogGet($since_date = null, $url = null, $slim_output = true)
+    function discoveryLogGet($since_time = null, $url = null, $slim_output = true)
     {
         $strings = [];
 
@@ -138,7 +138,7 @@ class Log
             if ($urls !== null && !in_array($line_parts[0], $urls)) {
                 continue;
             }
-            if ($since_date !== null && strtotime($since_date) > strtotime($line_parts[4])) {
+            if ($since_time !== null && floatval($since_time) > floatval($line_parts[4])) {
                 continue;
             }
             $strings[] = [
@@ -206,7 +206,7 @@ class Log
                 unset($data[$data__key]);
             }
         }
-        $data[] = $url . "\t" . $str . "\t" . $context . "\t" . $lng . "\t" . date('Y-m-d H:i:s');
+        $data[] = $url . "\t" . $str . "\t" . $context . "\t" . $lng . "\t" . microtime(true);
         $data = implode(PHP_EOL, $data);
         file_put_contents($filename, $data);
         $this->discovery_log_cache = $data;
