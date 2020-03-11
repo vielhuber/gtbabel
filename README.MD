@@ -128,6 +128,7 @@ You don't have to change any code in the frontend at all: If you already have fu
 The following features are included:
 
 -   Configuration gui
+-   Easy setup wizard
 -   Preloading & auto translation / deletion
 -   Manual string translation (search and filter by url)
 -   Translation services
