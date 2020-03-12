@@ -242,11 +242,12 @@ class GtbabelWordPress
                     if( wp !== undefined && wp.data !== undefined ) {
                         if( window.location.href.indexOf('post-new.php') > -1 || window.location.href.indexOf('post.php') > -1 ) {
                             let prev_status = wp.data.select('core/editor').getEditedPostAttribute('status'),
-                                prev_permalink = wp.data.select('core/editor').getPermalink();
+                                prev_permalink = wp.data.select('core/editor').getPermalink(),
+                                ready = false;
                             wp.data.subscribe(function () {
                                 let isSavingPost = wp.data.select('core/editor').isSavingPost(),
                                     isAutosavingPost = wp.data.select('core/editor').isAutosavingPost();
-                                if (isSavingPost && !isAutosavingPost) {
+                                if (isSavingPost && !isAutosavingPost && ready === false) {
                                     let cur_status = wp.data.select('core/editor').getEditedPostAttribute('status'),
                                         cur_permalink = wp.data.select('core/editor').getPermalink();
                                     let skip = false;
@@ -254,6 +255,10 @@ class GtbabelWordPress
                                     prev_status = cur_status;
                                     prev_permalink = cur_permalink;
                                     if( skip === true ) { return; }
+                                    ready = true;
+                                }
+                                else if(!isSavingPost && !isAutosavingPost && ready === true) {
+                                    ready = false;
                                     fetch(window.location.href).then(v=>v.text()).catch(v=>v).then(data => {
                                         let dom = new DOMParser().parseFromString(data, 'text/html').querySelector('#wp-admin-bar-gtbabel-translate');
                                         if( dom !== null ) {
@@ -1109,7 +1114,7 @@ class GtbabelWordPress
             __('URL in source language', 'gtbabel-plugin') .
             '" />';
         echo '<input class="gtbabel__input" type="text" name="s" value="' .
-            (isset($_GET['s']) ? esc_html($_GET['s']) : '') .
+            (isset($_GET['s']) ? wp_kses_post($_GET['s']) : '') .
             '" placeholder="' .
             __('Search term', 'gtbabel-plugin') .
             '" />';
@@ -1126,7 +1131,7 @@ class GtbabelWordPress
                 admin_url(
                     'admin.php?page=gtbabel-trans' .
                         ($pagination->cur != '' ? '&p=' . $pagination->cur : '') .
-                        (isset($_GET['s']) != '' ? '&s=' . esc_html($_GET['s']) : '') .
+                        (isset($_GET['s']) != '' ? '&s=' . wp_kses_post($_GET['s']) : '') .
                         (isset($_GET['url']) != '' ? '&url=' . esc_url($_GET['url']) : '')
                 ) .
                 '">';
@@ -1166,7 +1171,7 @@ class GtbabelWordPress
                 echo '<label for="gtbabel_publish_' . $lng__key . '" class="gtbabel__label">';
                 echo $lng__value;
                 echo '</label>';
-                $link = sanitize_url($_GET['url']);
+                $link = esc_url($_GET['url']);
                 if ($this->gtbabel->settings->getSourceLanguageCode() !== $lng__key) {
                     $link = $this->gtbabel->gettext->getUrlTranslationInLanguage($lng__key, $_GET['url']);
                 }
@@ -1196,7 +1201,7 @@ class GtbabelWordPress
                 admin_url(
                     'admin.php?page=gtbabel-trans' .
                         ($pagination->cur != '' ? '&p=' . $pagination->cur : '') .
-                        (isset($_GET['s']) != '' ? '&s=' . esc_html($_GET['s']) : '') .
+                        (isset($_GET['s']) != '' ? '&s=' . wp_kses_post($_GET['s']) : '') .
                         (isset($_GET['url']) != '' ? '&url=' . esc_url($_GET['url']) : '')
                 ) .
                 '">';
@@ -1706,7 +1711,7 @@ EOD;
 
         if (@$_GET['url'] != '') {
             $this->changeSetting('discovery_log', true);
-            $url = $_GET['url'];
+            $url = esc_url($_GET['url']);
             $urls = [];
             $urls[] = $this->getNoCacheUrl($url);
             $since_time = microtime(true);
@@ -1775,7 +1780,7 @@ EOD;
         if (@$_GET['s'] != '') {
             // filter
             foreach ($translations as $translations__key => $translations__value) {
-                if (mb_stripos($translations__value['orig'], $_GET['s']) === false) {
+                if (mb_stripos($translations__value['orig'], wp_kses_post($_GET['s'])) === false) {
                     unset($translations[$translations__key]);
                 }
             }
@@ -1929,9 +1934,9 @@ EOD;
         if (@$_GET['gtbabel_delete_unused'] == '1') {
             $delete_unused = true;
         }
-        $delete_unused_since_date = null;
-        if (__::x(@$_GET['gtbabel_delete_unused_since_date'])) {
-            $delete_unused_since_date = $_GET['gtbabel_delete_unused_since_date'];
+        $delete_unused_since_time = null;
+        if (__::x(@$_GET['gtbabel_delete_unused_since_time'])) {
+            $delete_unused_since_time = floatval($_GET['gtbabel_delete_unused_since_time']);
         }
 
         $chunk_size = 5;
@@ -1970,8 +1975,8 @@ EOD;
 
         // prepare delete unused
         if ($delete_unused === true) {
-            if ($delete_unused_since_date === null) {
-                $delete_unused_since_date = date('Y-m-d H:i:s');
+            if ($delete_unused_since_time === null) {
+                $delete_unused_since_time = microtime(true);
             }
         }
 
@@ -2020,7 +2025,7 @@ EOD;
         // if finished
         if ($chunk_size * $chunk + $chunk_size > count($queue) - 1) {
             if ($delete_unused === true) {
-                $deleted = $this->gtbabel->gettext->deleteUnusedTranslations($delete_unused_since_date);
+                $deleted = $this->gtbabel->gettext->deleteUnusedTranslations($delete_unused_since_time);
                 echo __('Deleted strings', 'gtbabel-plugin') . ': ' . $deleted;
                 echo '<br/>';
             }
@@ -2036,8 +2041,8 @@ EOD;
                     '&gtbabel_auto_translate=1&gtbabel_auto_translate_chunk=' .
                     ($chunk + 1) .
                     ($delete_unused === true ? '&gtbabel_delete_unused=1' : '') .
-                    (__::x($delete_unused_since_date)
-                        ? '&gtbabel_delete_unused_since_date=' . $delete_unused_since_date
+                    (__::x($delete_unused_since_time)
+                        ? '&gtbabel_delete_unused_since_time=' . $delete_unused_since_time
                         : '')
             );
             echo '<a href="' . $redirect_url . '" class="gtbabel__auto-translate-next"></a>';
