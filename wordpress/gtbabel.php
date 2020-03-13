@@ -1036,6 +1036,18 @@ class GtbabelWordPress
             if (isset($_POST['save_translations'])) {
                 check_admin_referer('gtbabel-trans-save-translations');
                 if (!empty(@$_POST['gtbabel'])) {
+                    // sanitize
+                    $_POST['gtbabel'] = __::array_map_deep($_POST['gtbabel'], function (
+                        $settings__value,
+                        $settings__key,
+                        $key_chain
+                    ) {
+                        if (in_array('translations', $key_chain)) {
+                            return wp_kses_post($settings__value);
+                        }
+                        return sanitize_textarea_field($settings__value);
+                    });
+
                     foreach ($_POST['gtbabel'] as $post__key => $post__value) {
                         if (!empty(@$post__value['translations'])) {
                             foreach ($post__value['translations'] as $translations__key => $translations__value) {
@@ -1138,7 +1150,7 @@ class GtbabelWordPress
             wp_nonce_field('gtbabel-trans-save-publish');
             echo '<p class="gtbabel__paragraph">';
             echo __('Status of source url', 'gtbabel-plugin') . ': ';
-            $url_published = $this->isUrlPublished($_GET['url']);
+            $url_published = $this->isUrlPublished(esc_url($_GET['url']));
             if ($url_published === true) {
                 echo __('Published', 'gtbabel-plugin');
             } else {
