@@ -54,19 +54,19 @@ zip -r ./gtbabel.zip ./gtbabel
 # add to subversion
 mkdir svn
 cd ./svn
-svn co https://plugins.svn.wordpress.org/gtbabel .
+svn co https://plugins.svn.wordpress.org/gtbabel . --quiet
 sleep 2
-svn cleanup
-svn update
+svn cleanup --quiet
+svn update --quiet
 sleep 2
-svn rm ./trunk/*
+svn rm ./trunk/* --quiet
 cp -r ./../gtbabel/. ./trunk/
-svn add ./trunk/*
-svn rm ./assets/*
+svn add ./trunk/* --quiet
+svn rm ./assets/* --quiet
 cp -r ./../gtbabel/assets/plugin/. ./assets/
-svn add ./assets/*
-svn cp ./trunk ./tags/$v_new
-svn ci -m "$v_new" --username vielhuber
+svn add ./assets/* --quiet
+svn cp ./trunk ./tags/$v_new --quiet
+svn ci -m "$v_new" --username vielhuber --quiet
 cd $SCRIPT_DIR
 
 # remove obsolete files
