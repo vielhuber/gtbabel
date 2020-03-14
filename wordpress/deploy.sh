@@ -52,6 +52,7 @@ zip -r ./gtbabel.zip ./gtbabel
 mkdir svn
 cd ./svn
 svn co https://plugins.svn.wordpress.org/gtbabel .
+svn cleanup
 rm -rf ./trunk/*
 cp -r ./../gtbabel/. ./trunk/
 svn add ./trunk/* --quiet
