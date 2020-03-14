@@ -53,7 +53,7 @@ cd ./svn
 svn co https://plugins.svn.wordpress.org/gtbabel .
 rm -rf ./trunk/*
 cp -r ./../gtbabel/. ./trunk/
-svn add ./trunk/*
+svn add ./trunk/* --quiet
 svn cp ./trunk ./tags/$v_new
 svn ci -m "$v_new" --username vielhuber
 cd $SCRIPT_DIR
