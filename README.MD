@@ -121,7 +121,7 @@ $gtbabel->tokenize('<p>Dies ist ein Test!</p>'); // [['string' => 'This is a tes
 
 ## WordPress plugin
 
-[de.wordpress.org/plugins/gtbabel](https://de.wordpress.org/plugins/gtbabel/)
+[wordpress.org/plugins/gtbabel](https://wordpress.org/plugins/gtbabel/)
 
 You don't have to change any code in the frontend at all: If you already have functions like `__()` in your code, just leave them (since WordPress internally only knows about the source language); if not, don't add them. Gtbabel acts on the output (like on any other page).
 

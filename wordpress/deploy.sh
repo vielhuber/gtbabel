@@ -83,4 +83,5 @@ rm -f ./composer.lock
 ln -s ../vendor ./vendor
 
 # git push + tag
+cd ./../
 git add -A . && git commit -m "$v_new" && git push origin HEAD && git tag -a $v_new -m "$v_new" && git push --tags
