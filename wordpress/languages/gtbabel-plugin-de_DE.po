@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gtbabel-plugin\n"
-"POT-Creation-Date: 2020-03-11 03:43+0100\n"
+"POT-Creation-Date: 2020-03-14 22:23+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -28,250 +28,250 @@ msgstr "Assistent starten"
 msgid "Translate now"
 msgstr "Jetzt übersetzen"
 
-#: gtbabel.php:323 gtbabel.php:324 gtbabel.php:584
+#: gtbabel.php:328 gtbabel.php:329 gtbabel.php:589
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: gtbabel.php:331 gtbabel.php:332 gtbabel.php:1187
+#: gtbabel.php:336 gtbabel.php:337 gtbabel.php:1204
 msgid "String translations"
 msgstr "String-Übersetzungen"
 
-#: gtbabel.php:343 gtbabel.php:344 gtbabel.php:2054
+#: gtbabel.php:348 gtbabel.php:349 gtbabel.php:2071
 msgid "Language picker"
 msgstr "Sprachauswahl"
 
-#: gtbabel.php:355 gtbabel.php:356 gtbabel.php:1326
+#: gtbabel.php:360 gtbabel.php:361 gtbabel.php:1343
 msgid "Translation services"
 msgstr "Übersetzungsdienste"
 
-#: gtbabel.php:367 gtbabel.php:368
-msgid "Setup-Wizard"
+#: gtbabel.php:372 gtbabel.php:373
+msgid "Setup wizard"
 msgstr "Einrichtungs-Assistent"
 
-#: gtbabel.php:573 gtbabel.php:1075
+#: gtbabel.php:578 gtbabel.php:1092
 msgid "Successfully edited"
 msgstr "Erfolgreiche Bearbeitung"
 
-#: gtbabel.php:588
+#: gtbabel.php:593
 msgid "Languages"
 msgstr "Sprachen"
 
-#: gtbabel.php:612 gtbabel.php:728
+#: gtbabel.php:617 gtbabel.php:733
 msgid "Source language"
 msgstr "Ausgangssprache"
 
-#: gtbabel.php:632
+#: gtbabel.php:637
 msgid "Language folder"
 msgstr "Sprachenordner"
 
-#: gtbabel.php:643
+#: gtbabel.php:648
 msgid "Log folder"
 msgstr "Protokollordner"
 
-#: gtbabel.php:654
+#: gtbabel.php:659
 msgid "Enable debug mode"
 msgstr "Debug-Modus aktivieren"
 
-#: gtbabel.php:665
+#: gtbabel.php:670
 msgid "Hide languages"
 msgstr "Sprachen verstecken"
 
-#: gtbabel.php:705
+#: gtbabel.php:710
 msgid "Prefix source language urls"
 msgstr "Präfix für Quellsprachen-URLs"
 
-#: gtbabel.php:716
+#: gtbabel.php:721
 msgid "Redirect root domain to"
 msgstr "Root-Domain umleiten auf"
 
-#: gtbabel.php:723
+#: gtbabel.php:728
 msgid "Browser language"
 msgstr "Browsersprache"
 
-#: gtbabel.php:736
+#: gtbabel.php:741
 msgid "Translate text nodes"
 msgstr "Textknoten übersetzen"
 
-#: gtbabel.php:747
+#: gtbabel.php:752
 msgid "Translate additional nodes"
 msgstr "Zusätzliche Knoten übersetzen"
 
-#: gtbabel.php:758
+#: gtbabel.php:763
 msgid "Set html lang attribute"
 msgstr "HTML-Lang-Attribut setzen"
 
-#: gtbabel.php:769
+#: gtbabel.php:774
 msgid "Add html hreflang tags"
 msgstr "Hreflang-Tags setzen"
 
-#: gtbabel.php:780
+#: gtbabel.php:785
 msgid "Auto add translations to gettext"
 msgstr "Übersetzung automatisch zu Gettext hinzufügen"
 
-#: gtbabel.php:791
+#: gtbabel.php:796
 msgid "Enable automatic translation"
 msgstr "Automatische Übersetzung aktivieren"
 
-#: gtbabel.php:802
+#: gtbabel.php:807
 msgid "Translation service"
 msgstr "Übersetzungsdienst"
 
-#: gtbabel.php:819
+#: gtbabel.php:824
 msgid "Google Translation API Key"
 msgstr "Google Übersetzungs-API-Schlüssel"
 
-#: gtbabel.php:821 gtbabel.php:837
+#: gtbabel.php:826 gtbabel.php:842
 msgid "Link"
 msgstr "Link"
 
-#: gtbabel.php:835
+#: gtbabel.php:840
 msgid "Microsoft Translation API Key"
 msgstr "Microsoft Übersetzungs-API-Schlüssel"
 
-#: gtbabel.php:851
+#: gtbabel.php:856
 msgid "Enable translation api usage stats"
 msgstr "Übersetzungs-API-Statistiken aktivieren"
 
-#: gtbabel.php:862
+#: gtbabel.php:867
 msgid "Prevent publish of pages"
 msgstr "Veröffentlichung folgender Seiten verhindern"
 
-#: gtbabel.php:884
+#: gtbabel.php:889
 msgid "Exclude urls"
 msgstr "URLs ausschließen"
 
-#: gtbabel.php:895
+#: gtbabel.php:900
 msgid "Exclude dom nodes"
 msgstr "DOM-Knoten ausschließen"
 
-#: gtbabel.php:906
+#: gtbabel.php:911
 msgid "Force tokenize"
 msgstr "Tokenisierung erzwingen"
 
-#: gtbabel.php:917
+#: gtbabel.php:922
 msgid "Include dom nodes"
 msgstr "DOM-Knoten einschließen"
 
-#: gtbabel.php:937 gtbabel.php:968
+#: gtbabel.php:942 gtbabel.php:973
 msgid "Remove"
 msgstr "Entfernen"
 
-#: gtbabel.php:943 gtbabel.php:974
+#: gtbabel.php:948 gtbabel.php:979
 msgid "Add"
 msgstr "Hinzufügen"
 
-#: gtbabel.php:951
+#: gtbabel.php:956
 msgid "Provide strings in JavaScript"
 msgstr "Zeichenketten in JavaScript zur Verfügung stellen"
 
-#: gtbabel.php:983 gtbabel.php:1179 gtbabel.php:1267
+#: gtbabel.php:988 gtbabel.php:1196 gtbabel.php:1284
 msgid "Save"
 msgstr "Speichern"
 
-#: gtbabel.php:986
+#: gtbabel.php:991
 msgid "Translate complete website"
 msgstr "Gesamte Webseite übersetzen"
 
-#: gtbabel.php:987
+#: gtbabel.php:992
 msgid "Only new strings are translated."
 msgstr "Nur neue Zeichenketten werden übersetzt."
 
-#: gtbabel.php:991
+#: gtbabel.php:996
 msgid "Delete unused translations"
 msgstr "Ungenutzte Übersetzungen löschen"
 
-#: gtbabel.php:1003
+#: gtbabel.php:1008
 msgid "Translation api usage stats"
 msgstr "Übersetzungs-API-Statistiken"
 
-#: gtbabel.php:1008
+#: gtbabel.php:1013
 msgid "Reset settings"
 msgstr "Einstellungen zurücksetzen"
 
-#: gtbabel.php:1010 gtbabel.php:1017
+#: gtbabel.php:1015 gtbabel.php:1022
 msgid "Please enter REMOVE to confirm!"
 msgstr "Bitte geben Sie zur Bestätigung REMOVE ein!"
 
-#: gtbabel.php:1012 gtbabel.php:1019
+#: gtbabel.php:1017 gtbabel.php:1024
 msgid "Reset"
 msgstr "Zurücksetzen"
 
-#: gtbabel.php:1015
+#: gtbabel.php:1020
 msgid "Reset translations"
 msgstr "Übersetzungen zurücksetzen"
 
-#: gtbabel.php:1094
+#: gtbabel.php:1111
 msgid "Search translations"
 msgstr "Übersetzungen durchsuchen"
 
-#: gtbabel.php:1097
+#: gtbabel.php:1114
 msgid "Translations available"
 msgstr "Übersetzungen vorhanden"
 
-#: gtbabel.php:1109
+#: gtbabel.php:1126
 msgid "URL in source language"
 msgstr "URL in Ausgangssprache"
 
-#: gtbabel.php:1114
+#: gtbabel.php:1131
 msgid "Search term"
 msgstr "Suchbegriff"
 
-#: gtbabel.php:1117
+#: gtbabel.php:1134
 msgid "Search"
 msgstr "Suchen"
 
-#: gtbabel.php:1123
+#: gtbabel.php:1140
 msgid "Publish status"
 msgstr "Veröffentlichungsstatus"
 
-#: gtbabel.php:1135
+#: gtbabel.php:1152
 msgid "Status of source url"
 msgstr "Status der Quell-URL"
 
-#: gtbabel.php:1138
+#: gtbabel.php:1155
 msgid "Published"
 msgstr "Veröffentlicht"
 
-#: gtbabel.php:1140
+#: gtbabel.php:1157
 msgid "Unpublished"
 msgstr "Unveröffentlicht"
 
-#: gtbabel.php:1191
+#: gtbabel.php:1208
 msgid "Warning: Some strings below could also be used on other pages."
 msgstr ""
 "Warnung: Einige Zeichenketten unterhalb können auch auf anderen Seiten "
 "verwendet werden."
 
-#: gtbabel.php:1212
+#: gtbabel.php:1229
 msgid "Context"
 msgstr "Kontext"
 
-#: gtbabel.php:1213
+#: gtbabel.php:1230
 msgid "Shared"
 msgstr "Gemeinsam genutzt"
 
-#: gtbabel.php:1214
+#: gtbabel.php:1231
 msgid "Delete"
 msgstr "Löschen"
 
-#: gtbabel.php:1272
+#: gtbabel.php:1289
 msgid "No translations available."
 msgstr "Keine Übersetzungen vorhanden."
 
-#: gtbabel.php:1311
+#: gtbabel.php:1328
 msgid "Successfully uploaded"
 msgstr "Erfolgreich hochgeladen"
 
-#: gtbabel.php:1316
+#: gtbabel.php:1333
 msgid "An error occured"
 msgstr "Es ist ein Fehler aufgetreten"
 
-#: gtbabel.php:1331
+#: gtbabel.php:1348
 #, php-format
 msgid "Register and login at %sICanLocalize%s."
 msgstr "Registrieren und melden Sie sich an auf %sICanLocalize%s."
 
-#: gtbabel.php:1339
+#: gtbabel.php:1356
 #, php-format
 msgid ""
 "Create a new %sSoftware localization project%s and pick the same original / "
@@ -280,7 +280,7 @@ msgstr ""
 "Erstellen Sie ein neues %sSoftware Übersetzungsprojekt%s und wählen Sie "
 "dieselben Quell-/Zielsprachen wie in Gtbabel aus."
 
-#: gtbabel.php:1348
+#: gtbabel.php:1365
 #, php-format
 msgid ""
 "Upload your current .pot-Template file, which can be downloaded %shere%s."
@@ -288,41 +288,41 @@ msgstr ""
 "Laden Sie Ihre aktuelle .pot-Template-Datei hoch, die %shier%s "
 "heruntergeladen werden kann."
 
-#: gtbabel.php:1358
+#: gtbabel.php:1375
 msgid "Add all strings for translation."
 msgstr "Fügen Sie alle Strings zur Übersetzung hinzu."
 
-#: gtbabel.php:1361
+#: gtbabel.php:1378
 msgid "Review and place the translation order."
 msgstr "Überprüfen Sie und bestellen Sie die Übersetzung."
 
-#: gtbabel.php:1364
+#: gtbabel.php:1381
 msgid "Wait for the job to finish and get back individual .po-files."
 msgstr ""
 "Warten Sie auf die Fertigstellung des Auftrags und erhalten Sie die "
 "individuellen .po-Dateien zurück."
 
-#: gtbabel.php:1367
+#: gtbabel.php:1384
 msgid "Reupload the .po-files via the following upload-form."
 msgstr "Laden Sie die .po-Dateien über das folgende Formular hoch."
 
-#: gtbabel.php:1371
+#: gtbabel.php:1388
 msgid "File upload"
 msgstr "Dateiupload"
 
-#: gtbabel.php:1380
+#: gtbabel.php:1397
 msgid "Language"
 msgstr "Sprache"
 
-#: gtbabel.php:1397
+#: gtbabel.php:1414
 msgid ".po-File"
 msgstr ".po-Datei"
 
-#: gtbabel.php:1406
+#: gtbabel.php:1423
 msgid "Upload"
 msgstr "Hochladen"
 
-#: gtbabel.php:1424
+#: gtbabel.php:1441
 msgid ""
 "Essentially, there are 3 different ways of adding a language picker to your "
 "website."
@@ -330,18 +330,18 @@ msgstr ""
 "Grundsätzlich gibt es drei verschiedene Möglichkeiten, Ihrer Website einen "
 "Sprachwähler hinzuzufügen."
 
-#: gtbabel.php:1429
+#: gtbabel.php:1446
 msgid "Widget"
 msgstr "Widget"
 
-#: gtbabel.php:1433
+#: gtbabel.php:1450
 #, php-format
 msgid "Simply add the %sLanguage picker widget%s to one of your sidebars."
 msgstr ""
 "Fügen Sie einfach das %sSprachauswahl Widget%s zu einer Ihrer Seitenleisten "
 "hinzu."
 
-#: gtbabel.php:1439
+#: gtbabel.php:1456
 msgid ""
 "Your theme does not have any sidebars. Register one first in order to use "
 "the Language picker widget."
@@ -349,46 +349,46 @@ msgstr ""
 "Ihr Theme hat keine Seitenleisten. Registrieren Sie zuerst eine, um das "
 "Sprachauswahl-Widget zu verwenden."
 
-#: gtbabel.php:1445
+#: gtbabel.php:1462
 msgid "Shortcode"
 msgstr "Shortcode"
 
-#: gtbabel.php:1447
+#: gtbabel.php:1464
 #, php-format
 msgid "Just add %s to your code."
 msgstr "Fügen Sie einfach %s zu Ihrem Code hinzu."
 
-#: gtbabel.php:1450
+#: gtbabel.php:1467
 msgid "Template"
 msgstr "Template"
 
-#: gtbabel.php:1452
+#: gtbabel.php:1469
 msgid "If you need more control, use the following php-code:"
 msgstr ""
 "Wenn Sie mehr Kontrolle benötigen, verwenden Sie den folgenden PHP-Code:"
 
-#: gtbabel.php:1546
+#: gtbabel.php:1563
 msgid "Choose languages"
 msgstr "Sprachen wählen"
 
-#: gtbabel.php:1565 gtbabel.php:1615 gtbabel.php:1651
+#: gtbabel.php:1582 gtbabel.php:1632 gtbabel.php:1668
 msgid "Next"
 msgstr "Weiter"
 
-#: gtbabel.php:1579
+#: gtbabel.php:1596
 msgid "Connect Google Translate"
 msgstr "Google Translate verbinden"
 
-#: gtbabel.php:1583
+#: gtbabel.php:1600
 #, php-format
 msgid "Go to %sGoogle API Console%s"
 msgstr "%sGoogle API Console%s öffnen"
 
-#: gtbabel.php:1589
+#: gtbabel.php:1606
 msgid "Create a new project"
 msgstr "Neues Projekt erstellen"
 
-#: gtbabel.php:1593
+#: gtbabel.php:1610
 msgid ""
 "Marketplace > Enable \"Cloud Translation API\" (this requires you to setup a "
 "billing account)"
@@ -396,23 +396,23 @@ msgstr ""
 "Marketplace > \"Cloud Translation API\" aktivieren (dazu müssen Sie ein "
 "Abrechnungskonto einrichten)"
 
-#: gtbabel.php:1598
+#: gtbabel.php:1615
 msgid "APIs and services > API credentials > Add a new api key"
 msgstr "APIs & Dienste > Anmeldedaten"
 
-#: gtbabel.php:1602
+#: gtbabel.php:1619
 msgid "Your Google Translation API Key"
 msgstr "Ihr Google Übersetzungs-API-Schlüssel"
 
-#: gtbabel.php:1612 gtbabel.php:1648 gtbabel.php:1671
+#: gtbabel.php:1629 gtbabel.php:1665 gtbabel.php:1688
 msgid "Back"
 msgstr "Zurück"
 
-#: gtbabel.php:1629
+#: gtbabel.php:1646
 msgid "Translate your content"
 msgstr "Inhalte übersetzen"
 
-#: gtbabel.php:1632
+#: gtbabel.php:1649
 msgid ""
 "It's time to translate all of your existing content (you can skip this step "
 "– this can be done later at any time)."
@@ -420,51 +420,51 @@ msgstr ""
 "Es ist Zeit, alle vorhandenen Inhalte zu übersetzen (Sie können diesen "
 "Schritt überspringen - dies kann jederzeit später erfolgen)."
 
-#: gtbabel.php:1665
+#: gtbabel.php:1682
 msgid "Add a language picker"
 msgstr "Sprachauswahl hinzufügen"
 
-#: gtbabel.php:1674
+#: gtbabel.php:1691
 msgid "Finish"
 msgstr "Fertigstellen"
 
-#: gtbabel.php:1684
+#: gtbabel.php:1701
 msgid "Well done"
 msgstr "Gut gemacht"
 
-#: gtbabel.php:1688
+#: gtbabel.php:1705
 msgid "Translated strings"
 msgstr "Übersetzte Zeichenketten"
 
-#: gtbabel.php:1896
+#: gtbabel.php:1913
 msgid "Characters"
 msgstr "Buchstaben"
 
-#: gtbabel.php:1913 gtbabel.php:1995
+#: gtbabel.php:1930 gtbabel.php:2012
 msgid "Loading"
 msgstr "Lade"
 
-#: gtbabel.php:1917
+#: gtbabel.php:1934
 msgid "Translate"
 msgstr "Übersetzen"
 
-#: gtbabel.php:2012
+#: gtbabel.php:2029
 msgid "Progress"
 msgstr "Fortschritt"
 
-#: gtbabel.php:2024
+#: gtbabel.php:2041
 msgid "Deleted strings"
 msgstr "Gelöschte Zeichenketten"
 
-#: gtbabel.php:2028
+#: gtbabel.php:2045
 msgid "Finished"
 msgstr "Erledigt"
 
-#: gtbabel.php:2055
+#: gtbabel.php:2072
 msgid "A language picker of Gtbabel."
 msgstr "Eine Sprachauswahl von Gtbabel."
 
-#: gtbabel.php:2089
+#: gtbabel.php:2106
 msgid "Title"
 msgstr "Titel"
 

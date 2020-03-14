@@ -24,8 +24,9 @@ cp ../helpers.php ./helpers.php
 composer install --no-dev
 composer update --no-dev
 
-# increase version number in readme.txt
+# increase version number in readme.txt and main php
 sed -i -e "s/Stable tag: [0-9]\.[0-9]\.[0-9]/Stable tag: $v_new/" ./readme.txt
+sed -i -e "s/ * Version: [0-9]\.[0-9]\.[0-9]/ * Version: $v_new/" ./gtbabel.php
 
 # do the prefixing with php-scoper
 wget https://github.com/humbug/php-scoper/releases/download/0.13.1/php-scoper.phar
@@ -54,6 +55,9 @@ svn co https://plugins.svn.wordpress.org/gtbabel .
 rm -rf ./trunk/*
 cp -r ./../gtbabel/. ./trunk/
 svn add ./trunk/* --quiet
+rm -rf ./assets/*
+cp -r ./../gtbabel/assets/plugin/. ./assets/
+svn add ./assets/* --quiet
 svn cp ./trunk ./tags/$v_new
 svn ci -m "$v_new" --username vielhuber
 cd $SCRIPT_DIR
