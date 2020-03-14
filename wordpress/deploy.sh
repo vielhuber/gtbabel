@@ -48,8 +48,6 @@ rm -rf ./gtbabel/locales/
 rm -rf ./gtbabel/logs/
 zip -r ./gtbabel.zip ./gtbabel
 
-exit 1
-
 # add to subversion
 mkdir svn
 cd ./svn
