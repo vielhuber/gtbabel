@@ -1,0 +1,22 @@
+{
+    "name": "vielhuber\/gtbabel",
+    "description": "Instant PHP server-side translation.",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "ScopedGtbabel\\vielhuber\\gtbabel\\": "src\/"
+        },
+        "files": [
+            "helpers.php"
+        ]
+    },
+    "require": {
+        "gettext\/gettext": "*",
+        "vlucas\/phpdotenv": "*",
+        "cocur\/slugify": "*",
+        "vielhuber\/stringhelper": "*"
+    },
+    "require-dev": {
+        "phpunit\/phpunit": "*"
+    }
+}

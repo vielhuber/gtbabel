@@ -1,0 +1,648 @@
+msgid ""
+msgstr ""
+"X-Domain: gtbabel\n"
+
+#. added: 2020-03-10 02:04:12
+msgctxt "slug"
+msgid "blog"
+msgstr "blok"
+
+#. added: 2020-03-10 02:04:12
+msgctxt "slug"
+msgid "wow-coole-sache"
+msgstr "o-o-b-rd-shy"
+
+#. added: 2020-03-10 02:04:19
+msgctxt "slug"
+msgid "impressum"
+msgstr "bsm"
+
+#. added: 2020-03-10 02:04:19
+msgctxt "slug"
+msgid "datenschutz"
+msgstr "hm-y-lby-n-t"
+
+#. added: 2020-03-10 02:04:20
+msgctxt "slug"
+msgid "disclaimer"
+msgstr "khl-lms-oly"
+
+#. added: 2020-03-10 02:04:20
+msgid "Cookies sind keine Kekse, Plätzchen oder Gebäck. Sie dienen in meinem Fall dazu, Besucherzahlen zu erfassen. Durch die weitere Nutzung der Webseite stimmst Du der Verwendung von Cookies zu."
+msgstr "ملفات تعريف الارتباط ليست ملفات تعريف الارتباط أو ملفات تعريف الارتباط أو المعجنات. في حالتي ، يتم استخدامها لتسجيل أرقام الزوار. من خلال الاستمرار في استخدام موقع الويب ، فإنك توافق على استخدام ملفات تعريف الارتباط."
+
+#. added: 2020-03-10 02:04:20
+msgid "Schließen"
+msgstr "يغلق"
+
+#. added: 2020-03-10 02:04:20
+msgid "Weitere Informationen"
+msgstr "مزيد من المعلومات"
+
+#. added: 2020-03-10 02:04:21
+msgid "Vielhuber David"
+msgstr "فيلهوبير ديفيد"
+
+#. added: 2020-03-10 02:04:21
+msgid "Über mich"
+msgstr "عني"
+
+#. added: 2020-03-10 02:04:21
+msgid "Blog"
+msgstr "المدونة"
+
+#. added: 2020-03-10 02:04:21
+msgid "Wow, coole Sache."
+msgstr "واو ، شيء رائع."
+
+#. added: 2020-03-10 02:04:21
+msgid "Nope."
+msgstr "كلا."
+
+#. added: 2020-03-10 02:04:21
+msgid "Wow, <a>das</a> rockt."
+msgstr "واو ، <a>تلك</a> الصخور."
+
+#. added: 2020-03-10 02:04:22
+msgid "Zurück"
+msgstr "العودة"
+
+#. added: 2020-03-10 02:04:22
+msgid "Büroanschrift"
+msgstr "عنوان المكتب"
+
+#. added: 2020-03-10 02:04:22
+msgid "close2 new media GmbH<br/>Auenstrasse 6<br/>80469 München"
+msgstr "إغلاق 2 وسائل الإعلام الجديدة GmbH المزيد <br/> Auenstrasse 6 <br/> 80469 ميونيخ"
+
+#. added: 2020-03-10 02:04:22
+msgid "Kontaktdaten"
+msgstr "تفاصيل الاتصال"
+
+#. added: 2020-03-10 02:04:22
+msgid "Tel"
+msgstr "هاتف"
+
+#. added: 2020-03-10 02:04:23
+msgid "Fax"
+msgstr "الفاكس"
+
+#. added: 2020-03-10 02:04:23
+msgid "Mail"
+msgstr "البريد"
+
+#. added: 2020-03-10 02:04:23
+msgid "GitHub"
+msgstr "جيثب"
+
+#. added: 2020-03-10 02:04:23
+msgid "Twitter"
+msgstr "تويتر"
+
+#. added: 2020-03-10 02:04:24
+msgid "Pinboard"
+msgstr "Pinboard"
+
+#. added: 2020-03-10 02:04:24
+msgid "Pinterest"
+msgstr "بينتيريست"
+
+#. added: 2020-03-10 02:04:24
+msgid "YouTube"
+msgstr "يوتيوب"
+
+#. added: 2020-03-10 02:04:24
+msgid "Shopware"
+msgstr "Shopware"
+
+#. added: 2020-03-10 02:04:24
+msgid "Spotify"
+msgstr "سبوتيفي"
+
+#. added: 2020-03-10 02:04:25
+msgid "Dribbble"
+msgstr "سال لعابه"
+
+#. added: 2020-03-10 02:04:25
+msgid "Xing"
+msgstr "شينغ"
+
+#. added: 2020-03-10 02:04:25
+msgid "Google+"
+msgstr "Google+"
+
+#. added: 2020-03-10 02:04:25
+msgid "PGP"
+msgstr "PGP"
+
+#. added: 2020-03-10 02:04:26
+msgid "W3C Markup Validation"
+msgstr "التحقق من صحة W3C"
+
+#. added: 2020-03-10 02:04:26
+msgid "Google Lighthouse"
+msgstr "منارة جوجل"
+
+#. added: 2020-03-10 02:04:26
+msgid "Impressum"
+msgstr "بصمة"
+
+#. added: 2020-03-10 02:04:26
+msgid "Datenschutz"
+msgstr "حماية البيانات"
+
+#. added: 2020-03-10 02:04:26
+msgid "Disclaimer"
+msgstr "إخلاء المسؤولية"
+
+#. added: 2020-03-10 02:04:26
+msgctxt "title"
+msgid "Wow, coole Sache."
+msgstr "واو ، شيء رائع."
+
+#. added: 2020-03-10 02:04:26
+msgctxt "title"
+msgid "Vielhuber David"
+msgstr "فيلهوبير ديفيد"
+
+#. added: 2020-03-10 02:04:27
+msgctxt "description"
+msgid "Nope.  Wow, das rockt."
+msgstr "كلا. واو ، تلك الصخور."
+
+#. added: 2020-03-10 02:04:27
+msgctxt "slug"
+msgid "wie-funktioniert-das"
+msgstr "kyf-yaaml-hth"
+
+#. added: 2020-03-10 02:04:29
+msgid "Wie funktioniert das?"
+msgstr "كيف يعمل هذا؟"
+
+#. added: 2020-03-10 02:04:29
+msgid "Keine Ahnung!"
+msgstr "لا اعرف"
+
+#. added: 2020-03-10 02:04:29
+msgctxt "title"
+msgid "Wie funktioniert das?"
+msgstr "كيف يعمل هذا؟"
+
+#. added: 2020-03-10 02:04:30
+msgctxt "description"
+msgid "Keine Ahnung!"
+msgstr "لا اعرف"
+
+#. added: 2020-03-10 02:04:30
+msgctxt "slug"
+msgid "coole-rotze"
+msgstr "b-rd-mkh-t"
+
+#. added: 2020-03-10 02:04:33
+msgid "Coole Rotzengrützenfotze."
+msgstr "بارد Rotzengrützenfotze."
+
+#. added: 2020-03-10 02:04:33
+msgid "Wow."
+msgstr "واو."
+
+#. added: 2020-03-10 02:04:33
+msgid "Das rockt ganz schön."
+msgstr "أن الصخور كثيرا."
+
+#. added: 2020-03-10 02:04:33
+msgid "Geiler Krampf."
+msgstr "تشنج رهيبة."
+
+#. added: 2020-03-10 02:04:34
+msgid "Roger."
+msgstr "روجر."
+
+#. added: 2020-03-10 02:04:34
+msgid "Wuuuuuuuuha."
+msgstr "وووووووووها"
+
+#. added: 2020-03-10 02:04:34
+msgctxt "title"
+msgid "Coole Rotzengrützenfotze."
+msgstr "بارد Rotzengrützenfotze."
+
+#. added: 2020-03-10 02:04:34
+msgctxt "description"
+msgid "Wow."
+msgstr "واو."
+
+#. added: 2020-03-10 02:04:35
+msgctxt "slug"
+msgid "dies-ist-eine-coole-rock"
+msgstr "hth-ho-b-rd-lskhor"
+
+#. added: 2020-03-10 02:04:38
+msgid "Dies ist eine coole Socke."
+msgstr "هذا هو جورب بارد."
+
+#. added: 2020-03-10 02:04:38
+msgid "Geile Scheiße."
+msgstr "القرف قرنية."
+
+#. added: 2020-03-10 02:04:38
+msgctxt "title"
+msgid "Dies ist eine coole Socke."
+msgstr "هذا هو جورب بارد."
+
+#. added: 2020-03-10 02:04:38
+msgctxt "description"
+msgid "Geile Scheiße."
+msgstr "القرف قرنية."
+
+#. added: 2020-03-10 02:04:39
+msgctxt "slug"
+msgid "change-events-in-vanillajs-ok"
+msgstr "ahd-th-ltghyyr-fy-vanillajs-ok"
+
+#. added: 2020-03-10 02:04:42
+msgid "Change-Events in VanillaJS auslösen"
+msgstr "الزناد تغيير الأحداث في VanillaJS"
+
+#. added: 2020-03-10 02:04:43
+msgid "<a>VanillaJS</a> ist seit <a>ES6</a> quasi in allen Bereichen dem Urgestein <a>jQuery</a> ebenbürtig und inzwischen weit überlegen. So lohnt es sich, Legacy-Code nach und nach weg von jQuery zu migrieren. Martin ist der beste <a>Schachspieler</a> der Welt. Beim Auslösen von manuellen Change-Events muss man jedoch aufpassen. So triggert <a>document.addEventListener</a> beispielsweise nicht auf <a>jQuery.change()</a>. Die nachfolgende Übersicht fasst die Besonderheiten zusammen."
+msgstr "لقد كانت <a>VanillaJS</a> على <a p=\"1\">قدم المساواة مع</a> <a>jQuery</a> المخضرم في جميع المجالات تقريبًا منذ <a p=\"2\">ES6</a> وأصبحت الآن أفضل بكثير. لذلك يجدر ترحيل الكود القديم بعيدًا عن jQuery. مارتن هو أفضل <a p=\"4\">لاعب شطرنج في</a> العالم. ومع ذلك ، يجب أن تكون حذراً عند تشغيل أحداث التغيير اليدوي. لذلك يطلق <a p=\"5\">document.addEventListener</a> سبيل المثال لا <a p=\"6\">jQuery.change ()</a> . يلخص النظرة التالية الميزات الخاصة."
+
+#. added: 2020-03-10 02:04:44
+msgctxt "title"
+msgid "Change-Events in VanillaJS auslösen"
+msgstr "الزناد تغيير الأحداث في VanillaJS"
+
+#. added: 2020-03-10 02:04:44
+msgctxt "description"
+msgid "VanillaJS ist seit ES6 quasi in allen Bereichen dem Urgestein jQuery ebenbürtig und inzwischen weit überlegen. So lohnt es sich, Legacy-Code nach un..."
+msgstr "لقد كانت VanillaJS على قدم المساواة مع jQuery المخضرم في جميع المجالات تقريبًا منذ ES6 وأصبحت الآن أفضل بكثير. لذلك فإنه يدفع لنشر الكود القديم بعد ..."
+
+#. added: 2020-03-10 02:04:46
+msgctxt "slug"
+msgid "cookies-kontrollieren-mit-php-und-js"
+msgstr "lthkm-fy-mlf-t-taaryf-l-rtb-t-maa-php-o-js"
+
+#. added: 2020-03-10 02:04:49
+msgid "Cookies kontrollieren mit PHP und JS"
+msgstr "تحكم في ملفات تعريف الارتباط باستخدام PHP و JS"
+
+#. added: 2020-03-10 02:04:50
+msgid "Das Setzen von Cookies durch eigene oder fremde Skripte lässt sich sowohl mit Hilfe von PHP und JavaScript fein steuern. Obwohl dies keine ausreichende Lösung für die Umsetzung von Cookie-Lösungen nach dem <a>Gerichtsurteil gegen Planet49</a> darstellt (hier ist es entscheidend, dass Tracking-Tools wie Google Analytics gar nicht erst nicht mittracken und damit in der Folge auch keine Cookies setzen), kann es sinnvoll sein, Cookies generell zu white-/blacklisten."
+msgstr "يمكن التحكم بدقة في إعداد ملفات تعريف الارتباط بواسطة البرامج النصية الخاصة بك أو الخاصة بجهات خارجية باستخدام PHP و JavaScript. على الرغم من أن هذا ليس حلاً كافياً لتنفيذ حلول ملفات تعريف الارتباط بعد <a>صدور حكم قضائي ضد Planet49</a> (هنا ، من الأهمية بمكان ألا تتبع أدوات التتبع مثل Google Analytics على الإطلاق وبالتالي لا تضع ملفات تعريف الارتباط كنتيجة) يكون إلى القائمة البيضاء / ملفات تعريف الارتباط القائمة السوداء بشكل عام."
+
+#. added: 2020-03-10 02:04:50
+msgid "In PHP ist dies einfach zu bewerkstelligen: Hier modifiziert/löscht man etwaig gesetzte <a>Set-Cookie-Header</a>. Ruft man folgendes Script auf, nachdem mit Hilfe von <a>setcookie</a> Cookies für den Response Header vorbereitet wurden, werden nicht gewünschte Header entfernt und damit diese Cookies gar nicht erst gesetzt. Außerdem werden in der Vergangenheit gesetzte Cookies (z.B. falls das Prevention-Script aus irgendeinem Grund nicht gegriffen hat), ebenfalls gelöscht."
+msgstr "هذا سهل في PHP: هنا يمكنك تعديل / حذف أي <a>رؤوس ملفات تعريف الارتباط</a> المحددة. إذا اتصلت بالبرنامج النصي التالي بعد إعداد ملفات تعريف الارتباط لرأس الاستجابة بمساعدة <a>setcookie</a> ، تتم إزالة الرؤوس غير المرغوب فيها ، وبالتالي لا يتم تعيين ملفات تعريف الارتباط هذه. بالإضافة إلى ذلك ، يتم أيضًا حذف ملفات تعريف الارتباط التي تم تعيينها في الماضي (على سبيل المثال إذا لم يعمل البرنامج النصي للوقاية لسبب ما)."
+
+#. added: 2020-03-10 02:04:52
+msgid "In JavaScript ist dies etwas weniger trivial: Hier überschreiben wir mit Hilfe von <a>Object.defineProperty</a> (dem mächtigen Nachfolger von <a>__defineGetter__</a> und <a>__defineSetter__</a>)  die Getter/Setter Methoden des Objekts document, die immer dann aufgerufen werden, wenn man mit Hilfe von <a>document.cookie</a> Cookies liest und schreibt. <a>Object.getOwnPropertyDescriptor</a> erhält dabei den originalen Getter/Setter, wobei man den Setter nur dann aufruft, wenn der Cookie auch erlaubt wird:"
+msgstr "في JavaScript ، يكون هذا أقل تافهة: نستخدم هنا <a>Object.defineProperty</a> (الوريث القوي لـ <a>__defineGetter__</a> و <a>__defineSetter__</a> ) <a p=\"3\">لتجاوز</a> أساليب getter / setter لكائن المستند ، والتي يتم استدعاؤها دائمًا عند تعيين ملفات تعريف الارتباط باستخدام <a p=\"4\">document.cookie</a> يقرأ ويكتب. <a p=\"5\">Object.getOwnPropertyDescriptor</a> يتلقى getter / setter الأصلي ، حيث يمكنك فقط استدعاء setter إذا كان ملف تعريف الارتباط مسموحًا به أيضًا:"
+
+#. added: 2020-03-10 02:04:52
+msgctxt "title"
+msgid "Cookies kontrollieren mit PHP und JS"
+msgstr "تحكم في ملفات تعريف الارتباط باستخدام PHP و JS"
+
+#. added: 2020-03-10 02:04:52
+msgctxt "description"
+msgid "Das Setzen von Cookies durch eigene oder fremde Skripte lässt sich sowohl mit Hilfe von PHP und JavaScript fein steuern. Obwohl dies keine ausreichen..."
+msgstr "يمكن التحكم بدقة في إعداد ملفات تعريف الارتباط بواسطة البرامج النصية الخاصة بك أو الخاصة بجهات خارجية باستخدام PHP و JavaScript. على الرغم من أن هذا لا يكفي ..."
+
+#. added: 2020-03-10 02:04:53
+msgctxt "slug"
+msgid "gerate-per-script-deaktivieren-in-windows"
+msgstr "taatyl-hsb-lbrn-mg-lnsy-fy-oyndoz"
+
+#. added: 2020-03-10 02:05:36
+msgid "Geräte per Script deaktivieren in Windows"
+msgstr "إلغاء تنشيط الأجهزة عن طريق البرنامج النصي في ويندوز"
+
+#. added: 2020-03-10 02:05:36
+msgid "Um Strom zu sparen oder die eigene Überwachungs-Paranoia zu mindern, empfiehlt es sich, nicht benutzte Geräte am eigenen Rechner komplett vom Strom zu trennen. Geräte wie Soundboxen oder Webcams kann man ganz klassisch über den Geräte-Manager de/aktivieren. Das Ganze funktioniert aber auch per Script. Früher war hierfür der Standardweg <a>devcon</a>. Inzwischen bietet Windows 10 über die <a>PowerShell</a> einen bequemeren Weg, dies zu realisieren."
+msgstr "من أجل توفير الكهرباء أو تقليل جنون العظمة الخاص بالمراقبة ، يُنصح بفصل الأجهزة غير المستخدمة تمامًا على جهاز الكمبيوتر الخاص بك عن الكهرباء. يمكن إلغاء / تنشيط الأجهزة مثل صناديق الصوت أو كاميرات الويب بالطريقة الكلاسيكية باستخدام إدارة الأجهزة. كل شيء يعمل أيضا عن طريق البرنامج النصي. في الماضي ، كانت <a>الطريقة</a> القياسية <a p=\"1\">devcon</a> . يوفر Windows 10 الآن طريقة أكثر ملاءمة للقيام بذلك عبر <a p=\"2\">PowerShell</a> ."
+
+#. added: 2020-03-10 02:05:37
+msgid "Zunächst ermittelt man über den Geräte-Manager den Namen oder die Hardware-ID (Rechtsklick auf das jeweilige Gerät &gt; Details &gt; Gerätebeschreibung / Hardware-IDs). Alternativ geht das auch mit dem PowerShell Kommando <strong>Get-PnpDevice -PresentOnly</strong>. Nun legt man das folgende PowerShell-Script an:"
+msgstr "عليك أولاً تحديد الاسم أو معرف الجهاز عن طريق مدير الجهاز (انقر بزر الماوس الأيمن على الجهاز المعني> التفاصيل> وصف الجهاز / معرفات الأجهزة). بدلاً من ذلك ، يمكنك القيام بذلك باستخدام الأمر PowerShell <strong>Get-PnpDevice -PresentOnly</strong> . قم الآن بإنشاء البرنامج النصي PowerShell التالي:"
+
+#. added: 2020-03-10 02:05:37
+msgid "Das Script zeigt automatisch den <a>UAC-Dialog</a>, da es Administratorrechte benötigt und lässt sich nun wiefolgt aufrufen:"
+msgstr "يعرض البرنامج النصي تلقائيًا <a>مربع حوار UAC</a> لأنه يتطلب حقوق المسؤول ويمكن الآن استدعاءه كما يلي:"
+
+#. added: 2020-03-10 02:05:37
+msgid "XXX steht dabei für den Namen oder die Hardware-ID, YYY für die Werte enable oder disable (type kann auch weggelassen werden, dann wird der momentane Status jeweils negiert). Um das Ganze bequem per Verknüpfung aufzurufen, legt man diese einfach wiefolgt an:"
+msgstr "XXX يرمز إلى الاسم أو معرف الجهاز ، YYY بالنسبة إلى تمكين القيم أو تعطيلها (يمكن أيضًا حذف النوع ، ثم يتم إلغاء الحالة الحالية في كل حالة). لاستدعاء الأمر برمته ، يمكنك إنشاءه على النحو التالي:"
+
+#. added: 2020-03-10 02:05:38
+msgid "Auch ein Autostart per <a>Aufgabenplanung</a> (mit den Optionen \"Ausführung unabhängig von der Benutzerkontensteuerung\" und \"mit höchsten Privilegien\") oder Steuerung per Tastatur-Hotkeys ist beispielsweise mit einem Tool wie <a>flimsy</a> ohne Weiteres möglich."
+msgstr "يمكن تشغيل أداة التشغيل التلقائي عن طريق تخطيط <a>المهام</a> (مع وجود خيارات \"تنفيذ مستقل عن التحكم في حساب المستخدم\" و \"مع أعلى الامتيازات\") أو التحكم عبر مفاتيح الاختصار للوحة المفاتيح بسهولة باستخدام أداة مثل <a>واهية</a> ."
+
+#. added: 2020-03-10 02:05:38
+msgctxt "title"
+msgid "Geräte per Script deaktivieren in Windows"
+msgstr "إلغاء تنشيط الأجهزة عن طريق البرنامج النصي في ويندوز"
+
+#. added: 2020-03-10 02:05:38
+msgctxt "description"
+msgid "Um Strom zu sparen oder die eigene Überwachungs-Paranoia zu mindern, empfiehlt es sich, nicht benutzte Geräte am eigenen Rechner komplett vom Strom ..."
+msgstr "من أجل توفير الكهرباء أو لتقليل جنون العظمة الخاص بالمراقبة ، يُنصح بإزالة الأجهزة غير المستخدمة تمامًا من جهاز الكمبيوتر الخاص بك ..."
+
+#. added: 2020-03-10 02:05:39
+msgctxt "slug"
+msgid "skype-background-blur"
+msgstr "sk-yb-lkhlfy-tms"
+
+#. added: 2020-03-10 02:05:41
+msgid "Skype Background Blur"
+msgstr "سكايب خلفية طمس"
+
+#. added: 2020-03-10 02:05:42
+msgid "<a>Skype</a> hat eine nette, etwas versteckte Funktion: Bei Videoübertragungen lässt sich durch Klick auf den Video-Button und der Funktion \"<strong>Meinen Hintergrund weichzeichnen</strong>\" ganz einfach der Hintergrund automatisch unscharf stellen. Mit Hilfe künstlicher Intelligenz funktioniert das mit jeder Kamera auch ohne Tiefeninformationen. Das Ganze wirkt dann professioneller und blendet private oder für das Gespräch unwichtige Dinge im Hintergrund aus."
+msgstr "لدى <a>Skype</a> وظيفة لطيفة ومخفية إلى حد ما: بالنسبة لعمليات نقل الفيديو ، يمكن نزع سلاح الخلفية تلقائيًا من خلال النقر على زر الفيديو ووظيفة \" <strong>Blur my background</strong> \". بمساعدة الذكاء الاصطناعي ، يعمل هذا مع أي كاميرا حتى بدون معلومات متعمقة. يبدو الأمر برمته أكثر احترافًا ويخفي معلومات خاصة أو معلومات أساسية غير مهمة للمحادثة."
+
+#. added: 2020-03-10 02:05:42
+msgid "Um einen einen ähnlichen Effekt in allen anderen Programmen erzielen, in denen die Webcam zum Einsatz kommt, sind Tools wie <a>CyberLink PerfectCam</a> und <a>XSplit VCam</a> zu empfehlen."
+msgstr "لتحقيق تأثير مماثل في جميع البرامج الأخرى التي تستخدم فيها كاميرا الويب ، <a>يوصى</a> باستخدام أدوات مثل <a p=\"1\">CyberLink PerfectCam</a> و <a p=\"2\">XSplit VCam</a> ."
+
+#. added: 2020-03-10 02:05:42
+msgctxt "title"
+msgid "Skype Background Blur"
+msgstr "سكايب خلفية طمس"
+
+#. added: 2020-03-10 02:05:43
+msgctxt "description"
+msgid "Skype hat eine nette, etwas versteckte Funktion: Bei Videoübertragungen lässt sich durch Klick auf den Video-Button und der Funktion \"Meinen Hinterg..."
+msgstr "لدى Skype وظيفة لطيفة ومخفية إلى حد ما: بالنسبة لعمليات نقل الفيديو ، يمكنك النقر فوق زر الفيديو والوظيفة \"خلفيتي ..."
+
+#. added: 2020-03-10 02:05:43
+msgctxt "slug"
+msgid "opcache-php-bootup-optimierung"
+msgstr "opcache-php-bootup-lamthly"
+
+#. added: 2020-03-10 02:05:51
+msgid "OPcache PHP Bootup Optimierung"
+msgstr "OPcache PHP الأمثل للتمهيد"
+
+#. added: 2020-03-10 02:05:51
+msgid "Bei Webseiten, die beispielsweise auf <a>WordPress</a>, <a>Joomla</a> oder <a>Laravel</a> basieren und keinen userspezifischen Content haben, empfiehlt es sich, alle Seiten in einem statischen HTML-Cache vorzuhalten und den Cache nur bei Änderung im Backend manuell (oder automatisch) neu zu generieren. Beinhaltet die Seite jedoch dynamische Inhalte, die abhängig von Sessions und Cookies oder auch Sprache und Ort abhängen, eignet sich der Einsatz von <a>OPcache</a>."
+msgstr "بالنسبة إلى مواقع الويب التي تستند إلى <a>WordPress</a> أو <a>Joomla</a> أو <a>Laravel</a> ، على سبيل المثال ، والتي لا تحتوي على محتوى خاص بالمستخدم ، يُنصح بالاحتفاظ بجميع الصفحات في ذاكرة تخزين مؤقت <a p=\"3\">بتنسيق</a> HTML ثابت وإنشاء ذاكرة التخزين المؤقت يدويًا (أو تلقائيًا) فقط عندما تتغير الخلفية. ومع ذلك ، إذا كانت الصفحة تحتوي على محتوى ديناميكي يعتمد على الجلسات وملفات تعريف الارتباط أو اللغة والموقع ، فإن استخدام <a p=\"4\">OPcache مناسب</a> ."
+
+#. added: 2020-03-10 02:05:51
+msgid "Dabei liegt die sog. Boot Time bei allen drei genannten Systemen bei einem frisch aufgesetzten CentOS7-Server (mit SSD und PHP 7.1) bei über 100 ms. Jedes Mal, wenn ein PHP-Script ausgeführt wird, muss dieses zur Laufzeit in Bytecode kompiliert werden. OPcache realisiert nun einen Cache für diesen Bytecode – wird nun beim nächsten Request dasselbe PHP-Script ausgeführt, muss es nicht rekompiliert werden. Nach dem Aktivieren von OPcache setzen wir folgende Einstellungen:"
+msgstr "يزيد وقت التمهيد المزعوم للأنظمة الثلاثة المذكورة مع خادم CentOS7 المثبت حديثًا (مع SSD و PHP 7.1) عن 100 مللي ثانية. في كل مرة يتم فيها تنفيذ برنامج نصي PHP ، يجب أن يتم تجميعه إلى رمز ثانوي في وقت التشغيل. تدرك OPcache الآن ذاكرة تخزين مؤقت لهذا الرمز الفرعي - إذا تم تنفيذ البرنامج النصي PHP نفسه على الطلب التالي ، فلن يلزم إعادة تجميعه. بعد تنشيط OPcache ، نقوم بعمل الإعدادات التالية:"
+
+#. added: 2020-03-10 02:05:52
+msgid "Die Ausführungszeit (gemittelt bei 10 Ausführungen) hat sich nun deutlich reduziert:"
+msgstr "تم الآن تقليل وقت التنفيذ (بلغ متوسطه أكثر من 10 عمليات إعدام) بشكل كبير:"
+
+#. added: 2020-03-10 02:05:52
+msgid "WordPress 4.7.4"
+msgstr "وورد 4.7.4"
+
+#. added: 2020-03-10 02:05:52
+msgid "Joomla 3.7"
+msgstr "جملة 3.7"
+
+#. added: 2020-03-10 02:05:53
+msgid "Laravel 5.4"
+msgstr "لارافيل 5.4"
+
+#. added: 2020-03-10 02:05:53
+msgid "ohne OPcache"
+msgstr "بدون OPcache"
+
+#. added: 2020-03-10 02:05:53
+msgid "295 ms"
+msgstr "295 مللي ثانية"
+
+#. added: 2020-03-10 02:05:53
+msgid "201 ms"
+msgstr "201 مللي ثانية"
+
+#. added: 2020-03-10 02:05:53
+msgid "110 ms"
+msgstr "110 مللي ثانية"
+
+#. added: 2020-03-10 02:05:54
+msgid "mit OPcache"
+msgstr "مع OPcache"
+
+#. added: 2020-03-10 02:05:54
+msgid "54 ms"
+msgstr "54 مللي ثانية"
+
+#. added: 2020-03-10 02:05:54
+msgid "59 ms"
+msgstr "59 مللي ثانية"
+
+#. added: 2020-03-10 02:05:54
+msgid "13 ms"
+msgstr "13 مللي ثانية"
+
+#. added: 2020-03-10 02:05:55
+msgid "Faktor"
+msgstr "عامل"
+
+#. added: 2020-03-10 02:05:55
+msgid "Da wir bei den Einstellung validate_timestamps auf 0 und gleichzeitig revalidate_freq auf die Dauer von einem Tag gesetzt haben, wird der Cache quasi nie automatisch neu aufgebaut (das machen wir bewusst manuell). Mit einem kleinen <a>Git-Hook</a> wird bei jedem \"pull\" ein PHP-Script ausgeführt. So aktiviert man den Hook:"
+msgstr "نظرًا لأننا قمنا بتعيين validate_timestamps على 0 و revalidate_freq ليوم واحد ، فلن يتم إعادة إنشاء ذاكرة التخزين المؤقت تلقائيًا تقريبًا (ننفذ هذا يدويًا بشكل متعمد). مع <a>ربط بوابة</a> صغيرة ، يتم تنفيذ برنامج نصي PHP مع كل \"سحب\". كيفية تفعيل الخطاف:"
+
+#. added: 2020-03-10 02:05:55
+msgid "Folgende Helferfunktion ist außerdem behilflich, um einzelne Code-Teile (oder die gesamte Ausführungszeit) zu messen:"
+msgstr "تساعد وظيفة المساعد التالية أيضًا في قياس أجزاء التعليمات البرمجية الفردية (أو إجمالي وقت التنفيذ):"
+
+#. added: 2020-03-10 02:05:56
+msgid "Will man hilfreiche Infos wie Status, genutzten Memory oder gecachte Filezahl erhalten, nutzt man diese PHP-Funktion:"
+msgstr "إذا كنت ترغب في الحصول على معلومات مفيدة مثل الحالة أو الذاكرة المستخدمة أو عدد الملفات المخزنة مؤقتًا ، فاستخدم وظيفة PHP هذه:"
+
+#. added: 2020-03-10 02:05:56
+msgid "Um in den Genuss von OPcache auch in einer lokalen Entwicklungsumgebung zu kommen (was generell nicht empfehlenswert ist), bedienen wir uns eines Tricks."
+msgstr "لاستخدام OPcache في بيئة تطوير محلية (والتي لا ينصح بها عمومًا) ، نستخدم خدعة."
+
+#. added: 2020-03-10 02:05:57
+msgid "OPcache ist auf allen Servern, die das OPcache-Modul installiert haben und bei denen die Einstellung opcache.enable nicht explizit gesetzt ist, aktiv. Das lassen wir auch so. Wir setzen lediglich in der php.ini opcache.validate_timestamps = 1. Damit greift opcache.revalidate_freq = 2. Damit erreichen wir, dass bei jedem Projekt OPcache quasi ständig revalidiert. Bei denjenigen Projekten, bei denen wir OPcache dauerhaft aktivieren wollen, setzen wir projektbezogen <span>in der .htaccess folgende Einstellung:</span>"
+msgstr "OPcache نشط على كافة الخوادم التي قامت بتثبيت وحدة OPcache والتي لم يتم تعيين إعداد opcache.enable عليها بشكل صريح. نترك الأمر كذلك. نحن فقط نضع في php.ini opcache.validate_timestamps = 1. هذا يعني أن opcache.revalidate_freq = 2. هذا يعني أننا نحقق أن OPcache يتم إبطالها بشكل دائم لكل مشروع. بالنسبة إلى تلك المشروعات التي نريد تنشيط OPcache فيها بشكل دائم ، قمنا بتعيين <span>الإعدادات التالية</span> المتعلقة بالمشروع <span p=\"1\">في .htaccess:</span>"
+
+#. added: 2020-03-10 02:05:57
+msgid "Danach starten wir den Webserver neu und legen folgendes Script an:"
+msgstr "ثم نعيد تشغيل خادم الويب وننشئ البرنامج النصي التالي:"
+
+#. added: 2020-03-10 02:05:57
+msgid "Dieses Script löscht den Cache und baut ihn gleichzeitig neu auf. Nun setzen wir im Lieblingseditor <a>VSCode</a> ein workspace-bezogenes <a>RunOnSave</a>-Kommando fest:"
+msgstr "يقوم هذا البرنامج النصي بمسح ذاكرة التخزين المؤقت وإعادة إنشائها في نفس الوقت. الآن قمنا <a>بتعيين</a> أمر <a>RunOnSave</a> المتعلق <a p=\"2\">بمساحة العمل</a> في <a p=\"1\">المحرر</a> المفضل VSCode:"
+
+#. added: 2020-03-10 02:05:57
+msgctxt "title"
+msgid "OPcache PHP Bootup Optimierung"
+msgstr "OPcache PHP الأمثل للتمهيد"
+
+#. added: 2020-03-10 02:05:58
+msgctxt "description"
+msgid "Bei Webseiten, die beispielsweise auf WordPress, Joomla oder Laravel basieren und keinen userspezifischen Content haben, empfiehlt es sich, alle Seite..."
+msgstr "بالنسبة إلى مواقع الويب التي تستند إلى WordPress أو Joomla أو Laravel ، على سبيل المثال ، ولا تحتوي على محتوى خاص بالمستخدم ، فمن المستحسن ..."
+
+#. added: 2020-03-10 02:05:59
+msgctxt "slug"
+msgid "svg-export-aus-illustrator"
+msgstr "svg-ltsdyr-mn-lmsor"
+
+#. added: 2020-03-10 02:06:02
+msgid "SVG Export aus Illustrator"
+msgstr "تصدير SVG من Illustrator"
+
+#. added: 2020-03-10 02:06:02
+msgid "Im heutigen Web spielen SVGs eine zentrale Rolle. Sie haben nicht nur Iconfonts verdrängt, sondern bieten auch die Möglichkeit der Manipulation via CSS oder JavaScript. Will man eine Vektorgrafik für das Web aus <a>Adobe Illustrator</a> als SVG abspeichern, sind einige Einstellungen zu treffen, um Fallstricke zu vermeiden und Ladezeiten zu reduzieren, die ich im nachfolgenden Artikel vorstelle."
+msgstr "تلعب SVGs دورًا رئيسيًا في شبكة اليوم. لم يقتصر الأمر على استبدال خطوط الرموز ، بل إنها توفر أيضًا إمكانية التلاعب عبر CSS أو JavaScript. إذا كنت تريد حفظ رسم متجه للويب من <a>Adobe Illustrator</a> كـ SVG ، فيجب عليك إعداد بعض الإعدادات لتجنب المزالق وتقليل أوقات التحميل ، والتي سأقدمها في المقالة التالية."
+
+#. added: 2020-03-10 02:06:03
+msgid "Die allgemeine Exportfunktion findet man unter \"<strong>Datei &gt; Exportieren &gt; Exportieren als...</strong>\". Schließlich wählt man bei Dateityp \"<strong>SVG (*.SVG)</strong>\" aus. Will man transparente Bereiche nicht beschneiden und die Zeichenfläche berücksichtigen, setzt man einen Haken bei \"<strong>Zeichenflächen verwenden</strong>\", ansonsten nicht. Im nachfolgenden Dialog wählt man folgende Optionen aus:"
+msgstr "يمكن العثور على وظيفة التصدير العامة ضمن \" <strong>ملف> تصدير> تصدير باسم ...</strong> \". أخيرًا ، حدد \" <strong>SVG (* .SVG)</strong> \" لنوع الملف. إذا كنت لا ترغب في اقتصاص المساحات الشفافة وأخذ منطقة الرسم في الاعتبار ، فتحقق من \" <strong>استخدام مناطق الرسم</strong> \" ، وإلا فلا. في مربع الحوار التالي ، حدد الخيارات التالية:"
+
+#. added: 2020-03-10 02:06:03
+msgid "Ist man mit dem Detailgrad der Pfade im Ergebnis nicht zufrieden, erhöht man sukzessive die Dezimalstellen auf 3 oder 4."
+msgstr "إذا لم تكن راضيًا عن مستوى تفاصيل المسارات ، فأنت تقوم تدريجياً بزيادة المنازل العشرية إلى 3 أو 4."
+
+#. added: 2020-03-10 02:06:03
+msgid "Interessant wird es, wenn man in der Vektordatei Schnittmasken eingebettet hat. Man kann diese ebenfalls eliminieren (das führt zu erneut geringeren Dateigrößen sowie zu erhöhter Kompatibilität bei der Verwendung von Druck-Tools wie <a>dompdf</a>)."
+msgstr "يصبح مثيرًا للاهتمام عندما تكون أقنعة القطع مضمنة في ملف المتجه. يمكن أيضًا حذفها (يؤدي ذلك إلى أحجام ملفات أصغر وتوافق أكبر عند استخدام أدوات الطباعة مثل <a>dompdf</a> )."
+
+#. added: 2020-03-10 02:06:04
+msgid "Hier gibt es im Illustrator zwei bekannte Wege: Zunächst markiert man alle Objekte mit STRG+A und wählt \"<strong>Objekt &gt; Transparenz reduzieren...</strong>\" aus. Anschließend entfernt man über \"<strong>Objekt &gt; Schnittmaske &gt; Zurückwandeln</strong>\" die bestehenden Schnittmasken. Wenn das nicht klappt, macht man statt der beiden letzten Schritte folgendes: Zunächst wählt man \"<strong>Objekt &gt; Umwandeln... &gt; OK</strong>\" aus und anschließend im Pathfinder-Dialog die Option \"<strong>Überlappungsbereich entfernen</strong>\":"
+msgstr "هناك طريقتان معروفتان للقيام بذلك في Illustrator: أولاً ، حدد كل الكائنات باستخدام CTRL + A وحدد \" <strong>Object> Reduce الشفافية ...</strong> \". ثم أزل <strong>أقنعة القطع</strong> الموجودة عبر \" <strong p=\"2\">كائن> قناع القطع> تحويل مرة أخرى</strong> \". إذا لم ينجح ذلك ، فقم بما يلي بدلاً من الخطوتين الأخيرتين: أولاً حدد \" <strong p=\"3\">كائن> تحويل ...> موافق</strong> \" ثم في مربع الحوار \"مستكشف المسار\" ، حدد الخيار \" <strong p=\"4\">إزالة منطقة التداخل</strong> \":"
+
+#. added: 2020-03-10 02:06:04
+msgid "Das finale SVG kann man dann nochmals mit Tools wie <a>svgo</a> (auf der Kommandozeile oder im <a>Web-GUI</a>) weiter optimieren."
+msgstr "يمكن بعد ذلك تحسين SVG النهائي باستخدام أدوات مثل <a>svgo</a> (في سطر الأوامر أو في <a>واجهة المستخدم الرسومية على الويب</a> )."
+
+#. added: 2020-03-10 02:06:05
+msgctxt "title"
+msgid "SVG Export aus Illustrator"
+msgstr "تصدير SVG من Illustrator"
+
+#. added: 2020-03-10 02:06:05
+msgctxt "description"
+msgid "Im heutigen Web spielen SVGs eine zentrale Rolle. Sie haben nicht nur Iconfonts verdrängt, sondern bieten auch die Möglichkeit der Manipulation via ..."
+msgstr "تلعب SVGs دورًا رئيسيًا في شبكة اليوم. لم يقتصر الأمر على استبدال خطوط الرموز ، بل إنها توفر أيضًا إمكانية التلاعب عبر ..."
+
+#. added: 2020-03-10 02:12:56
+msgctxt "slug"
+msgid "project-euler-lattice-paths"
+msgstr "ms-r-t-euler-shaary-lmshroaa"
+
+#. added: 2020-03-10 02:12:59
+msgid "Project Euler: Lattice paths"
+msgstr "Euler المشروع: مسارات شعرية"
+
+#. added: 2020-03-10 02:13:00
+msgid "<a>Project Euler</a> ist eine Serie von spannenden Programmier-Problemen, die oft einen mathematisch Hintergrund haben. Die Probleme sind oft so gestellt, das man raffinierte Algorithmen entwickeln muss, um in einer vernünftigen Laufzeit zum Ziel zu kommen. Heute lösen wir <a>Problem 15: Lattice paths</a>, bei dem man mit einfachen kombinatorischen Mitteln an die Lösung kommt."
+msgstr "<a>Project Euler</a> عبارة عن سلسلة من مشكلات البرمجة المثيرة التي غالباً ما تكون لها خلفية رياضية. غالبًا ما يتم تطوير المشكلات من أجل تطوير خوارزميات معقدة للوصول إلى هدفها في وقت معقول. نحل اليوم <a>المشكلة 15: مسارات الشبكة</a> ، والتي يمكن العثور على الحل بوسائل اندماجية بسيطة."
+
+#. added: 2020-03-10 02:13:00
+msgid "Die Frage lautet wie folgt:"
+msgstr "السؤال كما يلي:"
+
+#. added: 2020-03-10 02:13:01
+msgid "„Starting in the top left corner of a 2×2 grid, and only being able to move to the right and down, there are exactly 6 routes to the bottom right corner.  How many such routes are there through a 20×20 grid?“"
+msgstr "\"بدءًا من الركن الأيسر العلوي من شبكة 2 × 2 ، ولكي تتمكن من الانتقال إلى اليمين والأسفل فقط ، فهناك 6 طرق بالضبط إلى الركن الأيمن السفلي. كم من هذه الطرق موجودة من خلال شبكة 20 × 20؟ \""
+
+#. added: 2020-03-10 02:13:01
+msgid "Die Problemstellung lässt sich auch anders formulieren: Gesucht ist die Mächtigkeit der Teilmenge aller Wege"
+msgstr "يمكن أيضًا صياغة المشكلة بشكل مختلف: نحن نبحث عن سمك المجموعة الفرعية لجميع المسارات"
+
+#. added: 2020-03-10 02:13:01
+msgid "Es handelt sich hier um ein einfaches kombinatorisches Problem, bei dem wir das Urnenmodell heranziehen (ohne Zurücklegen und ohne Beachtung der Reihenfolge). Wir sind nun genau an denjenigen Wegen interessiert, für die gilt, dass <span class=\"notranslate\">\\(R\\)</span> und <span class=\"notranslate\">\\(D\\)</span> genau gleich oft vorkommen. Demnach ergibt sich für alle möglichen Kombinationen:"
+msgstr "هذه مشكلة اندماجية بسيطة نستخدم فيها نموذج الجرار (دون إعادته وتجاهل الترتيب). نحن مهتمون الآن بهذه الطرق بالضبط التي يحدث فيها <span class=\"notranslate\">\\(R\\)</span> و <span class=\"notranslate\">\\(D\\)</span> نفس عدد المرات بالضبط. ينتج عن هذا كل المجموعات الممكنة:"
+
+#. added: 2020-03-10 02:13:02
+msgid "Für <span class=\"notranslate\">\\(n=20\\)</span> ergibt sich damit:"
+msgstr "من أجل <span class=\"notranslate\">\\(n=20\\)</span> نحصل على:"
+
+#. added: 2020-03-10 02:13:02
+msgid "Wir können das Problem auf nicht-quadratische Grids erweitern. Nachfolgende Lösung realisiert in PHP mit Hilfe von <a>bcmath</a> mit einer Laufzeit von <span class=\"notranslate\">\\( O(n) \\)</span> eine Berechnung mit dem Eingabeformat \"Anzahl der Testfälle, <span class=\"notranslate\">\\(n_1\\)</span> <span class=\"notranslate\">\\(m_1\\)</span>, ...\":"
+msgstr "يمكننا تمديد المشكلة إلى شبكات غير مربعة. يستخدم الحل التالي في PHP <a>bcmath</a> مع وقت تشغيل <span class=\"notranslate\">\\( O(n) \\)</span> <a p=\"1\">لإجراء</a> عملية حسابية باستخدام تنسيق الإدخال \"عدد حالات الاختبار ، <span p=\"3\" class=\"notranslate\">\\(n_1\\)</span> <span p=\"4\" class=\"notranslate\">\\(m_1\\)</span> ، ...\":"
+
+#. added: 2020-03-10 02:13:02
+msgid "Alle Probleme des Euler Projects lassen sich auf der empfehlenswerten Seite <a>HackerRank</a> übrigens auch online lösen."
+msgstr "بالمناسبة ، يمكن أيضًا حل جميع مشكلات مشروع Euler عبر الإنترنت على صفحة <a>HackerRank</a> الموصى <a p=\"1\">بها</a> ."
+
+#. added: 2020-03-10 02:13:03
+msgctxt "title"
+msgid "Project Euler: Lattice paths"
+msgstr "Euler المشروع: مسارات شعرية"
+
+#. added: 2020-03-10 02:13:03
+msgctxt "description"
+msgid "Project Euler ist eine Serie von spannenden Programmier-Problemen, die oft einen mathematisch Hintergrund haben. Die Probleme sind oft so gestellt, da..."
+msgstr "Project Euler عبارة عن سلسلة من مشكلات البرمجة المثيرة التي غالباً ما تكون لها خلفية رياضية. غالبا ما تطرح المشاكل بسبب ..."
+
+#. added: 2020-03-10 02:13:04
+msgctxt "slug"
+msgid "automatische-wordpress-updates"
+msgstr "thdyth-t-oord-ltlk-y"
+
+#. added: 2020-03-10 02:13:10
+msgid "Automatische WordPress-Updates"
+msgstr "التحديثات التلقائية وورد"
+
+#. added: 2020-03-10 02:13:10
+msgid "<a>WordPress</a> hat seit Version <a>3.7</a> Background Updates nativ implementiert und automatisch für Minor Releases aktiviert. Man kann mit Hilfe von <a>Filtern</a> das Verhalten genauer steuern, was genau automatisch aktualisiert wird. Eine permanente, vollautomatische Installation aller Minor-, Major-, Plugin-, Theme- und Translation-Updates ist jedoch nicht vorgesehen, jedoch leicht anderweitig zu bewerkstelligen."
+msgstr "قام <a>WordPress</a> بتنفيذ تحديثات الخلفية بشكل أصلي منذ الإصدار <a>3.7</a> وقام بتنشيطها تلقائيًا للإصدارات الثانوية. يمكنك استخدام <a>عوامل التصفية للتحكم</a> في السلوك بشكل أكثر دقة ، والذي يتم تحديثه تلقائيًا. لا يتم توفير تثبيت دائم تلقائي بالكامل لجميع التحديثات البسيطة ، الرئيسية ، والمكونات الإضافية ، والموضوعات والترجمة ، ومع ذلك ، فمن السهل القيام بخلاف ذلك."
+
+#. added: 2020-03-10 02:13:12
+msgid "Es <a>gibt</a> <a>zahlreiche</a> <a>Plugins</a>, die zwar die Häufigkeit des Abrufs der Notifications erhöhen und teilweise die Durchführung der eigentlichen Updates auch versprechen; Das gelingt aber keinem dieser Plugins zuverlässig. Eine (nicht nur für diesen Zweck) sehr geeignete Lösung bietet das mächtige Kommandozeilentool <a>WP-CLI</a>. Nach kurzer <a>Installation</a> sorgen die folgenden Zeilen (ausgeführt im WP-Projektordner) dafür, dass alle Updates der oben genannten Komponenten ausnahmslos installiert werden:"
+msgstr "هناك <a>و</a> <a>العديد من</a> <a>الإضافات</a> ، مع زيادة حجم عمليات الوصول إلى الإخطارات وجزئيا أيضا نعد لتنفيذ التحديثات الفعلية؛ ومع ذلك ، لم ينجح أي من هذه المكونات الإضافية بشكل موثوق. توفر <a>أداة</a> سطر الأوامر القوية <a p=\"4\">WP-CLI</a> حلاً مناسبًا جدًا (ليس لهذا الغرض فقط). بعد <a p=\"5\">التثبيت</a> القصير <a p=\"5\">،</a> تضمن الأسطر التالية (المنفذة في مجلد مشروع WP) تثبيت جميع تحديثات المكونات أعلاه دون استثناء:"
+
+#. added: 2020-03-10 02:13:12
+msgid "Folgender Oneliner (den man über ein <a>Alias</a> oder mit Tools wie <a>flimsy</a> kürzen kann) kann auf beliebigen SSH-Servern (auch ohne vorher installiertem WP-CLI) ausgeführt werden, um dort alle Updates auf einen Schlag zu installieren:"
+msgstr "يمكن تشغيل oneliner التالي (والذي يمكن اختصاره باستخدام <a>اسم مستعار</a> أو باستخدام أدوات مثل <a>flimsy</a> ) على أي خادم SSH (حتى بدون WP-CLI المثبت مسبقًا) لتثبيت جميع التحديثات هناك دفعة واحدة:"
+
+#. added: 2020-03-10 02:13:13
+msgid "Der --allow-root Flag sorgt für die Lauffähigkeit auf Systemen als Root-User (in <a>WSL</a>-Umgebungen ist das unabdingbar). Ein Update jeglicher Komponenten ohne vorheriges Testen in einer lokalen Entwicklungsumgebung ist in keinem Fall zu empfehlen. Hat man jedoch eine abgeschirmte WP-Umgebung oder einen speziellen Use-Case, immer mit den neuesten Updates versorgt sein zu wollen, lässt sich das Ganze auch über einen simplen Cronjob in Form einer Bash-Datei automatisieren:"
+msgstr "تضمن العلامة --allow-root القدرة على العمل على الأنظمة كمستخدم الجذر (هذا ضروري في بيئات <a>WSL</a> ). لا ينصح بتحديث أي مكون دون اختبار مسبق في بيئة تطوير محلية تحت أي ظرف من الظروف. ومع ذلك ، إذا كان لديك بيئة WP محمية أو حالة استخدام خاصة ، وترغب دائمًا في تزويدك بآخر التحديثات ، يمكن أيضًا أتمتة كل شيء باستخدام مهمة cron بسيطة في شكل ملف bash:"
+
+#. added: 2020-03-10 02:13:15
+msgid "WP-CLI kann noch vieles mehr: User-Rollen hinzufügen, Kommentare löschen, Strings in Datenbanken suchen und ersetzen, Mediendateien importieren... es lohnt sich ein Blick in die <a>Dokumentation</a>. Momentan habe ich zwei <a>Github</a>-<a>Issues</a> eröffnet, die kleine Bugs im <a>Language-Modul</a> betreffen, jedoch einem Einsatz in Produktivumgebungen nicht im Wege stehen."
+msgstr "يمكن لـ WP-CLI فعل الكثير: إضافة أدوار المستخدم ، وحذف التعليقات ، والبحث واستبدال السلاسل في قواعد البيانات ، واستيراد ملفات الوسائط ... يجدر إلقاء نظرة على <a>الوثائق</a> . حاليا لدي اثنين من <a>جيثب</a> - <a>قضايا</a> فتحت البق قليلا في <a>اللغة وحدة</a> تتصل، ولكنها ليست استخدام في بيئات الإنتاج في الطريق."
+
+#. added: 2020-03-10 02:13:15
+msgctxt "title"
+msgid "Automatische WordPress-Updates"
+msgstr "التحديثات التلقائية وورد"
+
+#. added: 2020-03-10 02:13:15
+msgctxt "description"
+msgid "WordPress hat seit Version 3.7 Background Updates nativ implementiert und automatisch für Minor Releases aktiviert. Man kann mit Hilfe von Filtern da..."
+msgstr "قام WordPress بتنفيذ تحديثات الخلفية بشكل أصلي منذ الإصدار 3.7 وقام بتنشيطها تلقائيًا للإصدارات الثانوية. يمكنك استخدام المرشحات ..."
+
+#. added: 2020-03-10 02:13:16
+msgctxt "slug"
+msgid "google-sheets-formeln-ausdehnen"
+msgstr "tosyaa-gogl-ork-lsygh"
+
+#. added: 2020-03-10 02:13:19
+msgid "Google Sheets: Formeln ausdehnen"
+msgstr "أوراق Google: قم بتوسيع الصيغ"
+
+#. added: 2020-03-10 02:13:21
+msgid "Um  innerhalb von Google Sheets Formeln auf ganze Spalten auszudehnen, empfiehlt sich der Einsatz der nützlichen Funktion <a>ARRAYFORMULA</a>. Leider funktioniert diese nicht in Kombination mit einigen anderen wichtigen Funktionen wie <a>QUERY</a> oder <a>INDIREKT</a>, weshalb eine komplette Individualprogrammierung der Logik mit Hilfe von <a>Google Apps Script</a> oder alternativ das manuelle Kopieren der Formel bis hin zur letzten Zeile übrig bleibt."
+msgstr "من أجل توسيع الصيغ إلى أعمدة بأكملها داخل جداول بيانات Google ، <a>يوصى باستخدام</a> الدالة المفيدة <a p=\"1\">ARRAYFORMULA</a> . لسوء الحظ ، لا يعمل هذا مع بعض الوظائف المهمة الأخرى مثل <a p=\"2\">QUERY</a> أو <a p=\"3\">INDIRECT</a> ، وهذا هو السبب وراء ترك <a p=\"3\">برمجة</a> فردية كاملة للمنطق بمساعدة <a p=\"4\">Google Apps Script</a> أو بدلاً من ذلك ، يتم نسخ النسخة اليدوية من الصيغة إلى السطر الأخير."
+
+#. added: 2020-03-10 02:13:21
+msgid "Als Alternative bauen wir uns für die zweite Variante eine kleine Hilfsfunktion, die in allen Tabellenblättern in Zeile 2 nach Formeln sucht und diese automatisch bis ans Ende der Tabellen kopiert. Dabei werden ARRAYFORMULA-Formeln automatisch ignoriert. Das Ganze fügt man über <strong>Tools &gt; Skripteditor</strong> ein und lässt diese über <strong>Bearbeiten &gt; Trigger des aktuellen Projekts</strong> zeitgesteuert 1x pro Minute laufen:"
+msgstr "كبديل ، نحن نبني وظيفة مساعدة صغيرة للمتغير الثاني ، الذي يبحث عن الصيغ في الصف 2 من جميع أوراق العمل ونسخها تلقائيًا إلى نهاية الجداول. يتم تجاهل صيغ ARRAYFORMULA تلقائيًا. يمكنك إضافة كل شيء عبر <strong>أدوات> Script</strong> <strong>Editor</strong> والسماح لها بتشغيل 1x للتحكم في الوقت في الدقيقة الواحدة عبر <strong p=\"2\">Edit> Trigger للمشروع الحالي</strong> :"
+
+#. added: 2020-03-10 02:13:21
+msgctxt "title"
+msgid "Google Sheets: Formeln ausdehnen"
+msgstr "أوراق Google: قم بتوسيع الصيغ"
+
+#. added: 2020-03-10 02:13:22
+msgctxt "description"
+msgid "Um innerhalb von Google Sheets Formeln auf ganze Spalten auszudehnen, empfiehlt sich der Einsatz der nützlichen Funktion ARRAYFORMULA. Leider funktio..."
+msgstr "من أجل توسيع الصيغ إلى أعمدة بأكملها داخل جداول بيانات Google ، يوصى باستخدام الدالة المفيدة ARRAYFORMULA. لسوء الحظ functio ..."
+
+#. added: 2020-03-10 02:13:23
+msgctxt "slug"
+msgid "das-simpson-paradoxon"
+msgstr "mf-rk-symbson"
