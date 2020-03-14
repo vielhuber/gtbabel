@@ -56,9 +56,11 @@ mkdir svn
 cd ./svn
 svn co https://plugins.svn.wordpress.org/gtbabel .
 svn cleanup
+mkdir -p ./trunk
 rm -rf ./trunk/*
 cp -r ./../gtbabel/. ./trunk/
 svn add ./trunk/* --force
+mkdir -p ./assets
 rm -rf ./assets/*
 cp -r ./../gtbabel/assets/plugin/. ./assets/
 svn add ./assets/* --force
