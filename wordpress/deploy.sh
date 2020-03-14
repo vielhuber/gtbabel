@@ -29,7 +29,7 @@ composer update --no-dev
 
 # increase version number in readme.txt and main php
 sed -i -e "s/Stable tag: [0-9]\.[0-9]\.[0-9]/Stable tag: $v_new/" ./readme.txt
-sed -i -e "s/ * Version: [0-9]\.[0-9]\.[0-9]/ * Version: $v_new/" ./gtbabel.php
+sed -i -e "s/ \* Version: [0-9]\.[0-9]\.[0-9]/ * Version: $v_new/" ./gtbabel.php
 
 # do the prefixing with php-scoper
 wget https://github.com/humbug/php-scoper/releases/download/0.13.1/php-scoper.phar
