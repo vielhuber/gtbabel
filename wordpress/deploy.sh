@@ -55,7 +55,7 @@ rm -rf ./trunk/*
 cp -r ./../gtbabel/. ./trunk/
 svn add ./trunk/*
 svn cp ./trunk ./tags/$v_new
-svn ci -m "$v_new" --username vielhuber --password "XXXXXXXXX"
+svn ci -m "$v_new" --username vielhuber
 cd $SCRIPT_DIR
 
 # remove obsolete files
