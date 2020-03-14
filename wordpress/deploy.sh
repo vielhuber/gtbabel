@@ -51,20 +51,22 @@ rm -rf ./gtbabel/locales/
 rm -rf ./gtbabel/logs/
 zip -r ./gtbabel.zip ./gtbabel
 
+exit 1
+
 # add to subversion
 mkdir svn
 cd ./svn
 svn co https://plugins.svn.wordpress.org/gtbabel .
+sleep 2
 svn cleanup
 svn update
-mkdir -p ./trunk
-rm -rf ./trunk/*
+sleep 2
+svn rm ./trunk/*
 cp -r ./../gtbabel/. ./trunk/
-svn add ./trunk/* --force
-mkdir -p ./assets
-rm -rf ./assets/*
+svn add ./trunk/*
+svn rm ./assets/*
 cp -r ./../gtbabel/assets/plugin/. ./assets/
-svn add ./assets/* --force
+svn add ./assets/*
 svn cp ./trunk ./tags/$v_new
 svn ci -m "$v_new" --username vielhuber
 cd $SCRIPT_DIR
