@@ -57,10 +57,10 @@ svn co https://plugins.svn.wordpress.org/gtbabel .
 svn cleanup
 rm -rf ./trunk/*
 cp -r ./../gtbabel/. ./trunk/
-svn add ./trunk/* --quiet
+svn add ./trunk/* --force
 rm -rf ./assets/*
 cp -r ./../gtbabel/assets/plugin/. ./assets/
-svn add ./assets/* --quiet
+svn add ./assets/* --force
 svn cp ./trunk ./tags/$v_new
 svn ci -m "$v_new" --username vielhuber
 cd $SCRIPT_DIR
