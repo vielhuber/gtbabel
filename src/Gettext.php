@@ -165,29 +165,28 @@ class Gettext
     {
         $data = [];
         $poLoader = new PoLoader();
-        $moLoader = new MoLoader();
         if (!file_exists($this->getLngFilename('pot', '_template'))) {
             return $data;
         }
         $pot = $poLoader->loadFile($this->getLngFilename('pot', '_template'));
         foreach ($pot->getTranslations() as $gettext__value) {
-            $shared = $this->getSharedValueFromTranslation($gettext__value);
             $data[$this->getTranslationHash($gettext__value)] = [
                 'orig' => $gettext__value->getOriginal(),
                 'context' => $gettext__value->getContext() ?? '',
-                'shared' => $shared,
+                'shared' => $this->getCommentValueFromTranslation($gettext__value, 'shared'),
                 'translations' => []
             ];
         }
         foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
-            if (!file_exists($this->getLngFilename('mo', $languages__value))) {
+            if (!file_exists($this->getLngFilename('po', $languages__value))) {
                 continue;
             }
-            $mo = $moLoader->loadFile($this->getLngFilename('mo', $languages__value));
-            foreach ($mo->getTranslations() as $gettext__value) {
-                $data[$this->getTranslationHash($gettext__value)]['translations'][
-                    $languages__value
-                ] = $gettext__value->getTranslation();
+            $po = $poLoader->loadFile($this->getLngFilename('po', $languages__value));
+            foreach ($po->getTranslations() as $gettext__value) {
+                $data[$this->getTranslationHash($gettext__value)]['translations'][$languages__value] = [
+                    'str' => $gettext__value->getTranslation(),
+                    'checked' => $this->getCommentValueFromTranslation($gettext__value, 'checked')
+                ];
             }
         }
         uasort($data, function ($a, $b) {
@@ -211,11 +210,11 @@ class Gettext
         return md5($string . '#' . ($context ?? ''));
     }
 
-    function getSharedValueFromTranslation($gettext)
+    function getCommentValueFromTranslation($gettext, $comment)
     {
         $shared = null;
         foreach ($gettext->getExtractedComments() as $comments__value) {
-            if (mb_strpos($comments__value, 'shared') !== 0) {
+            if (mb_strpos($comments__value, $comment) !== 0) {
                 continue;
             }
             $shared = trim(explode(':', $comments__value)[1]) == '1' ? true : false;
@@ -224,11 +223,11 @@ class Gettext
         return $shared;
     }
 
-    function getSharedCommentFromTranslation($gettext)
+    function getCommentFromTranslation($gettext, $comment)
     {
         $shared = null;
         foreach ($gettext->getExtractedComments() as $comments__value) {
-            if (mb_strpos($comments__value, 'shared') !== 0) {
+            if (mb_strpos($comments__value, $comment) !== 0) {
                 continue;
             }
             $shared = $comments__value;
@@ -237,7 +236,7 @@ class Gettext
         return $shared;
     }
 
-    function editTranslationFromFiles($hash, $str, $lng)
+    function editTranslationFromFiles($hash, $lng, $str = null, $checked = null)
     {
         $success = false;
         $poLoader = new PoLoader();
@@ -251,7 +250,16 @@ class Gettext
             if ($this->getTranslationHash($gettext__value) !== $hash) {
                 continue;
             }
-            $gettext__value->translate($str);
+            if ($str !== null) {
+                $gettext__value->translate($str);
+            }
+            if ($checked !== null) {
+                $comment = $this->getCommentFromTranslation($gettext__value, 'checked');
+                if ($comment !== null) {
+                    $gettext__value->getExtractedComments()->delete($comment);
+                }
+                $gettext__value->getExtractedComments()->add('checked: ' . $checked);
+            }
             $success = true;
         }
         if ($success === true) {
@@ -274,7 +282,7 @@ class Gettext
             if ($this->getTranslationHash($gettext__value) !== $hash) {
                 continue;
             }
-            $comment = $this->getSharedCommentFromTranslation($gettext__value);
+            $comment = $this->getCommentFromTranslation($gettext__value, 'shared');
             if ($comment !== null) {
                 $gettext__value->getExtractedComments()->delete($comment);
             }
@@ -319,7 +327,7 @@ class Gettext
                 continue;
             }
             // never overwrite manually set value
-            if ($this->getSharedValueFromTranslation($gettext__value) !== null) {
+            if ($this->getCommentValueFromTranslation($gettext__value, 'shared') !== null) {
                 continue;
             }
             // only write not null values

@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 2.4.5
+ * Version: 2.4.6
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -1042,7 +1042,7 @@ class GtbabelWordPress
                         $settings__key,
                         $key_chain
                     ) {
-                        if (in_array('translations', $key_chain)) {
+                        if (in_array('str', $key_chain)) {
                             return wp_kses_post($settings__value);
                         }
                         return sanitize_textarea_field($settings__value);
@@ -1053,8 +1053,9 @@ class GtbabelWordPress
                             foreach ($post__value['translations'] as $translations__key => $translations__value) {
                                 $this->gtbabel->gettext->editTranslationFromFiles(
                                     $post__key,
-                                    $translations__value,
-                                    $translations__key
+                                    $translations__key,
+                                    @$translations__value['str'],
+                                    @$translations__value['checked']
                                 );
                             }
                         }
@@ -1130,6 +1131,32 @@ class GtbabelWordPress
             '" placeholder="' .
             __('Search term', 'gtbabel-plugin') .
             '" />';
+        echo '<select class="gtbabel__input gtbabel__input--select" name="checked">';
+        echo '<option value="">&ndash;&ndash;</option>';
+        echo '<option value="0"' .
+            (isset($_GET['checked']) && $_GET['checked'] == '0' ? ' selected="selected"' : '') .
+            '>' .
+            __('Not checked', 'gtbabel-plugin') .
+            '</option>';
+        echo '<option value="1"' .
+            (isset($_GET['checked']) && $_GET['checked'] == '1' ? ' selected="selected"' : '') .
+            '>' .
+            __('Checked', 'gtbabel-plugin') .
+            '</option>';
+        echo '</select>';
+        echo '<select class="gtbabel__input gtbabel__input--select" name="shared">';
+        echo '<option value="">&ndash;&ndash;</option>';
+        echo '<option value="0"' .
+            (isset($_GET['shared']) && $_GET['shared'] == '0' ? ' selected="selected"' : '') .
+            '>' .
+            __('Not shared', 'gtbabel-plugin') .
+            '</option>';
+        echo '<option value="1"' .
+            (isset($_GET['shared']) && $_GET['shared'] == '1' ? ' selected="selected"' : '') .
+            '>' .
+            __('Shared', 'gtbabel-plugin') .
+            '</option>';
+        echo '</select>';
         echo '<input class="gtbabel__submit button button-secondary" value="' .
             __('Search', 'gtbabel-plugin') .
             '" type="submit" />';
@@ -1140,12 +1167,7 @@ class GtbabelWordPress
             echo '<h2 class="gtbabel__subtitle">' . __('Publish status', 'gtbabel-plugin') . '</h2>';
             echo '<div class="gtbabel__publish">';
             echo '<form class="gtbabel__form" method="post" action="' .
-                admin_url(
-                    'admin.php?page=gtbabel-trans' .
-                        ($pagination->cur != '' ? '&p=' . $pagination->cur : '') .
-                        (isset($_GET['s']) != '' ? '&s=' . wp_kses_post($_GET['s']) : '') .
-                        (isset($_GET['url']) != '' ? '&url=' . esc_url($_GET['url']) : '')
-                ) .
+                $this->buildTranslationFormUrl($pagination->cur) .
                 '">';
             wp_nonce_field('gtbabel-trans-save-publish');
             echo '<p class="gtbabel__paragraph">';
@@ -1210,12 +1232,7 @@ class GtbabelWordPress
             }
 
             echo '<form class="gtbabel__form" method="post" action="' .
-                admin_url(
-                    'admin.php?page=gtbabel-trans' .
-                        ($pagination->cur != '' ? '&p=' . $pagination->cur : '') .
-                        (isset($_GET['s']) != '' ? '&s=' . wp_kses_post($_GET['s']) : '') .
-                        (isset($_GET['url']) != '' ? '&url=' . esc_url($_GET['url']) : '')
-                ) .
+                $this->buildTranslationFormUrl($pagination->cur) .
                 '">';
             wp_nonce_field('gtbabel-trans-save-translations');
 
@@ -1246,12 +1263,23 @@ class GtbabelWordPress
                     as $languages__key => $languages__value
                 ) {
                     echo '<td class="gtbabel__table-cell">';
+                    echo '<input title="' .
+                        __('String checked', 'gtbabel-plugin') .
+                        '" class="gtbabel__input gtbabel__input--checkbox gtbabel__input--on-change gtbabel__input--submit-unchecked gtbabel__input--check-translation" type="checkbox" data-name="gtbabel[' .
+                        $translations__key .
+                        '][translations][' .
+                        $languages__key .
+                        '][checked]" value="1"' .
+                        ($translations__value['translations'][$languages__key]['checked'] == '1'
+                            ? ' checked="checked"'
+                            : '') .
+                        ' />';
                     echo '<textarea class="gtbabel__input gtbabel__input--textarea gtbabel__input--on-change" data-name="gtbabel[' .
                         $translations__key .
                         '][translations][' .
                         $languages__key .
-                        ']">' .
-                        @$translations__value['translations'][$languages__key] .
+                        '][str]">' .
+                        $translations__value['translations'][$languages__key]['str'] .
                         '</textarea>';
                     echo '</td>';
                 }
@@ -1800,7 +1828,54 @@ EOD;
             }
         }
 
+        if (@$_GET['shared'] != '') {
+            // filter
+            foreach ($translations as $translations__key => $translations__value) {
+                if (
+                    ($_GET['shared'] == '0' && $translations__value['shared'] === true) ||
+                    ($_GET['shared'] == '1' && $translations__value['shared'] !== true)
+                ) {
+                    unset($translations[$translations__key]);
+                }
+            }
+        }
+
+        if (@$_GET['checked'] != '') {
+            // filter
+            foreach ($translations as $translations__key => $translations__value) {
+                $all_checked = true;
+                foreach ($translations__value['translations'] as $translations__value__value) {
+                    if ($translations__value__value['checked'] !== true) {
+                        $all_checked = false;
+                        break;
+                    }
+                }
+                if (
+                    ($all_checked === true && $_GET['checked'] == '0') ||
+                    ($all_checked !== true && $_GET['checked'] == '1')
+                ) {
+                    unset($translations[$translations__key]);
+                }
+            }
+        }
+
         return $translations;
+    }
+
+    private function buildTranslationFormUrl($p)
+    {
+        return admin_url(
+            'admin.php?page=gtbabel-trans&p=' .
+                $p .
+                (isset($_GET['s']) && $_GET['s'] !== '' ? '&s=' . wp_kses_post($_GET['s']) : '') .
+                (isset($_GET['url']) && $_GET['url'] !== '' ? '&url=' . esc_url($_GET['url']) : '') .
+                (isset($_GET['shared']) && $_GET['shared'] !== ''
+                    ? '&shared=' . sanitize_textarea_field($_GET['shared'])
+                    : '') .
+                (isset($_GET['checked']) && $_GET['checked'] !== ''
+                    ? '&checked=' . sanitize_textarea_field($_GET['checked'])
+                    : '')
+        );
     }
 
     private function initBackendPagination($translations)
@@ -1818,7 +1893,7 @@ EOD;
                 if ($pagination->cur !== $p) {
                     $pagination->html .=
                         '<a class="gtbabel__pagination-link" href="' .
-                        admin_url('admin.php?page=gtbabel-trans&p=' . $p) .
+                        $this->buildTranslationFormUrl($p) .
                         '">' .
                         $p .
                         '</a>';
