@@ -236,6 +236,24 @@ class Test extends \PHPUnit\Framework\TestCase
         ]);
     }
 
+    public function test39()
+    {
+        $this->runDiff('39.html', 500, [
+            'debug_translations' => false,
+            'auto_translation' => true,
+            'google_translation_api_key' => null
+        ]);
+    }
+
+    public function test40()
+    {
+        $this->runDiff('40.html', 500, [
+            'debug_translations' => false,
+            'auto_translation' => true,
+            'google_translation_api_key' => 'free'
+        ]);
+    }
+
     public function test_translate()
     {
         $this->gtbabel = new Gtbabel();

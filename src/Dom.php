@@ -268,15 +268,19 @@ class Dom
         // if the html source doesn't contain a valid utf8 header, domdocument interprets is as iso
         // we circumvent this with mb_convert_encoding
         //@$this->DOMDocument->loadHTML($html);
-        @$this->DOMDocument->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+        $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
+        $html = str_replace(
+            '<meta charset="utf-8"',
+            '<meta http-equiv="content-type" content="text/html;charset=utf-8" /><meta charset="utf-8"',
+            $html
+        );
+        @$this->DOMDocument->loadHTML($html);
         $this->DOMXpath = new \DOMXpath($this->DOMDocument);
     }
 
     function finishDomDocument($htmlOriginal)
     {
         $htmlModified = $this->DOMDocument->saveHTML();
-        // since domdocument converts all umlauts to html entities, we revert that completely
-        $htmlModified = html_entity_decode($htmlModified);
         // if domdocument added previously a default header, we squish that
         if (
             mb_stripos($htmlOriginal, '<!DOCTYPE') !== 0 &&

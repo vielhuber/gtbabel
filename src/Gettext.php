@@ -723,9 +723,18 @@ class Gettext
         if ($transWithoutAttributes === false) {
             $origWithIds = $this->tags->addIds($orig);
             $transWithIds = $this->autoTranslateString($origWithIds, $lng, $context);
-            $transWithoutAttributes = $this->tags->removeAttributesExceptIrregularIds($transWithIds);
-            $this->addStringToPotFileAndToCache($origWithoutAttributes, $context);
-            $this->addTranslationToPoFileAndToCache($origWithoutAttributes, $transWithoutAttributes, $lng, $context);
+            if ($transWithIds !== null) {
+                $transWithoutAttributes = $this->tags->removeAttributesExceptIrregularIds($transWithIds);
+                $this->addStringToPotFileAndToCache($origWithoutAttributes, $context);
+                $this->addTranslationToPoFileAndToCache(
+                    $origWithoutAttributes,
+                    $transWithoutAttributes,
+                    $lng,
+                    $context
+                );
+            } else {
+                $transWithoutAttributes = $this->tags->removeAttributesExceptIrregularIds($origWithIds);
+            }
         }
 
         $trans = $this->tags->addAttributesAndRemoveIds($transWithoutAttributes, $mappingTable);
@@ -748,6 +757,9 @@ class Gettext
                     $api_key = $api_key[array_rand($api_key)];
                 }
                 $trans = __::translate_google($orig, $from_lng, $to_lng, $api_key);
+                if ($trans === null) {
+                    return null;
+                }
                 $this->log->apiStatsIncrease('google', mb_strlen($orig));
             } elseif ($this->settings->get('auto_translation_service') === 'microsoft') {
                 $api_key = $this->settings->get('microsoft_translation_api_key');
@@ -755,15 +767,15 @@ class Gettext
                     $api_key = $api_key[array_rand($api_key)];
                 }
                 $trans = __::translate_microsoft($orig, $from_lng, $to_lng, $api_key);
+                if ($trans === null) {
+                    return null;
+                }
                 $this->log->apiStatsIncrease('microsoft', mb_strlen($orig));
             }
             if ($context === 'slug') {
                 $trans = $this->utils->slugify($trans, $orig, $to_lng);
             }
-        }
-
-        // this does apply if auto_translation is either false or failed (due to wrong api key)
-        if ($trans === null) {
+        } else {
             $trans = $this->translateStringMock($orig, $to_lng, $context, $from_lng);
         }
 
@@ -953,9 +965,13 @@ class Gettext
                 );
             }
             $trans = $this->autoTranslateString($str_in_source, $to_lng, $context, $from_lng);
-            $this->addStringToPotFileAndToCache($str_in_source, $context);
-            $this->addTranslationToPoFileAndToCache($str_in_source, $str, $from_lng, $context);
-            $this->addTranslationToPoFileAndToCache($str_in_source, $trans, $to_lng, $context);
+            if ($trans !== null) {
+                $this->addStringToPotFileAndToCache($str_in_source, $context);
+                $this->addTranslationToPoFileAndToCache($str_in_source, $str, $from_lng, $context);
+                $this->addTranslationToPoFileAndToCache($str_in_source, $trans, $to_lng, $context);
+            } else {
+                $trans = $str;
+            }
         }
         return $trans;
     }
