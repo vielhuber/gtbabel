@@ -5,7 +5,7 @@ Donate link: https://vielhuber.de
 Requires at least: 5.3.2
 Tested up to: 5.3.2
 Requires PHP: 7.2
-Stable tag: 2.4.6
+Stable tag: 2.4.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -46,6 +46,9 @@ Yes (see [repository](https://github.com/vielhuber/gtbabel)).
 2. Setup wizard
 
 == Changelog ==
+= 2.4.8 =
+* Improve google translation api
+
 = 2.4.6 =
 * Include string checked functionality
 
