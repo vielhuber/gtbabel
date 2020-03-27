@@ -164,6 +164,8 @@ gtbabel__('string');
 gtbabel__('string', 'context');
 ```
 
+Also first check, if gtbabel is available in JavaScript with `if (typeof gtbabel__ === 'function') { }`.
+
 In WordPress environments Gtbabel gives you a backend interface to handle the strings more conveniently.\
 Instead you can also can use [wp_localize_script](https://codex.wordpress.org/Function_Reference/wp_localize_script) (in conjunction with `gtbabel__`).
 
