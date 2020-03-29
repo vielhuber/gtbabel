@@ -124,10 +124,12 @@ function fetchNextAutoTranslate(url, tries = 0) {
             }
             return null;
         })
-        .catch(v => v)
+        .catch(() => {
+            return null;
+        })
         .then(response => {
             // something went wrong, try again
-            if (response === null || response === undefined || response.trim() === '') {
+            if (response === null || response === undefined || response == '') {
                 setTimeout(() => {
                     fetchNextAutoTranslate(url, tries + 1);
                 }, 30000);
