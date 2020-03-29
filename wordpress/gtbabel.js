@@ -128,21 +128,30 @@ function fetchNextAutoTranslate(url, tries = 0) {
         .then(response => {
             // something went wrong, try again
             if (response === null || response === undefined || response.trim() === '') {
-                fetchNextAutoTranslate(url, tries + 1);
-            }
-            let html = new DOMParser().parseFromString(response, 'text/html');
-            if (document.querySelector('.gtbabel__auto-translate') !== null) {
-                document.querySelector('.gtbabel__auto-translate').innerHTML = html.querySelector(
-                    '.gtbabel__auto-translate'
-                ).innerHTML;
-            }
-            if (document.querySelector('.gtbabel__api-stats') !== null) {
-                document.querySelector('.gtbabel__api-stats').innerHTML = html.querySelector(
-                    '.gtbabel__api-stats'
-                ).innerHTML;
-            }
-            if (html.querySelector('.gtbabel__auto-translate-next') !== null) {
-                fetchNextAutoTranslate(html.querySelector('.gtbabel__auto-translate-next').getAttribute('href'));
+                setTimeout(() => {
+                    fetchNextAutoTranslate(url, tries + 1);
+                }, 30000);
+            } else {
+                let html = new DOMParser().parseFromString(response, 'text/html');
+                if (
+                    document.querySelector('.gtbabel__auto-translate') !== null &&
+                    html.querySelector('.gtbabel__auto-translate') !== null
+                ) {
+                    document.querySelector('.gtbabel__auto-translate').innerHTML = html.querySelector(
+                        '.gtbabel__auto-translate'
+                    ).innerHTML;
+                }
+                if (
+                    document.querySelector('.gtbabel__api-stats') !== null &&
+                    html.querySelector('.gtbabel__api-stats') !== null
+                ) {
+                    document.querySelector('.gtbabel__api-stats').innerHTML = html.querySelector(
+                        '.gtbabel__api-stats'
+                    ).innerHTML;
+                }
+                if (html.querySelector('.gtbabel__auto-translate-next') !== null) {
+                    fetchNextAutoTranslate(html.querySelector('.gtbabel__auto-translate-next').getAttribute('href'));
+                }
             }
         });
 }
