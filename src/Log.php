@@ -215,11 +215,14 @@ class Log
     function generalLog($msg)
     {
         $filename = $this->generalLogFilename();
+        if (!file_exists($filename)) {
+            file_put_contents($filename, '');
+        }
         if (is_array($msg)) {
             $msg = print_r($msg, true);
         }
         $msg = date('Y-m-d H:i:s') . ': ' . $msg;
-        file_put_contents($filename, $msg . PHP_EOL . @file_get_contents($filename));
+        file_put_contents($filename, $msg . PHP_EOL . file_get_contents($filename));
     }
 
     function generalLogFilename()
