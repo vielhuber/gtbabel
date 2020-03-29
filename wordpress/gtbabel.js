@@ -39,7 +39,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             el.insertAdjacentHTML(
                 'afterend',
-                '<div class="gtbabel__auto-translate">' + el.getAttribute('data-loading-text') + '</div>'
+                '<div class="gtbabel__auto-translate" data-error-text="' +
+                    el.getAttribute('data-error-text') +
+                    '">' +
+                    el.getAttribute('data-loading-text') +
+                    '</div>'
             );
             let href = el.getAttribute('data-href');
             if (
@@ -105,6 +109,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function fetchNextAutoTranslate(url, tries = 0) {
     if (tries > 10) {
+        if (document.querySelector('.gtbabel__auto-translate') !== null) {
+            document.querySelector('.gtbabel__auto-translate').innerHTML =
+                '<span class="gtbabel__auto-translate-error">' +
+                document.querySelector('.gtbabel__auto-translate').getAttribute('data-error-text') +
+                '</span>';
+        }
         return;
     }
     fetch(url)

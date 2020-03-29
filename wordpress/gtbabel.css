@@ -149,6 +149,15 @@
     margin-right: 10px;
 }
 
+.gtbabel__auto-translate-error {
+    color: red;
+    font-weight: bold;
+}
+.gtbabel__auto-translate-loading {
+    display: block;
+    margin: 10px auto;
+}
+
 .gtbabel__search {
     width: 100%;
     margin-bottom: 20px;

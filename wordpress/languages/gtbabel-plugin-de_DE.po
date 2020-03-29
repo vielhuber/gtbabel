@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gtbabel-plugin\n"
-"POT-Creation-Date: 2020-03-16 00:42+0100\n"
+"POT-Creation-Date: 2020-03-29 01:36+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -36,7 +36,7 @@ msgstr "Einstellungen"
 msgid "String translations"
 msgstr "String-Übersetzungen"
 
-#: gtbabel.php:348 gtbabel.php:349 gtbabel.php:2117
+#: gtbabel.php:348 gtbabel.php:349 gtbabel.php:2156
 msgid "Language picker"
 msgstr "Sprachauswahl"
 
@@ -217,20 +217,20 @@ msgid "Search term"
 msgstr "Suchbegriff"
 
 #: gtbabel.php:1139
-msgid "Checked"
-msgstr "Überprüft"
-
-#: gtbabel.php:1144
 msgid "Not checked"
 msgstr "Nicht überprüft"
 
-#: gtbabel.php:1152 gtbabel.php:1247
-msgid "Shared"
-msgstr "Gemeinsam genutzt"
+#: gtbabel.php:1144
+msgid "Checked"
+msgstr "Überprüft"
 
-#: gtbabel.php:1157
+#: gtbabel.php:1152
 msgid "Not shared"
 msgstr "Nicht gemeinsam genutzt"
+
+#: gtbabel.php:1157 gtbabel.php:1247
+msgid "Shared"
+msgstr "Gemeinsam genutzt"
 
 #: gtbabel.php:1161
 msgid "Search"
@@ -278,8 +278,8 @@ msgstr "Keine Übersetzungen vorhanden."
 msgid "Successfully uploaded"
 msgstr "Erfolgreich hochgeladen"
 
-#: gtbabel.php:1361
-msgid "An error occured"
+#: gtbabel.php:1361 gtbabel.php:2035
+msgid "An error occurred"
 msgstr "Es ist ein Fehler aufgetreten"
 
 #: gtbabel.php:1376
@@ -452,76 +452,34 @@ msgstr "Gut gemacht"
 msgid "Translated strings"
 msgstr "Übersetzte Zeichenketten"
 
-#: gtbabel.php:1959
+#: gtbabel.php:1990
 msgid "Characters"
 msgstr "Buchstaben"
 
-#: gtbabel.php:1976 gtbabel.php:2058
+#: gtbabel.php:2010 gtbabel.php:2096
 msgid "Loading"
 msgstr "Lade"
 
-#: gtbabel.php:1980
+#: gtbabel.php:2014
 msgid "Translate"
 msgstr "Übersetzen"
 
-#: gtbabel.php:2075
+#: gtbabel.php:2113
 msgid "Progress"
 msgstr "Fortschritt"
 
-#: gtbabel.php:2087
+#: gtbabel.php:2125
 msgid "Deleted strings"
 msgstr "Gelöschte Zeichenketten"
 
-#: gtbabel.php:2091
+#: gtbabel.php:2129
 msgid "Finished"
 msgstr "Erledigt"
 
-#: gtbabel.php:2118
+#: gtbabel.php:2157
 msgid "A language picker of Gtbabel."
 msgstr "Eine Sprachauswahl von Gtbabel."
 
-#: gtbabel.php:2152
+#: gtbabel.php:2191
 msgid "Title"
 msgstr "Titel"
-
-#~ msgid "To the translated website"
-#~ msgstr "Zur übersetzten Webseite"
-
-#~ msgid "Zur Webseite"
-#~ msgstr "To website"
-
-#~ msgid "Gtbabel language picker"
-#~ msgstr "Gtbabel Sprachauswahl"
-
-#~ msgid "Enable discovery log"
-#~ msgstr "Entdeckungs-Log aktivieren"
-
-#~ msgid "Translation api usage stats file"
-#~ msgstr "Übersetzungs-API-Statistiken Dateipfad"
-
-#~ msgid "Discovery log file"
-#~ msgstr "Entdeckungs-Log Dateipfad"
-
-#~ msgid "String translation"
-#~ msgstr "String-Übersetzung"
-
-#~ msgid "URL"
-#~ msgstr "URL"
-
-#, fuzzy
-#~| msgid "Reset settings"
-#~ msgid "Backup / restore settings"
-#~ msgstr "Einstellungen zurücksetzen"
-
-#, fuzzy
-#~| msgid "Reset translations"
-#~ msgid "Remove unused translations"
-#~ msgstr "Übersetzungen zurücksetzen"
-
-#~ msgid "Fetching"
-#~ msgstr "Lade"
-
-#, fuzzy
-#~| msgid "Google Translation API Key"
-#~ msgid "Translation API usage"
-#~ msgstr "Google Übersetzungs-API-Schlüssel"

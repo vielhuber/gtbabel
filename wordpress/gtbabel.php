@@ -1358,7 +1358,7 @@ class GtbabelWordPress
                     } else {
                         $message =
                             '<div class="gtbabel__notice notice notice-error is-dismissible"><p>' .
-                            __('An error occured', 'gtbabel-plugin') .
+                            __('An error occurred', 'gtbabel-plugin') .
                             '</p></div>';
                     }
                 }
@@ -2003,9 +2003,14 @@ EOD;
 
     private function initBackendAutoTranslate($page)
     {
+        $chunk_size = 1;
+
+        $this->gtbabel->log->lb('all');
         echo '<a data-loading-text="' .
             __('Loading', 'gtbabel-plugin') .
-            '..." data-href="' .
+            '..." data-error-text="' .
+            __('An error occurred', 'gtbabel-plugin') .
+            '" data-href="' .
             admin_url('admin.php?' . $page . '&gtbabel_auto_translate=1') .
             '" href="#" class="gtbabel__submit gtbabel__submit--auto-translate button button-secondary">' .
             __('Translate', 'gtbabel-plugin') .
@@ -2028,11 +2033,10 @@ EOD;
             $delete_unused_since_time = floatval($_GET['gtbabel_delete_unused_since_time']);
         }
 
-        $chunk_size = 5;
-
         echo '<div class="gtbabel__auto-translate">';
 
         // build general queue
+        $this->gtbabel->log->lb('queue');
         $queue = [];
         $urls = [];
         $query = new \WP_Query(['post_type' => 'any', 'posts_per_page' => '-1', 'post_status' => 'publish']);
@@ -2058,6 +2062,7 @@ EOD;
                 $queue[] = ['url' => $urls__value, 'convert_to_lng' => $lngs__value, 'refresh_after' => false];
             }
         }
+        $this->gtbabel->log->le('queue');
 
         // always enable discovery log (also if delete unused is set to false in order to get more logs)
         $this->changeSetting('discovery_log', true);
@@ -2084,7 +2089,9 @@ EOD;
             }
 
             // append a pseudo get parameter, so that frontend cache plugins don't work
+            $this->gtbabel->log->lb('fetch');
             $this->fetch($this->getNoCacheUrl($url));
+            $this->gtbabel->log->le('fetch');
 
             echo __('Loading', 'gtbabel-plugin');
             echo '... ' . $url . '<br/>';
@@ -2135,9 +2142,13 @@ EOD;
                         : '')
             );
             echo '<a href="' . $redirect_url . '" class="gtbabel__auto-translate-next"></a>';
+            echo '<img class="gtbabel__auto-translate-loading" src="' .
+                plugin_dir_url(__FILE__) .
+                'assets/images/loading.gif" alt="" />';
         }
 
         echo '</div>';
+        $this->gtbabel->log->le('all');
     }
 }
 
