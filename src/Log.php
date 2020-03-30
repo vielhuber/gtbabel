@@ -5,8 +5,7 @@ use vielhuber\stringhelper\__;
 
 class Log
 {
-    public $api_stats_cache;
-    public $discovery_log_cache;
+    public $discovery_log_to_save;
 
     public $utils;
     public $settings;
@@ -73,15 +72,11 @@ class Log
             return;
         }
         $filename = $this->apiStatsFilename();
-        // we use a cache on writing (not reading, because this has to be live)
-        if ($this->api_stats_cache === null) {
-            $this->setupLogFolder();
-            if (!file_exists($filename)) {
-                file_put_contents($filename, '');
-            }
-            $this->api_stats_cache = file_get_contents($filename);
+        $this->setupLogFolder();
+        if (!file_exists($filename)) {
+            file_put_contents($filename, '');
         }
-        $data = $this->api_stats_cache;
+        $data = file_get_contents($filename);
         $data = explode(PHP_EOL, $data);
         foreach ($data as $data__key => $data__value) {
             if (trim($data__value) == '') {
@@ -103,7 +98,6 @@ class Log
         }
         $data = implode(PHP_EOL, $data);
         file_put_contents($filename, $data);
-        $this->api_stats_cache = $data;
     }
 
     function discoveryLogFilename()
@@ -190,26 +184,24 @@ class Log
         if ($this->host->currentUrlIsExcluded()) {
             return;
         }
+        // we save this asynchroniously, because otherwise hdd throughput is the bottleneck
+        if ($this->discovery_log_to_save === null) {
+            $this->discovery_log_to_save = [];
+        }
+        $this->discovery_log_to_save[] = $url . "\t" . $str . "\t" . $context . "\t" . $lng . "\t" . microtime(true);
+    }
+
+    function discoveryLogSave()
+    {
+        if ($this->discovery_log_to_save === null) {
+            return;
+        }
         $filename = $this->discoveryLogFilename();
-        // we use a cache on writing (not reading, because this has to be live)
-        if ($this->discovery_log_cache === null) {
-            $this->setupLogFolder();
-            if (!file_exists($filename)) {
-                file_put_contents($filename, '');
-            }
-            $this->discovery_log_cache = file_get_contents($filename);
+        $this->setupLogFolder();
+        if (!file_exists($filename)) {
+            file_put_contents($filename, '');
         }
-        $data = $this->discovery_log_cache;
-        $data = explode(PHP_EOL, $data);
-        foreach ($data as $data__key => $data__value) {
-            if (trim($data__value) == '') {
-                unset($data[$data__key]);
-            }
-        }
-        $data[] = $url . "\t" . $str . "\t" . $context . "\t" . $lng . "\t" . microtime(true);
-        $data = implode(PHP_EOL, $data);
-        file_put_contents($filename, $data);
-        $this->discovery_log_cache = $data;
+        file_put_contents($filename, implode(PHP_EOL, $this->discovery_log_to_save) . PHP_EOL, FILE_APPEND);
     }
 
     function generalLog($msg)

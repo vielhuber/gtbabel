@@ -70,6 +70,7 @@ class Gtbabel
         ob_end_clean();
         echo $content;
         $this->gettext->generateGettextFiles();
+        $this->log->discoveryLogSave();
     }
 
     function reset()

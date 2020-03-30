@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 2.5.4
+ * Version: 2.5.6
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -2003,7 +2003,7 @@ EOD;
 
     private function initBackendAutoTranslate($page)
     {
-        $chunk_size = 1;
+        $chunk_size = 20;
 
         $this->gtbabel->log->lb('all');
         echo '<a data-loading-text="' .
