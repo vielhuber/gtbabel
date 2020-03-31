@@ -16,6 +16,10 @@ class Log
         $this->utils = $utils ?: new Utils();
         $this->settings = $settings ?: new Settings();
         $this->host = $host ?: new Host();
+    }
+
+    function setup()
+    {
         $this->setupLogFolder();
     }
 

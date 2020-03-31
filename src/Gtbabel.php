@@ -44,6 +44,7 @@ class Gtbabel
         $this->started = true;
         $this->settings->setup($args);
         $this->host->setup();
+        $this->log->setup();
         $this->gettext->createLngFolderIfNotExists();
         $this->gettext->preloadGettextInCache();
         if ($this->host->currentUrlIsExcluded()) {
@@ -84,6 +85,7 @@ class Gtbabel
     {
         $this->settings->setup($args);
         $this->host->setup();
+        $this->log->setup();
         $this->gettext->preloadGettextInCache();
         $content = $this->dom->modifyContent($content);
         return $content;
@@ -97,6 +99,7 @@ class Gtbabel
         $args['discovery_log'] = true;
         $this->settings->setup($args);
         $this->host->setup();
+        $this->log->setup();
         $this->gettext->preloadGettextInCache();
         $since_time = microtime(true);
         $content = $this->dom->modifyContent($content);
