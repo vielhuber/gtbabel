@@ -406,18 +406,19 @@ class Gettext
             return $deleted;
         }
         $pot = $poLoader->loadFile($this->getLngFilename('pot', '_template'));
-        $to_remove = null;
+        $to_remove = [];
         foreach ($pot->getTranslations() as $gettext__value) {
             if (in_array($gettext__value->getOriginal() . '#' . $gettext__value->getContext(), $discovery_strings)) {
                 continue;
             }
-            $to_remove = $gettext__value;
-            break;
+            $to_remove[] = $gettext__value;
         }
-        if ($to_remove !== null) {
-            $pot->remove($to_remove);
+        if (!empty($to_remove)) {
+            foreach ($to_remove as $to_remove__value) {
+                $pot->remove($to_remove__value);
+                $deleted++;
+            }
             $poGenerator->generateFile($pot, $this->getLngFilename('pot', '_template'));
-            $deleted++;
         }
 
         foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
@@ -425,21 +426,22 @@ class Gettext
                 continue;
             }
             $po = $poLoader->loadFile($this->getLngFilename('po', $languages__value));
-            $to_remove = null;
+            $to_remove = [];
             foreach ($po->getTranslations() as $gettext__value) {
                 if (
                     in_array($gettext__value->getOriginal() . '#' . $gettext__value->getContext(), $discovery_strings)
                 ) {
                     continue;
                 }
-                $to_remove = $gettext__value;
-                break;
+                $to_remove[] = $gettext__value;
             }
-            if ($to_remove !== null) {
-                $po->remove($to_remove);
+            if (!empty($to_remove)) {
+                foreach ($to_remove as $to_remove__value) {
+                    $po->remove($to_remove__value);
+                    $deleted++;
+                }
                 $poGenerator->generateFile($po, $this->getLngFilename('po', $languages__value));
                 $moGenerator->generateFile($po, $this->getLngFilename('mo', $languages__value));
-                $deleted++;
             }
         }
 
