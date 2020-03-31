@@ -16,11 +16,7 @@ class Log
         $this->utils = $utils ?: new Utils();
         $this->settings = $settings ?: new Settings();
         $this->host = $host ?: new Host();
-    }
-
-    function getLogFolder()
-    {
-        return rtrim($this->utils->getDocRoot(), '/') . '/' . trim($this->settings->get('log_folder'), '/');
+        $this->setupLogFolder();
     }
 
     function setupLogFolder()
@@ -31,6 +27,11 @@ class Log
         if (!file_exists($this->getLogFolder() . '/.gitignore')) {
             file_put_contents($this->getLogFolder() . '/.gitignore', '*');
         }
+    }
+
+    function getLogFolder()
+    {
+        return rtrim($this->utils->getDocRoot(), '/') . '/' . trim($this->settings->get('log_folder'), '/');
     }
 
     function apiStatsFilename()
@@ -72,7 +73,6 @@ class Log
             return;
         }
         $filename = $this->apiStatsFilename();
-        $this->setupLogFolder();
         if (!file_exists($filename)) {
             file_put_contents($filename, '');
         }
@@ -197,7 +197,6 @@ class Log
             return;
         }
         $filename = $this->discoveryLogFilename();
-        $this->setupLogFolder();
         if (!file_exists($filename)) {
             file_put_contents($filename, '');
         }
