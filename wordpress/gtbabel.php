@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 2.5.6
+ * Version: 2.5.7
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -2028,9 +2028,11 @@ EOD;
         if (@$_GET['gtbabel_delete_unused'] == '1') {
             $delete_unused = true;
         }
-        $delete_unused_since_time = null;
-        if (__::x(@$_GET['gtbabel_delete_unused_since_time'])) {
-            $delete_unused_since_time = floatval($_GET['gtbabel_delete_unused_since_time']);
+        $since_time = null;
+        if (__::x(@$_GET['gtbabel_since_time'])) {
+            $since_time = floatval($_GET['gtbabel_since_time']);
+        } else {
+            $since_time = microtime(true);
         }
 
         echo '<div class="gtbabel__auto-translate">';
@@ -2066,13 +2068,6 @@ EOD;
 
         // always enable discovery log (also if delete unused is set to false in order to get more logs)
         $this->changeSetting('discovery_log', true);
-
-        // prepare delete unused
-        if ($delete_unused === true) {
-            if ($delete_unused_since_time === null) {
-                $delete_unused_since_time = microtime(true);
-            }
-        }
 
         // do next chunk
         for ($i = $chunk_size * $chunk; $i < $chunk_size * $chunk + $chunk_size; $i++) {
@@ -2110,6 +2105,9 @@ EOD;
         $progress = round($progress, 2);
         $progress = number_format($progress, 2, ',', '');
         echo '<strong>';
+        echo __('Duration', 'gtbabel-plugin');
+        echo ': ' . gmdate('H:i:s', round(microtime(true) - $since_time));
+        echo '<br/>';
         echo __('Progress', 'gtbabel-plugin');
         echo ': ' . $progress . '%';
         echo '</strong>';
@@ -2121,7 +2119,7 @@ EOD;
         // if finished
         if ($chunk_size * $chunk + $chunk_size > count($queue) - 1) {
             if ($delete_unused === true) {
-                $deleted = $this->gtbabel->gettext->deleteUnusedTranslations($delete_unused_since_time);
+                $deleted = $this->gtbabel->gettext->deleteUnusedTranslations($since_time);
                 echo __('Deleted strings', 'gtbabel-plugin') . ': ' . $deleted;
                 echo '<br/>';
             }
@@ -2137,9 +2135,7 @@ EOD;
                     '&gtbabel_auto_translate=1&gtbabel_auto_translate_chunk=' .
                     ($chunk + 1) .
                     ($delete_unused === true ? '&gtbabel_delete_unused=1' : '') .
-                    (__::x($delete_unused_since_time)
-                        ? '&gtbabel_delete_unused_since_time=' . $delete_unused_since_time
-                        : '')
+                    (__::x($since_time) ? '&gtbabel_since_time=' . $since_time : '')
             );
             echo '<a href="' . $redirect_url . '" class="gtbabel__auto-translate-next"></a>';
             echo '<img class="gtbabel__auto-translate-loading" src="' .

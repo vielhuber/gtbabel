@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gtbabel-plugin\n"
-"POT-Creation-Date: 2020-03-29 01:36+0100\n"
+"POT-Creation-Date: 2020-03-31 01:56+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -36,7 +36,7 @@ msgstr "Einstellungen"
 msgid "String translations"
 msgstr "String-Übersetzungen"
 
-#: gtbabel.php:348 gtbabel.php:349 gtbabel.php:2156
+#: gtbabel.php:348 gtbabel.php:349 gtbabel.php:2162
 msgid "Language picker"
 msgstr "Sprachauswahl"
 
@@ -278,7 +278,7 @@ msgstr "Keine Übersetzungen vorhanden."
 msgid "Successfully uploaded"
 msgstr "Erfolgreich hochgeladen"
 
-#: gtbabel.php:1361 gtbabel.php:2035
+#: gtbabel.php:1361 gtbabel.php:2012
 msgid "An error occurred"
 msgstr "Es ist ein Fehler aufgetreten"
 
@@ -460,7 +460,7 @@ msgstr "Buchstaben"
 msgid "Loading"
 msgstr "Lade"
 
-#: gtbabel.php:2014
+#: gtbabel.php:2016
 msgid "Translate"
 msgstr "Übersetzen"
 
@@ -468,18 +468,22 @@ msgstr "Übersetzen"
 msgid "Progress"
 msgstr "Fortschritt"
 
-#: gtbabel.php:2125
+#: gtbabel.php:2116
+msgid "Duration"
+msgstr "Dauer"
+
+#: gtbabel.php:2128
 msgid "Deleted strings"
 msgstr "Gelöschte Zeichenketten"
 
-#: gtbabel.php:2129
+#: gtbabel.php:2132
 msgid "Finished"
 msgstr "Erledigt"
 
-#: gtbabel.php:2157
+#: gtbabel.php:2163
 msgid "A language picker of Gtbabel."
 msgstr "Eine Sprachauswahl von Gtbabel."
 
-#: gtbabel.php:2191
+#: gtbabel.php:2197
 msgid "Title"
 msgstr "Titel"
