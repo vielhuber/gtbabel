@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 2.5.7
+ * Version: 2.5.8
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -2003,7 +2003,7 @@ EOD;
 
     private function initBackendAutoTranslate($page)
     {
-        $chunk_size = 20;
+        $chunk_size = 1;
 
         $this->gtbabel->log->lb('all');
         echo '<a data-loading-text="' .
@@ -2103,13 +2103,15 @@ EOD;
         }
         $progress *= 100;
         $progress = round($progress, 2);
-        $progress = number_format($progress, 2, ',', '');
         echo '<strong>';
         echo __('Duration', 'gtbabel-plugin');
         echo ': ' . gmdate('H:i:s', round(microtime(true) - $since_time));
         echo '<br/>';
+        echo __('Estimated time remaining', 'gtbabel-plugin');
+        echo ': ' . gmdate('H:i:s', ((microtime(true) - $since_time) / $progress) * (100 - $progress));
+        echo '<br/>';
         echo __('Progress', 'gtbabel-plugin');
-        echo ': ' . $progress . '%';
+        echo ': ' . number_format($progress, 2, ',', '') . '%';
         echo '</strong>';
         echo '<br/>';
 
