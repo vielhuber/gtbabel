@@ -395,6 +395,7 @@ class Gettext
     {
         $deleted = 0;
 
+        // TODO: Fatal error: Allowed memory size of 268435456 bytes exhausted (tried to allocate 114688 bytes)
         $discovery_strings = array_map(function ($a) {
             return $a['string'] . '#' . $a['context'];
         }, $this->log->discoveryLogGet($since_time));

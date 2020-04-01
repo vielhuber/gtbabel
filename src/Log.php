@@ -128,25 +128,26 @@ class Log
             }
         }
 
-        $data = file_get_contents($filename);
-        $data = explode(PHP_EOL, $data);
-
-        foreach ($data as $data__value) {
-            $line_parts = explode("\t", $data__value);
-            if ($urls !== null && !in_array($line_parts[0], $urls)) {
-                continue;
+        $handle = fopen($filename, 'r');
+        if ($handle) {
+            while (($line = fgets($handle)) !== false) {
+                $line_parts = explode("\t", $line);
+                if ($urls !== null && !in_array($line_parts[0], $urls)) {
+                    continue;
+                }
+                if ($since_time !== null && floatval($since_time) > floatval($line_parts[4])) {
+                    continue;
+                }
+                $strings[] = [
+                    'string' => $line_parts[1],
+                    'context' => $line_parts[2],
+                    'url' => $line_parts[0],
+                    'lng' => $line_parts[3],
+                    'date' => $line_parts[4],
+                    'order' => count($strings) + 1
+                ];
             }
-            if ($since_time !== null && floatval($since_time) > floatval($line_parts[4])) {
-                continue;
-            }
-            $strings[] = [
-                'string' => $line_parts[1],
-                'context' => $line_parts[2],
-                'url' => $line_parts[0],
-                'lng' => $line_parts[3],
-                'date' => $line_parts[4],
-                'order' => count($strings) + 1
-            ];
+            fclose($handle);
         }
 
         usort($strings, function ($a, $b) {
