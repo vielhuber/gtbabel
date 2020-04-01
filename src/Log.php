@@ -138,7 +138,26 @@ class Log
                 if ($since_time !== null && floatval($since_time) > floatval($line_parts[4])) {
                     continue;
                 }
-                $strings[] = [
+
+                // needed for fast array unique below (for hosts that have a low memory limit)
+                if ($slim_output === true) {
+                    $key = $line_parts[1] . '#' . $line_parts[2];
+                } else {
+                    $key =
+                        $line_parts[1] .
+                        '#' .
+                        $line_parts[2] .
+                        '#' .
+                        $line_parts[0] .
+                        '#' .
+                        $line_parts[3] .
+                        '#' .
+                        $line_parts[4] .
+                        '#' .
+                        (count($strings) + 1);
+                }
+
+                $strings[$key] = [
                     'string' => $line_parts[1],
                     'context' => $line_parts[2],
                     'url' => $line_parts[0],
@@ -158,13 +177,12 @@ class Log
         });
 
         if ($slim_output === true) {
-            foreach ($strings as $strings__key => $strings__value) {
-                unset($strings[$strings__key]['url']);
-                unset($strings[$strings__key]['lng']);
-                unset($strings[$strings__key]['date']);
-                unset($strings[$strings__key]['order']);
-            }
-            $strings = __::array_unique($strings);
+            $strings = array_map(function ($a) {
+                return [
+                    'string' => $a['string'],
+                    'context' => $a['context']
+                ];
+            }, $strings);
             $strings = array_values($strings);
         }
 
