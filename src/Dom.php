@@ -269,11 +269,23 @@ class Dom
         // we circumvent this with mb_convert_encoding
         //@$this->DOMDocument->loadHTML($html);
         $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
-        $html = str_replace(
-            '<meta charset="utf-8"',
-            '<meta http-equiv="content-type" content="text/html;charset=utf-8" /><meta charset="utf-8"',
-            $html
-        );
+        if (mb_strpos($html, '</head>') !== false) {
+            $html = str_replace(
+                '</head>',
+                '<!--remove--><meta http-equiv="Content-type" content="text/html; charset=utf-8" /><!--/remove--></head>',
+                $html
+            );
+        } elseif (mb_strpos($html, '<body') !== false) {
+            $html = str_replace(
+                '<body',
+                '<!--remove--><head><meta http-equiv="content-type" content="text/html;charset=utf-8" /></head><!--/remove--><body',
+                $html
+            );
+        } else {
+            $html =
+                '<!--remove--><head><meta http-equiv="content-type" content="text/html;charset=utf-8" /></head><!--/remove-->' .
+                $html;
+        }
         @$this->DOMDocument->loadHTML($html);
         $this->DOMXpath = new \DOMXpath($this->DOMDocument);
     }
@@ -281,6 +293,14 @@ class Dom
     function finishDomDocument($htmlOriginal)
     {
         $htmlModified = $this->DOMDocument->saveHTML();
+        if (
+            mb_strpos($htmlModified, '<!--remove-->') !== false &&
+            mb_strpos($htmlModified, '<!--/remove-->') !== false
+        ) {
+            $htmlModified =
+                mb_substr($htmlModified, 0, mb_strpos($htmlModified, '<!--remove-->')) .
+                mb_substr($htmlModified, mb_strpos($htmlModified, '<!--/remove-->') + mb_strlen('<!--/remove-->'));
+        }
         // if domdocument added previously a default header, we squish that
         if (
             mb_stripos($htmlOriginal, '<!DOCTYPE') !== 0 &&

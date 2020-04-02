@@ -103,6 +103,7 @@ class Gtbabel
         $this->gettext->preloadGettextInCache();
         $since_time = microtime(true);
         $content = $this->dom->modifyContent($content);
+        $this->log->discoveryLogSave();
         $data = $this->log->discoveryLogGet($since_time);
         return $data;
     }
