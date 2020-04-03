@@ -27,7 +27,7 @@ class Log
     function setupLogFolder()
     {
         if (!is_dir($this->getLogFolder())) {
-            mkdir($this->getLogFolder());
+            mkdir($this->getLogFolder(), 0777, true);
         }
         if (!file_exists($this->getLogFolder() . '/.gitignore')) {
             file_put_contents($this->getLogFolder() . '/.gitignore', '*');
