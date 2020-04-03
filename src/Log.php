@@ -5,6 +5,7 @@ use vielhuber\stringhelper\__;
 
 class Log
 {
+    public $stats_log_to_save;
     public $discovery_log_to_save;
 
     public $utils;
@@ -38,14 +39,14 @@ class Log
         return rtrim($this->utils->getDocRoot(), '/') . '/' . trim($this->settings->get('log_folder'), '/');
     }
 
-    function apiStatsFilename()
+    function statsLogFilename()
     {
-        return $this->getLogFolder() . '/api-stats.txt';
+        return $this->getLogFolder() . '/stats-log.txt';
     }
 
-    function apiStatsGet($service)
+    function statsLogGet($service)
     {
-        $filename = $this->apiStatsFilename();
+        $filename = $this->statsLogFilename();
         if (!file_exists($filename)) {
             return 0;
         }
@@ -61,27 +62,33 @@ class Log
         return 0;
     }
 
-    function apiStatsIsDisabled()
+    function statsLogIsDisabled()
     {
-        return !($this->settings->get('api_stats') == '1');
+        return !($this->settings->get('stats_log') == '1');
     }
 
-    function apiStatsReset()
+    function statsLogReset()
     {
-        @unlink($this->apiStatsFilename());
+        @unlink($this->statsLogFilename());
     }
 
-    function apiStatsIncrease($service, $count)
+    function statsLogIncrease($service, $count)
     {
-        if ($this->apiStatsIsDisabled()) {
+        if ($this->statsLogIsDisabled()) {
             return;
         }
-        $filename = $this->apiStatsFilename();
-        if (!file_exists($filename)) {
-            file_put_contents($filename, '');
+
+        if ($this->stats_log_to_save === null) {
+            $filename = $this->statsLogFilename();
+            if (!file_exists($filename)) {
+                file_put_contents($filename, '');
+            }
+            $data = file_get_contents($filename);
+            $data = explode(PHP_EOL, $data);
+        } else {
+            $data = $this->stats_log_to_save;
         }
-        $data = file_get_contents($filename);
-        $data = explode(PHP_EOL, $data);
+
         foreach ($data as $data__key => $data__value) {
             if (trim($data__value) == '') {
                 unset($data[$data__key]);
@@ -100,8 +107,21 @@ class Log
         if ($avail === false) {
             $data[] = $service . '=' . $count;
         }
-        $data = implode(PHP_EOL, $data);
-        file_put_contents($filename, $data);
+
+        // we save this asynchroniously, because otherwise hdd throughput is the bottleneck
+        $this->stats_log_to_save = $data;
+    }
+
+    function statsLogSave()
+    {
+        if ($this->stats_log_to_save === null) {
+            return;
+        }
+        $filename = $this->statsLogFilename();
+        if (!file_exists($filename)) {
+            file_put_contents($filename, '');
+        }
+        file_put_contents($filename, implode(PHP_EOL, $this->stats_log_to_save) . PHP_EOL);
     }
 
     function discoveryLogFilename()

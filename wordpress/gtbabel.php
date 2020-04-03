@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 2.6.4
+ * Version: 2.6.5
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -420,7 +420,7 @@ class GtbabelWordPress
                             'auto_translation_service',
                             'google_translation_api_key',
                             'microsoft_translation_api_key',
-                            'api_stats',
+                            'stats_log',
                             'prevent_publish_urls',
                             'exclude_urls',
                             'exclude_dom',
@@ -451,7 +451,7 @@ class GtbabelWordPress
                             'debug_translations',
                             'auto_add_translations_to_gettext',
                             'auto_translation',
-                            'api_stats'
+                            'stats_log'
                         ]
                         as $checkbox__value
                     ) {
@@ -852,12 +852,12 @@ class GtbabelWordPress
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_api_stats" class="gtbabel__label">';
+        echo '<label for="gtbabel_stats_log" class="gtbabel__label">';
         echo __('Enable translation api usage stats', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_api_stats" name="gtbabel[api_stats]" value="1"' .
-            ($settings['api_stats'] == '1' ? ' checked="checked"' : '') .
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_stats_log" name="gtbabel[stats_log]" value="1"' .
+            ($settings['stats_log'] == '1' ? ' checked="checked"' : '') .
             ' />';
         echo '</div>';
         echo '</li>';
@@ -1003,10 +1003,10 @@ class GtbabelWordPress
 
         $this->initBackendAutoTranslate('page=gtbabel-settings');
 
-        if ($settings['api_stats'] == '1') {
-            echo '<div class="gtbabel__api-stats">';
+        if ($settings['stats_log'] == '1') {
+            echo '<div class="gtbabel__stats-log">';
             echo '<h2 class="gtbabel__subtitle">' . __('Translation api usage stats', 'gtbabel-plugin') . '</h2>';
-            echo $this->showApiStats();
+            echo $this->showStatsLog();
             echo '</div>';
         }
 
@@ -1681,9 +1681,9 @@ EOD;
 
             $this->initBackendAutoTranslate('page=gtbabel-wizard&step=3');
 
-            if ($settings['api_stats'] == '1') {
-                echo '<div class="gtbabel__api-stats">';
-                echo $this->showApiStats('google');
+            if ($settings['stats_log'] == '1') {
+                echo '<div class="gtbabel__stats-log">';
+                echo $this->showStatsLog('google');
                 echo '</div>';
             }
             echo '<div class="gtbabel__wizard-buttons">';
@@ -1972,7 +1972,7 @@ EOD;
         );
     }
 
-    private function showApiStats($service = null)
+    private function showStatsLog($service = null)
     {
         echo '<ul>';
         foreach (
@@ -1984,7 +1984,7 @@ EOD;
             }
             echo '<li>';
             echo $service__value . ': ';
-            $cur = $this->gtbabel->log->apiStatsGet($service__key);
+            $cur = $this->gtbabel->log->statsLogGet($service__key);
             echo $cur;
             echo ' ';
             echo __('Characters', 'gtbabel-plugin');
@@ -2005,7 +2005,6 @@ EOD;
     {
         $chunk_size = 1;
 
-        $this->gtbabel->log->lb('all');
         echo '<a data-loading-text="' .
             __('Loading', 'gtbabel-plugin') .
             '..." data-error-text="' .
@@ -2038,7 +2037,6 @@ EOD;
         echo '<div class="gtbabel__auto-translate">';
 
         // build general queue
-        $this->gtbabel->log->lb('queue');
         $queue = [];
         $urls = [];
         $query = new \WP_Query(['post_type' => 'any', 'posts_per_page' => '-1', 'post_status' => 'publish']);
@@ -2064,7 +2062,6 @@ EOD;
                 $queue[] = ['url' => $urls__value, 'convert_to_lng' => $lngs__value, 'refresh_after' => false];
             }
         }
-        $this->gtbabel->log->le('queue');
 
         // always enable discovery log (also if delete unused is set to false in order to get more logs)
         $this->changeSetting('discovery_log', true);
@@ -2084,9 +2081,7 @@ EOD;
             }
 
             // append a pseudo get parameter, so that frontend cache plugins don't work
-            $this->gtbabel->log->lb('fetch');
             $this->fetch($this->getNoCacheUrl($url));
-            $this->gtbabel->log->le('fetch');
 
             echo __('Loading', 'gtbabel-plugin');
             echo '... ' . $url . '<br/>';
@@ -2146,7 +2141,6 @@ EOD;
         }
 
         echo '</div>';
-        $this->gtbabel->log->le('all');
     }
 }
 

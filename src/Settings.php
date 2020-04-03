@@ -46,7 +46,7 @@ class Settings
             'auto_translation_service' => 'google',
             'google_translation_api_key' => [],
             'microsoft_translation_api_key' => [],
-            'api_stats' => true,
+            'stats_log' => true,
             'discovery_log' => false,
             'prevent_publish' => true,
             'prevent_publish_urls' => [

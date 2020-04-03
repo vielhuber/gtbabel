@@ -69,7 +69,7 @@ $gtbabel->start([
     'auto_translation_service' => 'google', // google|microsoft
     'google_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', // you can also use an array here to provide multiple keys at once
     'microsoft_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', // you can also use an array here to provide multiple keys at once
-    'api_stats' => true,
+    'stats_log' => true,
     'discovery_log' => false,
     'prevent_publish' => true,
     'prevent_publish_urls' => [
@@ -290,7 +290,7 @@ If you use the auto translation feature for example with the help of the Google 
 
 ## API usage costs
 
-The translation apis of Google or Microsoft can be costly. Try to keep track of your current usage stats. Gtbabel helps you by tracking the total amount of translated chars (see the `api_stats` option). You can also provide multiple api keys, Gtbabel then distributes the calls uniformly.
+The translation apis of Google or Microsoft can be costly. Try to keep track of your current usage stats. Gtbabel helps you by tracking the total amount of translated chars (see the `stats_log` option). You can also provide multiple api keys, Gtbabel then distributes the calls uniformly.
 
 ## Caveats
 

@@ -762,7 +762,7 @@ class Gettext
                 if ($trans === null) {
                     return null;
                 }
-                $this->log->apiStatsIncrease('google', mb_strlen($orig));
+                $this->log->statsLogIncrease('google', mb_strlen($orig));
             } elseif ($this->settings->get('auto_translation_service') === 'microsoft') {
                 $api_key = $this->settings->get('microsoft_translation_api_key');
                 if (is_array($api_key)) {
@@ -772,7 +772,7 @@ class Gettext
                 if ($trans === null) {
                     return null;
                 }
-                $this->log->apiStatsIncrease('microsoft', mb_strlen($orig));
+                $this->log->statsLogIncrease('microsoft', mb_strlen($orig));
             }
             if ($context === 'slug') {
                 $trans = $this->utils->slugify($trans, $orig, $to_lng);

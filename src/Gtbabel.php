@@ -71,13 +71,14 @@ class Gtbabel
         ob_end_clean();
         echo $content;
         $this->gettext->generateGettextFiles();
+        $this->log->statsLogSave();
         $this->log->discoveryLogSave();
     }
 
     function reset()
     {
         $this->gettext->resetTranslations();
-        $this->log->apiStatsReset();
+        $this->log->statsLogReset();
         $this->log->discoveryLogReset();
     }
 
@@ -103,6 +104,7 @@ class Gtbabel
         $this->gettext->preloadGettextInCache();
         $since_time = microtime(true);
         $content = $this->dom->modifyContent($content);
+        $this->log->statsLogSave();
         $this->log->discoveryLogSave();
         $data = $this->log->discoveryLogGet($since_time);
         return $data;

@@ -144,11 +144,11 @@ function fetchNextAutoTranslate(url, tries = 0) {
                     ).innerHTML;
                 }
                 if (
-                    document.querySelector('.gtbabel__api-stats') !== null &&
-                    html.querySelector('.gtbabel__api-stats') !== null
+                    document.querySelector('.gtbabel__stats-log') !== null &&
+                    html.querySelector('.gtbabel__stats-log') !== null
                 ) {
-                    document.querySelector('.gtbabel__api-stats').innerHTML = html.querySelector(
-                        '.gtbabel__api-stats'
+                    document.querySelector('.gtbabel__stats-log').innerHTML = html.querySelector(
+                        '.gtbabel__stats-log'
                     ).innerHTML;
                 }
                 if (html.querySelector('.gtbabel__auto-translate-next') !== null) {

@@ -315,7 +315,7 @@ class Test extends \PHPUnit\Framework\TestCase
             'auto_translation' => false,
             'auto_translation_service' => 'google',
             'google_translation_api_key' => getenv('GOOGLE_TRANSLATION_API_KEY'),
-            'api_stats' => true,
+            'stats_log' => true,
             'discovery_log' => false
         ];
     }
