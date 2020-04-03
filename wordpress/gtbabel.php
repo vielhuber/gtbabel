@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 2.6.5
+ * Version: 2.6.6
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -121,18 +121,20 @@ class GtbabelWordPress
                 $this->gtbabel->settings->setupSettings([
                     'languages' => $languages,
                     'lng_source' => $lng_source,
-                    'lng_folder' => $this->getRelativePluginPath() . '/gtbabel/locales',
-                    'log_folder' => $this->getRelativePluginPath() . '/gtbabel/logs',
+                    'lng_folder' => $this->getPluginFileStorePath() . '/locales',
+                    'log_folder' => $this->getPluginFileStorePath() . '/logs',
                     'exclude_urls' => ['/wp-admin', 'wp-login.php', 'wp-cron.php', 'wp-comments-post.php'],
-                    'exclude_dom' => ['.notranslate', '.lngpicker', '#wpadminbar']
+                    'exclude_dom' => ['.notranslate', '.lngpicker', '#wpadminbar'],
                 ])
             );
         }
     }
 
-    private function getRelativePluginPath()
+    private function getPluginFileStorePath()
     {
-        return '/' . trim(str_replace($this->gtbabel->utils->getDocRoot(), '', \WP_PLUGIN_DIR), '/');
+        return '/' .
+            trim(str_replace($this->gtbabel->utils->getDocRoot(), '', wp_upload_dir()['basedir']), '/') .
+            '/gtbabel';
     }
 
     private function triggerPreventPublish()
@@ -221,7 +223,7 @@ class GtbabelWordPress
                     'group' => null,
                     'title' => $html,
                     'href' => admin_url('admin.php?page=gtbabel-trans&url=' . urlencode($url)),
-                    'meta' => ['target' => '_blank']
+                    'meta' => ['target' => '_blank'],
                 ]);
             },
             500
@@ -426,7 +428,7 @@ class GtbabelWordPress
                             'exclude_dom',
                             'force_tokenize',
                             'include_dom',
-                            'localize_js'
+                            'localize_js',
                         ]
                         as $fields__value
                     ) {
@@ -451,7 +453,7 @@ class GtbabelWordPress
                             'debug_translations',
                             'auto_add_translations_to_gettext',
                             'auto_translation',
-                            'stats_log'
+                            'stats_log',
                         ]
                         as $checkbox__value
                     ) {
@@ -467,7 +469,7 @@ class GtbabelWordPress
                             'exclude_dom',
                             'force_tokenize',
                             'google_translation_api_key',
-                            'microsoft_translation_api_key'
+                            'microsoft_translation_api_key',
                         ]
                         as $exclude__value
                     ) {
@@ -522,7 +524,7 @@ class GtbabelWordPress
                         foreach ($post_data['selector'] as $post_data__key => $post_data__value) {
                             if (
                                 @$post_data['selector'][$post_data__key] == '' &&
-                                    @$post_data['attribute'][$post_data__key] == '' &&
+                                @$post_data['attribute'][$post_data__key] == '' &&
                                 @$post_data['context'][$post_data__key] == ''
                             ) {
                                 continue;
@@ -530,7 +532,7 @@ class GtbabelWordPress
                             $settings['include_dom'][] = [
                                 'selector' => $post_data['selector'][$post_data__key],
                                 'attribute' => $post_data['attribute'][$post_data__key],
-                                'context' => $post_data['context'][$post_data__key]
+                                'context' => $post_data['context'][$post_data__key],
                             ];
                         }
                     }
@@ -549,7 +551,7 @@ class GtbabelWordPress
                                 $post_data['string'][$post_data__key],
                                 $post_data['context'][$post_data__key] != ''
                                     ? $post_data['context'][$post_data__key]
-                                    : null
+                                    : null,
                             ];
                         }
                     }
@@ -1336,7 +1338,7 @@ class GtbabelWordPress
                 if (@$_POST['gtbabel']['language'] != '' && @$_FILES['gtbabel']['name']['file'] != '') {
                     $extension = strtolower(end(explode('.', $_FILES['gtbabel']['name']['file'])));
                     $allowed_extension = [
-                        'po' => ['application/octet-stream']
+                        'po' => ['application/octet-stream'],
                     ];
                     if (
                         array_key_exists($extension, $allowed_extension) &&
@@ -2149,7 +2151,7 @@ class gtbabel_lngpicker_widget extends \WP_Widget
     function __construct()
     {
         parent::__construct('gtbabel_lngpicker_widget', __('Language picker', 'gtbabel-plugin'), [
-            'description' => __('A language picker of Gtbabel.', 'gtbabel-plugin')
+            'description' => __('A language picker of Gtbabel.', 'gtbabel-plugin'),
         ]);
     }
     public function widget($args, $instance)
