@@ -29,8 +29,8 @@ class Log
         if (!is_dir($this->getLogFolder())) {
             mkdir($this->getLogFolder(), 0777, true);
         }
-        if (!file_exists($this->getLogFolder() . '/.gitignore')) {
-            file_put_contents($this->getLogFolder() . '/.gitignore', '*');
+        if (!file_exists($this->getLogFolder() . '/.htaccess')) {
+            file_put_contents($this->getLogFolder() . '/.htaccess', 'Deny from all');
         }
     }
 

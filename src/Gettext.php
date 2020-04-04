@@ -518,10 +518,13 @@ class Gettext
         }
     }
 
-    function createLngFolderIfNotExists()
+    function setupLngFolder()
     {
         if (!is_dir($this->getLngFolder())) {
             mkdir($this->getLngFolder(), 0777, true);
+        }
+        if (!file_exists($this->getLngFolder() . '/.htaccess')) {
+            file_put_contents($this->getLngFolder() . '/.htaccess', 'Deny from all');
         }
     }
 

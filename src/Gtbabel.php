@@ -45,7 +45,7 @@ class Gtbabel
         $this->settings->setup($args);
         $this->host->setup();
         $this->log->setup();
-        $this->gettext->createLngFolderIfNotExists();
+        $this->gettext->setupLngFolder();
         $this->gettext->preloadGettextInCache();
         if ($this->host->currentUrlIsExcluded()) {
             return;
