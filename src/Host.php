@@ -99,4 +99,9 @@ class Host
         }
         return false;
     }
+
+    function responseCodeIsSuccessful()
+    {
+        return in_array(http_response_code(), [200, 304]);
+    }
 }

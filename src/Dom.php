@@ -322,6 +322,10 @@ class Dom
 
     function setLangTags()
     {
+        if (!$this->host->responseCodeIsSuccessful()) {
+            return;
+        }
+
         if ($this->settings->get('html_lang_attribute') === true) {
             $html_node = $this->DOMXpath->query('/html')[0];
             if ($html_node !== null) {

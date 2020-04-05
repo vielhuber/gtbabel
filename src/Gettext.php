@@ -578,6 +578,9 @@ class Gettext
     {
         $data = [];
         foreach ($this->settings->getSelectedLanguages() as $languages__key => $languages__value) {
+            if (!$this->host->responseCodeIsSuccessful()) {
+                continue;
+            }
             $url = $this->getUrlTranslationInLanguage($languages__key);
             if (
                 $this->publish->isActive() &&
@@ -1039,6 +1042,9 @@ class Gettext
             return;
         }
         if ($this->host->isAjaxRequest()) {
+            return;
+        }
+        if (!$this->host->responseCodeIsSuccessful()) {
             return;
         }
         foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
