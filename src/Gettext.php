@@ -191,9 +191,9 @@ class Gettext
         }
         uasort($data, function ($a, $b) {
             if ($a['context'] != $b['context']) {
-                return strcmp($a['context'], $b['context']);
+                return strnatcasecmp($a['context'], $b['context']);
             }
-            return strcmp($a['orig'], $b['orig']);
+            return strnatcasecmp($a['orig'], $b['orig']);
         });
         return $data;
     }
