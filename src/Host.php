@@ -19,36 +19,68 @@ class Host
 
     function setup()
     {
-        $this->original_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH); // store without get parameters
-        $this->original_path_with_args = $_SERVER['REQUEST_URI'];
-        $this->original_args = str_replace($this->original_path, '', $this->original_path_with_args);
-        $this->original_url =
-            'http' .
+        $this->original_path = $this->getCurrentPathConverted();
+        $this->original_path_with_args = $this->getCurrentPathWithArgsConverted();
+        $this->original_args = $this->getCurrentArgsConverted();
+        $this->original_url = $this->getCurrentUrlConverted();
+        $this->original_url_with_args = $this->getCurrentUrlWithArgsConverted();
+        $this->original_host = $this->getCurrentHostConverted();
+    }
+
+    function getCurrentPathConverted()
+    {
+        return parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    }
+
+    function getCurrentPathWithArgsConverted()
+    {
+        return $_SERVER['REQUEST_URI'];
+    }
+
+    function getCurrentArgsConverted()
+    {
+        return str_replace($this->original_path, '', $this->original_path_with_args);
+    }
+
+    function getCurrentUrlConverted()
+    {
+        return 'http' .
             (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 's' : '') .
             '://' .
             $_SERVER['HTTP_HOST'] .
             parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        $this->original_url_with_args =
-            'http' .
+    }
+
+    function getCurrentUrlWithArgsConverted()
+    {
+        return 'http' .
             (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 's' : '') .
             '://' .
             $_SERVER['HTTP_HOST'] .
             $_SERVER['REQUEST_URI'];
-        $this->original_host =
-            'http' .
+    }
+
+    function getCurrentHostConverted()
+    {
+        return 'http' .
             (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 's' : '') .
             '://' .
             $_SERVER['HTTP_HOST'];
     }
 
+    function getCurrentPath()
+    {
+        return $this->original_path;
+    }
+
+    function getCurrentPathWithArgs()
+    {
+        return $this->original_path_with_args;
+    }
+
     function getCurrentArgs()
     {
         return $this->original_args;
-    }
-
-    function getCurrentHost()
-    {
-        return $this->original_host;
     }
 
     function getCurrentUrl()
@@ -61,14 +93,9 @@ class Host
         return $this->original_url_with_args;
     }
 
-    function getCurrentPath()
+    function getCurrentHost()
     {
-        return $this->original_path;
-    }
-
-    function getCurrentPathWithArgs()
-    {
-        return $this->original_path_with_args;
+        return $this->original_host;
     }
 
     function currentUrlIsExcluded()

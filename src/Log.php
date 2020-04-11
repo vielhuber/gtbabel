@@ -155,7 +155,7 @@ class Log
         $query .= ' FROM log WHERE 1=1';
         $args = [];
         if ($urls !== null) {
-            $query .= ' AND url NOT IN (?)';
+            $query .= ' AND url IN (' . str_repeat('?,', count($urls) - 1) . '?)';
             $args = array_merge($args, $urls);
         }
         if ($since_time !== null) {
@@ -166,6 +166,7 @@ class Log
         $statement = $db->prepare($query);
         $statement->execute($args);
         $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        $db = null;
         return $result;
     }
 
@@ -179,7 +180,7 @@ class Log
         @unlink($this->discoveryLogFilename());
     }
 
-    function discoveryLogAdd($url, $string, $context, $lng)
+    function discoveryLogAdd($url, $url_orig, $string, $context, $lng)
     {
         if ($this->discoveryLogIsDisabled()) {
             return;
@@ -193,6 +194,7 @@ class Log
         }
         $this->discovery_log_to_save[] = [
             'url' => $url,
+            'url_orig' => $url_orig,
             'string' => $string,
             'context' => $context,
             'lng' => $lng,
@@ -212,6 +214,7 @@ class Log
             $db->exec('CREATE TABLE IF NOT EXISTS log(
                 id INTEGER PRIMARY KEY AUTOINCREMENT, 
                 url VARCHAR(255),
+                url_orig VARCHAR(255),
                 string TEXT,
                 context VARCHAR(10),
                 lng VARCHAR(10),
@@ -223,10 +226,12 @@ class Log
         $query_q = [];
         $query_p = [];
         foreach ($this->discovery_log_to_save as $discovery_log_to_save__value) {
-            $query_q[] = '(?,?,?,?,?)';
+            $query_q[] = '(?,?,?,?,?,?)';
             $query_p = array_merge($query_p, array_values($discovery_log_to_save__value));
         }
-        $query = $db->prepare('INSERT INTO log(url, string, context, lng, time) VALUES ' . implode(', ', $query_q));
+        $query = $db->prepare(
+            'INSERT INTO log(url, url_orig, string, context, lng, time) VALUES ' . implode(', ', $query_q)
+        );
         $query->execute($query_p);
         $db = null;
     }

@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 2.7.1
+ * Version: 2.7.2
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -1327,6 +1327,9 @@ class GtbabelWordPress
         $message = '';
 
         /* debug */
+        $response = $this->gtbabel->gettext->deleteUnusedTranslations(1586569290.865);
+        __d($response);
+        die('OK');
         __d($this->gtbabel->log->discoveryLogGet(1586563694.8273, ['http://vielhuber.local.vielhuber.de/en/'], true));
         $this->gtbabel->gettext->autoEditSharedValues();
         die('OK');
@@ -1764,7 +1767,7 @@ EOD;
             $urls = [];
             $urls[] = $this->getNoCacheUrl($url);
             $since_time = microtime(true);
-            $this->fetch($this->getNoCacheUrl($url));
+            $response = $this->fetch($this->getNoCacheUrl($url));
             // subsequent urls are now available (we need to refresh the current session)
             $this->start();
             foreach ($this->gtbabel->settings->getSelectedLanguageCodesWithoutSource() as $lngs__value) {

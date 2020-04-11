@@ -100,7 +100,7 @@ class Router
         } else {
             $path = $this->gettext->getPathTranslationInLanguage($this->settings->getSourceLanguageCode(), true);
             $path = trim($path, '/');
-            $path = '/' . $path . ($path != '' ? '/' : '') . $this->host->getCurrentArgs();
+            $path = '/' . $path;
         }
         $_SERVER['REQUEST_URI'] = $path;
     }

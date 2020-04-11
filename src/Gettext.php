@@ -131,7 +131,13 @@ class Gettext
     function getExistingTranslationFromCache($str, $lng, $context = null)
     {
         // track discovery
-        $this->log->discoveryLogAdd($this->host->getCurrentUrlWithArgs(), $str, $context, $lng);
+        $this->log->discoveryLogAdd(
+            $this->host->getCurrentUrlWithArgs(),
+            $this->host->getCurrentUrlWithArgsConverted(),
+            $str,
+            $context,
+            $lng
+        );
 
         if (
             $str === '' ||
@@ -198,9 +204,9 @@ class Gettext
         return $data;
     }
 
-    function getTranslationHash($gettext, $context = null)
+    function getTranslationHash($gettext, $context = false)
     {
-        if ($context === null) {
+        if ($context === false) {
             $string = $gettext->getOriginal();
             $context = $gettext->getContext();
         } else {
@@ -306,33 +312,38 @@ class Gettext
         $pot = $poLoader->loadFile($this->getLngFilename('pot', '_template'));
         $data = [];
 
-        if( $strings === null ) {
-            $d1 = $this->log->discoveryLogGet(null, null, false);
-            $d2 = $d1;
+        $filename = $this->log->discoveryLogFilename();
+        if (!file_exists($filename)) {
+            return $success;
         }
-        else {
-            $d1 = $strings;
-            $d2 = $this->log->discoveryLogGet(null, null, false);
+        $db = new \PDO('sqlite:' . $filename);
+        $query = '';
+        $query .= '
+            SELECT string, context, COUNT(string) as count FROM (
+                SELECT string, context, url_orig FROM log';
+        $args = [];
+        if ($strings !== null) {
+            $query .= ' WHERE string IN (' . str_repeat('?,', count($strings) - 1) . '?)';
+            $args = array_merge(
+                $args,
+                array_map(function ($strings__value) {
+                    return $strings__value['string'];
+                }, $strings)
+            );
+        }
+        $query .= '
+                GROUP BY string, context, url_orig
+            ) as t GROUP BY string, context
+        ';
+        $statement = $db->prepare($query);
+        $statement->execute($args);
+        $results = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+        foreach ($results as $results__value) {
+            $data[$this->getTranslationHash($results__value['string'], $results__value['context'])] =
+                $results__value['count'] > 1;
         }
 
-        $this->log->lb();
-        foreach ($d1 as $d1__value) {
-            $shared = null;
-            foreach ($d2 as $d2__value) {
-                if (
-                    $d1__value['string'] == $d2__value['string'] &&
-                    $d1__value['context'] == $d2__value['context'] &&
-                    $d1__value['url'] != $d2__value['url']
-                ) {
-                    $shared = true;
-                    break;
-                }
-            }
-            $data[$this->getTranslationHash($d1__value['string'], $d1__value['context'])] = $shared;
-        $this->log->le();
-
-die('OK');
-        }
         foreach ($pot->getTranslations() as $gettext__value) {
             $hash = $this->getTranslationHash($gettext__value);
             if (!array_key_exists($hash, $data)) {
