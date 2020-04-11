@@ -295,7 +295,7 @@ class Gettext
         return $success;
     }
 
-    function autoEditSharedValueFromFiles($strings, $not_in_urls)
+    function autoEditSharedValues($strings = null)
     {
         $success = false;
         $poLoader = new PoLoader();
@@ -305,21 +305,33 @@ class Gettext
         }
         $pot = $poLoader->loadFile($this->getLngFilename('pot', '_template'));
         $data = [];
-        $discovery_log = $this->log->discoveryLogGet(null, null, false);
-        foreach ($strings as $strings__value) {
+
+        if( $strings === null ) {
+            $d1 = $this->log->discoveryLogGet(null, null, false);
+            $d2 = $d1;
+        }
+        else {
+            $d1 = $strings;
+            $d2 = $this->log->discoveryLogGet(null, null, false);
+        }
+
+        $this->log->lb();
+        foreach ($d1 as $d1__value) {
             $shared = null;
-            // auto determine shared
-            foreach ($discovery_log as $discovery_log__value) {
+            foreach ($d2 as $d2__value) {
                 if (
-                    $discovery_log__value['string'] == $strings__value['string'] &&
-                    $discovery_log__value['context'] == $strings__value['context'] &&
-                    !in_array($discovery_log__value['url'], $not_in_urls)
+                    $d1__value['string'] == $d2__value['string'] &&
+                    $d1__value['context'] == $d2__value['context'] &&
+                    $d1__value['url'] != $d2__value['url']
                 ) {
                     $shared = true;
                     break;
                 }
             }
-            $data[$this->getTranslationHash($strings__value['string'], $strings__value['context'])] = $shared;
+            $data[$this->getTranslationHash($d1__value['string'], $d1__value['context'])] = $shared;
+        $this->log->le();
+
+die('OK');
         }
         foreach ($pot->getTranslations() as $gettext__value) {
             $hash = $this->getTranslationHash($gettext__value);

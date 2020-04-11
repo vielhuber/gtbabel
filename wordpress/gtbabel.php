@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 2.7.0
+ * Version: 2.7.1
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -1326,6 +1326,11 @@ class GtbabelWordPress
     {
         $message = '';
 
+        /* debug */
+        __d($this->gtbabel->log->discoveryLogGet(1586563694.8273, ['http://vielhuber.local.vielhuber.de/en/'], true));
+        $this->gtbabel->gettext->autoEditSharedValues();
+        die('OK');
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (isset($_POST['upload_file'])) {
                 check_admin_referer('gtbabel-services-upload-file');
@@ -1769,7 +1774,7 @@ EOD;
             }
             // restart again
             $this->start();
-            $discovery_strings = $this->gtbabel->log->discoveryLogGet($since_time, $urls);
+            $discovery_strings = $this->gtbabel->log->discoveryLogGet($since_time, $urls, false);
             $discovery_strings_map = [];
             foreach ($discovery_strings as $discovery_strings__key => $discovery_strings__value) {
                 $discovery_strings_map[
@@ -1787,7 +1792,7 @@ EOD;
                 );
             }
             $this->start();
-            $this->gtbabel->gettext->autoEditSharedValueFromFiles($discovery_strings, $urls);
+            $this->gtbabel->gettext->autoEditSharedValues($discovery_strings);
             $this->changeSetting('discovery_log', false);
         }
 

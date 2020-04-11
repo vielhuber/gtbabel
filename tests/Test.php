@@ -14,6 +14,8 @@ class Test extends \PHPUnit\Framework\TestCase
         $dotenv->load();
         // reset server environment (this is changed in magic router)
         $this->server_orig = $_SERVER;
+        // mock response code
+        http_response_code(200);
     }
 
     protected function tearDown(): void

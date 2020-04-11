@@ -126,18 +126,15 @@ class Log
 
     function discoveryLogFilename()
     {
-        return $this->getLogFolder() . '/discovery-log.txt';
+        return $this->getLogFolder() . '/discovery-log.db';
     }
 
     function discoveryLogGet($since_time = null, $url = null, $slim_output = true)
     {
-        $strings = [];
-
         $filename = $this->discoveryLogFilename();
         if (!file_exists($filename)) {
-            return $strings;
+            return [];
         }
-
         $urls = null;
         if ($url !== null) {
             if (is_array($url)) {
@@ -147,66 +144,29 @@ class Log
                 $urls = [$url];
             }
         }
-
-        $handle = fopen($filename, 'r');
-        if ($handle) {
-            while (($line = fgets($handle)) !== false) {
-                $line_parts = explode("\t", $line);
-                if ($urls !== null && !in_array($line_parts[0], $urls)) {
-                    continue;
-                }
-                if ($since_time !== null && floatval($since_time) > floatval($line_parts[4])) {
-                    continue;
-                }
-
-                // needed for fast array unique below (for hosts that have a low memory limit)
-                if ($slim_output === true) {
-                    $key = $line_parts[1] . '#' . $line_parts[2];
-                } else {
-                    $key =
-                        $line_parts[1] .
-                        '#' .
-                        $line_parts[2] .
-                        '#' .
-                        $line_parts[0] .
-                        '#' .
-                        $line_parts[3] .
-                        '#' .
-                        $line_parts[4] .
-                        '#' .
-                        (count($strings) + 1);
-                }
-
-                $strings[$key] = [
-                    'string' => $line_parts[1],
-                    'context' => $line_parts[2],
-                    'url' => $line_parts[0],
-                    'lng' => $line_parts[3],
-                    'date' => $line_parts[4],
-                    'order' => count($strings) + 1
-                ];
-            }
-            fclose($handle);
+        $db = new \PDO('sqlite:' . $filename);
+        $query = '';
+        $query .= 'SELECT';
+        if ($slim_output === false) {
+            $query .= ' *';
+        } else {
+            $query .= ' DISTINCT string, context';
         }
-
-        usort($strings, function ($a, $b) {
-            if ($a['context'] != $b['context']) {
-                return strcmp($a['context'], $b['context']);
-            }
-            return $a['order'] - $b['order'];
-        });
-
-        if ($slim_output === true) {
-            $strings = array_map(function ($a) {
-                return [
-                    'string' => $a['string'],
-                    'context' => $a['context']
-                ];
-            }, $strings);
-            $strings = array_values($strings);
+        $query .= ' FROM log WHERE 1=1';
+        $args = [];
+        if ($urls !== null) {
+            $query .= ' AND url NOT IN (?)';
+            $args = array_merge($args, $urls);
         }
-
-        return $strings;
+        if ($since_time !== null) {
+            $query .= ' AND time >= ?';
+            $args[] = $since_time;
+        }
+        $query .= ' ORDER BY context ASC, time ASC';
+        $statement = $db->prepare($query);
+        $statement->execute($args);
+        $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        return $result;
     }
 
     function discoveryLogIsDisabled()
@@ -219,7 +179,7 @@ class Log
         @unlink($this->discoveryLogFilename());
     }
 
-    function discoveryLogAdd($url, $str, $context, $lng)
+    function discoveryLogAdd($url, $string, $context, $lng)
     {
         if ($this->discoveryLogIsDisabled()) {
             return;
@@ -231,7 +191,13 @@ class Log
         if ($this->discovery_log_to_save === null) {
             $this->discovery_log_to_save = [];
         }
-        $this->discovery_log_to_save[] = $url . "\t" . $str . "\t" . $context . "\t" . $lng . "\t" . microtime(true);
+        $this->discovery_log_to_save[] = [
+            'url' => $url,
+            'string' => $string,
+            'context' => $context,
+            'lng' => $lng,
+            'time' => microtime(true)
+        ];
     }
 
     function discoveryLogSave()
@@ -242,8 +208,27 @@ class Log
         $filename = $this->discoveryLogFilename();
         if (!file_exists($filename)) {
             file_put_contents($filename, '');
+            $db = new \PDO('sqlite:' . $filename);
+            $db->exec('CREATE TABLE IF NOT EXISTS log(
+                id INTEGER PRIMARY KEY AUTOINCREMENT, 
+                url VARCHAR(255),
+                string TEXT,
+                context VARCHAR(10),
+                lng VARCHAR(10),
+                time FLOAT
+            )');
+        } else {
+            $db = new \PDO('sqlite:' . $filename);
         }
-        file_put_contents($filename, implode(PHP_EOL, $this->discovery_log_to_save) . PHP_EOL, FILE_APPEND);
+        $query_q = [];
+        $query_p = [];
+        foreach ($this->discovery_log_to_save as $discovery_log_to_save__value) {
+            $query_q[] = '(?,?,?,?,?)';
+            $query_p = array_merge($query_p, array_values($discovery_log_to_save__value));
+        }
+        $query = $db->prepare('INSERT INTO log(url, string, context, lng, time) VALUES ' . implode(', ', $query_q));
+        $query->execute($query_p);
+        $db = null;
     }
 
     function generalLog($msg)
@@ -256,7 +241,7 @@ class Log
             $msg = print_r($msg, true);
         }
         $msg = date('Y-m-d H:i:s') . ': ' . $msg;
-        file_put_contents($filename, $msg . PHP_EOL . file_get_contents($filename));
+        file_put_contents($filename, $msg . PHP_EOL, FILE_APPEND);
     }
 
     function generalLogFilename()
