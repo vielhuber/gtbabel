@@ -79,6 +79,7 @@ class Gtbabel
     {
         $this->gettext->resetTranslations();
         $this->log->statsLogReset();
+        $this->log->generalLogReset();
         $this->log->discoveryLogReset();
     }
 

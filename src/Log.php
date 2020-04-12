@@ -236,6 +236,11 @@ class Log
         $db = null;
     }
 
+    function generalLogReset()
+    {
+        @unlink($this->generalLogFilename());
+    }
+
     function generalLog($msg)
     {
         $filename = $this->generalLogFilename();

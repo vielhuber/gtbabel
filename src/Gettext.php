@@ -196,6 +196,15 @@ class Gettext
             }
         }
         uasort($data, function ($a, $b) {
+            if ($a['shared'] === true) {
+                $a['shared'] = $a['shared'] === true ? 1 : 0;
+            }
+            if ($b['shared'] === true) {
+                $b['shared'] = $b['shared'] === true ? 1 : 0;
+            }
+            if ($a['shared'] !== $b['shared']) {
+                return $a['shared'] < $b['shared'] ? -1 : 1;
+            }
             if ($a['context'] != $b['context']) {
                 return strnatcasecmp($a['context'], $b['context']);
             }
@@ -229,17 +238,36 @@ class Gettext
         return $shared;
     }
 
-    function getCommentFromTranslation($gettext, $comment)
+    function getCommentFromTranslation($gettext, $key)
     {
         $shared = null;
         foreach ($gettext->getExtractedComments() as $comments__value) {
-            if (mb_strpos($comments__value, $comment) !== 0) {
+            if (mb_strpos($comments__value, $key) !== 0) {
                 continue;
             }
             $shared = $comments__value;
             break;
         }
         return $shared;
+    }
+
+    function deleteCommentFromTranslation($gettext, $key)
+    {
+        $comment = $this->getCommentFromTranslation($gettext, $key);
+        if ($comment !== null) {
+            $gettext->getExtractedComments()->delete($comment);
+        }
+    }
+
+    function addCommentToTranslation($gettext, $key, $value)
+    {
+        $gettext->getExtractedComments()->add($key . ': ' . $value);
+    }
+
+    function updateOrAddCommentToTranslation($gettext, $key, $value)
+    {
+        $this->deleteCommentFromTranslation($gettext, $key);
+        $this->addCommentToTranslation($gettext, $key, $value);
     }
 
     function editTranslationFromFiles($hash, $lng, $str = null, $checked = null)
@@ -260,11 +288,7 @@ class Gettext
                 $gettext__value->translate($str);
             }
             if ($checked !== null) {
-                $comment = $this->getCommentFromTranslation($gettext__value, 'checked');
-                if ($comment !== null) {
-                    $gettext__value->getExtractedComments()->delete($comment);
-                }
-                $gettext__value->getExtractedComments()->add('checked: ' . $checked);
+                $this->updateOrAddCommentToTranslation($gettext__value, 'checked', $checked);
             }
             $success = true;
         }
@@ -272,6 +296,7 @@ class Gettext
             $poGenerator->generateFile($po, $this->getLngFilename('po', $lng));
             $moGenerator->generateFile($po, $this->getLngFilename('mo', $lng));
         }
+        clearstatcache();
         return $success;
     }
 
@@ -288,16 +313,13 @@ class Gettext
             if ($this->getTranslationHash($gettext__value) !== $hash) {
                 continue;
             }
-            $comment = $this->getCommentFromTranslation($gettext__value, 'shared');
-            if ($comment !== null) {
-                $gettext__value->getExtractedComments()->delete($comment);
-            }
-            $gettext__value->getExtractedComments()->add('shared: ' . $shared);
+            $this->updateOrAddCommentToTranslation($gettext__value, 'shared', $shared);
             $success = true;
         }
         if ($success === true) {
             $poGenerator->generateFile($pot, $this->getLngFilename('pot', '_template'));
         }
+        clearstatcache();
         return $success;
     }
 
@@ -349,20 +371,13 @@ class Gettext
             if (!array_key_exists($hash, $data)) {
                 continue;
             }
-            // never overwrite manually set value
-            if ($this->getCommentValueFromTranslation($gettext__value, 'shared') !== null) {
-                continue;
-            }
-            // only write not null values
-            if ($data[$hash] === null) {
-                continue;
-            }
-            $gettext__value->getExtractedComments()->add('shared: ' . ($data[$hash] === true ? '1' : '0'));
+            $this->updateOrAddCommentToTranslation($gettext__value, 'shared', $data[$hash] === true ? '1' : '0');
             $success = true;
         }
         if ($success === true) {
             $poGenerator->generateFile($pot, $this->getLngFilename('pot', '_template'));
         }
+        clearstatcache();
         return $success;
     }
 
@@ -409,15 +424,15 @@ class Gettext
                 $moGenerator->generateFile($po, $this->getLngFilename('mo', $languages__value));
                 $success = true;
             }
+            $po = null;
         }
-
+        clearstatcache();
         return $success;
     }
 
     function deleteUnusedTranslations($since_time)
     {
         $deleted = 0;
-
         $discovery_strings = array_map(function ($a) {
             return $a['string'] . '#' . $a['context'];
         }, $this->log->discoveryLogGet($since_time));
@@ -467,7 +482,7 @@ class Gettext
                 $moGenerator->generateFile($po, $this->getLngFilename('mo', $languages__value));
             }
         }
-
+        clearstatcache();
         return $deleted;
     }
 
@@ -476,7 +491,7 @@ class Gettext
         $translation = Translation::create($context, $str);
         $translation->translate('');
         if ($this->settings->get('auto_add_added_date_to_gettext') === true) {
-            $translation->getExtractedComments()->add('added: ' . date('Y-m-d H:i:s'));
+            $this->addCommentToTranslation($translation, 'added', date('Y-m-d H:i:s'));
         }
         if ($comment !== null) {
             $translation->getComments()->add($comment);
@@ -494,7 +509,7 @@ class Gettext
         $translation = Translation::create($context, $orig);
         $translation->translate($trans);
         if ($this->settings->get('auto_add_added_date_to_gettext') === true) {
-            $translation->getExtractedComments()->add('added: ' . date('Y-m-d H:i:s'));
+            $this->addCommentToTranslation($translation, 'added', date('Y-m-d H:i:s'));
         }
         if ($comment !== null) {
             $translation->getComments()->add($comment);

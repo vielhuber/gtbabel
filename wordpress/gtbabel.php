@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 2.7.2
+ * Version: 2.7.3
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -1326,14 +1326,6 @@ class GtbabelWordPress
     {
         $message = '';
 
-        /* debug */
-        $response = $this->gtbabel->gettext->deleteUnusedTranslations(1586569290.865);
-        __d($response);
-        die('OK');
-        __d($this->gtbabel->log->discoveryLogGet(1586563694.8273, ['http://vielhuber.local.vielhuber.de/en/'], true));
-        $this->gtbabel->gettext->autoEditSharedValues();
-        die('OK');
-
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (isset($_POST['upload_file'])) {
                 check_admin_referer('gtbabel-services-upload-file');
@@ -1808,25 +1800,6 @@ EOD;
                     unset($translations[$translations__key]);
                 }
             }
-            // sort
-            foreach ($translations as $translations__key => $translations__value) {
-                $translations[$translations__key]['order'] = $discovery_strings_map[$translations__key];
-            }
-            uasort($translations, function ($a, $b) {
-                if ($a['shared'] === true) {
-                    $a['shared'] = $a['shared'] === true ? 1 : 0;
-                }
-                if ($b['shared'] === true) {
-                    $b['shared'] = $b['shared'] === true ? 1 : 0;
-                }
-                if ($a['shared'] !== $b['shared']) {
-                    return $a['shared'] < $b['shared'] ? -1 : 1;
-                }
-                if ($a['context'] != $b['context']) {
-                    return strcmp($a['context'], $b['context']);
-                }
-                return $a['order'] < $b['order'] ? -1 : 1;
-            });
         }
 
         if (@$_GET['s'] != '') {
@@ -2125,6 +2098,8 @@ EOD;
 
         // if finished
         if ($chunk_size * $chunk + $chunk_size > count($queue) - 1) {
+            $this->gtbabel->gettext->autoEditSharedValues();
+
             if ($delete_unused === true) {
                 $deleted = $this->gtbabel->gettext->deleteUnusedTranslations($since_time);
                 echo __('Deleted strings', 'gtbabel-plugin') . ': ' . $deleted;
