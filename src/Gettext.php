@@ -569,7 +569,10 @@ class Gettext
     function getCurrentPrefix()
     {
         foreach ($this->settings->getSelectedLanguageCodes() as $languages__value) {
-            if (mb_strpos($this->host->getCurrentPath(), '/' . $languages__value) === 0) {
+            if (
+                $this->host->getCurrentPath() === $languages__value ||
+                mb_strpos($this->host->getCurrentPath(), '/' . $languages__value . '/') === 0
+            ) {
                 return $languages__value;
             }
         }
@@ -600,7 +603,7 @@ class Gettext
     {
         $path = str_replace($this->host->getCurrentHost(), '', $url);
         foreach ($this->settings->getSelectedLanguageCodes() as $languages__value) {
-            if (mb_strpos($path, '/' . $languages__value) === 0) {
+            if ($path === $languages__value || mb_strpos($path, '/' . $languages__value . '/') === 0) {
                 return $languages__value;
             }
         }

@@ -90,7 +90,11 @@ class Router
                 return;
             }
             if (
-                mb_strpos($this->host->getCurrentPathWithArgs(), '/' . $this->settings->getSourceLanguageCode()) === 0
+                $this->host->getCurrentPathWithArgs() === $this->settings->getSourceLanguageCode() ||
+                mb_strpos(
+                    $this->host->getCurrentPathWithArgs(),
+                    '/' . $this->settings->getSourceLanguageCode() . '/'
+                ) === 0
             ) {
                 $path = mb_substr(
                     $this->host->getCurrentPathWithArgs(),
