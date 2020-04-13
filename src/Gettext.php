@@ -167,7 +167,7 @@ class Gettext
         return $this->gettext_cache_reverse[$lng][$context ?? ''][$str];
     }
 
-    function getAllTranslationsFromFiles()
+    function getAllTranslationsFromFiles($lng = null)
     {
         $data = [];
         $poLoader = new PoLoader();
@@ -184,6 +184,9 @@ class Gettext
             ];
         }
         foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
+            if ($lng !== null && $lng !== $languages__value) {
+                continue;
+            }
             if (!file_exists($this->getLngFilename('po', $languages__value))) {
                 continue;
             }
@@ -344,7 +347,7 @@ class Gettext
             SELECT string, context, COUNT(string) as count FROM (
                 SELECT string, context, url_orig FROM log';
         $args = [];
-        if ($strings !== null) {
+        if ($strings !== null && !empty($strings)) {
             $query .= ' WHERE string IN (' . str_repeat('?,', count($strings) - 1) . '?)';
             $args = array_merge(
                 $args,
