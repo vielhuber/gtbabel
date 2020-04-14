@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 2.7.6
+ * Version: 2.7.7
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -1758,7 +1758,7 @@ EOD;
             // subsequent urls are now available (we need to refresh the current session)
             $this->start();
             foreach ($this->gtbabel->settings->getSelectedLanguageCodesWithoutSource() as $lngs__value) {
-                if ($lngs__value !== $lng) {
+                if ($lng !== null && $lngs__value !== $lng) {
                     continue;
                 }
                 $url_trans = $this->gtbabel->gettext->getUrlTranslationInLanguage($lngs__value, $url);
@@ -1780,7 +1780,7 @@ EOD;
             $this->fetch($this->getNoCacheUrl($home_url));
             $this->start();
             foreach ($this->gtbabel->settings->getSelectedLanguageCodesWithoutSource() as $lngs__value) {
-                if ($lngs__value !== $lng) {
+                if ($lng !== null && $lngs__value !== $lng) {
                     continue;
                 }
                 $this->fetch(
@@ -2097,6 +2097,7 @@ EOD;
         if ($chunk_size * $chunk + $chunk_size > count($queue) - 1) {
             $this->gtbabel->gettext->autoEditSharedValues();
 
+            $this->gtbabel->log->generalLog('calling $this->gtbabel->gettext->deleteUnusedTranslations('.$since_time.')');
             if ($delete_unused === true) {
                 $deleted = $this->gtbabel->gettext->deleteUnusedTranslations($since_time);
                 echo __('Deleted strings', 'gtbabel-plugin') . ': ' . $deleted;
