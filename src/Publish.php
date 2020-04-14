@@ -26,6 +26,35 @@ class Publish
         $this->settings->set('prevent_publish_urls', $prevent_publish_urls);
     }
 
+    function unpublish($url, $lng)
+    {
+        $prevent_publish_urls = $this->settings->get('prevent_publish_urls');
+        $url = '/' . trim(str_replace($this->host->getCurrentHost(), '', $url), '/');
+        if (!array_key_exists($url, $prevent_publish_urls)) {
+            $prevent_publish_urls[$url] = [];
+        }
+        if (!in_array($lng, $prevent_publish_urls[$url])) {
+            $prevent_publish_urls[$url][] = $lng;
+        }
+        $this->settings->set('prevent_publish_urls', $prevent_publish_urls);
+    }
+
+    function publish($url, $lng)
+    {
+        $prevent_publish_urls = $this->settings->get('prevent_publish_urls');
+        $url = '/' . trim(str_replace($this->host->getCurrentHost(), '', $url), '/');
+        if (!array_key_exists($url, $prevent_publish_urls)) {
+            return;
+        }
+        if (in_array($lng, $prevent_publish_urls[$url])) {
+            $prevent_publish_urls[$url] = array_diff($prevent_publish_urls[$url], [$lng]);
+        }
+        if (empty($prevent_publish_urls[$url])) {
+            unset($prevent_publish_urls[$url]);
+        }
+        $this->settings->set('prevent_publish_urls', $prevent_publish_urls);
+    }
+
     function change($old_url, $new_url)
     {
         $prevent_publish_urls = $this->settings->get('prevent_publish_urls');

@@ -93,7 +93,6 @@
     width: 8%;
 }
 .gtbabel--trans .gtbabel__table .gtbabel__input--textarea {
-    font-size: 11px;
     width: 100%;
     height: 50px;
     border: 0;
@@ -136,6 +135,9 @@
 .gtbabel--trans .gtbabel__input--check-translation + .gtbabel__input--textarea {
     width: calc(100% - 5px);
     margin-top: 5px;
+}
+.gtbabel--trans .gtbabel__submit + .gtbabel__submit {
+    margin-left: 10px;
 }
 
 .gtbabel__pagination {
@@ -184,26 +186,29 @@
 .gtbabel__search .gtbabel__form .gtbabel__input[name='checked'] {
     flex: 0 0 calc((100% - 80px - (4 * 5px)) * 0.1);
 }
+.gtbabel__search--post-id .gtbabel__form .gtbabel__input[name='url'] {
+    display: none;
+}
+.gtbabel__search--post-id .gtbabel__form .gtbabel__input[name='s'] {
+    flex: 0 0 calc((100% - 80px - (4 * 5px)) * 0.8);
+}
 .gtbabel__search .gtbabel__form .gtbabel__submit {
     flex: 0 0 80px;
     margin-right: 0;
 }
 
-.gtbabel__publish-listitem {
-    margin-bottom: 0;
+.gtbabel__transmeta-mainlink {
+    font-size: 16px;
 }
-.gtbabel__publish .gtbabel__input--checkbox {
-    margin-top: 1px;
+.gtbabel__transmeta-list {
+    display: flex;
+    align-items: flex-start;
 }
-.gtbabel__publish .gtbabel__label {
-    margin-left: 5px;
-    width: 70px;
-    display: inline-block;
-    vertical-align: middle;
+.gtbabel__transmeta-listitem {
+    flex: 0 1 auto;
 }
-.gtbabel__publish-listitem-link {
+.gtbabel__transmeta-listitem:not(:first-child) {
     margin-left: 10px;
-    vertical-align: middle;
 }
 
 .gtbabel__highlight {

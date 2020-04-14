@@ -236,6 +236,18 @@ class Log
         $db = null;
     }
 
+    function discoveryLogChangeUrl($old, $new)
+    {
+        $filename = $this->discoveryLogFilename();
+        if (!file_exists($filename)) {
+            return;
+        }
+        $db = new \PDO('sqlite:' . $filename);
+        $query = $db->prepare('UPDATE log SET url_orig = ? WHERE url_orig = ?');
+        $query->execute([$new, $old]);
+        $db = null;
+    }
+
     function generalLogReset()
     {
         @unlink($this->generalLogFilename());

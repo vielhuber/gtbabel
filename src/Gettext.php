@@ -167,7 +167,7 @@ class Gettext
         return $this->gettext_cache_reverse[$lng][$context ?? ''][$str];
     }
 
-    function getAllTranslationsFromFiles($lng = null)
+    function getAllTranslationsFromFiles($lng = null, $order_by_string = true)
     {
         $data = [];
         $poLoader = new PoLoader();
@@ -175,12 +175,14 @@ class Gettext
             return $data;
         }
         $pot = $poLoader->loadFile($this->getLngFilename('pot', '_template'));
+        $order = 0;
         foreach ($pot->getTranslations() as $gettext__value) {
             $data[$this->getTranslationHash($gettext__value)] = [
                 'orig' => $gettext__value->getOriginal(),
                 'context' => $gettext__value->getContext() ?? '',
                 'shared' => $this->getCommentValueFromTranslation($gettext__value, 'shared'),
-                'translations' => []
+                'translations' => [],
+                'order' => ++$order
             ];
         }
         foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
@@ -198,7 +200,7 @@ class Gettext
                 ];
             }
         }
-        uasort($data, function ($a, $b) {
+        uasort($data, function ($a, $b) use ($order_by_string) {
             if ($a['shared'] === true) {
                 $a['shared'] = $a['shared'] === true ? 1 : 0;
             }
@@ -209,9 +211,37 @@ class Gettext
                 return $a['shared'] < $b['shared'] ? -1 : 1;
             }
             if ($a['context'] != $b['context']) {
+                if ($a['context'] == '') {
+                    return -1;
+                }
+                if ($b['context'] == '') {
+                    return 1;
+                }
+                if ($a['context'] === 'slug') {
+                    return -1;
+                }
+                if ($b['context'] === 'slug') {
+                    return 1;
+                }
+                if ($a['context'] === 'title') {
+                    return -1;
+                }
+                if ($b['context'] === 'title') {
+                    return 1;
+                }
+                if ($a['context'] === 'description') {
+                    return -1;
+                }
+                if ($b['context'] === 'description') {
+                    return 1;
+                }
                 return strnatcasecmp($a['context'], $b['context']);
             }
-            return strnatcasecmp($a['orig'], $b['orig']);
+            if ($order_by_string === true) {
+                return strnatcasecmp($a['orig'], $b['orig']);
+            } else {
+                return strcmp($a['order'], $b['order']);
+            }
         });
         return $data;
     }

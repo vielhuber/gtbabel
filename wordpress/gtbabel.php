@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 2.7.5
+ * Version: 2.7.6
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -161,26 +161,38 @@ class GtbabelWordPress
                 $post_after_status = get_post_status($post_after);
                 $post_before_url = get_permalink($post_before);
                 $post_after_url = get_permalink($post_after);
-                if (
-                    $post_after_status === 'trash' ||
-                    $post_after_status === 'draft' ||
-                    $post_before_url != $post_after_url
-                ) {
-                    // remove trashed
-                    if ($post_after_status === 'trash') {
-                        $this->gtbabel->publish->edit($post_after_url, []);
-                    }
-                    // by default any post has prevent publish on for all languages
-                    if ($post_after_status === 'draft') {
-                        $this->gtbabel->publish->edit(
-                            $post_after_url,
-                            $this->gtbabel->settings->getSelectedLanguageCodesWithoutSource()
-                        );
-                    }
-                    // if a slug is changed, preserve settings
-                    if ($post_before_url != $post_after_url) {
-                        $this->gtbabel->publish->change($post_before_url, $post_after_url);
-                    }
+
+                $trigger1 = $post_after_status === 'trash';
+                $trigger2 =
+                    ($post_before_status === 'auto-draft' && $post_after_status === 'publish') ||
+                    ($post_before_status === 'draft' && $post_after_status === 'publish') ||
+                    ($post_before_status === 'publish' && $post_after_status === 'draft');
+                $trigger3 = $post_before_url != $post_after_url;
+
+                // remove trashed
+                if ($trigger1) {
+                    $this->gtbabel->publish->edit($post_after_url, []);
+                }
+                // by default any post has prevent publish on for all languages
+                if ($trigger2) {
+                    $this->gtbabel->publish->edit(
+                        $post_after_url,
+                        $this->gtbabel->settings->getSelectedLanguageCodesWithoutSource()
+                    );
+                }
+                // if a slug is changed, preserve settings in prevent publish
+                if ($trigger3) {
+                    $this->gtbabel->publish->change($post_before_url, $post_after_url);
+                }
+                // if a slug is changed, change old url to new in discovery log
+                if ($trigger3) {
+                    $this->gtbabel->log->discoveryLogChangeUrl(
+                        $this->getNoCacheUrl($post_before_url),
+                        $this->getNoCacheUrl($post_after_url)
+                    );
+                }
+
+                if ($trigger1 || $trigger2 || $trigger3) {
                     $this->changeSetting('prevent_publish_urls', $this->gtbabel->settings->get('prevent_publish_urls'));
                 }
             },
@@ -226,7 +238,7 @@ class GtbabelWordPress
                             admin_url('admin.php?page=gtbabel-trans&post_id=' . $post->ID) .
                             '&lng=' .
                             $languages__key .
-                            '">' .
+                            '&shared=0">' .
                             $languages__value .
                             '</a></li>';
                     }
@@ -388,7 +400,8 @@ class GtbabelWordPress
                             'exclude_dom',
                             'force_tokenize',
                             'include_dom',
-                            'localize_js'
+                            'localize_js',
+                            'wizard_finished'
                         ]
                         as $fields__value
                     ) {
@@ -413,7 +426,8 @@ class GtbabelWordPress
                             'debug_translations',
                             'auto_add_translations_to_gettext',
                             'auto_translation',
-                            'stats_log'
+                            'stats_log',
+                            'wizard_finished'
                         ]
                         as $checkbox__value
                     ) {
@@ -546,6 +560,9 @@ class GtbabelWordPress
         echo '<div class="gtbabel gtbabel--settings wrap">';
         echo '<form class="gtbabel__form" method="post" action="' . admin_url('admin.php?page=gtbabel-settings') . '">';
         wp_nonce_field('gtbabel-settings');
+        echo '<input type="hidden" name="gtbabel[wizard_finished]" value="' .
+            (isset($settings['wizard_finished']) && $settings['wizard_finished'] == 1 ? 1 : 0) .
+            '" />';
         echo '<h1 class="gtbabel__title">🦜 Gtbabel 🦜</h1>';
         echo $message;
         echo '<h2 class="gtbabel__subtitle">' . __('Settings', 'gtbabel-plugin') . '</h2>';
@@ -994,8 +1011,26 @@ class GtbabelWordPress
     {
         $message = '';
 
+        $url = null;
+        $post_id = null;
+        $lng = null;
+        if (isset($_GET['post_id']) && $_GET['post_id'] != '' && is_numeric($_GET['post_id'])) {
+            $post_id = intval($_GET['post_id']);
+            $url = get_permalink($post_id);
+        }
+        if (isset($_GET['url']) && $_GET['url'] != '') {
+            $url = esc_url($_GET['url']);
+        }
+        if (isset($_GET['lng']) && $_GET['lng'] != '') {
+            $lng = sanitize_textarea_field($_GET['lng']);
+        }
+        $source_url_published = null;
+        if ($url !== null) {
+            $source_url_published = $this->isUrlPublished($url);
+        }
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            if (isset($_POST['save_translations'])) {
+            if (isset($_POST['translations_submit'])) {
                 check_admin_referer('gtbabel-trans-save-translations');
                 if (!empty(@$_POST['gtbabel'])) {
                     // sanitize
@@ -1029,6 +1064,14 @@ class GtbabelWordPress
                         }
                     }
                 }
+                if (isset($_POST['translations_submit']['publish'])) {
+                    if (isset($_POST['translations_submit']['publish'][1])) {
+                        $this->gtbabel->publish->publish($url, $lng);
+                    } else {
+                        $this->gtbabel->publish->unpublish($url, $lng);
+                    }
+                    $this->changeSetting('prevent_publish_urls', $this->gtbabel->settings->get('prevent_publish_urls'));
+                }
             }
             if (isset($_POST['save_publish'])) {
                 check_admin_referer('gtbabel-trans-save-publish');
@@ -1056,20 +1099,6 @@ class GtbabelWordPress
                 '</p></div>';
         }
 
-        $url = null;
-        $post_id = null;
-        $lng = null;
-        if (isset($_GET['post_id']) && is_numeric($_GET['post_id'])) {
-            $post_id = intval($_GET['post_id']);
-            $url = get_permalink($post_id);
-        }
-        if (isset($_GET['url'])) {
-            $url = esc_url($_GET['url']);
-        }
-        if (isset($_GET['lng'])) {
-            $lng = sanitize_textarea_field($_GET['lng']);
-        }
-
         $translations = $this->initBackendTranslations($url, $lng);
 
         $pagination = $this->initBackendPagination($translations);
@@ -1085,19 +1114,49 @@ class GtbabelWordPress
         echo '<div class="gtbabel gtbabel--trans wrap">';
         echo '<h1 class="gtbabel__title">🦜 Gtbabel 🦜</h1>';
         echo $message;
-        echo '<h2 class="gtbabel__subtitle">' . __('Search translations', 'gtbabel-plugin') . '</h2>';
+        echo '<h2 class="gtbabel__subtitle">' . __('String translations', 'gtbabel-plugin') . '</h2>';
 
-        echo '<p class="gtbabel__paragraph">' .
-            __('Translations available', 'gtbabel-plugin') .
-            ': ' .
-            $pagination->count .
-            '</p>';
+        if ($url !== null && $lng !== null && $post_id !== null) {
+            echo '<div class="gtbabel__transmeta">';
 
-        echo '<div class="gtbabel__search">';
+            echo '<p class="gtbabel__transmeta-mainlink">';
+            if ($this->gtbabel->settings->getSourceLanguageCode() === $lng) {
+                $link_public = $url;
+            } else {
+                $link_public = $this->gtbabel->gettext->getUrlTranslationInLanguage($lng, $url);
+            }
+            echo '<a href="' . $link_public . '" target="_blank">' . $link_public . '</a>';
+            echo '</p>';
+
+            echo '<ul class="gtbabel__transmeta-list">';
+            foreach ($this->gtbabel->settings->getSelectedLanguages() as $lng__key => $lng__value) {
+                if ($this->gtbabel->settings->getSourceLanguageCode() === $lng__key) {
+                    $link_edit = get_edit_post_link($post_id);
+                } else {
+                    $link_edit = admin_url(
+                        'admin.php?page=gtbabel-trans&post_id=' . $post_id . '&lng=' . $lng__key . '&shared=0'
+                    );
+                }
+                echo '<li class="gtbabel__transmeta-listitem">';
+                if ($lng !== $lng__key) {
+                    echo '<a class="gtbabel__transmeta-listitem-link" href="' . $link_edit . '">';
+                }
+                echo $lng__value;
+                if ($lng !== $lng__key) {
+                    echo '</a>';
+                }
+                echo '</li>';
+            }
+            echo '</ul>';
+            echo '</div>';
+        }
+
+        echo '<div class="gtbabel__search' . ($post_id !== null ? ' gtbabel__search--post-id' : '') . '">';
         echo '<form class="gtbabel__form" method="get" action="' . admin_url('admin.php') . '">';
         echo '<input type="hidden" name="page" value="gtbabel-trans" />';
         echo '<input type="hidden" name="p" value="1" />';
         echo '<input type="hidden" name="lng" value="' . ($lng !== null ? $lng : '') . '" />';
+        echo '<input type="hidden" name="post_id" value="' . ($post_id !== null ? $post_id : '') . '" />';
         echo '<input class="gtbabel__input" type="text" name="url" value="' .
             ($url !== null ? $url : '') .
             '" placeholder="' .
@@ -1140,85 +1199,12 @@ class GtbabelWordPress
         echo '</form>';
         echo '</div>';
 
-        if ($url !== null) {
-            echo '<h2 class="gtbabel__subtitle">' . __('Publish status', 'gtbabel-plugin') . '</h2>';
-            echo '<div class="gtbabel__publish">';
-            echo '<form class="gtbabel__form" method="post" action="' .
-                $this->buildTranslationFormUrl($pagination->cur) .
-                '">';
-            wp_nonce_field('gtbabel-trans-save-publish');
-            echo '<p class="gtbabel__paragraph">';
-            echo __('Status of source url', 'gtbabel-plugin') . ': ';
-            $url_published = $this->isUrlPublished($url);
-            if ($url_published === true) {
-                echo __('Published', 'gtbabel-plugin');
-            } else {
-                echo __('Unpublished', 'gtbabel-plugin');
-            }
-            echo '</p>';
-            echo '<ul class="gtbabel__publish-list">';
-            foreach ($this->gtbabel->settings->getSelectedLanguages() as $lng__key => $lng__value) {
-                echo '<li class="gtbabel__publish-listitem">';
-                $disabled = $this->gtbabel->settings->getSourceLanguageCode() === $lng__key || $url_published === false;
-                $checked =
-                    ($this->gtbabel->settings->getSourceLanguageCode() === $lng__key && $url_published === true) ||
-                    ($this->gtbabel->settings->getSourceLanguageCode() !== $lng__key &&
-                        !$this->gtbabel->publish->isPrevented($url, $lng__key, false));
-                echo '<input' .
-                    ($disabled ? ' disabled="disabled"' : '') .
-                    ($checked ? ' checked="checked"' : '') .
-                    ' class="gtbabel__input gtbabel__input--checkbox gtbabel__input--inverse" type="checkbox" id="gtbabel_publish_' .
-                    $lng__key .
-                    '" />';
-                if ($this->gtbabel->settings->getSourceLanguageCode() !== $lng__key) {
-                    echo '<input type="hidden" name="gtbabel[' .
-                        $url .
-                        '][' .
-                        $lng__key .
-                        ']" value="' .
-                        ($checked ? '0' : '1') .
-                        '" />';
-                }
-                echo '<label for="gtbabel_publish_' . $lng__key . '" class="gtbabel__label">';
-                echo $lng__value;
-                echo '</label>';
-                if ($this->gtbabel->settings->getSourceLanguageCode() === $lng__key) {
-                    $link_public = $url;
-                    $link_edit = get_edit_post_link($post_id);
-                } else {
-                    $link_public = $this->gtbabel->gettext->getUrlTranslationInLanguage($lng__key, $url);
-                    $link_edit = admin_url('admin.php?page=gtbabel-trans&post_id=' . $post_id . '&lng=' . $lng__key);
-                }
-                echo '<a class="gtbabel__publish-listitem-link" href="' .
-                    $link_public .
-                    '" target="_blank">' .
-                    $link_public .
-                    '</a>';
-                echo '<a class="gtbabel__publish-listitem-link" href="' .
-                    $link_edit .
-                    '">' .
-                    __('Edit', 'gtbabel-plugin') .
-                    '</a>';
-                echo '</li>';
-            }
-            echo '</ul>';
-            if ($url_published === true) {
-                echo '<input class="gtbabel__submit button button-secondary" name="save_publish" value="' .
-                    __('Save', 'gtbabel-plugin') .
-                    '" type="submit" />';
-            }
-            echo '</form>';
-            echo '</div>';
-        }
-
         if (!empty($translations)) {
-            echo '<h2 class="gtbabel__subtitle">' . __('String translations', 'gtbabel-plugin') . '</h2>';
-
-            if ($url !== null) {
-                echo '<p class="gtbabel__paragraph gtbabel__highlight">' .
-                    __('Warning: Some strings below could also be used on other pages.', 'gtbabel-plugin') .
-                    '</p>';
-            }
+            echo '<p class="gtbabel__paragraph">' .
+                __('Translations available', 'gtbabel-plugin') .
+                ': ' .
+                $pagination->count .
+                '</p>';
 
             echo '<form class="gtbabel__form" method="post" action="' .
                 $this->buildTranslationFormUrl($pagination->cur) .
@@ -1306,9 +1292,27 @@ class GtbabelWordPress
             echo '</table>';
             echo $pagination->html;
 
-            echo '<input class="gtbabel__submit button button-primary" name="save_translations" value="' .
-                __('Save', 'gtbabel-plugin') .
-                '" type="submit" />';
+            if ($url !== null && $lng !== null && $source_url_published === true) {
+                if ($this->gtbabel->publish->isPrevented($url, $lng, false) === true) {
+                    echo '<input class="gtbabel__submit button button-secondary" name="translations_submit[save]" value="' .
+                        __('Save', 'gtbabel-plugin') .
+                        '" type="submit" />';
+                    echo '<input class="gtbabel__submit button button-primary" name="translations_submit[publish][1]" value="' .
+                        __('Publish', 'gtbabel-plugin') .
+                        '" type="submit" />';
+                } else {
+                    echo '<input class="gtbabel__submit button button-secondary" name="translations_submit[publish][0]" value="' .
+                        __('Set to draft', 'gtbabel-plugin') .
+                        '" type="submit" />';
+                    echo '<input class="gtbabel__submit button button-primary" name="translations_submit[save]" value="' .
+                        __('Save', 'gtbabel-plugin') .
+                        '" type="submit" />';
+                }
+            } else {
+                echo '<input class="gtbabel__submit button button-primary" name="translations_submit[save]" value="' .
+                    __('Save', 'gtbabel-plugin') .
+                    '" type="submit" />';
+            }
 
             echo '</form>';
         } else {
@@ -1788,28 +1792,24 @@ EOD;
             $this->changeSetting('discovery_log', false);
         }
 
-        $translations = $this->gtbabel->gettext->getAllTranslationsFromFiles($lng);
+        $translations = $this->gtbabel->gettext->getAllTranslationsFromFiles($lng, $url === null);
 
+        // filter
         if ($url !== null) {
-            // filter
             foreach ($translations as $translations__key => $translations__value) {
                 if (!array_key_exists($translations__key, $discovery_strings_map)) {
                     unset($translations[$translations__key]);
                 }
             }
         }
-
         if (@$_GET['s'] != '') {
-            // filter
             foreach ($translations as $translations__key => $translations__value) {
                 if (mb_stripos($translations__value['orig'], wp_kses_post($_GET['s'])) === false) {
                     unset($translations[$translations__key]);
                 }
             }
         }
-
         if (@$_GET['shared'] != '') {
-            // filter
             foreach ($translations as $translations__key => $translations__value) {
                 if (
                     ($_GET['shared'] == '0' && $translations__value['shared'] === true) ||
@@ -1819,9 +1819,7 @@ EOD;
                 }
             }
         }
-
         if (@$_GET['checked'] != '') {
-            // filter
             foreach ($translations as $translations__key => $translations__value) {
                 $all_checked = true;
                 foreach ($translations__value['translations'] as $translations__value__value) {
@@ -1863,7 +1861,7 @@ EOD;
     private function initBackendPagination($translations)
     {
         $pagination = (object) [];
-        $pagination->per_page = 10;
+        $pagination->per_page = 100;
         $pagination->count = count($translations);
         $pagination->cur = @$_GET['p'] != '' ? intval($_GET['p']) : 1;
         $pagination->max = ceil($pagination->count / $pagination->per_page);
