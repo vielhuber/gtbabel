@@ -200,6 +200,7 @@ class Log
             'lng' => $lng,
             'time' => microtime(true)
         ];
+        $this->generalLog('adding to array: '.$string);
     }
 
     function discoveryLogSave()
@@ -232,8 +233,10 @@ class Log
         $query = $db->prepare(
             'INSERT INTO log(url, url_orig, string, context, lng, time) VALUES ' . implode(', ', $query_q)
         );
-        $query->execute($query_p);
+        $response = $query->execute($query_p);
         $db = null;
+        $this->generalLog('saving array: '.serialize($this->discovery_log_to_save));
+        $this->generalLog('pdo log: '.$response.' - '.$query->errorCode());
     }
 
     function discoveryLogChangeUrl($old, $new)
