@@ -200,12 +200,10 @@ class Log
             'lng' => $lng,
             'time' => microtime(true)
         ];
-        $this->generalLog('adding to array: '.$string);
     }
 
     function discoveryLogSave()
     {
-        $this->generalLog('starting discoveryLogSave()');
         if ($this->discovery_log_to_save === null) {
             return;
         }
@@ -225,19 +223,32 @@ class Log
         } else {
             $db = new \PDO('sqlite:' . $filename);
         }
-        $query_q = [];
-        $query_p = [];
-        foreach ($this->discovery_log_to_save as $discovery_log_to_save__value) {
-            $query_q[] = '(?,?,?,?,?,?)';
-            $query_p = array_merge($query_p, array_values($discovery_log_to_save__value));
+
+        // insert batch wise (because sqlite has limits)
+        $batch_size = 100;
+        for ($batch_cur = 0; $batch_cur * $batch_size < count($this->discovery_log_to_save); $batch_cur++) {
+            $query_q = [];
+            $query_p = [];
+            foreach ($this->discovery_log_to_save as $discovery_log_to_save__key => $discovery_log_to_save__value) {
+                if (
+                    $discovery_log_to_save__key < $batch_size * $batch_cur ||
+                    $discovery_log_to_save__key >= $batch_size * ($batch_cur + 1)
+                ) {
+                    continue;
+                }
+                $query_q[] = '(?,?,?,?,?,?)';
+                $query_p = array_merge($query_p, array_values($discovery_log_to_save__value));
+            }
+            $query = $db->prepare(
+                'INSERT INTO log(url, url_orig, string, context, lng, time) VALUES ' . implode(', ', $query_q)
+            );
+            if (!$query) {
+                $this->generalLog($db->errorInfo());
+            }
+            $query->execute($query_p);
         }
-        $query = $db->prepare(
-            'INSERT INTO log(url, url_orig, string, context, lng, time) VALUES ' . implode(', ', $query_q)
-        );
-        $response = $query->execute($query_p);
+
         $db = null;
-        $this->generalLog('saving array: '.serialize($this->discovery_log_to_save));
-        $this->generalLog('pdo log: '.$response.' - '.$query->errorCode());
     }
 
     function discoveryLogChangeUrl($old, $new)
