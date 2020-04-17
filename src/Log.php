@@ -205,6 +205,7 @@ class Log
 
     function discoveryLogSave()
     {
+        $this->generalLog('starting discoveryLogSave()');
         if ($this->discovery_log_to_save === null) {
             return;
         }

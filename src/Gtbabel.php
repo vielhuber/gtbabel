@@ -70,8 +70,11 @@ class Gtbabel
         $content = $this->dom->modifyContent($content);
         ob_end_clean();
         echo $content;
+        $this->log->generalLog('$this->gettext->generateGettextFiles()');
         $this->gettext->generateGettextFiles();
+        $this->log->generalLog('$this->log->statsLogSave()');
         $this->log->statsLogSave();
+        $this->log->generalLog('$this->log->discoveryLogSave()');
         $this->log->discoveryLogSave();
     }
 
