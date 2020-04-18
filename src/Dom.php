@@ -231,7 +231,7 @@ class Dom
                         if (@$include__value['attribute'] != '') {
                             $nodes__value->setAttribute($include__value['attribute'], $trans);
                         } else {
-                            $nodes__value->nodeValue = $trans;
+                            $nodes__value->nodeValue = htmlspecialchars($trans);
                         }
                     }
                 }

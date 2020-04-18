@@ -482,6 +482,7 @@ class Gettext
             if (in_array($gettext__value->getOriginal() . '#' . $gettext__value->getContext(), $discovery_strings)) {
                 continue;
             }
+            $this->log->generalLog('removing ' . $gettext__value->getOriginal() . '#' . $gettext__value->getContext());
             $to_remove[] = $gettext__value;
         }
         if (!empty($to_remove)) {
@@ -504,6 +505,9 @@ class Gettext
                 ) {
                     continue;
                 }
+                $this->log->generalLog(
+                    'removing ' . $gettext__value->getOriginal() . '#' . $gettext__value->getContext()
+                );
                 $to_remove[] = $gettext__value;
             }
             if (!empty($to_remove)) {
