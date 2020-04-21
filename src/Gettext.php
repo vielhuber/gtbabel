@@ -313,6 +313,26 @@ class Gettext
             return $success;
         }
         $po = $poLoader->loadFile($this->getLngFilename('po', $lng));
+
+        // slug collission detection
+        if ($str !== null) {
+            $collission = true;
+            $counter = 2;
+            while ($collission === true) {
+                $collission = false;
+                foreach ($po->getTranslations() as $gettext__value) {
+                    if ($gettext__value->getContext() === 'slug' && $gettext__value->getTranslation() === $str) {
+                        if ($counter > 2) {
+                            $str = mb_substr($str, 0, mb_strrpos($str, '-'));
+                        }
+                        $str .= '-' . $counter;
+                        $counter++;
+                        $collission = true;
+                    }
+                }
+            }
+        }
+
         foreach ($po->getTranslations() as $gettext__value) {
             if ($this->getTranslationHash($gettext__value) !== $hash) {
                 continue;
@@ -738,14 +758,21 @@ class Gettext
         if (mb_strpos($link, 'http') === false && mb_strpos($link, ':') !== false) {
             return $link;
         }
-        $link = str_replace(
+
+        // replace host/lng
+        foreach (
             [
                 $this->host->getCurrentHost() . '/' . $this->settings->getSourceLanguageCode(),
-                $this->host->getCurrentHost()
-            ],
-            '',
-            $link
-        );
+                $this->host->getCurrentHost(),
+                '/' . $this->settings->getSourceLanguageCode(),
+                $this->settings->getSourceLanguageCode()
+            ]
+            as $begin__value
+        ) {
+            if (mb_strpos($link, $begin__value) === 0) {
+                $link = str_replace($begin__value, '', $link);
+            }
+        }
 
         if ($translate === true) {
             $url_parts = explode('/', $link);
@@ -863,6 +890,18 @@ class Gettext
             }
         } else {
             $trans = $this->translateStringMock($orig, $to_lng, $context, $from_lng);
+        }
+
+        // slug collission detection
+        if ($context === 'slug') {
+            $counter = 2;
+            while ($this->getExistingTranslationReverseFromCache($trans, $to_lng, $context) !== false) {
+                if ($counter > 2) {
+                    $trans = mb_substr($trans, 0, mb_strrpos($trans, '-'));
+                }
+                $trans .= '-' . $counter;
+                $counter++;
+            }
         }
 
         if ($this->settings->get('debug_translations') === true) {
