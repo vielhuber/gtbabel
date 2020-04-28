@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 2.8.3
+ * Version: 2.8.4
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -2061,7 +2061,8 @@ EOD;
             }
 
             // append a pseudo get parameter, so that frontend cache plugins don't work
-            $this->fetch($this->getNoCacheUrl($url));
+            $response = $this->fetch($this->getNoCacheUrl($url));
+            $this->gtbabel->log->generalLog($response);
 
             echo __('Loading', 'gtbabel-plugin');
             echo '... ' . $url . '<br/>';

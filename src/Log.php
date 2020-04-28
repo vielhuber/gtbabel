@@ -277,6 +277,9 @@ class Log
         if (is_array($msg)) {
             $msg = print_r($msg, true);
         }
+        if (is_object($msg)) {
+            $msg = print_r((array)$msg, true);
+        }
         $msg = date('Y-m-d H:i:s') . ': ' . $msg;
         file_put_contents($filename, $msg . PHP_EOL, FILE_APPEND);
     }
