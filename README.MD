@@ -203,6 +203,14 @@ If you want to exclude a complete node of being translated (and not added to get
 
 `<p class="notranslate">Das ist das <span>Haus</span> vom Nikolaus</p>`
 
+Note that attributes of ignored nodes are also not translated (the `href`-attribute and the text `Link` does not get translated):
+
+`<a href="/home" class="notranslate">Link</a>`
+
+However, if you want the `href`-attribute to be modified, do something like
+
+`<a href="/home"><span class="notranslate">Link</span></a>`
+
 ## HTML in gettext
 
 Gtbabel preserves inline HTML-tags and leaves them inside your gettext strings.\
