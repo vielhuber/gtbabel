@@ -181,7 +181,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test31()
     {
-        $this->runDiff('31.html', 500, [
+        $this->runDiff('31.html', 750, [
             'debug_translations' => false,
             'auto_translation' => true
         ]);
@@ -398,11 +398,11 @@ class Test extends \PHPUnit\Framework\TestCase
                     PHP_EOL .
                     __::minify_html($this->normalize($html_target))
             );
+            $this->assertEquals(__::minify_html($this->normalize($html_translated)), __::minify_html($this->normalize($html_target)));
         } else {
             @unlink($debug_filename);
+            $this->assertTrue(true);
         }
-
-        $this->assertEquals($passed, true);
     }
 
     public function normalize($str)
