@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/vielhuber/gtbabel.svg?branch=master)](https://travis-ci.org/vielhuber/gtbabel)
+
 # 🦜 Gtbabel 🦜
 
 Gtbabel automatically translates your HTML/PHP pages – server sided!
