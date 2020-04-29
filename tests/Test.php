@@ -10,8 +10,11 @@ class Test extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $dotenv = Dotenv::createImmutable(dirname(__DIR__));
-        $dotenv->load();
+        // load env file
+        if( file_exists(dirname(__DIR__).'/.env') ) {
+            $dotenv = Dotenv::createImmutable(dirname(__DIR__));
+            $dotenv->load();
+        }
         // mock response code
         http_response_code(200);
     }
