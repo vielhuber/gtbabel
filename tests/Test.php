@@ -400,7 +400,7 @@ class Test extends \PHPUnit\Framework\TestCase
             );
             // debug output to copy
             echo PHP_EOL.PHP_EOL.'##############################################'.PHP_EOL;
-            echo serialize([__::minify_html($this->normalize($html_translated)), __::minify_html($this->normalize($html_target))]);
+            echo json_encode([__::minify_html($this->normalize($html_translated)), __::minify_html($this->normalize($html_target))]);
             echo PHP_EOL.'##############################################'.PHP_EOL.PHP_EOL;
             $this->assertTrue(false);
 
