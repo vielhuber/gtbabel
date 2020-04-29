@@ -398,8 +398,8 @@ class Test extends \PHPUnit\Framework\TestCase
                     PHP_EOL .
                     __::minify_html($this->normalize($html_target))
             );
-            $this->assertEquals(__::minify_html($this->normalize($html_translated)), __::minify_html($this->normalize($html_target)));
-            fwrite(STDERR, print_r($this->normalize($html_translated).' '.$this->normalize($html_target).PHP_EOL, true));
+            $this->assertEquals(__::diff(__::minify_html($this->normalize($html_translated)), __::minify_html($this->normalize($html_target))), '');
+
         } else {
             @unlink($debug_filename);
             $this->assertTrue(true);
