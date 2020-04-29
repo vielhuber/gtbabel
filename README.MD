@@ -4,8 +4,6 @@
 
 Gtbabel automatically translates your HTML/PHP pages – server sided!
 
-# WORK IN PROGRESS /// WARNING: THIS IS EXPERIMENTAL
-
 ## Basic idea
 
 -   Gtbabel extracts on every page load any page into logical paragraph tokens.
