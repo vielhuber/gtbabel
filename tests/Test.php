@@ -111,7 +111,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test19()
     {
-        $this->runDiff('19.html', 900);
+        $this->runDiff('19.html', 1500);
     }
 
     public function test20()
@@ -125,12 +125,12 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test21()
     {
-        $this->runDiff('21.php', 3500);
+        $this->runDiff('21.php', 4500);
     }
 
     public function test22()
     {
-        $this->runDiff('22.php', 2000);
+        $this->runDiff('22.php', 3000);
     }
 
     public function test23()

@@ -27,6 +27,10 @@ Gtbabel automatically translates your HTML/PHP pages – server sided!
 -   Besides plain html does also handle and translate json responses.
 -   PHPUnit e2e tests available.
 
+## Requirements
+
+- PHP >=7.2
+
 ## Installation
 
 Install once with [composer](https://getcomposer.org/):
