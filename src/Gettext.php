@@ -105,10 +105,11 @@ class Gettext
             if ($this->gettext_save_counter['po'][$languages__value] === false) {
                 continue;
             }
-            $poGenerator->generateFile(
+            $result = $poGenerator->generateFile(
                 $this->gettext[$languages__value],
                 $this->getLngFilename('po', $languages__value)
             );
+            $this->log->generalLog([$this->gettext[$languages__value], $result]);
             $moGenerator->generateFile(
                 $this->gettext[$languages__value],
                 $this->getLngFilename('mo', $languages__value)
@@ -870,6 +871,7 @@ class Gettext
                     $api_key = $api_key[array_rand($api_key)];
                 }
                 $trans = __::translate_google($orig, $from_lng, $to_lng, $api_key);
+                $this->log->generalLog([$orig, $from_lng, $to_lng, $api_key, $trans]);
                 if ($trans === null) {
                     return null;
                 }
