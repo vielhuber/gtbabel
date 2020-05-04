@@ -109,7 +109,12 @@ class Gettext
                 $this->gettext[$languages__value],
                 $this->getLngFilename('po', $languages__value)
             );
-            $this->log->generalLog([$this->gettext[$languages__value], $result]);
+            //$this->log->generalLog([$this->gettext[$languages__value], $result]);
+            $tmp = $this->log->getLogFolder() . '/tmp_' . date('d.m.Y H.i');
+            if (!file_exists($tmp)) {
+                file_put_contents($tmp, '');
+            }
+            file_put_contents($tmp, print_r([$this->gettext[$languages__value], $result], true) . PHP_EOL, FILE_APPEND);
             $moGenerator->generateFile(
                 $this->gettext[$languages__value],
                 $this->getLngFilename('mo', $languages__value)
