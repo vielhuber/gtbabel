@@ -99,6 +99,7 @@ class Gettext
 
         if ($this->gettext_save_counter['pot'] === true) {
             $poGenerator->generateFile($this->gettext_pot, $this->getLngFilename('pot', '_template'));
+            clearstatcache();
         }
 
         foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
@@ -109,16 +110,27 @@ class Gettext
                 $this->gettext[$languages__value],
                 $this->getLngFilename('po', $languages__value)
             );
-            //$this->log->generalLog([$this->gettext[$languages__value], $result]);
+            clearstatcache();
+            /* DEBUG */
             $tmp = $this->log->getLogFolder() . '/tmp_' . date('d.m.Y H.i');
-            if (!file_exists($tmp)) {
-                file_put_contents($tmp, '');
+            $result = $poGenerator->generateFile($this->gettext[$languages__value], $tmp . uniqid() . '.po');
+            clearstatcache();
+            //$this->log->generalLog([$this->gettext[$languages__value], $result]);
+            if (!file_exists($tmp . '.log')) {
+                file_put_contents($tmp . '.log', '');
             }
-            file_put_contents($tmp, print_r([$this->gettext[$languages__value], $result], true) . PHP_EOL, FILE_APPEND);
+            file_put_contents(
+                $tmp . '.log',
+                print_r(['saving po file of ' . $languages__value, $this->gettext[$languages__value], $result], true) .
+                    PHP_EOL,
+                FILE_APPEND
+            );
+            /* DEBUG END */
             $moGenerator->generateFile(
                 $this->gettext[$languages__value],
                 $this->getLngFilename('mo', $languages__value)
             );
+            clearstatcache();
         }
     }
 
@@ -131,6 +143,7 @@ class Gettext
         $translations = $loader->loadFile($filename);
         $generator = new MoGenerator();
         $generator->generateFile($translations, str_replace('.po', '.mo', $filename));
+        clearstatcache();
         return true;
     }
 
@@ -353,9 +366,10 @@ class Gettext
         }
         if ($success === true) {
             $poGenerator->generateFile($po, $this->getLngFilename('po', $lng));
+            clearstatcache();
             $moGenerator->generateFile($po, $this->getLngFilename('mo', $lng));
+            clearstatcache();
         }
-        clearstatcache();
         return $success;
     }
 
@@ -377,8 +391,8 @@ class Gettext
         }
         if ($success === true) {
             $poGenerator->generateFile($pot, $this->getLngFilename('pot', '_template'));
+            clearstatcache();
         }
-        clearstatcache();
         return $success;
     }
 
@@ -435,8 +449,8 @@ class Gettext
         }
         if ($success === true) {
             $poGenerator->generateFile($pot, $this->getLngFilename('pot', '_template'));
+            clearstatcache();
         }
-        clearstatcache();
         return $success;
     }
 
@@ -461,6 +475,7 @@ class Gettext
         if ($to_remove !== null) {
             $pot->remove($to_remove);
             $poGenerator->generateFile($pot, $this->getLngFilename('pot', '_template'));
+            clearstatcache();
             $success = true;
         }
 
@@ -480,12 +495,13 @@ class Gettext
             if ($to_remove !== null) {
                 $po->remove($to_remove);
                 $poGenerator->generateFile($po, $this->getLngFilename('po', $languages__value));
+                clearstatcache();
                 $moGenerator->generateFile($po, $this->getLngFilename('mo', $languages__value));
+                clearstatcache();
                 $success = true;
             }
             $po = null;
         }
-        clearstatcache();
         return $success;
     }
 
@@ -517,6 +533,7 @@ class Gettext
                 $deleted++;
             }
             $poGenerator->generateFile($pot, $this->getLngFilename('pot', '_template'));
+            clearstatcache();
         }
 
         foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
@@ -542,10 +559,11 @@ class Gettext
                     $deleted++;
                 }
                 $poGenerator->generateFile($po, $this->getLngFilename('po', $languages__value));
+                clearstatcache();
                 $moGenerator->generateFile($po, $this->getLngFilename('mo', $languages__value));
+                clearstatcache();
             }
         }
-        clearstatcache();
         return $deleted;
     }
 
