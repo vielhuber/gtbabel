@@ -7,6 +7,7 @@ use Gettext\Loader\PoLoader;
 use Gettext\Loader\MoLoader;
 use Gettext\Translations;
 use Gettext\Translation;
+use Gettext\Merge;
 
 use vielhuber\stringhelper\__;
 
@@ -60,6 +61,7 @@ class Gettext
             $this->gettext_pot = Translations::create('gtbabel');
         } else {
             $this->gettext_pot = $poLoader->loadFile($filename);
+            clearstatcache();
         }
         foreach ($this->gettext_pot->getTranslations() as $gettext__value) {
             $context = $gettext__value->getContext() ?? '';
@@ -75,6 +77,7 @@ class Gettext
                 $this->gettext[$languages__value] = Translations::create('gtbabel');
             } else {
                 $this->gettext[$languages__value] = $poLoader->loadFile($this->getLngFilename('po', $languages__value));
+                clearstatcache();
             }
             foreach ($this->gettext[$languages__value]->getTranslations() as $gettext__value) {
                 $context = $gettext__value->getContext() ?? '';
@@ -94,10 +97,53 @@ class Gettext
             return;
         }
 
+        /*
+        we don't simply use generateFile on the whole string we have read at the beginning of the request
+        another request could potentially be in between this request we lose its contents:
+
+        No problem
+        A_begin         
+        |
+        A_end
+
+                B_begin
+                |
+                B_end
+
+        Problem (we lose changes of request B)
+        A_begin         
+        |
+        |       B_begin
+        |       |
+        |       B_end
+        |
+        A_end
+
+        Problem (we lose changes of request A)
+        A_begin         
+        |
+        |       B_begin
+        |       |
+        A_end   |
+                |
+                B_end
+
+        To overcome this issue, we save "securely" by merging the translations with the current
+        version of the file (that could be potentially changed in the meantime)
+        */
+
         $poGenerator = new PoGenerator();
         $moGenerator = new MoGenerator();
+        $poLoader = new PoLoader();
 
         if ($this->gettext_save_counter['pot'] === true) {
+            // merge
+            if (file_exists($this->getLngFilename('pot', '_template'))) {
+                $this->gettext_pot = $poLoader
+                    ->loadFile($this->getLngFilename('pot', '_template'))
+                    ->mergeWith($this->gettext_pot, Merge::COMMENTS_OURS | Merge::EXTRACTED_COMMENTS_OURS);
+                clearstatcache();
+            }
             $poGenerator->generateFile($this->gettext_pot, $this->getLngFilename('pot', '_template'));
             clearstatcache();
         }
@@ -106,7 +152,17 @@ class Gettext
             if ($this->gettext_save_counter['po'][$languages__value] === false) {
                 continue;
             }
-            $result = $poGenerator->generateFile(
+            // merge
+            if (file_exists($this->getLngFilename('po', $languages__value))) {
+                $this->gettext[$languages__value] = $poLoader
+                    ->loadFile($this->getLngFilename('po', $languages__value))
+                    ->mergeWith(
+                        $this->gettext[$languages__value],
+                        Merge::COMMENTS_OURS | Merge::EXTRACTED_COMMENTS_OURS
+                    );
+                clearstatcache();
+            }
+            $poGenerator->generateFile(
                 $this->gettext[$languages__value],
                 $this->getLngFilename('po', $languages__value)
             );
@@ -141,6 +197,7 @@ class Gettext
         }
         $loader = new PoLoader();
         $translations = $loader->loadFile($filename);
+        clearstatcache();
         $generator = new MoGenerator();
         $generator->generateFile($translations, str_replace('.po', '.mo', $filename));
         clearstatcache();
@@ -194,6 +251,7 @@ class Gettext
             return $data;
         }
         $pot = $poLoader->loadFile($this->getLngFilename('pot', '_template'));
+        clearstatcache();
         $order = 0;
         foreach ($pot->getTranslations() as $gettext__value) {
             $data[$this->getTranslationHash($gettext__value)] = [
@@ -212,6 +270,7 @@ class Gettext
                 continue;
             }
             $po = $poLoader->loadFile($this->getLngFilename('po', $languages__value));
+            clearstatcache();
             foreach ($po->getTranslations() as $gettext__value) {
                 $data[$this->getTranslationHash($gettext__value)]['translations'][$languages__value] = [
                     'str' => $gettext__value->getTranslation(),
@@ -332,6 +391,7 @@ class Gettext
             return $success;
         }
         $po = $poLoader->loadFile($this->getLngFilename('po', $lng));
+        clearstatcache();
 
         // slug collission detection
         if ($str !== null) {
@@ -382,6 +442,7 @@ class Gettext
             return $success;
         }
         $pot = $poLoader->loadFile($this->getLngFilename('pot', '_template'));
+        clearstatcache();
         foreach ($pot->getTranslations() as $gettext__value) {
             if ($this->getTranslationHash($gettext__value) !== $hash) {
                 continue;
@@ -405,6 +466,7 @@ class Gettext
             return $success;
         }
         $pot = $poLoader->loadFile($this->getLngFilename('pot', '_template'));
+        clearstatcache();
         $data = [];
 
         $filename = $this->log->discoveryLogFilename();
@@ -464,6 +526,7 @@ class Gettext
             return $success;
         }
         $pot = $poLoader->loadFile($this->getLngFilename('pot', '_template'));
+        clearstatcache();
         $to_remove = null;
         foreach ($pot->getTranslations() as $gettext__value) {
             if ($this->getTranslationHash($gettext__value) !== $hash) {
@@ -484,6 +547,7 @@ class Gettext
                 continue;
             }
             $po = $poLoader->loadFile($this->getLngFilename('po', $languages__value));
+            clearstatcache();
             $to_remove = null;
             foreach ($po->getTranslations() as $gettext__value) {
                 if ($this->getTranslationHash($gettext__value) !== $hash) {
@@ -519,6 +583,7 @@ class Gettext
             return $deleted;
         }
         $pot = $poLoader->loadFile($this->getLngFilename('pot', '_template'));
+        clearstatcache();
         $to_remove = [];
         foreach ($pot->getTranslations() as $gettext__value) {
             if (in_array($gettext__value->getOriginal() . '#' . $gettext__value->getContext(), $discovery_strings)) {
@@ -541,6 +606,7 @@ class Gettext
                 continue;
             }
             $po = $poLoader->loadFile($this->getLngFilename('po', $languages__value));
+            clearstatcache();
             $to_remove = [];
             foreach ($po->getTranslations() as $gettext__value) {
                 if (
