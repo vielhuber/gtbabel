@@ -961,6 +961,11 @@ class Gettext
                 }
                 $trans = __::translate_google($orig, $from_lng, $to_lng, $api_key);
                 $this->log->generalLog([$orig, $from_lng, $to_lng, $api_key, $trans]);
+                // try again (sometimes google has some hickups on latin
+                if ($trans === null) {
+                    $trans = __::translate_google($orig, $from_lng, $to_lng, $api_key);
+                    $this->log->generalLog(['TRIED AGAIN!', $orig, $from_lng, $to_lng, $api_key, $trans]);
+                }
                 if ($trans === null) {
                     return null;
                 }

@@ -11,7 +11,7 @@ class Test extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         // load env file
-        if( file_exists(dirname(__DIR__).'/.env') ) {
+        if (file_exists(dirname(__DIR__) . '/.env')) {
             $dotenv = Dotenv::createImmutable(dirname(__DIR__));
             $dotenv->load();
         }
@@ -189,7 +189,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test32()
     {
-        $this->runDiff('32.html', 500, [
+        $this->runDiff('32.html', 750, [
             'debug_translations' => false,
             'auto_translation' => true
         ]);
@@ -399,11 +399,13 @@ class Test extends \PHPUnit\Framework\TestCase
                     __::minify_html($this->normalize($html_target))
             );
             // debug output to copy
-            echo PHP_EOL.PHP_EOL.'##############################################'.PHP_EOL;
-            echo json_encode([__::minify_html($this->normalize($html_translated)), __::minify_html($this->normalize($html_target))]);
-            echo PHP_EOL.'##############################################'.PHP_EOL.PHP_EOL;
+            echo PHP_EOL . PHP_EOL . '##############################################' . PHP_EOL;
+            echo json_encode([
+                __::minify_html($this->normalize($html_translated)),
+                __::minify_html($this->normalize($html_target))
+            ]);
+            echo PHP_EOL . '##############################################' . PHP_EOL . PHP_EOL;
             $this->assertTrue(false);
-
         } else {
             @unlink($debug_filename);
             $this->assertTrue(true);
