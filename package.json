@@ -1,0 +1,27 @@
+{
+  "name": "gtbabel",
+  "version": "1.0.0",
+  "description": "[![Build Status](https://travis-ci.org/vielhuber/gtbabel.svg?branch=master)](https://travis-ci.org/vielhuber/gtbabel)",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@prettier/plugin-php": "^0.14.0",
+    "prettier": "^2.0.5"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vielhuber/gtbabel.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vielhuber/gtbabel/issues"
+  },
+  "homepage": "https://github.com/vielhuber/gtbabel#readme"
+}

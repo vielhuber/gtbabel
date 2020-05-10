@@ -960,19 +960,29 @@ class Gettext
                     $api_key = $api_key[array_rand($api_key)];
                 }
                 $trans = null;
-                try {
-                    $trans = __::translate_google($orig, $from_lng, $to_lng, $api_key);
-                    $this->log->generalLog(['SUCCESSFUL TRANSLATION', $orig, $from_lng, $to_lng, $api_key, $trans]);
-                } catch (\Throwable $t) {
-                    $this->log->generalLog([
-                        'FAILED TRANSLATION',
-                        $t->getMessage(),
-                        $orig,
-                        $from_lng,
-                        $to_lng,
-                        $api_key,
-                        $trans
-                    ]);
+                // sometimes google translation api has some hickups (especially in latin); we overcome this by trying it again
+                $tries = 0;
+                while ($tries < 10) {
+                    try {
+                        $trans = __::translate_google($orig, $from_lng, $to_lng, $api_key);
+                        $this->log->generalLog(['SUCCESSFUL TRANSLATION', $orig, $from_lng, $to_lng, $api_key, $trans]);
+                        break;
+                    } catch (\Throwable $t) {
+                        $this->log->generalLog([
+                            'FAILED TRANSLATION (TRIES: ' . $tries . ')',
+                            $t->getMessage(),
+                            $orig,
+                            $from_lng,
+                            $to_lng,
+                            $api_key,
+                            $trans
+                        ]);
+                        if (strpos($t->getMessage(), 'PERMISSION_DENIED') !== false) {
+                            break;
+                        }
+                        sleep(1);
+                        $tries++;
+                    }
                 }
                 if ($trans === null) {
                     return null;
