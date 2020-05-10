@@ -959,12 +959,20 @@ class Gettext
                 if (is_array($api_key)) {
                     $api_key = $api_key[array_rand($api_key)];
                 }
-                $trans = __::translate_google($orig, $from_lng, $to_lng, $api_key);
-                $this->log->generalLog([$orig, $from_lng, $to_lng, $api_key, $trans]);
-                // try again (sometimes google has some hickups on latin
-                if ($trans === null) {
+                $trans = null;
+                try {
                     $trans = __::translate_google($orig, $from_lng, $to_lng, $api_key);
-                    $this->log->generalLog(['TRIED AGAIN!', $orig, $from_lng, $to_lng, $api_key, $trans]);
+                    $this->log->generalLog(['SUCCESSFUL TRANSLATION', $orig, $from_lng, $to_lng, $api_key, $trans]);
+                } catch (\Throwable $t) {
+                    $this->log->generalLog([
+                        'FAILED TRANSLATION',
+                        $t->getMessage(),
+                        $orig,
+                        $from_lng,
+                        $to_lng,
+                        $api_key,
+                        $trans
+                    ]);
                 }
                 if ($trans === null) {
                     return null;
