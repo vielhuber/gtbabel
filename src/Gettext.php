@@ -167,21 +167,6 @@ class Gettext
                 $this->getLngFilename('po', $languages__value)
             );
             clearstatcache();
-            /* DEBUG */
-            $tmp = $this->log->getLogFolder() . '/tmp_' . date('d.m.Y H.i');
-            $result = $poGenerator->generateFile($this->gettext[$languages__value], $tmp . uniqid() . '.po');
-            clearstatcache();
-            //$this->log->generalLog([$this->gettext[$languages__value], $result]);
-            if (!file_exists($tmp . '.log')) {
-                file_put_contents($tmp . '.log', '');
-            }
-            file_put_contents(
-                $tmp . '.log',
-                print_r(['saving po file of ' . $languages__value, $this->gettext[$languages__value], $result], true) .
-                    PHP_EOL,
-                FILE_APPEND
-            );
-            /* DEBUG END */
             $moGenerator->generateFile(
                 $this->gettext[$languages__value],
                 $this->getLngFilename('mo', $languages__value)
@@ -589,7 +574,7 @@ class Gettext
             if (in_array($gettext__value->getOriginal() . '#' . $gettext__value->getContext(), $discovery_strings)) {
                 continue;
             }
-            $this->log->generalLog('removing ' . $gettext__value->getOriginal() . '#' . $gettext__value->getContext());
+            //$this->log->generalLog('removing ' . $gettext__value->getOriginal() . '#' . $gettext__value->getContext());
             $to_remove[] = $gettext__value;
         }
         if (!empty($to_remove)) {
@@ -614,9 +599,7 @@ class Gettext
                 ) {
                     continue;
                 }
-                $this->log->generalLog(
-                    'removing ' . $gettext__value->getOriginal() . '#' . $gettext__value->getContext()
-                );
+                //$this->log->generalLog('removing ' . $gettext__value->getOriginal() . '#' . $gettext__value->getContext());
                 $to_remove[] = $gettext__value;
             }
             if (!empty($to_remove)) {
@@ -965,18 +948,10 @@ class Gettext
                 while ($tries < 10) {
                     try {
                         $trans = __::translate_google($orig, $from_lng, $to_lng, $api_key);
-                        $this->log->generalLog(['SUCCESSFUL TRANSLATION', $orig, $from_lng, $to_lng, $api_key, $trans]);
+                        //$this->log->generalLog(['SUCCESSFUL TRANSLATION', $orig, $from_lng, $to_lng, $api_key, $trans]);
                         break;
                     } catch (\Throwable $t) {
-                        $this->log->generalLog([
-                            'FAILED TRANSLATION (TRIES: ' . $tries . ')',
-                            $t->getMessage(),
-                            $orig,
-                            $from_lng,
-                            $to_lng,
-                            $api_key,
-                            $trans
-                        ]);
+                        //$this->log->generalLog(['FAILED TRANSLATION (TRIES: ' . $tries . ')',$t->getMessage(),$orig,$from_lng,$to_lng,$api_key,$trans]);
                         if (strpos($t->getMessage(), 'PERMISSION_DENIED') !== false) {
                             break;
                         }

@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.0.4
+ * Version: 3.0.5
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -2062,7 +2062,7 @@ EOD;
 
             // append a pseudo get parameter, so that frontend cache plugins don't work
             $response = $this->fetch($this->getNoCacheUrl($url));
-            $this->gtbabel->log->generalLog($response);
+            //$this->gtbabel->log->generalLog($response);
 
             echo __('Loading', 'gtbabel-plugin');
             echo '... ' . $url . '<br/>';
@@ -2098,9 +2098,7 @@ EOD;
         if ($chunk_size * $chunk + $chunk_size > count($queue) - 1) {
             $this->gtbabel->gettext->autoEditSharedValues();
 
-            $this->gtbabel->log->generalLog(
-                'calling $this->gtbabel->gettext->deleteUnusedTranslations(' . $since_time . ')'
-            );
+            //$this->gtbabel->log->generalLog('calling $this->gtbabel->gettext->deleteUnusedTranslations(' . $since_time . ')');
             if ($delete_unused === true) {
                 $deleted = $this->gtbabel->gettext->deleteUnusedTranslations($since_time);
                 echo __('Deleted strings', 'gtbabel-plugin') . ': ' . $deleted;
