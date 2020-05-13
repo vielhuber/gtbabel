@@ -264,12 +264,8 @@ class Gettext
             }
         }
         uasort($data, function ($a, $b) use ($order_by_string) {
-            if ($a['shared'] === true) {
-                $a['shared'] = $a['shared'] === true ? 1 : 0;
-            }
-            if ($b['shared'] === true) {
-                $b['shared'] = $b['shared'] === true ? 1 : 0;
-            }
+            $a['shared'] = $a['shared'] === true ? 1 : 0;
+            $b['shared'] = $b['shared'] === true ? 1 : 0;
             if ($a['shared'] !== $b['shared']) {
                 return $a['shared'] < $b['shared'] ? -1 : 1;
             }
@@ -1074,9 +1070,10 @@ class Gettext
             return true;
         }
         // email adresses
-        if (substr_count($str, '@') === 1 && substr_count($str, '.') === 1) {
+        if (filter_var($str, FILTER_VALIDATE_EMAIL)) {
             return true;
         }
+        // lng codes
         foreach ($this->settings->getSelectedLanguageCodes() as $languages__value) {
             if ($languages__value === trim(mb_strtolower($str))) {
                 return true;
