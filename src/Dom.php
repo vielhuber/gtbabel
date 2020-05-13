@@ -160,6 +160,11 @@ class Dom
                     'context' => null
                 ],
                 [
+                    'selector' => '*',
+                    'attribute' => 'title',
+                    'context' => null
+                ],
+                [
                     'selector' => 'input',
                     'attribute' => 'placeholder',
                     'context' => null

@@ -273,9 +273,15 @@ class Test extends \PHPUnit\Framework\TestCase
             'prefix_source_lng' => true
         ]);
     }
+
     public function test43()
     {
         $this->runDiff('43.html', 200);
+    }
+
+    public function test44()
+    {
+        $this->runDiff('44.html', 200);
     }
 
     public function test_translate()

@@ -29,7 +29,7 @@ Gtbabel automatically translates your HTML/PHP pages – server sided!
 
 ## Requirements
 
-- PHP >=7.2
+-   PHP >=7.2
 
 ## Installation
 
@@ -180,6 +180,7 @@ By default Gtbabel translates all text nodes and the following tag nodes:
 -   `<a>` (attribute: href)
 -   `<form>` (attribute: action)
 -   `<img>` (attribute: alt)
+-   `<*>` (attribute: title)
 -   `<input>` (attribute: placeholder)
 -   `<title>`
 -   `<meta name="description">` (attribute: content)
