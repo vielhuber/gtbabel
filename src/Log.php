@@ -152,7 +152,7 @@ class Log
         } else {
             $query .= ' DISTINCT string, context';
         }
-        $query .= ' FROM log WHERE 1=1';
+        $query .= ' FROM logs WHERE 1=1';
         $args = [];
         if ($urls !== null) {
             $query .= ' AND url IN (' . str_repeat('?,', count($urls) - 1) . '?)';
@@ -211,7 +211,7 @@ class Log
         if (!file_exists($filename)) {
             file_put_contents($filename, '');
             $db = new \PDO('sqlite:' . $filename);
-            $db->exec('CREATE TABLE IF NOT EXISTS log(
+            $db->exec('CREATE TABLE IF NOT EXISTS logs(
                 id INTEGER PRIMARY KEY AUTOINCREMENT, 
                 url VARCHAR(255),
                 url_orig VARCHAR(255),
@@ -240,7 +240,7 @@ class Log
                 $query_p = array_merge($query_p, array_values($discovery_log_to_save__value));
             }
             $query = $db->prepare(
-                'INSERT INTO log(url, url_orig, string, context, lng, time) VALUES ' . implode(', ', $query_q)
+                'INSERT INTO logs(url, url_orig, string, context, lng, time) VALUES ' . implode(', ', $query_q)
             );
             if (!$query) {
                 $this->generalLog($db->errorInfo());
@@ -258,7 +258,7 @@ class Log
             return;
         }
         $db = new \PDO('sqlite:' . $filename);
-        $query = $db->prepare('UPDATE log SET url_orig = ? WHERE url_orig = ?');
+        $query = $db->prepare('UPDATE logs SET url_orig = ? WHERE url_orig = ?');
         $query->execute([$new, $old]);
         $db = null;
     }
@@ -278,7 +278,7 @@ class Log
             $msg = print_r($msg, true);
         }
         if (is_object($msg)) {
-            $msg = print_r((array)$msg, true);
+            $msg = print_r((array) $msg, true);
         }
         $msg = date('Y-m-d H:i:s') . ': ' . $msg;
         file_put_contents($filename, $msg . PHP_EOL, FILE_APPEND);

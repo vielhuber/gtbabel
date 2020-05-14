@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.0.8
+ * Version: 3.0.9
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -1028,6 +1028,7 @@ class GtbabelWordPress
         $url = null;
         $post_id = null;
         $lng = null;
+        $source_url_published = null;
         if (isset($_GET['post_id']) && $_GET['post_id'] != '' && is_numeric($_GET['post_id'])) {
             $post_id = intval($_GET['post_id']);
             $url = get_permalink($post_id);
@@ -1038,7 +1039,6 @@ class GtbabelWordPress
         if (isset($_GET['lng']) && $_GET['lng'] != '') {
             $lng = sanitize_textarea_field($_GET['lng']);
         }
-        $source_url_published = null;
         if ($url !== null) {
             $source_url_published = $this->isUrlPublished($url);
         }
@@ -1789,6 +1789,8 @@ EOD;
                 ] = $discovery_strings__key;
             }
             // now auto set shared values
+
+            /* the following trick is disabled, because we want to save time and are pretty sure the homepage was indexed before
             // we now do a cool trick here: we fetch the homepage first to feed discovery url
             $home_url = get_home_url();
             $this->fetch($this->getNoCacheUrl($home_url));
@@ -1801,6 +1803,7 @@ EOD;
                     $this->getNoCacheUrl($this->gtbabel->gettext->getUrlTranslationInLanguage($lngs__value, $home_url))
                 );
             }
+            */
             $this->start();
             $this->gtbabel->gettext->autoEditSharedValues($discovery_strings);
             $this->changeSetting('discovery_log', false);
@@ -1953,6 +1956,7 @@ EOD;
 
     private function fetch($url, $with_current_session = true)
     {
+        //$this->gtbabel->log->generalLog('fetch ' . $url);
         return __::curl(
             $url,
             null,

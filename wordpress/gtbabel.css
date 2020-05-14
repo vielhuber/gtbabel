@@ -203,13 +203,15 @@
 }
 .gtbabel__transmeta-list {
     display: flex;
+    flex-wrap: wrap;
     align-items: flex-start;
+    align-content: flex-start;
 }
 .gtbabel__transmeta-listitem {
     flex: 0 1 auto;
 }
-.gtbabel__transmeta-listitem:not(:first-child) {
-    margin-left: 10px;
+.gtbabel__transmeta-listitem:not(:last-child) {
+    margin-right: 10px;
 }
 
 .gtbabel__highlight {

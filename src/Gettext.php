@@ -469,7 +469,7 @@ class Gettext
         $query = '';
         $query .= '
             SELECT string, context, COUNT(string) as count FROM (
-                SELECT string, context, url_orig FROM log';
+                SELECT string, context, url_orig FROM logs';
         $args = [];
         if ($strings !== null && !empty($strings)) {
             $query .= ' WHERE string IN (' . str_repeat('?,', count($strings) - 1) . '?)';
