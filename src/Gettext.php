@@ -264,10 +264,21 @@ class Gettext
             }
         }
         uasort($data, function ($a, $b) use ($order_by_string) {
-            $a['shared'] = $a['shared'] === true ? 1 : 0;
-            $b['shared'] = $b['shared'] === true ? 1 : 0;
-            if ($a['shared'] !== $b['shared']) {
-                return $a['shared'] < $b['shared'] ? -1 : 1;
+            /*
+            order_by_string = true (url is not set)
+                context
+                orig
+            order_by_string = false (url is set)
+                shared
+                context
+                order
+            */
+            if ($order_by_string === false) {
+                $a['shared'] = $a['shared'] === true ? 1 : 0;
+                $b['shared'] = $b['shared'] === true ? 1 : 0;
+                if ($a['shared'] !== $b['shared']) {
+                    return $a['shared'] < $b['shared'] ? -1 : 1;
+                }
             }
             if ($a['context'] != $b['context']) {
                 if ($a['context'] == '') {
@@ -1087,6 +1098,10 @@ class Gettext
                 return true;
             }
             if (mb_strpos(trim($str, '/'), '&') === 0) {
+                return true;
+            }
+            // static files like big-image.jpg
+            if (mb_strpos($str, '.') !== false) {
                 return true;
             }
         }

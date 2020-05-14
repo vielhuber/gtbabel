@@ -78,8 +78,15 @@ class Router
         if (mb_strrpos($url, '/') === mb_strlen($url) - 1) {
             return;
         }
+        // also exclude pseudo filenames like automatically generated urls like /sitemap.xml
+        $path_last_part = $this->host->getCurrentPath();
+        $path_last_part = explode('/', $path_last_part);
+        $path_last_part = $path_last_part[count($path_last_part) - 1];
+        if (mb_strpos($path_last_part, '.') !== false) {
+            return;
+        }
         $url = $url . '/';
-        header('Location: ' . $url, true, @$_SERVER['REQUEST_METHOD'] === 'POST' ? 307 : 301);
+        header('Location: ' . $url, true, @$_SERVER['REQUEST_METHOD'] === 'POST' ? 307 : 301); // 307 forces the browser to repost to the new url
         die();
     }
 

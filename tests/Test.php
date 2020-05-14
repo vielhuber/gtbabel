@@ -284,6 +284,14 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->runDiff('44.html', 200);
     }
 
+    public function test45()
+    {
+        $this->runDiff('45.html', 500, [
+            'debug_translations' => false,
+            'auto_translation' => true
+        ]);
+    }
+
     public function test_translate()
     {
         $this->gtbabel = new Gtbabel();
