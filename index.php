@@ -13,6 +13,7 @@ $gtbabel->start([
     'debug_translations' => true,
     'auto_add_translations_to_gettext' => false,
     'auto_add_added_date_to_gettext' => true,
+    'only_show_checked_strings' => true,
     'auto_translation' => true,
     'auto_translation_service' => 'google',
     'google_translation_api_key' => getenv('GOOGLE_TRANSLATION_API_KEY'),
