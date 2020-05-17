@@ -54,6 +54,7 @@ class Gtbabel
         $this->router->addTrailingSlash();
         $this->router->redirectUnpublished();
         $this->router->initMagicRouter();
+        $this->gettext->addCurrentUrlToTranslations();
         ob_start();
     }
 
@@ -65,7 +66,6 @@ class Gtbabel
         if ($this->host->currentUrlIsExcluded()) {
             return;
         }
-        $this->gettext->addCurrentUrlToTranslations();
         $content = ob_get_contents();
         $content = $this->dom->modifyContent($content);
         ob_end_clean();

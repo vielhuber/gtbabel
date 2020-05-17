@@ -339,6 +339,9 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test_gettext()
     {
+        __::rrmdir('./tests/locales');
+        __::rrmdir('./tests/logs');
+
         $this->gtbabel = new Gtbabel();
         $settings = $this->getDefaultSettings();
         $settings['languages'] = ['de', 'en'];
@@ -400,12 +403,133 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->assertEquals($output, '<p>Haus</p>');
         $this->assertEquals(strpos(file_get_contents('./tests/locales/_template.pot'), 'msgid "Haus"') !== false, true);
         $this->assertEquals(strpos(file_get_contents('./tests/locales/en.po'), 'msgstr "House"') !== false, true);
+
+        $this->gtbabel->gettext->editCheckedValueFromFiles(true, 'House', 'en', null);
+
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo '<p>Haus</p>';
+        $this->gtbabel->stop();
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertEquals($output, '<p>House</p>');
+        $this->assertEquals(
+            strpos(
+                file_get_contents('./tests/locales/en.po'),
+                '#. checked: 1' . PHP_EOL . 'msgid "Haus"' . PHP_EOL . 'msgstr "House"'
+            ) !== false,
+            true
+        );
         $this->gtbabel->reset();
 
-        unlink('./tests/locales/.htaccess');
-        rmdir('./tests/locales');
-        unlink('./tests/logs/.htaccess');
-        rmdir('./tests/logs');
+        __::rrmdir('./tests/locales');
+        __::rrmdir('./tests/logs');
+    }
+
+    public function test__router()
+    {
+        __::rrmdir('./tests/locales');
+        __::rrmdir('./tests/logs');
+
+        $this->gtbabel = new Gtbabel();
+        $settings = $this->getDefaultSettings();
+        $settings['languages'] = ['de', 'en'];
+        $settings['exclude_dom'] = ['.notranslate', '.lngpicker'];
+        $settings['lng_source'] = 'de';
+        $settings['lng_target'] = null;
+        $settings['lng_folder'] = '/tests/locales';
+        $settings['log_folder'] = '/tests/logs';
+        $settings['debug_translations'] = false;
+        $settings['auto_translation'] = true;
+        $settings['auto_add_translations_to_gettext'] = true;
+        $settings['only_show_checked_strings'] = false;
+
+        $settings['prefix_source_lng'] = false;
+        $_SERVER['REQUEST_URI'] = '/impressum/';
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo '<!DOCTYPE html><html><body><div class="lngpicker">';
+        foreach ($this->gtbabel->gettext->getLanguagePickerData() as $lngpicker__value) {
+            echo '<a href="' . $lngpicker__value['url'] . '"></a>';
+        }
+        echo '</div></body></html>';
+        $this->gtbabel->stop();
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertEquals(
+            strpos(
+                $output,
+                '<a href="http://gtbabel.local.vielhuber.de/impressum/"></a><a href="http://gtbabel.local.vielhuber.de/en/imprint/"></a>'
+            ) !== false,
+            true
+        );
+        $this->gtbabel->reset();
+
+        $settings['prefix_source_lng'] = true;
+        $_SERVER['REQUEST_URI'] = '/de/impressum/';
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo '<!DOCTYPE html><html><body><div class="lngpicker">';
+        foreach ($this->gtbabel->gettext->getLanguagePickerData() as $lngpicker__value) {
+            echo '<a href="' . $lngpicker__value['url'] . '"></a>';
+        }
+        echo '</div></body></html>';
+        $this->gtbabel->stop();
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertEquals(
+            strpos(
+                $output,
+                '<a href="http://gtbabel.local.vielhuber.de/de/impressum/"></a><a href="http://gtbabel.local.vielhuber.de/en/imprint/"></a>'
+            ) !== false,
+            true
+        );
+        $this->gtbabel->reset();
+
+        $settings['only_show_checked_strings'] = true;
+        $_SERVER['REQUEST_URI'] = '/de/impressum/';
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo '<!DOCTYPE html><html><body><div class="lngpicker">';
+        foreach ($this->gtbabel->gettext->getLanguagePickerData() as $lngpicker__value) {
+            echo '<a href="' . $lngpicker__value['url'] . '"></a>';
+        }
+        echo '</div></body></html>';
+        $this->gtbabel->stop();
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertEquals(
+            strpos(
+                $output,
+                '<a href="http://gtbabel.local.vielhuber.de/de/impressum/"></a><a href="http://gtbabel.local.vielhuber.de/en/impressum/"></a>'
+            ) !== false,
+            true
+        );
+        $this->gtbabel->reset();
+
+        $settings['only_show_checked_strings'] = true;
+        $_SERVER['REQUEST_URI'] = '/en/impressum/';
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo '<!DOCTYPE html><html><body><div class="lngpicker">';
+        foreach ($this->gtbabel->gettext->getLanguagePickerData() as $lngpicker__value) {
+            echo '<a href="' . $lngpicker__value['url'] . '"></a>';
+        }
+        echo '</div></body></html>';
+        $this->gtbabel->stop();
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertEquals(
+            strpos(
+                $output,
+                '<a href="http://gtbabel.local.vielhuber.de/de/impressum/"></a><a href="http://gtbabel.local.vielhuber.de/en/impressum/"></a>'
+            ) !== false,
+            true
+        );
+        $this->gtbabel->reset();
+
+        __::rrmdir('./tests/locales');
+        __::rrmdir('./tests/logs');
     }
 
     public function getDefaultSettings()

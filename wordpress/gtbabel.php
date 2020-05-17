@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.0.9
+ * Version: 3.1.6
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -555,6 +555,10 @@ class GtbabelWordPress
                 }
             }
 
+            if (isset($_POST['check_all_strings'])) {
+                $this->gtbabel->gettext->setCheckedToAllStringsFromFiles();
+            }
+
             if (isset($_POST['reset_settings'])) {
                 delete_option('gtbabel_settings');
                 $this->setDefaultSettingsToOption();
@@ -1016,6 +1020,11 @@ class GtbabelWordPress
             echo '</div>';
         }
 
+        echo '<h2 class="gtbabel__subtitle">' . __('Set all strings to checked', 'gtbabel-plugin') . '</h2>';
+        echo '<input class="gtbabel__submit button button-secondary" name="check_all_strings" value="' .
+            __('Save', 'gtbabel-plugin') .
+            '" type="submit" />';
+
         echo '<h2 class="gtbabel__subtitle">' . __('Reset settings', 'gtbabel-plugin') . '</h2>';
         echo '<input data-question="' .
             __('Please enter REMOVE to confirm!', 'gtbabel-plugin') .
@@ -1087,7 +1096,7 @@ class GtbabelWordPress
                             $this->gtbabel->gettext->deleteTranslationFromFiles($post__key);
                         }
                         if (array_key_exists('shared', $post__value)) {
-                            $this->gtbabel->gettext->editSharedValueFromFiles($post__key, $post__value['shared']);
+                            $this->gtbabel->gettext->editSharedValueFromFilesByHash($post__key, $post__value['shared']);
                         }
                     }
                 }
@@ -1274,17 +1283,19 @@ class GtbabelWordPress
                         continue;
                     }
                     echo '<td class="gtbabel__table-cell">';
-                    echo '<input title="' .
-                        __('String checked', 'gtbabel-plugin') .
-                        '" class="gtbabel__input gtbabel__input--checkbox gtbabel__input--on-change gtbabel__input--submit-unchecked gtbabel__input--check-translation" type="checkbox" data-name="gtbabel[' .
-                        $translations__key .
-                        '][translations][' .
-                        $languages__key .
-                        '][checked]" value="1"' .
-                        ($translations__value['translations'][$languages__key]['checked'] == '1'
-                            ? ' checked="checked"'
-                            : '') .
-                        ' />';
+                    if ($translations__value['translations'][$languages__key]['str'] != '') {
+                        echo '<input title="' .
+                            __('String checked', 'gtbabel-plugin') .
+                            '" class="gtbabel__input gtbabel__input--checkbox gtbabel__input--on-change gtbabel__input--submit-unchecked gtbabel__input--check-translation" type="checkbox" data-name="gtbabel[' .
+                            $translations__key .
+                            '][translations][' .
+                            $languages__key .
+                            '][checked]" value="1"' .
+                            ($translations__value['translations'][$languages__key]['checked'] == '1'
+                                ? ' checked="checked"'
+                                : '') .
+                            ' />';
+                    }
                     echo '<textarea class="gtbabel__input gtbabel__input--textarea gtbabel__input--on-change" data-name="gtbabel[' .
                         $translations__key .
                         '][translations][' .
@@ -1891,7 +1902,7 @@ EOD;
     private function initBackendPagination($translations)
     {
         $pagination = (object) [];
-        $pagination->per_page = 100;
+        $pagination->per_page = 30;
         $pagination->count = count($translations);
         $pagination->cur = @$_GET['p'] != '' ? intval($_GET['p']) : 1;
         $pagination->max = ceil($pagination->count / $pagination->per_page);

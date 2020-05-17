@@ -31,7 +31,7 @@ class Dom
                 $nodes = $this->DOMXpath->query($this->transformSelectorToXpath($exclude__value));
                 foreach ($nodes as $nodes__value) {
                     $this->excluded_nodes[$this->getIdOfNode($nodes__value)] = true;
-                    foreach ($this->getChildrenOfNode($nodes__value) as $nodes__value__value) {
+                    foreach ($this->getChildrenOfNodeIncludingWhitespace($nodes__value) as $nodes__value__value) {
                         $this->excluded_nodes[$this->getIdOfNode($nodes__value__value)] = true;
                     }
                 }
@@ -118,8 +118,6 @@ class Dom
                 continue;
             }
 
-            $this->gettext->stringCurrentlyUnderTransformationIsChecked(true);
-
             $translatedText = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
                 $originalText,
                 $this->gettext->getCurrentLanguageCode(),
@@ -128,12 +126,10 @@ class Dom
 
             $translatedText = $this->gettext->reintroduceLineBreaks($translatedText, $originalText, $originalTextRaw);
 
-            if ($this->gettext->stringCurrentlyUnderTransformationIsChecked() === true) {
-                if ($this->isTextNode($groups__value)) {
-                    $groups__value->nodeValue = $translatedText;
-                } else {
-                    $this->setInnerHtml($groups__value, $translatedText);
-                }
+            if ($this->isTextNode($groups__value)) {
+                $groups__value->nodeValue = $translatedText;
+            } else {
+                $this->setInnerHtml($groups__value, $translatedText);
             }
         }
     }
@@ -215,33 +211,28 @@ class Dom
                         if ($context === 'slug' && $this->host->urlIsExcluded($value)) {
                             continue;
                         }
-
-                        // only prefix source lng
                         if ($this->gettext->sourceLngIsCurrentLng() && $context !== 'slug') {
                             continue;
                         }
 
-                        $this->gettext->stringCurrentlyUnderTransformationIsChecked(true);
-
-                        $trans = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
-                            $value,
-                            $this->gettext->getCurrentLanguageCode(),
-                            $context
-                        );
+                        if ($this->gettext->sourceLngIsCurrentLng()) {
+                            $trans = $this->gettext->addPrefixToLink($value, $this->gettext->getCurrentLanguageCode());
+                        } else {
+                            $trans = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
+                                $value,
+                                $this->gettext->getCurrentLanguageCode(),
+                                $context
+                            );
+                        }
 
                         if ($trans === null) {
                             continue;
                         }
 
-                        if (
-                            $context === 'slug' ||
-                            $this->gettext->stringCurrentlyUnderTransformationIsChecked() === true
-                        ) {
-                            if (@$include__value['attribute'] != '') {
-                                $nodes__value->setAttribute($include__value['attribute'], $trans);
-                            } else {
-                                $nodes__value->nodeValue = htmlspecialchars($trans);
-                            }
+                        if (@$include__value['attribute'] != '') {
+                            $nodes__value->setAttribute($include__value['attribute'], $trans);
+                        } else {
+                            $nodes__value->nodeValue = htmlspecialchars($trans);
                         }
                     }
                 }
@@ -477,6 +468,11 @@ class Dom
     function getChildrenOfNode($node)
     {
         return $this->DOMXpath->query('.//node()[normalize-space()]', $node);
+    }
+
+    function getChildrenOfNodeIncludingWhitespace($node)
+    {
+        return $this->DOMXpath->query('.//node()', $node);
     }
 
     function getParentNodeWithMoreThanOneChildren($node)

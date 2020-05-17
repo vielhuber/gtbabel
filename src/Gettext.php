@@ -17,7 +17,6 @@ class Gettext
     public $gettext_cache;
     public $gettext_cache_reverse;
     public $gettext_checked_strings;
-    public $gettext_checked_string;
     public $gettext_pot;
     public $gettext_pot_cache;
     public $gettext_save_counter;
@@ -206,9 +205,6 @@ class Gettext
             $context,
             $lng
         );
-
-        // if this function is triggered, we check if the string currently under transformation has parts that are not checked
-        // if the current string is not in cache, this surely is false, otherwise check prefilled array
         if (
             $str === '' ||
             $str === null ||
@@ -217,10 +213,8 @@ class Gettext
             !array_key_exists($str, $this->gettext_cache[$lng][$context ?? '']) ||
             $this->gettext_cache[$lng][$context ?? ''][$str] === ''
         ) {
-            $this->stringCurrentlyUnderTransformationIsChecked(false);
             return false;
         }
-        $this->stringCurrentlyUnderTransformationIsChecked($this->stringIsChecked($str, $lng, $context));
         return $this->gettext_cache[$lng][$context ?? ''][$str];
     }
 
@@ -375,6 +369,12 @@ class Gettext
 
     function addCommentToTranslation($gettext, $key, $value)
     {
+        if ($value === null || $value === false) {
+            $value = '0';
+        }
+        if ($value === true) {
+            $value = '1';
+        }
         $gettext->getExtractedComments()->add($key . ': ' . $value);
     }
 
@@ -436,7 +436,66 @@ class Gettext
         return $success;
     }
 
-    function editSharedValueFromFiles($hash, $shared)
+    function setCheckedToAllStringsFromFiles()
+    {
+        $success = true;
+        $poLoader = new PoLoader();
+        $poGenerator = new PoGenerator();
+        $moGenerator = new MoGenerator();
+        foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
+            if (!file_exists($this->getLngFilename('po', $languages__value))) {
+                continue;
+            }
+            $po = $poLoader->loadFile($this->getLngFilename('po', $languages__value));
+            clearstatcache();
+            foreach ($po->getTranslations() as $gettext__value) {
+                $this->updateOrAddCommentToTranslation($gettext__value, 'checked', true);
+                $success_this = true;
+            }
+            if ($success_this === true) {
+                $poGenerator->generateFile($po, $this->getLngFilename('po', $languages__value));
+                clearstatcache();
+                $moGenerator->generateFile($po, $this->getLngFilename('mo', $languages__value));
+                clearstatcache();
+            } else {
+                $success = false;
+            }
+        }
+        return $success;
+    }
+
+    function editCheckedValueFromFiles($checked, $str, $lng, $context = null)
+    {
+        $success = false;
+        $poLoader = new PoLoader();
+        $poGenerator = new PoGenerator();
+        $moGenerator = new MoGenerator();
+        if (!file_exists($this->getLngFilename('po', $lng))) {
+            return $success;
+        }
+        $po = $poLoader->loadFile($this->getLngFilename('po', $lng));
+        clearstatcache();
+        foreach ($po->getTranslations() as $gettext__value) {
+            if ($gettext__value->getTranslation() !== $str && $gettext__value->getContext() != $context) {
+                continue;
+            }
+            if ($checked === false) {
+                $this->deleteCommentFromTranslation($gettext__value, 'checked');
+            } else {
+                $this->updateOrAddCommentToTranslation($gettext__value, 'checked', $checked);
+            }
+            $success = true;
+        }
+        if ($success === true) {
+            $poGenerator->generateFile($po, $this->getLngFilename('po', $lng));
+            clearstatcache();
+            $moGenerator->generateFile($po, $this->getLngFilename('mo', $lng));
+            clearstatcache();
+        }
+        return $success;
+    }
+
+    function editSharedValueFromFilesByHash($hash, $shared)
     {
         $success = false;
         $poLoader = new PoLoader();
@@ -828,7 +887,17 @@ class Gettext
         return $this->getTranslationAndAddDynamicallyIfNeeded($orig, $lng, $context);
     }
 
+    function addPrefixToLink($link, $lng)
+    {
+        return $this->addPrefixToLinkAndGetTranslationOfLinkHrefAndAddDynamicallyIfNeeded($link, $lng, false);
+    }
+
     function getTranslationOfLinkHrefAndAddDynamicallyIfNeeded($link, $lng)
+    {
+        return $this->addPrefixToLinkAndGetTranslationOfLinkHrefAndAddDynamicallyIfNeeded($link, $lng, true);
+    }
+
+    function addPrefixToLinkAndGetTranslationOfLinkHrefAndAddDynamicallyIfNeeded($link, $lng, $translate)
     {
         if ($link === null || trim($link) === '') {
             return $link;
@@ -865,7 +934,7 @@ class Gettext
             }
         }
 
-        if (!$this->sourceLngIsCurrentLng()) {
+        if ($translate === true) {
             $url_parts = explode('/', $link);
             foreach ($url_parts as $url_parts__key => $url_parts__value) {
                 if ($this->stringShouldNotBeTranslated($url_parts__value, 'slug')) {
@@ -942,6 +1011,10 @@ class Gettext
         }
 
         $trans = $this->tags->addAttributesAndRemoveIds($transWithoutAttributes, $mappingTable);
+
+        if (!$this->stringIsChecked($origWithoutAttributes, $lng, $context)) {
+            return $origWithoutAttributes;
+        }
 
         return $trans;
     }
@@ -1143,6 +1216,9 @@ class Gettext
         if ($this->settings->get('only_show_checked_strings') !== true) {
             return true;
         }
+        if ($lng === $this->settings->getSourceLanguageCode()) {
+            return true;
+        }
         if (
             $str === '' ||
             $str === null ||
@@ -1154,17 +1230,6 @@ class Gettext
             return false;
         }
         return true;
-    }
-
-    function stringCurrentlyUnderTransformationIsChecked($value = null)
-    {
-        if ($this->settings->get('only_show_checked_strings') !== true) {
-            return true;
-        }
-        if ($value !== null) {
-            $this->gettext_checked_string = $value;
-        }
-        return $this->gettext_checked_string;
     }
 
     function getUrlTranslationInLanguage($lng, $url = null)
@@ -1185,25 +1250,31 @@ class Gettext
 
     function getTranslationInForeignLng($str, $to_lng, $from_lng = null, $context = null)
     {
-        if ($from_lng === null) {
-            $from_lng = $this->getCurrentLanguageCode();
-        }
+        $data = [
+            'trans' => false,
+            'str_in_source_lng' => false,
+            'checked_from' => true,
+            'checked_to' => true
+        ];
         if ($from_lng === $this->settings->getSourceLanguageCode()) {
-            $str_in_source_lng = $str;
+            $data['str_in_source_lng'] = $str;
         } else {
-            $str_in_source_lng = $this->getExistingTranslationReverseFromCache($str, $from_lng, $context); // str in source lng
+            $data['str_in_source_lng'] = $this->getExistingTranslationReverseFromCache($str, $from_lng, $context); // str in source lng
         }
-        if ($str_in_source_lng === false) {
-            return false;
+        if ($data['str_in_source_lng'] === false) {
+            return $data;
         }
-        if ($to_lng === $this->settings->getSourceLanguageCode()) {
-            return $str_in_source_lng;
+        if (
+            $to_lng === $this->settings->getSourceLanguageCode() ||
+            $this->stringShouldNotBeTranslated($data['str_in_source_lng'], $context)
+        ) {
+            $data['trans'] = $data['str_in_source_lng'];
+            return $data;
         }
-        if ($this->stringShouldNotBeTranslated($str_in_source_lng, $context)) {
-            return $str_in_source_lng;
-        }
-        $trans = $this->getExistingTranslationFromCache($str_in_source_lng, $to_lng, $context);
-        return $trans;
+        $data['checked_from'] = $this->stringIsChecked($data['str_in_source_lng'], $from_lng, $context);
+        $data['checked_to'] = $this->stringIsChecked($data['str_in_source_lng'], $to_lng, $context);
+        $data['trans'] = $this->getExistingTranslationFromCache($data['str_in_source_lng'], $to_lng, $context);
+        return $data;
     }
 
     function getTranslationInForeignLngAndAddDynamicallyIfNeeded(
@@ -1218,7 +1289,8 @@ class Gettext
         if ($from_lng === null) {
             $from_lng = $this->settings->getSourceLanguageCode();
         }
-        $trans = $this->getTranslationInForeignLng($str, $to_lng, $from_lng, $context);
+        $data = $this->getTranslationInForeignLng($str, $to_lng, $from_lng, $context);
+        $trans = $data['trans'];
         if ($trans === false) {
             if ($from_lng === $this->settings->getSourceLanguageCode()) {
                 $str_in_source = $str;
@@ -1238,6 +1310,9 @@ class Gettext
             } else {
                 $trans = $str;
             }
+        }
+        if ($data['checked_from'] === false || $data['checked_to'] === false) {
+            return $str;
         }
         return $trans;
     }
@@ -1278,13 +1353,35 @@ class Gettext
             if (in_array($path_parts__value, $this->settings->getSelectedLanguageCodes())) {
                 continue;
             }
-            $trans = $this->getTranslationInForeignLng($path_parts__value, $lng, null, 'slug');
-            // links are discovered gradually by gtbabel:
-            // if one goes directly to a translated page that is not linked from the homepage,
-            // gtbabel cannot figure out it's source
-            // the following line is a convenience method when auto translation is disabled
-            if ($trans === false && $this->settings->get('auto_translation') === false) {
-                $trans = $this->autoTranslateString($path_parts__value, $lng, 'slug', $this->getCurrentLanguageCode());
+            $data = $this->getTranslationInForeignLng(
+                $path_parts__value,
+                $lng,
+                $this->getCurrentLanguageCode(),
+                'slug'
+            );
+            if ($this->settings->get('only_show_checked_strings') === true) {
+                // no string has been found in general (unchecked or checked)
+                // this is always the case, if you are on a unchecked url (like /en/impressum)
+                // and try to translate that e.g. from english to french
+                if ($data['trans'] === false) {
+                    $data = $this->getTranslationInForeignLng(
+                        $path_parts__value,
+                        $lng,
+                        $this->settings->getSourceLanguageCode(),
+                        'slug'
+                    );
+                }
+                if ($data['checked_from'] === false && $data['checked_to'] === false) {
+                    $trans = false;
+                } elseif ($data['checked_from'] === true && $data['checked_to'] === false) {
+                    $trans = $data['str_in_source_lng'];
+                } elseif ($data['checked_from'] === false && $data['checked_to'] === true) {
+                    $trans = false;
+                } elseif ($data['checked_from'] === true && $data['checked_to'] === true) {
+                    $trans = $data['trans'];
+                }
+            } else {
+                $trans = $data['trans'];
             }
             if ($trans !== false) {
                 $path_parts[$path_parts__key] = $trans;
