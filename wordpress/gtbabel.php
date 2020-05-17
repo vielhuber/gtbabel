@@ -404,6 +404,7 @@ class GtbabelWordPress
                             'html_lang_attribute',
                             'html_hreflang_tags',
                             'auto_add_translations_to_gettext',
+                            'only_show_checked_strings',
                             'auto_translation',
                             'auto_translation_service',
                             'google_translation_api_key',
@@ -439,6 +440,7 @@ class GtbabelWordPress
                             'html_hreflang_tags',
                             'debug_translations',
                             'auto_add_translations_to_gettext',
+                            'only_show_checked_strings',
                             'auto_translation',
                             'stats_log',
                             'wizard_finished'
@@ -780,6 +782,17 @@ class GtbabelWordPress
         echo '<div class="gtbabel__inputbox">';
         echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_auto_add_translations_to_gettext" name="gtbabel[auto_add_translations_to_gettext]" value="1"' .
             ($settings['auto_add_translations_to_gettext'] == '1' ? ' checked="checked"' : '') .
+            ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_only_show_checked_strings" class="gtbabel__label">';
+        echo __('Only show checked strings', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_only_show_checked_strings" name="gtbabel[only_show_checked_strings]" value="1"' .
+            ($settings['only_show_checked_strings'] == '1' ? ' checked="checked"' : '') .
             ' />';
         echo '</div>';
         echo '</li>';

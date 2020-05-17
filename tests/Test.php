@@ -337,9 +337,81 @@ class Test extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function test_gettext()
+    {
+        $this->gtbabel = new Gtbabel();
+        $settings = $this->getDefaultSettings();
+        $settings['languages'] = ['de', 'en'];
+        $settings['debug_translations'] = false;
+        $settings['lng_folder'] = '/tests/locales';
+        $settings['log_folder'] = '/tests/logs';
+
+        $settings['auto_translation'] = false;
+        $settings['auto_add_translations_to_gettext'] = false;
+        $settings['only_show_checked_strings'] = false;
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo '<p>Haus</p>';
+        $this->gtbabel->stop();
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertEquals($output, '<p>Haus-en</p>');
+        $this->assertEquals(file_exists('./tests/locales/_template.pot') === false, true);
+        $this->assertEquals(file_exists('./tests/locales/en.po') === false, true);
+        $this->gtbabel->reset();
+
+        $settings['auto_translation'] = true;
+        $settings['auto_add_translations_to_gettext'] = false;
+        $settings['only_show_checked_strings'] = false;
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo '<p>Haus</p>';
+        $this->gtbabel->stop();
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertEquals($output, '<p>House</p>');
+        $this->assertEquals(file_exists('./tests/locales/_template.pot') === false, true);
+        $this->assertEquals(file_exists('./tests/locales/en.po') === false, true);
+        $this->gtbabel->reset();
+
+        $settings['auto_translation'] = true;
+        $settings['auto_add_translations_to_gettext'] = true;
+        $settings['only_show_checked_strings'] = false;
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo '<p>Haus</p>';
+        $this->gtbabel->stop();
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertEquals($output, '<p>House</p>');
+        $this->assertEquals(strpos(file_get_contents('./tests/locales/_template.pot'), 'msgid "Haus"') !== false, true);
+        $this->assertEquals(strpos(file_get_contents('./tests/locales/en.po'), 'msgstr "House"') !== false, true);
+        $this->gtbabel->reset();
+
+        $settings['auto_translation'] = true;
+        $settings['auto_add_translations_to_gettext'] = true;
+        $settings['only_show_checked_strings'] = true;
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo '<p>Haus</p>';
+        $this->gtbabel->stop();
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertEquals($output, '<p>Haus</p>');
+        $this->assertEquals(strpos(file_get_contents('./tests/locales/_template.pot'), 'msgid "Haus"') !== false, true);
+        $this->assertEquals(strpos(file_get_contents('./tests/locales/en.po'), 'msgstr "House"') !== false, true);
+        $this->gtbabel->reset();
+
+        unlink('./tests/locales/.htaccess');
+        rmdir('./tests/locales');
+        unlink('./tests/logs/.htaccess');
+        rmdir('./tests/logs');
+    }
+
     public function getDefaultSettings()
     {
         return [
+            'languages' => gtbabel_default_language_codes(),
             'lng_source' => 'de',
             'lng_target' => 'en',
             'prefix_source_lng' => false,

@@ -141,6 +141,10 @@ The following features are included:
 -   Translate specific posts/pages or any other url
 -   Control publish status of posts/pages (slug changes are auto-reflected in the `prevent_publish_urls`-option)
 
+## Flow
+
+![Alt](gtbabel.drawio.svg)
+
 ## Gettext
 
 -   The final html gets parsed and is split up in reasonable strings.
@@ -266,6 +270,10 @@ These urls are automatically added to gettext (ajax requested urls are excluded)
 
 JSON responses are also automatically parsed by Gtbabel.\
 Currently only string values with the key `message` are automatically translated.
+
+## String checks
+
+If `only_show_checked_strings` is set to `true`, only translations with an [extracted comment](https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html) of `checked: 1` are shown. This way you can build an approval system in your backend, where translators can check strings before they are published.
 
 ## Helper functions
 

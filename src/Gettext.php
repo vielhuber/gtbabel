@@ -16,6 +16,8 @@ class Gettext
     public $gettext;
     public $gettext_cache;
     public $gettext_cache_reverse;
+    public $gettext_checked_strings;
+    public $gettext_checked_string;
     public $gettext_pot;
     public $gettext_pot_cache;
     public $gettext_save_counter;
@@ -48,6 +50,7 @@ class Gettext
         $this->gettext = [];
         $this->gettext_cache = [];
         $this->gettext_cache_reverse = [];
+        $this->gettext_checked_strings = [];
         $this->gettext_pot = [];
         $this->gettext_pot_cache = [];
         $this->gettext_save_counter = [];
@@ -73,6 +76,7 @@ class Gettext
             $this->gettext_save_counter['po'][$languages__value] = false;
             $this->gettext_cache[$languages__value] = [];
             $this->gettext_cache_reverse[$languages__value] = [];
+            $this->gettext_checked_strings[$languages__value] = [];
             if (!file_exists($this->getLngFilename('po', $languages__value))) {
                 $this->gettext[$languages__value] = Translations::create('gtbabel');
             } else {
@@ -87,6 +91,9 @@ class Gettext
                 $this->gettext_cache_reverse[$languages__value][$context][
                     $gettext__value->getTranslation()
                 ] = $gettext__value->getOriginal();
+                $this->gettext_checked_strings[$languages__value][$context][
+                    $gettext__value->getOriginal()
+                ] = $this->getCommentValueFromTranslation($gettext__value, 'checked');
             }
         }
     }
@@ -200,6 +207,8 @@ class Gettext
             $lng
         );
 
+        // if this function is triggered, we check if the string currently under transformation has parts that are not checked
+        // if the current string is not in cache, this surely is false, otherwise check prefilled array
         if (
             $str === '' ||
             $str === null ||
@@ -208,8 +217,10 @@ class Gettext
             !array_key_exists($str, $this->gettext_cache[$lng][$context ?? '']) ||
             $this->gettext_cache[$lng][$context ?? ''][$str] === ''
         ) {
+            $this->stringCurrentlyUnderTransformationIsChecked(false);
             return false;
         }
+        $this->stringCurrentlyUnderTransformationIsChecked($this->stringIsChecked($str, $lng, $context));
         return $this->gettext_cache[$lng][$context ?? ''][$str];
     }
 
@@ -794,7 +805,7 @@ class Gettext
         }
 
         if ($context === 'slug') {
-            $trans = $this->getTranslationOfLinkHrefAndAddDynamicallyIfNeeded($orig, $lng, true);
+            $trans = $this->getTranslationOfLinkHrefAndAddDynamicallyIfNeeded($orig, $lng);
             if ($trans === null) {
                 return $orig;
             }
@@ -817,7 +828,7 @@ class Gettext
         return $this->getTranslationAndAddDynamicallyIfNeeded($orig, $lng, $context);
     }
 
-    function getTranslationOfLinkHrefAndAddDynamicallyIfNeeded($link, $lng, $translate)
+    function getTranslationOfLinkHrefAndAddDynamicallyIfNeeded($link, $lng)
     {
         if ($link === null || trim($link) === '') {
             return $link;
@@ -854,7 +865,7 @@ class Gettext
             }
         }
 
-        if ($translate === true) {
+        if (!$this->sourceLngIsCurrentLng()) {
             $url_parts = explode('/', $link);
             foreach ($url_parts as $url_parts__key => $url_parts__value) {
                 if ($this->stringShouldNotBeTranslated($url_parts__value, 'slug')) {
@@ -1125,6 +1136,35 @@ class Gettext
             return true;
         }
         return false;
+    }
+
+    function stringIsChecked($str, $lng, $context = null)
+    {
+        if ($this->settings->get('only_show_checked_strings') !== true) {
+            return true;
+        }
+        if (
+            $str === '' ||
+            $str === null ||
+            $this->gettext_checked_strings[$lng] === null ||
+            !array_key_exists($context ?? '', $this->gettext_checked_strings[$lng]) ||
+            !array_key_exists($str, $this->gettext_checked_strings[$lng][$context ?? '']) ||
+            $this->gettext_checked_strings[$lng][$context ?? ''][$str] != '1'
+        ) {
+            return false;
+        }
+        return true;
+    }
+
+    function stringCurrentlyUnderTransformationIsChecked($value = null)
+    {
+        if ($this->settings->get('only_show_checked_strings') !== true) {
+            return true;
+        }
+        if ($value !== null) {
+            $this->gettext_checked_string = $value;
+        }
+        return $this->gettext_checked_string;
     }
 
     function getUrlTranslationInLanguage($lng, $url = null)

@@ -118,6 +118,8 @@ class Dom
                 continue;
             }
 
+            $this->gettext->stringCurrentlyUnderTransformationIsChecked(true);
+
             $translatedText = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
                 $originalText,
                 $this->gettext->getCurrentLanguageCode(),
@@ -126,10 +128,12 @@ class Dom
 
             $translatedText = $this->gettext->reintroduceLineBreaks($translatedText, $originalText, $originalTextRaw);
 
-            if ($this->isTextNode($groups__value)) {
-                $groups__value->nodeValue = $translatedText;
-            } else {
-                $this->setInnerHtml($groups__value, $translatedText);
+            if ($this->gettext->stringCurrentlyUnderTransformationIsChecked() === true) {
+                if ($this->isTextNode($groups__value)) {
+                    $groups__value->nodeValue = $translatedText;
+                } else {
+                    $this->setInnerHtml($groups__value, $translatedText);
+                }
             }
         }
     }
@@ -212,31 +216,32 @@ class Dom
                             continue;
                         }
 
-                        if ($this->gettext->sourceLngIsCurrentLng()) {
-                            if ($context === 'slug') {
-                                $trans = $this->gettext->getTranslationOfLinkHrefAndAddDynamicallyIfNeeded(
-                                    $value,
-                                    $this->gettext->getCurrentLanguageCode(),
-                                    false
-                                );
-                                if ($trans === null) {
-                                    continue;
-                                }
-                            } else {
-                                continue;
-                            }
-                        } else {
-                            $trans = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
-                                $value,
-                                $this->gettext->getCurrentLanguageCode(),
-                                $context
-                            );
+                        // only prefix source lng
+                        if ($this->gettext->sourceLngIsCurrentLng() && $context !== 'slug') {
+                            continue;
                         }
 
-                        if (@$include__value['attribute'] != '') {
-                            $nodes__value->setAttribute($include__value['attribute'], $trans);
-                        } else {
-                            $nodes__value->nodeValue = htmlspecialchars($trans);
+                        $this->gettext->stringCurrentlyUnderTransformationIsChecked(true);
+
+                        $trans = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
+                            $value,
+                            $this->gettext->getCurrentLanguageCode(),
+                            $context
+                        );
+
+                        if ($trans === null) {
+                            continue;
+                        }
+
+                        if (
+                            $context === 'slug' ||
+                            $this->gettext->stringCurrentlyUnderTransformationIsChecked() === true
+                        ) {
+                            if (@$include__value['attribute'] != '') {
+                                $nodes__value->setAttribute($include__value['attribute'], $trans);
+                            } else {
+                                $nodes__value->nodeValue = htmlspecialchars($trans);
+                            }
                         }
                     }
                 }

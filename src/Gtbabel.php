@@ -85,6 +85,7 @@ class Gtbabel
 
     function translate($content, $args = [])
     {
+        $args['only_show_checked_strings'] = 'false';
         $this->settings->setup($args);
         $this->host->setup();
         $this->log->setup();
