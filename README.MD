@@ -22,7 +22,8 @@ Gtbabel automatically translates your HTML/PHP pages – server sided!
 -   Helper functions for current language and all languages available.
 -   Basic seo considered: title tags, seo descriptions, html lang attribute, hreflang tags included.
 -   RTL support: Adds a html dir attribute if language is rtl
--   WordPress plugin available
+-   WordPress plugin available.
+-   Prepared for translation management.
 -   Works seamlessly with caching/preloading plugins.
 -   Besides plain html does also handle and translate xml (like in dynamically generated sitemaps) and json (like in ajax responses).
 -   PHPUnit e2e tests available.
@@ -267,7 +268,7 @@ These urls are automatically added to gettext (ajax requested urls are excluded)
 JSON responses are also automatically parsed by Gtbabel.\
 Currently only string values with the key `message` are automatically translated.
 
-## String checks
+## Translation management
 
 If `only_show_checked_strings` is set to `true`, only translations with an [extracted comment](https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html) of `checked: 1` are shown. This way you can build an approval system in your backend, where translators can check strings before they are published.
 
