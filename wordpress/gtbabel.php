@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.1.6
+ * Version: 3.1.7
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -252,7 +252,7 @@ class GtbabelWordPress
                             admin_url('admin.php?page=gtbabel-trans&post_id=' . $post->ID) .
                             '&lng=' .
                             $languages__key .
-                            '&shared=0">' .
+                            '">' .
                             $languages__value .
                             '</a></li>';
                     }
@@ -1152,52 +1152,65 @@ class GtbabelWordPress
         echo $message;
         echo '<h2 class="gtbabel__subtitle">' . __('String translations', 'gtbabel-plugin') . '</h2>';
 
-        if ($url !== null && $lng !== null && $post_id !== null) {
-            echo '<div class="gtbabel__transmeta">';
-
+        echo '<div class="gtbabel__transmeta">';
+        if ($url !== null) {
             echo '<p class="gtbabel__transmeta-mainlink">';
-            if ($this->gtbabel->settings->getSourceLanguageCode() === $lng) {
+            if ($lng === null || $this->gtbabel->settings->getSourceLanguageCode() === $lng) {
                 $link_public = $url;
             } else {
                 $link_public = $this->gtbabel->gettext->getUrlTranslationInLanguage($lng, $url);
             }
             echo '<a href="' . $link_public . '" target="_blank">' . $link_public . '</a>';
             echo '</p>';
-
-            echo '<ul class="gtbabel__transmeta-list">';
-            foreach ($this->gtbabel->settings->getSelectedLanguages() as $lng__key => $lng__value) {
-                if ($this->gtbabel->settings->getSourceLanguageCode() === $lng__key) {
-                    $link_edit = get_edit_post_link($post_id);
-                } else {
-                    $link_edit = admin_url(
-                        'admin.php?page=gtbabel-trans&post_id=' . $post_id . '&lng=' . $lng__key . '&shared=0'
-                    );
-                }
-                echo '<li class="gtbabel__transmeta-listitem">';
-                if ($lng !== $lng__key) {
-                    echo '<a class="gtbabel__transmeta-listitem-link" href="' . $link_edit . '">';
-                }
-                echo $lng__value;
-                if ($lng !== $lng__key) {
-                    echo '</a>';
-                }
-                echo '</li>';
-            }
-            echo '</ul>';
-            echo '</div>';
         }
+        echo '<ul class="gtbabel__transmeta-list">';
+        if ($url === null) {
+            echo '<li class="gtbabel__transmeta-listitem">';
+            if ($lng !== null) {
+                echo '<a class="gtbabel__transmeta-listitem-link" href="' .
+                    admin_url('admin.php?page=gtbabel-trans') .
+                    '">';
+            }
+            echo __('All languages', 'gtbabel-plugin');
+            if ($lng !== null) {
+                echo '</a>';
+            }
+            echo '</li>';
+        }
+        if ($post_id !== null) {
+            echo '<li class="gtbabel__transmeta-listitem">';
+            echo '<a class="gtbabel__transmeta-listitem-link" href="' . get_edit_post_link($post_id) . '">';
+            echo $this->gtbabel->settings->getSourceLanguageLabel();
+            echo '</a>';
+            echo '</li>';
+        }
+        foreach ($this->gtbabel->settings->getSelectedLanguagesWithoutSource() as $lng__key => $lng__value) {
+            echo '<li class="gtbabel__transmeta-listitem">';
+            if ($lng !== $lng__key) {
+                echo '<a class="gtbabel__transmeta-listitem-link" href="' .
+                    admin_url(
+                        'admin.php?page=gtbabel-trans&lng=' .
+                            $lng__key .
+                            '' .
+                            ($post_id !== null ? '&post_id=' . $post_id : '')
+                    ) .
+                    '">';
+            }
+            echo $lng__value;
+            if ($lng !== $lng__key) {
+                echo '</a>';
+            }
+            echo '</li>';
+        }
+        echo '</ul>';
+        echo '</div>';
 
-        echo '<div class="gtbabel__search' . ($post_id !== null ? ' gtbabel__search--post-id' : '') . '">';
+        echo '<div class="gtbabel__search">';
         echo '<form class="gtbabel__form" method="get" action="' . admin_url('admin.php') . '">';
         echo '<input type="hidden" name="page" value="gtbabel-trans" />';
         echo '<input type="hidden" name="p" value="1" />';
         echo '<input type="hidden" name="lng" value="' . ($lng !== null ? $lng : '') . '" />';
         echo '<input type="hidden" name="post_id" value="' . ($post_id !== null ? $post_id : '') . '" />';
-        echo '<input class="gtbabel__input" type="text" name="url" value="' .
-            ($url !== null ? $url : '') .
-            '" placeholder="' .
-            __('URL in source language', 'gtbabel-plugin') .
-            '" />';
         echo '<input class="gtbabel__input" type="text" name="s" value="' .
             (isset($_GET['s']) ? wp_kses_post($_GET['s']) : '') .
             '" placeholder="' .

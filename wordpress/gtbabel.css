@@ -175,23 +175,14 @@
     margin-right: 5px;
     margin-left: 0;
 }
-.gtbabel__search .gtbabel__form .gtbabel__input[name='url'] {
-    flex: 0 0 calc((100% - 80px - (4 * 5px)) * 0.5);
-}
 .gtbabel__search .gtbabel__form .gtbabel__input[name='s'] {
-    flex: 0 0 calc((100% - 80px - (4 * 5px)) * 0.3);
+    flex: 0 0 calc((100% - 80px - (4 * 5px)) * 0.8);
 }
 .gtbabel__search .gtbabel__form .gtbabel__input[name='shared'] {
     flex: 0 0 calc((100% - 80px - (4 * 5px)) * 0.1);
 }
 .gtbabel__search .gtbabel__form .gtbabel__input[name='checked'] {
     flex: 0 0 calc((100% - 80px - (4 * 5px)) * 0.1);
-}
-.gtbabel__search--post-id .gtbabel__form .gtbabel__input[name='url'] {
-    display: none;
-}
-.gtbabel__search--post-id .gtbabel__form .gtbabel__input[name='s'] {
-    flex: 0 0 calc((100% - 80px - (4 * 5px)) * 0.8);
 }
 .gtbabel__search .gtbabel__form .gtbabel__submit {
     flex: 0 0 80px;

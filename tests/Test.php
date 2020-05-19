@@ -254,7 +254,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test41()
     {
-        $this->runDiff('41.html', 1500, [
+        $this->runDiff('41.html', 2000, [
             'lng_source' => 'en',
             'lng_target' => 'de',
             'debug_translations' => false,
