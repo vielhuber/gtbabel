@@ -52,6 +52,12 @@ document.addEventListener('DOMContentLoaded', function () {
             ) {
                 href += '&gtbabel_delete_unused=1';
             }
+            if (
+                document.querySelector('#gtbabel_auto_set_discovered_strings_checked') !== null &&
+                document.querySelector('#gtbabel_auto_set_discovered_strings_checked').checked === true
+            ) {
+                href += '&gtbabel_auto_set_discovered_strings_checked=1';
+            }
             el.remove();
             fetchNextAutoTranslate(href);
             e.preventDefault();

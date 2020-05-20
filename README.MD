@@ -70,6 +70,7 @@ $gtbabel->start([
     'debug_translations' => false, // surround outputted translations with "%|%" to see borders
     'auto_add_translations_to_gettext' => true,
     'auto_add_added_date_to_gettext' => true,
+    'auto_set_discovered_strings_checked' => false,
     'only_show_checked_strings' => true,
     'auto_translation' => true,
     'auto_translation_service' => 'google', // google|microsoft

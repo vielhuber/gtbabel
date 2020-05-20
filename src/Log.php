@@ -144,6 +144,12 @@ class Log
                 $urls = [$url];
             }
         }
+        if ($urls !== null) {
+            $current_host = $this->host->getCurrentHost();
+            $urls = array_map(function ($urls__value) use ($current_host) {
+                return str_replace($current_host, '', $urls__value);
+            }, $urls);
+        }
         $db = new \PDO('sqlite:' . $filename);
         $query = '';
         $query .= 'SELECT';
@@ -187,6 +193,24 @@ class Log
         }
         if ($this->host->currentUrlIsExcluded()) {
             return;
+        }
+        foreach (['url', 'url_orig'] as $url__value) {
+            // extract path
+            ${$url__value} = str_replace($this->host->getCurrentHost(), '', ${$url__value});
+            // strip server sided requests initiated by auto translation
+            $pos = strpos(${$url__value}, '?');
+            if ($pos !== false) {
+                $args = explode('&', substr(${$url__value}, $pos + 1));
+                foreach ($args as $args__key => $args__value) {
+                    if (strpos($args__value, 'gtbabel_') === 0) {
+                        unset($args[$args__key]);
+                    }
+                }
+                ${$url__value} = substr(${$url__value}, 0, $pos);
+                if (!empty($args)) {
+                    ${$url__value} .= '?' . implode('&', $args);
+                }
+            }
         }
         // we save this asynchroniously, because otherwise hdd throughput is the bottleneck
         if ($this->discovery_log_to_save === null) {
@@ -257,6 +281,8 @@ class Log
         if (!file_exists($filename)) {
             return;
         }
+        $old = str_replace($this->host->getCurrentHost(), '', $old);
+        $new = str_replace($this->host->getCurrentHost(), '', $new);
         $db = new \PDO('sqlite:' . $filename);
         $query = $db->prepare('UPDATE logs SET url_orig = ? WHERE url_orig = ?');
         $query->execute([$new, $old]);

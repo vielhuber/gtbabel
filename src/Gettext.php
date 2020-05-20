@@ -495,6 +495,23 @@ class Gettext
         return $success;
     }
 
+    function setAllDiscoveredStringsToChecked()
+    {
+        if ($this->log->discovery_log_to_save === null) {
+            return;
+        }
+        foreach ($this->log->discovery_log_to_save as $discovery_log_to_save__value) {
+            $translation = $this->gettext[$discovery_log_to_save__value['lng']]->find(
+                $discovery_log_to_save__value['context'],
+                $discovery_log_to_save__value['string']
+            );
+            if ($translation !== null) {
+                $this->updateOrAddCommentToTranslation($translation, 'checked', true);
+                $this->gettext_save_counter['po'][$discovery_log_to_save__value['lng']] = true;
+            }
+        }
+    }
+
     function editSharedValueFromFilesByHash($hash, $shared)
     {
         $success = false;
@@ -1050,7 +1067,7 @@ class Gettext
                         $tries++;
                     }
                 }
-                if ($trans === null) {
+                if ($trans === null || $trans === '') {
                     return null;
                 }
                 $this->log->statsLogIncrease('google', mb_strlen($orig));
@@ -1060,7 +1077,7 @@ class Gettext
                     $api_key = $api_key[array_rand($api_key)];
                 }
                 $trans = __::translate_microsoft($orig, $from_lng, $to_lng, $api_key);
-                if ($trans === null) {
+                if ($trans === null || $trans === '') {
                     return null;
                 }
                 $this->log->statsLogIncrease('microsoft', mb_strlen($orig));
@@ -1088,6 +1105,10 @@ class Gettext
             if ($context !== 'slug') {
                 $trans = '%|%' . $trans . '%|%';
             }
+        }
+
+        if ($trans === '') {
+            return null;
         }
 
         return $trans;

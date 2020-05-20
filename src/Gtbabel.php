@@ -70,6 +70,7 @@ class Gtbabel
         $content = $this->dom->modifyContent($content);
         ob_end_clean();
         echo $content;
+        $this->gettext->setAllDiscoveredStringsToChecked();
         $this->gettext->generateGettextFiles();
         $this->log->statsLogSave();
         $this->log->discoveryLogSave();

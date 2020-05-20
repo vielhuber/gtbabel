@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.1.7
+ * Version: 3.1.8
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -93,8 +93,19 @@ class GtbabelWordPress
     private function start()
     {
         $settings = get_option('gtbabel_settings');
+
         // dynamically changed settings
         $settings['prevent_publish'] = !is_user_logged_in();
+
+        foreach (
+            ['discovery_log', 'auto_set_discovered_strings_checked', 'auto_add_translations_to_gettext']
+            as $parameters__value
+        ) {
+            if (isset($_GET['gtbabel_' . $parameters__value]) && $_GET['gtbabel_' . $parameters__value] == '1') {
+                $settings[$parameters__value] = true;
+            }
+        }
+
         $this->gtbabel->start($settings);
     }
 
@@ -200,10 +211,7 @@ class GtbabelWordPress
                 }
                 // if a slug is changed, change old url to new in discovery log
                 if ($trigger3) {
-                    $this->gtbabel->log->discoveryLogChangeUrl(
-                        $this->getNoCacheUrl($post_before_url),
-                        $this->getNoCacheUrl($post_after_url)
-                    );
+                    $this->gtbabel->log->discoveryLogChangeUrl($post_before_url, $post_after_url);
                 }
 
                 if ($trigger1 || $trigger2 || $trigger3) {
@@ -1006,7 +1014,15 @@ class GtbabelWordPress
         echo __('Delete unused translations', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" id="gtbabel_delete_unused" type="checkbox" value="1" />';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" id="gtbabel_delete_unused" type="checkbox" checked="checked" value="1" />';
+        echo '</div>';
+        echo '</li>';
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_auto_set_discovered_strings_checked" class="gtbabel__label">';
+        echo __('Auto set to checked', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" id="gtbabel_auto_set_discovered_strings_checked" type="checkbox" checked="checked" value="1" />';
         echo '</div>';
         echo '</li>';
         echo '</ul>';
@@ -1803,9 +1819,9 @@ EOD;
         if ($url !== null) {
             $this->changeSetting('discovery_log', true);
             $urls = [];
-            $urls[] = $this->getNoCacheUrl($url);
+            $urls[] = $url;
             $since_time = microtime(true);
-            $this->fetch($this->getNoCacheUrl($url));
+            $this->fetch($this->buildFetchUrl($url));
             // subsequent urls are now available (we need to refresh the current session)
             $this->start();
             foreach ($this->gtbabel->settings->getSelectedLanguageCodesWithoutSource() as $lngs__value) {
@@ -1813,8 +1829,8 @@ EOD;
                     continue;
                 }
                 $url_trans = $this->gtbabel->gettext->getUrlTranslationInLanguage($lngs__value, $url);
-                $this->fetch($this->getNoCacheUrl($url_trans));
-                $urls[] = $this->getNoCacheUrl($url_trans);
+                $this->fetch($this->buildFetchUrl($url_trans));
+                $urls[] = $url_trans;
             }
             // restart again
             $this->start();
@@ -1826,21 +1842,6 @@ EOD;
                 ] = $discovery_strings__key;
             }
             // now auto set shared values
-
-            /* the following trick is disabled, because we want to save time and are pretty sure the homepage was indexed before
-            // we now do a cool trick here: we fetch the homepage first to feed discovery url
-            $home_url = get_home_url();
-            $this->fetch($this->getNoCacheUrl($home_url));
-            $this->start();
-            foreach ($this->gtbabel->settings->getSelectedLanguageCodesWithoutSource() as $lngs__value) {
-                if ($lng !== null && $lngs__value !== $lng) {
-                    continue;
-                }
-                $this->fetch(
-                    $this->getNoCacheUrl($this->gtbabel->gettext->getUrlTranslationInLanguage($lngs__value, $home_url))
-                );
-            }
-            */
             $this->start();
             $this->gtbabel->gettext->autoEditSharedValues($discovery_strings);
             $this->changeSetting('discovery_log', false);
@@ -1984,10 +1985,35 @@ EOD;
         return $published;
     }
 
-    private function getNoCacheUrl($url)
-    {
-        $url .= mb_strpos($url, '?') === false ? '?' : '&';
-        $url .= 'no_cache=1';
+    private function buildFetchUrl(
+        $url,
+        $bypass_cache = true,
+        $discovery_log = false,
+        $auto_set_discovered_strings_checked = false,
+        $auto_add_translations_to_gettext = false
+    ) {
+        if (
+            $bypass_cache === true ||
+            $discovery_log === true ||
+            $auto_set_discovered_strings_checked === true ||
+            $auto_add_translations_to_gettext === true
+        ) {
+            $url .= mb_strpos($url, '?') === false ? '?' : '&';
+        }
+        $args = [];
+        if ($bypass_cache === true) {
+            $args[] = 'gtbabel_no_cache=1';
+        }
+        if ($discovery_log === true) {
+            $args[] = 'gtbabel_discovery_log=1';
+        }
+        if ($auto_set_discovered_strings_checked === true) {
+            $args[] = 'gtbabel_auto_set_discovered_strings_checked=1';
+        }
+        if ($auto_add_translations_to_gettext === true) {
+            $args[] = 'gtbabel_auto_add_translations_to_gettext=1';
+        }
+        $url .= implode('&', $args);
         return $url;
     }
 
@@ -2062,6 +2088,10 @@ EOD;
         if (@$_GET['gtbabel_delete_unused'] == '1') {
             $delete_unused = true;
         }
+        $auto_set_discovered_strings_checked = false;
+        if (@$_GET['gtbabel_auto_set_discovered_strings_checked'] == '1') {
+            $auto_set_discovered_strings_checked = true;
+        }
         $since_time = null;
         if (__::x(@$_GET['gtbabel_since_time'])) {
             $since_time = floatval($_GET['gtbabel_since_time']);
@@ -2074,7 +2104,7 @@ EOD;
         // build general queue
         $queue = [];
         $urls = [];
-        $query = new \WP_Query(['post_type' => 'any', 'posts_per_page' => '-1', 'post_status' => 'publish']);
+        $query = new \WP_Query(['post_type' => 'any', 'posts_per_page' => '2', 'post_status' => 'publish']);
         while ($query->have_posts()) {
             $query->the_post();
             $url = get_permalink();
@@ -2098,16 +2128,13 @@ EOD;
             }
         }
 
-        // always enable discovery log (also if delete unused is set to false in order to get more logs)
-        $this->changeSetting('discovery_log', true);
-
         // do next chunk
         for ($i = $chunk_size * $chunk; $i < $chunk_size * $chunk + $chunk_size; $i++) {
             if (!isset($queue[$i])) {
                 break;
             }
             // this is important, that we fetch the url in the source language first (this calls addCurrentUrlToTranslations())
-            // if we call the source url, the translated urls are generated
+            // if we call the source url, the translated urls are generated (only if show checked is true)
             // important: the main fetch happened in a different session (the current session does not know of the translated slugs yet)
             // therefore we refresh gtbabel after every main url
             $url = $queue[$i]['url'];
@@ -2116,7 +2143,15 @@ EOD;
             }
 
             // append a pseudo get parameter, so that frontend cache plugins don't work
-            $response = $this->fetch($this->getNoCacheUrl($url));
+            $response = $this->fetch(
+                $this->buildFetchUrl(
+                    $url,
+                    true, // bypass caching
+                    true, // general_log
+                    $auto_set_discovered_strings_checked,
+                    true // auto_add_translations_to_gettext
+                )
+            );
             //$this->gtbabel->log->generalLog($response);
 
             echo __('Loading', 'gtbabel-plugin');
@@ -2146,9 +2181,6 @@ EOD;
         echo '</strong>';
         echo '<br/>';
 
-        // disable discovery log
-        $this->changeSetting('discovery_log', false);
-
         // if finished
         if ($chunk_size * $chunk + $chunk_size > count($queue) - 1) {
             $this->gtbabel->gettext->autoEditSharedValues();
@@ -2171,6 +2203,9 @@ EOD;
                     '&gtbabel_auto_translate=1&gtbabel_auto_translate_chunk=' .
                     ($chunk + 1) .
                     ($delete_unused === true ? '&gtbabel_delete_unused=1' : '') .
+                    ($auto_set_discovered_strings_checked === true
+                        ? '&gtbabel_auto_set_discovered_strings_checked=1'
+                        : '') .
                     (__::x($since_time) ? '&gtbabel_since_time=' . $since_time : '')
             );
             echo '<a href="' . $redirect_url . '" class="gtbabel__auto-translate-next"></a>';
