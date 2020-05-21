@@ -158,6 +158,9 @@
 }
 .gtbabel__auto-translate-loading {
     display: block;
+    margin: 10px 0;
+}
+.gtbabel--wizard .gtbabel__auto-translate-loading {
     margin: 10px auto;
 }
 

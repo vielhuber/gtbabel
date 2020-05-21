@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.1.8
+ * Version: 3.1.9
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -98,11 +98,17 @@ class GtbabelWordPress
         $settings['prevent_publish'] = !is_user_logged_in();
 
         foreach (
-            ['discovery_log', 'auto_set_discovered_strings_checked', 'auto_add_translations_to_gettext']
+            [
+                'discovery_log',
+                'auto_set_discovered_strings_checked',
+                'auto_add_translations_to_gettext',
+                'redirect_root_domain'
+            ]
             as $parameters__value
         ) {
-            if (isset($_GET['gtbabel_' . $parameters__value]) && $_GET['gtbabel_' . $parameters__value] == '1') {
-                $settings[$parameters__value] = true;
+            if (isset($_GET['gtbabel_' . $parameters__value]) && $_GET['gtbabel_' . $parameters__value] != '') {
+                $settings[$parameters__value] =
+                    $_GET['gtbabel_' . $parameters__value] == '1' ? true : $_GET['gtbabel_' . $parameters__value];
             }
         }
 
@@ -1817,7 +1823,6 @@ EOD;
         $translations = [];
 
         if ($url !== null) {
-            $this->changeSetting('discovery_log', true);
             $urls = [];
             $urls[] = $url;
             $since_time = microtime(true);
@@ -1844,7 +1849,6 @@ EOD;
             // now auto set shared values
             $this->start();
             $this->gtbabel->gettext->autoEditSharedValues($discovery_strings);
-            $this->changeSetting('discovery_log', false);
         }
 
         $translations = $this->gtbabel->gettext->getAllTranslationsFromFiles($lng, $url === null);
@@ -1988,9 +1992,10 @@ EOD;
     private function buildFetchUrl(
         $url,
         $bypass_cache = true,
-        $discovery_log = false,
+        $discovery_log = true,
         $auto_set_discovered_strings_checked = false,
-        $auto_add_translations_to_gettext = false
+        $auto_add_translations_to_gettext = true,
+        $redirect_root_domain = 'source'
     ) {
         if (
             $bypass_cache === true ||
@@ -2013,14 +2018,54 @@ EOD;
         if ($auto_add_translations_to_gettext === true) {
             $args[] = 'gtbabel_auto_add_translations_to_gettext=1';
         }
+        if ($redirect_root_domain !== null) {
+            $args[] = 'gtbabel_redirect_root_domain=' . $redirect_root_domain;
+        }
         $url .= implode('&', $args);
         return $url;
     }
 
+    private function getAllPublicUrlsForSite()
+    {
+        $urls = [];
+
+        // approach 1 (get all posts)
+        $urls[] = get_bloginfo('url');
+        $query = new \WP_Query(['post_type' => 'any', 'posts_per_page' => '-1', 'post_status' => 'publish']);
+        while ($query->have_posts()) {
+            $query->the_post();
+            $url = get_permalink();
+            $urls[] = $url;
+        }
+        $query = new \WP_Term_Query(['hide_empty' => false]);
+        if (!empty($query->terms)) {
+            foreach ($query->terms as $terms__value) {
+                $url = get_term_link($terms__value);
+                // exclude non-public
+                if (strpos($url, '?') !== false) {
+                    continue;
+                }
+                $urls[] = $url;
+            }
+        }
+
+        // approach 2 (parse sitemap; this also works for dynamically generated sitemaps like yoast)
+        $urls = array_merge($urls, __::extract_urls_from_sitemap(get_bloginfo('url') . '/sitemap.xml'));
+
+        $urls = array_map(function ($urls__value) {
+            return rtrim($urls__value, '/') . '/';
+        }, $urls);
+
+        $urls = array_unique($urls);
+
+        sort($urls);
+
+        return $urls;
+    }
+
     private function fetch($url, $with_current_session = true)
     {
-        //$this->gtbabel->log->generalLog('fetch ' . $url);
-        return __::curl(
+        $response = __::curl(
             $url,
             null,
             'GET',
@@ -2031,6 +2076,8 @@ EOD;
             null,
             $with_current_session === true ? $_COOKIE : null
         );
+        //$this->gtbabel->log->generalLog($response);
+        return $response;
     }
 
     private function showStatsLog($service = null)
@@ -2103,24 +2150,7 @@ EOD;
 
         // build general queue
         $queue = [];
-        $urls = [];
-        $query = new \WP_Query(['post_type' => 'any', 'posts_per_page' => '2', 'post_status' => 'publish']);
-        while ($query->have_posts()) {
-            $query->the_post();
-            $url = get_permalink();
-            $urls[] = $url;
-        }
-        $query = new \WP_Term_Query(['hide_empty' => false]);
-        if (!empty($query->terms)) {
-            foreach ($query->terms as $terms__value) {
-                $url = get_term_link($terms__value);
-                // exclude non-public
-                if (strpos($url, '?') !== false) {
-                    continue;
-                }
-                $urls[] = $url;
-            }
-        }
+        $urls = $this->getAllPublicUrlsForSite();
         foreach ($urls as $urls__value) {
             $queue[] = ['url' => $urls__value, 'convert_to_lng' => null, 'refresh_after' => true];
             foreach ($this->gtbabel->settings->getSelectedLanguageCodesWithoutSource() as $lngs__value) {
@@ -2142,17 +2172,16 @@ EOD;
                 $url = $this->gtbabel->gettext->getUrlTranslationInLanguage($queue[$i]['convert_to_lng'], $url);
             }
 
-            // append a pseudo get parameter, so that frontend cache plugins don't work
-            $response = $this->fetch(
+            $this->fetch(
                 $this->buildFetchUrl(
                     $url,
                     true, // bypass caching
                     true, // general_log
                     $auto_set_discovered_strings_checked,
-                    true // auto_add_translations_to_gettext
+                    true, // auto_add_translations_to_gettext
+                    'source' // redirect_root_domain
                 )
             );
-            //$this->gtbabel->log->generalLog($response);
 
             echo __('Loading', 'gtbabel-plugin');
             echo '... ' . $url . '<br/>';

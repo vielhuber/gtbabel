@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 href += '&gtbabel_delete_unused=1';
             }
             if (
-                document.querySelector('#gtbabel_auto_set_discovered_strings_checked') !== null &&
+                document.querySelector('#gtbabel_auto_set_discovered_strings_checked') === null || // on wizard, if checkbox is not available
                 document.querySelector('#gtbabel_auto_set_discovered_strings_checked').checked === true
             ) {
                 href += '&gtbabel_auto_set_discovered_strings_checked=1';
@@ -134,13 +134,16 @@ function fetchNextAutoTranslate(url, tries = 0) {
             return null;
         })
         .then(response => {
+            let html = null;
+            if (response !== null || response !== undefined || response != '') {
+                html = new DOMParser().parseFromString(response, 'text/html');
+            }
             // something went wrong, try again
-            if (response === null || response === undefined || response == '') {
+            if (html === null || html.querySelector('.gtbabel__auto-translate') === null) {
                 setTimeout(() => {
                     fetchNextAutoTranslate(url, tries + 1);
-                }, 30000);
+                }, 3000);
             } else {
-                let html = new DOMParser().parseFromString(response, 'text/html');
                 if (
                     document.querySelector('.gtbabel__auto-translate') !== null &&
                     html.querySelector('.gtbabel__auto-translate') !== null

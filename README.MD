@@ -136,7 +136,9 @@ The following features are included:
 
 -   Configuration gui
 -   Easy setup wizard
--   Preloading & auto translation / deletion
+-   Auto translation (including sitemap parser)
+-   Delete unused strings
+-   Detect shared strings
 -   Manual string translation (search and filter by url)
 -   Translation services
 -   Support for plugins like [Contact Form 7](https://de.wordpress.org/plugins/contact-form-7/)

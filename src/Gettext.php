@@ -497,6 +497,9 @@ class Gettext
 
     function setAllDiscoveredStringsToChecked()
     {
+        if ($this->settings->get('auto_set_discovered_strings_checked') !== true) {
+            return;
+        }
         if ($this->log->discovery_log_to_save === null) {
             return;
         }
