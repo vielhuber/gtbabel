@@ -182,15 +182,15 @@ Instead you can also can use [wp_localize_script](https://codex.wordpress.org/Fu
 
 By default Gtbabel translates all text and tag nodes in the following contexts:
 
-| selector                 | attribute   | context     |
-| ------------------------ | ----------- | ----------- |
-| a                        | href        | slug        |
-| form                     | action      | slug        |
-| img                      | alt         |             |
-| \*                       | title       |             |
-| input                    | placeholder |             |
-| head title               |             | title       |
-| meta[name="description"] | content     | description |
+| selector                   | attribute     | context       |
+| -------------------------- | ------------- | ------------- |
+| `a`                        | `href`        | `slug`        |
+| `form`                     | `action`      | `slug`        |
+| `img`                      | `alt`         | ``            |
+| `*`                        | `title`       | ``            |
+| `input`                    | `placeholder` | ``            |
+| `head title`               | `` | `title`  |
+| `meta[name="description"]` | `content`     | `description` |
 
 To disable text/tag node transformation, provide the options:
 
