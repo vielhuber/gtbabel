@@ -184,13 +184,15 @@ By default Gtbabel translates all text and tag nodes in the following contexts:
 
 | selector                   | attribute     | context     |
 | -------------------------- | ------------- | ----------- |
-| `a`                        | `href`        | slug        |
+| `a`                        | `href`        | slug\|file  |
 | `form`                     | `action`      | slug        |
 | `img`                      | `alt`         |             |
 | `*`                        | `title`       |             |
 | `input`                    | `placeholder` |             |
 | `head title`               |               | title       |
 | `meta[name="description"]` | `content`     | description |
+| `img`                      | `src`         | file        |
+| `*`                        | `style`       | file        |
 
 To disable text/tag node transformation, provide the options:
 
