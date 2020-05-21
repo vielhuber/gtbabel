@@ -416,7 +416,7 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             strpos(
                 file_get_contents('./tests/locales/en.po'),
-                '#. checked: 1' . PHP_EOL . 'msgid "Haus"' . PHP_EOL . 'msgstr "House"'
+                '#. checked' . PHP_EOL . 'msgid "Haus"' . PHP_EOL . 'msgstr "House"'
             ) !== false,
             true
         );

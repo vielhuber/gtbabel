@@ -1110,7 +1110,9 @@ class GtbabelWordPress
                                     $post__key,
                                     $translations__key,
                                     @$translations__value['str'],
-                                    @$translations__value['checked']
+                                    isset($translations__value['checked']) && $translations__value['checked'] == '1'
+                                        ? true
+                                        : false
                                 );
                             }
                         }
@@ -1118,7 +1120,10 @@ class GtbabelWordPress
                             $this->gtbabel->gettext->deleteTranslationFromFiles($post__key);
                         }
                         if (array_key_exists('shared', $post__value)) {
-                            $this->gtbabel->gettext->editSharedValueFromFilesByHash($post__key, $post__value['shared']);
+                            $this->gtbabel->gettext->editSharedValueFromFilesByHash(
+                                $post__key,
+                                $post__value['shared'] == '1' ? true : false
+                            );
                         }
                     }
                 }

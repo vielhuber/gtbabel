@@ -273,7 +273,7 @@ Currently only string values with the key `message` are automatically translated
 
 ## Translation management
 
-If `only_show_checked_strings` is set to `true`, only translations with an [extracted comment](https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html) of `checked: 1` are shown. This way you can build an approval system in your backend, where translators can check strings before they are published.
+If `only_show_checked_strings` is set to `true`, only translations with an [extracted comment](https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html) of `#. checked` are shown. This way you can build an approval system in your backend, where translators can check strings before they are published.
 
 ## Flow diagram
 
