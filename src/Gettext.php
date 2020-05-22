@@ -871,6 +871,13 @@ class Gettext
             }
             return $trans;
         }
+        if ($context === 'file') {
+            $trans = $this->getTranslationOfFileAndAddDynamicallyIfNeeded($orig, $lng);
+            if ($trans === null) {
+                return $orig;
+            }
+            return $trans;
+        }
         if ($context === 'title') {
             foreach (['|', '·', '•', '>', '-', '–', '—', ':', '*', '⋆', '~', '«', '»', '<'] as $delimiters__value) {
                 $orig = str_replace(' ', ' ', $orig); // replace hidden &nbsp; chars
@@ -954,6 +961,55 @@ class Gettext
             $link = rtrim($this->host->getCurrentHost(), '/') . '/' . ltrim($link, '/');
         }
         return $link;
+    }
+
+    function getTranslationOfFileAndAddDynamicallyIfNeeded($orig, $lng)
+    {
+        $urls = [];
+        // extract urls from style tag
+        if (strpos($orig, 'url(') !== false) {
+            preg_match_all('/url\((.+?)\)/', $orig, $matches);
+            foreach ($matches[1] as $matches__value) {
+                $urls[] = trim(trim($matches__value, '\''), '"');
+            }
+        } else {
+            $urls[] = $orig;
+        }
+        foreach ($urls as $urls__value) {
+            if ($urls__value === '/beispiel-bilddatei14.jpg') {
+                var_dump($urls__value);
+                die();
+            }
+            // always submit relative urls
+            foreach (
+                [
+                    $this->host->getCurrentHost() . '/' . $this->settings->getSourceLanguageCode(),
+                    $this->host->getCurrentHost(),
+                    '/' . $this->settings->getSourceLanguageCode(),
+                    $this->settings->getSourceLanguageCode()
+                ]
+                as $begin__value
+            ) {
+                if (strpos($urls__value, $begin__value) === 0) {
+                    $urls__value = str_replace($begin__value, '', $urls__value);
+                }
+            }
+            $urls__value = trim($urls__value, '/');
+            // skip external files
+            if (strpos($urls__value, 'http') === 0 && strpos($urls__value, $this->host->getCurrentHost()) === false) {
+                continue;
+            }
+            if ($this->stringShouldNotBeTranslated($urls__value, 'file')) {
+                continue;
+            }
+            $trans = $this->getExistingTranslationFromCache($urls__value, $lng, 'file');
+            if ($trans === false) {
+                $this->addStringToPotFileAndToCache($urls__value, 'file');
+            } elseif ($this->stringIsChecked($urls__value, $lng, 'file')) {
+                $orig = str_replace($urls__value, $trans, $orig);
+            }
+        }
+        return $orig;
     }
 
     function getTranslationAndAddDynamicallyIfNeeded($orig, $lng, $context = null)

@@ -284,14 +284,6 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->runDiff('44.html', 200);
     }
 
-    public function test45()
-    {
-        $this->runDiff('45.html', 500, [
-            'debug_translations' => false,
-            'auto_translation' => true
-        ]);
-    }
-
     public function test_translate()
     {
         $this->gtbabel = new Gtbabel();
@@ -424,6 +416,58 @@ class Test extends \PHPUnit\Framework\TestCase
 
         __::rrmdir('./tests/locales');
         __::rrmdir('./tests/logs');
+    }
+
+    public function test_file()
+    {
+        __::rrmdir('./tests/locales');
+        __::rrmdir('./tests/logs');
+
+        $this->gtbabel = new Gtbabel();
+        $settings = $this->getDefaultSettings();
+        $settings['languages'] = ['de', 'en'];
+        $settings['lng_source'] = 'de';
+        $settings['lng_target'] = 'en';
+        $settings['debug_translations'] = false;
+        $settings['lng_folder'] = '/tests/locales';
+        $settings['log_folder'] = '/tests/logs';
+        $settings['auto_translation'] = true;
+        $settings['auto_add_translations_to_gettext'] = true;
+        $settings['only_show_checked_strings'] = true;
+
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo <<<'EOD'
+<div style="background-image: url(http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei1.jpg);"></div>
+<div style="background-image: url(/beispiel-bilddatei2.jpg);"></div>
+<div style="background-image: url('beispiel-bilddatei3.jpg');"></div>
+<div style="background-image: url('http://test.de/beispiel-bilddatei4.jpg');"></div>
+<div style="background-image: url('beispiel-bilddatei1.jpg'), url('beispiel-bilddatei2.jpg');"></div>
+<img src="http://test.de/beispiel-bilddatei5.jpg" alt="" />
+<img src="http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei6.jpg" alt="" />
+<img src="/beispiel-bilddatei7.jpg" alt="" />
+<img src="beispiel-bilddatei8.jpg" alt="" />
+<a href="http://test.de/beispiel-bilddatei9.jpg"></a>
+<a href="http://test.de/beispiel-pfad10"></a>
+<a href="http://gtbabel.local.vielhuber.de/datenschutz/beispiel-pfad11"></a>
+<a href="http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei12.jpg"></a>
+<a href="/beispiel-bilddatei13.jpg"></a>
+<a href="beispiel-bilddatei14.jpg"></a>
+<a href="beispiel-script.php?foo=bar"></a>
+<a href="beispiel.html"></a>
+<a href="beispiel/pfad/1._Buch_Moses"></a>
+EOD;
+        $this->gtbabel->stop();
+        $output = ob_get_contents();
+        ob_end_clean();
+        //echo $output;
+        //$this->assertEquals($output, '<p>Haus-en</p>');
+        //$this->assertEquals(file_exists('./tests/locales/_template.pot') === false, true);
+        //$this->assertEquals(file_exists('./tests/locales/en.po') === false, true);
+        //$this->gtbabel->reset();
+
+        //__::rrmdir('./tests/locales');
+        //__::rrmdir('./tests/logs');
     }
 
     public function test__router()

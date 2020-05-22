@@ -147,7 +147,7 @@ class Dom
                 [
                     'selector' => 'a',
                     'attribute' => 'href',
-                    'context' => 'slug'
+                    'context' => 'slug|file'
                 ],
                 [
                     'selector' => 'form',
@@ -178,6 +178,16 @@ class Dom
                     'selector' => 'head meta[name="description"]',
                     'attribute' => 'content',
                     'context' => 'description'
+                ],
+                [
+                    'selector' => 'img',
+                    'attribute' => 'src',
+                    'context' => 'file'
+                ],
+                [
+                    'selector' => '*',
+                    'attribute' => 'style',
+                    'context' => 'file'
                 ]
             ]);
         }
@@ -197,20 +207,35 @@ class Dom
                         $value = $nodes__value->nodeValue;
                     }
                     if ($value != '') {
+                        // (auto) determine context
                         $context = null;
                         if (@$include__value['context'] != '') {
                             $context = $include__value['context'];
                         }
-                        if ($include__value['selector'] === 'a' && $include__value['attribute'] === 'href') {
-                            $context = 'slug';
+                        if (
+                            ($context === null || $context == '') &&
+                            mb_strpos($value, $this->host->getCurrentHost()) === 0
+                        ) {
+                            $context = 'slug|file';
                         }
-                        if (mb_strpos($value, $this->host->getCurrentHost()) === 0) {
-                            $context = 'slug';
+                        if ($context === 'slug|file') {
+                            $value_modified = $value;
+                            $value_modified =
+                                (strpos($value_modified, 'http') === false ? $this->host->getCurrentHost() . '/' : '') .
+                                $value_modified;
+                            $value_modified = str_replace(['.php', '.html'], '', $value_modified);
+                            if (preg_match('/\/.+\.[a-zA-Z\d]+$/', str_replace('://', '', $value_modified))) {
+                                $context = 'file';
+                            } else {
+                                $context = 'slug';
+                            }
                         }
 
-                        if ($context === 'slug' && $this->host->urlIsExcluded($value)) {
+                        if (($context === 'slug' || $context === 'file') && $this->host->urlIsExcluded($value)) {
                             continue;
                         }
+
+                        // on source only translate slugs
                         if ($this->gettext->sourceLngIsCurrentLng() && $context !== 'slug') {
                             continue;
                         }
