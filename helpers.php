@@ -21,17 +21,6 @@ if (!function_exists('gtbabel_language_label')) {
     }
 }
 
-if (!function_exists('gtbabel_string_check')) {
-    function gtbabel_string_check($checked, $str, $lng, $context = null)
-    {
-        global $gtbabel;
-        if ($gtbabel === null) {
-            $gtbabel = new \vielhuber\gtbabel\Gtbabel();
-        }
-        return $gtbabel->gettext->editCheckedValueFromFiles($checked, $str, $lng, $context);
-    }
-}
-
 if (!function_exists('gtbabel_languages')) {
     function gtbabel_languages()
     {

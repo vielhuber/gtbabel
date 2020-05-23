@@ -241,7 +241,7 @@ class Gettext
         clearstatcache();
         $order = 0;
         foreach ($pot->getTranslations() as $gettext__value) {
-            $data[$this->getTranslationHash($gettext__value)] = [
+            $data[$this->getIdFromStringAndContext($gettext__value)] = [
                 'orig' => $gettext__value->getOriginal(),
                 'context' => $gettext__value->getContext() ?? '',
                 'shared' => $this->translationHasComment($gettext__value, 'shared'),
@@ -259,7 +259,7 @@ class Gettext
             $po = $poLoader->loadFile($this->getLngFilename('po', $languages__value));
             clearstatcache();
             foreach ($po->getTranslations() as $gettext__value) {
-                $data[$this->getTranslationHash($gettext__value)]['translations'][$languages__value] = [
+                $data[$this->getIdFromStringAndContext($gettext__value)]['translations'][$languages__value] = [
                     'str' => $gettext__value->getTranslation(),
                     'checked' => $this->translationHasComment($gettext__value, 'checked')
                 ];
@@ -318,7 +318,7 @@ class Gettext
         return $data;
     }
 
-    function getTranslationHash($gettext, $context = false)
+    function getIdFromStringAndContext($gettext, $context = false)
     {
         if ($context === false) {
             $string = $gettext->getOriginal();
@@ -327,7 +327,12 @@ class Gettext
             $string = $gettext;
             $context = $context;
         }
-        return md5($string . '#' . ($context ?? ''));
+        return base64_encode(serialize([$string, $context ?? '']));
+    }
+
+    function getStringAndContextFromId($id)
+    {
+        return unserialize(base64_decode($id));
     }
 
     function translationHasComment($gettext, $comment)
@@ -350,7 +355,12 @@ class Gettext
         $gettext->getExtractedComments()->add($comment);
     }
 
-    function editTranslationFromFiles($hash, $lng, $str = null, $checked = null)
+    function editTranslation($orig, $context, $lng, $str = false, $checked = null)
+    {
+        return $this->editTranslationById($this->getIdFromStringAndContext($orig, $context), $lng, $str, $checked);
+    }
+
+    function editTranslationById($id, $lng, $str = false, $checked = null)
     {
         $success = false;
         $poLoader = new PoLoader();
@@ -363,7 +373,7 @@ class Gettext
         clearstatcache();
 
         // slug collission detection
-        if ($str !== null) {
+        if ($str != '') {
             $collission = true;
             $counter = 2;
             while ($collission === true) {
@@ -381,23 +391,57 @@ class Gettext
             }
         }
 
+        // get existing
+        $gettext = null;
         foreach ($po->getTranslations() as $gettext__value) {
-            if ($this->getTranslationHash($gettext__value) !== $hash) {
+            if ($this->getIdFromStringAndContext($gettext__value) !== $id) {
                 continue;
             }
-            if ($str !== null) {
-                $gettext__value->translate($str);
+            $gettext = $gettext__value;
+            break;
+        }
+
+        if ($gettext !== null) {
+            // delete
+            if ($str !== false && ($str === null || $str === '')) {
+                //$this->log->generalLog('removing ' . $gettext->getOriginal());
+                $po->remove($gettext);
             }
-            if ($checked !== null) {
-                if ($checked === true) {
-                    $this->addCommentToTranslation($gettext__value, 'checked');
+            // update
+            else {
+                if ($str !== false) {
+                    //$this->log->generalLog('updating translation ' . $gettext->getOriginal());
+                    $gettext->translate($str);
                 }
-                if ($checked === false) {
-                    $this->deleteCommentFromTranslation($gettext__value, 'checked');
+                if ($checked !== null) {
+                    //$this->log->generalLog('updating checked ' . $gettext->getOriginal());
+                    if ($checked === true) {
+                        $this->addCommentToTranslation($gettext, 'checked');
+                    }
+                    if ($checked === false) {
+                        $this->deleteCommentFromTranslation($gettext, 'checked');
+                    }
                 }
             }
             $success = true;
         }
+
+        // create
+        else {
+            [$orig, $context] = $this->getStringAndContextFromId($id);
+            $translation = Translation::create($context, $orig);
+            $translation->translate($str);
+            //$this->log->generalLog('creating ' . $translation->getOriginal());
+            if ($this->settings->get('auto_add_added_date_to_gettext') === true) {
+                $this->addCommentToTranslation($translation, 'added: ' . date('Y-m-d H:i:s'));
+            }
+            if ($checked !== false) {
+                $this->addCommentToTranslation($translation, 'checked');
+            }
+            $po->add($translation);
+            $success = true;
+        }
+
         if ($success === true) {
             $poGenerator->generateFile($po, $this->getLngFilename('po', $lng));
             clearstatcache();
@@ -435,7 +479,12 @@ class Gettext
         return $success;
     }
 
-    function editCheckedValueFromFiles($checked, $str, $lng, $context = null)
+    function editCheckedValue($orig, $context, $lng, $checked)
+    {
+        return $this->editCheckedValueById($this->getIdFromStringAndContext($orig, $context), $lng, $checked);
+    }
+
+    function editCheckedValueById($id, $lng, $checked)
     {
         $success = false;
         $poLoader = new PoLoader();
@@ -447,7 +496,7 @@ class Gettext
         $po = $poLoader->loadFile($this->getLngFilename('po', $lng));
         clearstatcache();
         foreach ($po->getTranslations() as $gettext__value) {
-            if ($gettext__value->getTranslation() !== $str && $gettext__value->getContext() != $context) {
+            if ($this->getIdFromStringAndContext($gettext__value) !== $id) {
                 continue;
             }
             if ($checked === true) {
@@ -487,7 +536,12 @@ class Gettext
         }
     }
 
-    function editSharedValueFromFilesByHash($hash, $shared)
+    function editSharedValue($orig, $context, $shared)
+    {
+        return $this->editSharedValueById($this->getIdFromStringAndContext($orig, $context), $shared);
+    }
+
+    function editSharedValueById($id, $shared)
     {
         $success = false;
         $poLoader = new PoLoader();
@@ -498,7 +552,7 @@ class Gettext
         $pot = $poLoader->loadFile($this->getLngFilename('pot', '_template'));
         clearstatcache();
         foreach ($pot->getTranslations() as $gettext__value) {
-            if ($this->getTranslationHash($gettext__value) !== $hash) {
+            if ($this->getIdFromStringAndContext($gettext__value) !== $id) {
                 continue;
             }
             if ($shared === true) {
@@ -556,16 +610,16 @@ class Gettext
         $results = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
         foreach ($results as $results__value) {
-            $data[$this->getTranslationHash($results__value['string'], $results__value['context'])] =
+            $data[$this->getIdFromStringAndContext($results__value['string'], $results__value['context'])] =
                 $results__value['count'] > 1;
         }
 
         foreach ($pot->getTranslations() as $gettext__value) {
-            $hash = $this->getTranslationHash($gettext__value);
-            if (!array_key_exists($hash, $data)) {
+            $id = $this->getIdFromStringAndContext($gettext__value);
+            if (!array_key_exists($id, $data)) {
                 continue;
             }
-            if ($data[$hash] === true) {
+            if ($data[$id] === true) {
                 $this->addCommentToTranslation($gettext__value, 'shared');
             } else {
                 $this->deleteCommentFromTranslation($gettext__value, 'shared');
@@ -579,7 +633,12 @@ class Gettext
         return $success;
     }
 
-    function deleteTranslationFromFiles($hash)
+    function deleteStringFromGettext($orig, $context)
+    {
+        return $this->deleteStringFromGettextById($this->getIdFromStringAndContext($orig, $context));
+    }
+
+    function deleteStringFromGettextById($id)
     {
         $success = false;
         $poLoader = new PoLoader();
@@ -592,7 +651,7 @@ class Gettext
         clearstatcache();
         $to_remove = null;
         foreach ($pot->getTranslations() as $gettext__value) {
-            if ($this->getTranslationHash($gettext__value) !== $hash) {
+            if ($this->getIdFromStringAndContext($gettext__value) !== $id) {
                 continue;
             }
             $to_remove = $gettext__value;
@@ -613,7 +672,7 @@ class Gettext
             clearstatcache();
             $to_remove = null;
             foreach ($po->getTranslations() as $gettext__value) {
-                if ($this->getTranslationHash($gettext__value) !== $hash) {
+                if ($this->getIdFromStringAndContext($gettext__value) !== $id) {
                     continue;
                 }
                 $to_remove = $gettext__value;
@@ -1246,7 +1305,7 @@ class Gettext
                 return true;
             }
             // static files like big-image.jpg
-            if (mb_strpos($str, '.') !== false) {
+            if (preg_match('/.+\.[a-zA-Z\d]+$/', $str)) {
                 return true;
             }
         }

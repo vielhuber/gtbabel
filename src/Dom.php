@@ -220,9 +220,9 @@ class Dom
                         }
                         if ($context === 'slug|file') {
                             $value_modified = $value;
-                            $value_modified =
-                                (strpos($value_modified, 'http') === false ? $this->host->getCurrentHost() . '/' : '') .
-                                $value_modified;
+                            if (!preg_match('/^[a-zA-Z]+?:.+$/', $value_modified)) {
+                                $value_modified = $this->host->getCurrentHost() . '/' . $value_modified;
+                            }
                             $value_modified = str_replace(['.php', '.html'], '', $value_modified);
                             if (preg_match('/\/.+\.[a-zA-Z\d]+$/', str_replace('://', '', $value_modified))) {
                                 $context = 'file';

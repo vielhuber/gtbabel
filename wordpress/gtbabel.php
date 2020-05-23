@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.1.9
+ * Version: 3.2.5
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -401,6 +401,9 @@ class GtbabelWordPress
                 check_admin_referer('gtbabel-settings');
                 if (!empty($_POST['gtbabel'])) {
                     $settings = [];
+
+                    // remove slashes
+                    $_POST['gtbabel'] = stripslashes_deep($_POST['gtbabel']);
 
                     // whitelist
                     foreach (
@@ -1091,6 +1094,8 @@ class GtbabelWordPress
             if (isset($_POST['translations_submit'])) {
                 check_admin_referer('gtbabel-trans-save-translations');
                 if (!empty(@$_POST['gtbabel'])) {
+                    // remove slashes
+                    $_POST['gtbabel'] = stripslashes_deep($_POST['gtbabel']);
                     // sanitize
                     $_POST['gtbabel'] = __::array_map_deep($_POST['gtbabel'], function (
                         $settings__value,
@@ -1106,21 +1111,24 @@ class GtbabelWordPress
                     foreach ($_POST['gtbabel'] as $post__key => $post__value) {
                         if (!empty(@$post__value['translations'])) {
                             foreach ($post__value['translations'] as $translations__key => $translations__value) {
-                                $this->gtbabel->gettext->editTranslationFromFiles(
+                                $this->gtbabel->gettext->editTranslationById(
                                     $post__key,
                                     $translations__key,
-                                    @$translations__value['str'],
+                                    isset($translations__value['str']) ? $translations__value['str'] : false,
                                     isset($translations__value['checked']) && $translations__value['checked'] == '1'
                                         ? true
-                                        : false
+                                        : (isset($translations__value['checked']) &&
+                                        $translations__value['checked'] == '0'
+                                            ? false
+                                            : null)
                                 );
                             }
                         }
                         if (@$post__value['delete'] == '1') {
-                            $this->gtbabel->gettext->deleteTranslationFromFiles($post__key);
+                            $this->gtbabel->gettext->deleteStringFromGettextById($post__key);
                         }
                         if (array_key_exists('shared', $post__value)) {
-                            $this->gtbabel->gettext->editSharedValueFromFilesByHash(
+                            $this->gtbabel->gettext->editSharedValueById(
                                 $post__key,
                                 $post__value['shared'] == '1' ? true : false
                             );
@@ -1407,6 +1415,8 @@ class GtbabelWordPress
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (isset($_POST['upload_file'])) {
                 check_admin_referer('gtbabel-services-upload-file');
+                // remove slashes
+                $_POST['gtbabel'] = stripslashes_deep($_POST['gtbabel']);
                 $_POST['gtbabel'] = __::array_map_deep($_POST['gtbabel'], function ($settings__value) {
                     return sanitize_textarea_field($settings__value);
                 });
@@ -1604,6 +1614,9 @@ EOD;
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (isset($_POST['save_step'])) {
                 $settings = [];
+
+                // remove slashes
+                $_POST['gtbabel'] = stripslashes_deep($_POST['gtbabel']);
 
                 // whitelist
                 foreach (['languages', 'google_translation_api_key'] as $fields__value) {
@@ -1848,7 +1861,10 @@ EOD;
             $discovery_strings_map = [];
             foreach ($discovery_strings as $discovery_strings__key => $discovery_strings__value) {
                 $discovery_strings_map[
-                    md5($discovery_strings__value['string'] . '#' . ($discovery_strings__value['context'] ?? ''))
+                    $this->gtbabel->gettext->getIdFromStringAndContext(
+                        $discovery_strings__value['string'],
+                        $discovery_strings__value['context']
+                    )
                 ] = $discovery_strings__key;
             }
             // now auto set shared values

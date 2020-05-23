@@ -295,9 +295,11 @@ gtbabel_default_languages() // ['de' => 'Deutsch', 'en' => 'English', ...]
 gtbabel_language_label('en') // 'English'
 gtbabel_default_settings() // ['languages' => ['de', 'en', 'fr'], 'lng_folder' => '/locales', ...]
 gtbabel_default_settings(['lng_folder' => '/foo']) // ['languages' => ['de', 'en', 'fr'], 'lng_folder' => '/foo', ...]
+
 gtbabel_languagepicker() // [['code' => 'de', 'label' => 'Deutsch', 'url' => 'https://tld.com/de/nudel', 'active' => true], ['code' => 'en', 'label' => 'English', 'url' => 'https://tld.com/en/noodle', 'active' => false], ...]
-gtbabel_string_check(true, 'Hello World', 'en', 'title');
+
 gtbabel_localize_js(['string', ['string', 'context']]) // hotload translations inside your javascript files
+
 gtbabel__('Hallo') // 'Hi there'
 gtbabel__('blog', 'slug') // 'blog-en'
 gtbabel__('Hi there', null, 'de', 'en') // 'Hello'

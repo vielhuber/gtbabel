@@ -396,7 +396,7 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->assertEquals(strpos(file_get_contents('./tests/locales/_template.pot'), 'msgid "Haus"') !== false, true);
         $this->assertEquals(strpos(file_get_contents('./tests/locales/en.po'), 'msgstr "House"') !== false, true);
 
-        $this->gtbabel->gettext->editCheckedValueFromFiles(true, 'House', 'en', null);
+        $this->gtbabel->gettext->editCheckedValue('Haus', null, 'en', true);
 
         ob_start();
         $this->gtbabel->start($settings);
@@ -433,11 +433,10 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['log_folder'] = '/tests/logs';
         $settings['auto_translation'] = true;
         $settings['auto_add_translations_to_gettext'] = true;
-        $settings['only_show_checked_strings'] = true;
+        $settings['auto_add_added_date_to_gettext'] = false;
+        $settings['only_show_checked_strings'] = false;
 
-        ob_start();
-        $this->gtbabel->start($settings);
-        echo <<<'EOD'
+        $input = <<<'EOD'
 <div style="background-image: url(http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei1.jpg);"></div>
 <div style="background-image: url(/beispiel-bilddatei2.jpg);"></div>
 <div style="background-image: url('beispiel-bilddatei3.jpg');"></div>
@@ -447,27 +446,219 @@ class Test extends \PHPUnit\Framework\TestCase
 <img src="http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei6.jpg" alt="" />
 <img src="/beispiel-bilddatei7.jpg" alt="" />
 <img src="beispiel-bilddatei8.jpg" alt="" />
+<a href="mailto:david@vielhuber.de"></a>
+<a href="tel:+4989111312113"></a>
 <a href="http://test.de/beispiel-bilddatei9.jpg"></a>
 <a href="http://test.de/beispiel-pfad10"></a>
 <a href="http://gtbabel.local.vielhuber.de/datenschutz/beispiel-pfad11"></a>
 <a href="http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei12.jpg"></a>
+<a href="http://gtbabel.local.vielhuber.de"></a>
+<a href="http://gtbabel.local.vielhuber.de/"></a>
 <a href="/beispiel-bilddatei13.jpg"></a>
 <a href="beispiel-bilddatei14.jpg"></a>
 <a href="beispiel-script.php?foo=bar"></a>
 <a href="beispiel.html"></a>
 <a href="beispiel/pfad/1._Buch_Moses"></a>
 EOD;
+
+        $expected_html = <<<'EOD'
+<div style="background-image: url(http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei1_EN.jpg);"></div>
+<div style="background-image: url(/beispiel-bilddatei2_EN.jpg);"></div>
+<div style="background-image: url('beispiel-bilddatei3_EN.jpg');"></div>
+<div style="background-image: url('http://test.de/beispiel-bilddatei4.jpg');"></div>
+<div style="background-image: url('beispiel-bilddatei1_EN.jpg'), url('beispiel-bilddatei2_EN.jpg');"></div>
+<img src="http://test.de/beispiel-bilddatei5.jpg" alt="">
+<img src="http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei6_EN.jpg" alt="">
+<img src="/beispiel-bilddatei7_EN.jpg" alt="">
+<img src="beispiel-bilddatei8_EN.jpg" alt="">
+<a href="mailto:david@vielhuber.de"></a>
+<a href="tel:+4989111312113"></a>
+<a href="http://test.de/beispiel-bilddatei9.jpg"></a>
+<a href="http://test.de/beispiel-pfad10"></a>
+<a href="http://gtbabel.local.vielhuber.de/en/privacy/example-path11"></a>
+<a href="http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei12_EN.jpg"></a>
+<a href="http://gtbabel.local.vielhuber.de/en/"></a>
+<a href="http://gtbabel.local.vielhuber.de/en/"></a>
+<a href="/beispiel-bilddatei13_EN.jpg"></a>
+<a href="beispiel-bilddatei14_EN.jpg"></a>
+<a href="en/beispiel-script.php?foo=bar"></a>
+<a href="en/beispiel.html"></a>
+<a href="en/example/path/1-buch-moses"></a>
+EOD;
+
+        $expected_po = <<<'EOD'
+msgid ""
+msgstr ""
+"X-Domain: gtbabel\n"
+
+msgctxt "slug"
+msgid "datenschutz"
+msgstr "privacy"
+
+msgctxt "slug"
+msgid "beispiel-pfad11"
+msgstr "example-path11"
+
+msgctxt "slug"
+msgid "beispiel"
+msgstr "example"
+
+msgctxt "slug"
+msgid "pfad"
+msgstr "path"
+
+msgctxt "slug"
+msgid "1._Buch_Moses"
+msgstr "1-buch-moses"
+
+#. checked
+msgctxt "file"
+msgid "datenschutz/beispiel-bilddatei1.jpg"
+msgstr "datenschutz/beispiel-bilddatei1_EN.jpg"
+
+#. checked
+msgctxt "file"
+msgid "beispiel-bilddatei2.jpg"
+msgstr "beispiel-bilddatei2_EN.jpg"
+
+#. checked
+msgctxt "file"
+msgid "beispiel-bilddatei3.jpg"
+msgstr "beispiel-bilddatei3_EN.jpg"
+
+#. checked
+msgctxt "file"
+msgid "beispiel-bilddatei1.jpg"
+msgstr "beispiel-bilddatei1_EN.jpg"
+
+#. checked
+msgctxt "file"
+msgid "datenschutz/beispiel-bilddatei6.jpg"
+msgstr "datenschutz/beispiel-bilddatei6_EN.jpg"
+
+#. checked
+msgctxt "file"
+msgid "beispiel-bilddatei7.jpg"
+msgstr "beispiel-bilddatei7_EN.jpg"
+
+#. checked
+msgctxt "file"
+msgid "beispiel-bilddatei8.jpg"
+msgstr "beispiel-bilddatei8_EN.jpg"
+
+#. checked
+msgctxt "file"
+msgid "datenschutz/beispiel-bilddatei12.jpg"
+msgstr "datenschutz/beispiel-bilddatei12_EN.jpg"
+
+#. checked
+msgctxt "file"
+msgid "beispiel-bilddatei13.jpg"
+msgstr "beispiel-bilddatei13_EN.jpg"
+
+#. checked
+msgctxt "file"
+msgid "beispiel-bilddatei14.jpg"
+msgstr "beispiel-bilddatei14_EN.jpg"
+EOD;
+
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo $input;
+        $this->gtbabel->stop();
+        ob_get_contents();
+        ob_end_clean();
+
+        $this->gtbabel->gettext->editTranslation(
+            'datenschutz/beispiel-bilddatei1.jpg',
+            'file',
+            'en',
+            'datenschutz/beispiel-bilddatei1_EN.jpg',
+            true
+        );
+        $this->gtbabel->gettext->editTranslation(
+            'beispiel-bilddatei2.jpg',
+            'file',
+            'en',
+            'beispiel-bilddatei2_EN.jpg',
+            true
+        );
+        $this->gtbabel->gettext->editTranslation(
+            'beispiel-bilddatei3.jpg',
+            'file',
+            'en',
+            'beispiel-bilddatei3_EN.jpg',
+            true
+        );
+        $this->gtbabel->gettext->editTranslation(
+            'beispiel-bilddatei1.jpg',
+            'file',
+            'en',
+            'beispiel-bilddatei1_EN.jpg',
+            true
+        );
+        $this->gtbabel->gettext->editTranslation(
+            'datenschutz/beispiel-bilddatei6.jpg',
+            'file',
+            'en',
+            'datenschutz/beispiel-bilddatei6_EN.jpg',
+            true
+        );
+        $this->gtbabel->gettext->editTranslation(
+            'beispiel-bilddatei7.jpg',
+            'file',
+            'en',
+            'beispiel-bilddatei7_EN.jpg',
+            true
+        );
+        $this->gtbabel->gettext->editTranslation(
+            'beispiel-bilddatei8.jpg',
+            'file',
+            'en',
+            'beispiel-bilddatei8_EN.jpg',
+            true
+        );
+        $this->gtbabel->gettext->editTranslation(
+            'datenschutz/beispiel-bilddatei12.jpg',
+            'file',
+            'en',
+            'datenschutz/beispiel-bilddatei12_EN.jpg',
+            true
+        );
+        $this->gtbabel->gettext->editTranslation(
+            'beispiel-bilddatei13.jpg',
+            'file',
+            'en',
+            'beispiel-bilddatei13_EN.jpg',
+            true
+        );
+        $this->gtbabel->gettext->editTranslation(
+            'beispiel-bilddatei14.jpg',
+            'file',
+            'en',
+            'beispiel-bilddatei14_EN.jpg',
+            true
+        );
+
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo $input;
         $this->gtbabel->stop();
         $output = ob_get_contents();
         ob_end_clean();
-        //echo $output;
-        //$this->assertEquals($output, '<p>Haus-en</p>');
-        //$this->assertEquals(file_exists('./tests/locales/_template.pot') === false, true);
-        //$this->assertEquals(file_exists('./tests/locales/en.po') === false, true);
-        //$this->gtbabel->reset();
 
-        //__::rrmdir('./tests/locales');
-        //__::rrmdir('./tests/logs');
+        $this->assertEquals(
+            __::minify_html($this->normalize($output)),
+            __::minify_html($this->normalize($expected_html))
+        );
+        $this->assertEquals(
+            $this->normalize(file_get_contents('./tests/locales/en.po')),
+            $this->normalize($expected_po)
+        );
+
+        $this->gtbabel->reset();
+        __::rrmdir('./tests/locales');
+        __::rrmdir('./tests/logs');
     }
 
     public function test__router()
@@ -676,6 +867,7 @@ EOD;
     {
         $str = str_replace("\r\n", "\n", $str);
         $str = str_replace("\r", "\n", $str);
+        $str = trim($str);
         return $str;
     }
 }
