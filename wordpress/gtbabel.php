@@ -285,7 +285,7 @@ class GtbabelWordPress
         add_action(
             'admin_bar_menu',
             function ($wp_admin_bar) {
-                if (is_admin() || !is_user_logged_in()) {
+                if (is_admin() || !is_user_logged_in() || $this->gtbabel->gettext->sourceLngIsCurrentLng()) {
                     return;
                 }
                 $wp_admin_bar->add_node([
@@ -293,7 +293,16 @@ class GtbabelWordPress
                     'parent' => null,
                     'group' => null,
                     'title' => '<span class="ab-icon"></span>' . __('Translate page', 'gtbabel-plugin'),
-                    'href' => admin_url('admin.php?page=gtbabel-trans'),
+                    'href' => admin_url(
+                        'admin.php?page=gtbabel-trans&lng=' .
+                            $this->gtbabel->gettext->getCurrentLanguageCode() .
+                            '&url=' .
+                            urlencode(
+                                $this->gtbabel->gettext->getUrlTranslationInLanguage(
+                                    $this->gtbabel->settings->getSourceLanguageCode()
+                                )
+                            )
+                    ),
                     'meta' => ['target' => '_blank']
                 ]);
             },
