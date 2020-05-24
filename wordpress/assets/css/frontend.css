@@ -1,0 +1,7 @@
+html {
+    opacity: 0.5 !important;
+}
+#wpadminbar #wp-admin-bar-gtbabel-frontend-editor .ab-icon:before {
+    content: '\f11f';
+    top: 3px;
+}

@@ -28,6 +28,7 @@ class GtbabelWordPress
         $this->initBackend();
         $this->triggerPreventPublish();
         $this->addGutenbergSidebar();
+        $this->initFrontendEditor();
         $this->showWizardNotice();
         $this->languagePickerWidget();
         $this->languagePickerShortcode();
@@ -279,6 +280,34 @@ class GtbabelWordPress
         });
     }
 
+    private function initFrontendEditor()
+    {
+        add_action(
+            'admin_bar_menu',
+            function ($wp_admin_bar) {
+                if (is_admin() || !is_user_logged_in()) {
+                    return;
+                }
+                $wp_admin_bar->add_node([
+                    'id' => 'gtbabel-frontend-editor',
+                    'parent' => null,
+                    'group' => null,
+                    'title' => '<span class="ab-icon"></span>' . __('Translate page', 'gtbabel-plugin'),
+                    'href' => admin_url('admin.php?page=gtbabel-trans'),
+                    'meta' => ['target' => '_blank']
+                ]);
+            },
+            999
+        );
+        add_action('wp_enqueue_scripts', function () {
+            if (is_admin() || !is_user_logged_in()) {
+                return;
+            }
+            wp_enqueue_style('gtbabel-frontend-css', plugins_url('assets/css/frontend.css', __FILE__));
+            wp_enqueue_script('gtbabel-frontend-js', plugins_url('assets/js/frontend.js', __FILE__));
+        });
+    }
+
     private function languagePickerWidget()
     {
         add_action('widgets_init', function () {
@@ -383,10 +412,10 @@ class GtbabelWordPress
 
             foreach ($menus as $menus__value) {
                 add_action('admin_print_styles-' . $menus__value, function () {
-                    wp_enqueue_style('gtbabel-css', plugins_url('gtbabel.css', __FILE__));
+                    wp_enqueue_style('gtbabel-backend-css', plugins_url('assets/css/backend.css', __FILE__));
                 });
                 add_action('admin_print_scripts-' . $menus__value, function () {
-                    wp_enqueue_script('gtbabel-js', plugins_url('gtbabel.js', __FILE__));
+                    wp_enqueue_script('gtbabel-backend-js', plugins_url('assets/js/backend.js', __FILE__));
                 });
             }
         });

@@ -37,6 +37,10 @@ Yes.
 
 Yes.
 
+= Can I use language specific subdomains or different domains? =
+
+Currently only a path based approach is supported. However, this feature is planned in the future.
+
 = Can I use Gtbabel without WordPress? =
 
 Yes (see [repository](https://github.com/vielhuber/gtbabel)).
@@ -46,6 +50,9 @@ Yes (see [repository](https://github.com/vielhuber/gtbabel)).
 2. Setup wizard
 
 == Changelog ==
+= 3.2.7 =
+* Add file support
+
 = 3.0.3 =
 * Improve stability
 
