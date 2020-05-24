@@ -144,6 +144,7 @@ The following features are included:
 -   Support for plugins like [Contact Form 7](https://de.wordpress.org/plugins/contact-form-7/)
 -   Translate specific posts/pages or any other url
 -   Control publish status of posts/pages (slug changes are auto-reflected in the `prevent_publish_urls`-option)
+-   Possibility to replace files per language via the media library
 
 ## Gettext
 
@@ -269,6 +270,10 @@ The string then finally gets correctly translated to
 The router automatically modifies the `$_SERVER['REQUEST_URI']` variable to catch translated urls.\
 Unknown translations of urls are picked up from the current url and from links that are on the page.\
 These urls are automatically added to gettext (ajax requested urls are excluded).
+
+## Dealing with assets
+
+Although Gtbabel leaves static files untouched, it adds them to the template file (with context `file`). This gives you the possibility to output images, downloads and other media individually per language.
 
 ## JSON Responses
 

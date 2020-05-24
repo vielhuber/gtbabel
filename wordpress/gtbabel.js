@@ -74,6 +74,41 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    document.addEventListener('click', e => {
+        let el = e.target.closest('.gtbabel__file-info-upload');
+        if (el) {
+            let image_frame;
+            if (image_frame) {
+                image_frame.open();
+            }
+
+            image_frame = wp.media({
+                multiple: false
+            });
+
+            image_frame.on('close', function () {
+                let url = null,
+                    selection = image_frame.state().get('selection'),
+                    textarea = el.closest('.gtbabel__table-cell').querySelector('.gtbabel__input--textarea');
+                if (selection.length > 0) {
+                    selection.forEach(attachment => {
+                        url = attachment.attributes.url;
+                    });
+                }
+                if (url !== null) {
+                    url = url.replace(window.location.protocol + '//' + window.location.host, '');
+                    url = url.replace(/^\/+|\/+$/g, '');
+                    textarea.value = url;
+                    textarea.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            });
+
+            image_frame.open();
+
+            e.preventDefault();
+        }
+    });
+
     document.addEventListener('change', e => {
         let el = e.target.closest('.gtbabel__input--on-change');
         if (el) {

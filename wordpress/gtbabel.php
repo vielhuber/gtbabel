@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.2.5
+ * Version: 3.2.6
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -1068,6 +1068,33 @@ class GtbabelWordPress
         echo '</div>';
     }
 
+    private function initBackendStringTranslationShowFile($str, $show_upload = true)
+    {
+        echo '<div class="gtbabel__file-info">';
+        if ($str != '') {
+            if (preg_match('/.+\.(jpg|jpeg|png|gif|svg)$/i', $str)) {
+                echo '<img class="gtbabel__file-info-img" src="' .
+                    $this->gtbabel->host->getCurrentHost() .
+                    '/' .
+                    $str .
+                    '" alt="" />';
+            }
+            echo '<a class="button button-secondary button-small gtbabel__file-info-link" target="_blank" href="' .
+                $this->gtbabel->host->getCurrentHost() .
+                '/' .
+                $str .
+                '">' .
+                __('Open file', 'gtbabel-plugin') .
+                '</a>';
+        }
+        if ($show_upload === true) {
+            echo '<a class="button button-secondary button-small gtbabel__file-info-upload" href="#">' .
+                __('Upload file', 'gtbabel-plugin') .
+                '</a>';
+        }
+        echo '</div>';
+    }
+
     private function initBackendStringTranslation()
     {
         $message = '';
@@ -1322,6 +1349,9 @@ class GtbabelWordPress
                     '][orig]" disabled="disabled">' .
                     $translations__value['orig'] .
                     '</textarea>';
+                if ($translations__value['context'] === 'file') {
+                    $this->initBackendStringTranslationShowFile($translations__value['orig'], false);
+                }
                 echo '</td>';
                 foreach (
                     $this->gtbabel->settings->getSelectedLanguagesWithoutSource()
@@ -1351,6 +1381,12 @@ class GtbabelWordPress
                         '][str]">' .
                         $translations__value['translations'][$languages__key]['str'] .
                         '</textarea>';
+                    if ($translations__value['context'] === 'file') {
+                        $this->initBackendStringTranslationShowFile(
+                            $translations__value['translations'][$languages__key]['str'],
+                            true
+                        );
+                    }
                     echo '</td>';
                 }
                 echo '<td class="gtbabel__table-cell">';

@@ -141,6 +141,37 @@
     margin-left: 10px;
 }
 
+.gtbabel__file-info {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    align-content: flex-start;
+    padding: 4px 2px;
+    position: relative;
+}
+.gtbabel__file-info > * {
+    flex: 0 1 auto;
+    margin-right: 6px !important;
+    font-size: 10px;
+}
+.gtbabel__file-info > *:last-child {
+    margin-right: 0 !important;
+}
+.gtbabel__file-info-img {
+    display: block;
+    height: 26px;
+    width: auto;
+    position: absolute;
+    top: 4px;
+    left: 2px;
+    z-index: 1;
+    transition: all 0.1s ease-in-out;
+}
+.gtbabel__file-info-img:hover {
+    height: 200px;
+    z-index: 2;
+}
+
 .gtbabel__pagination {
     display: flex;
     align-items: flex-start;
