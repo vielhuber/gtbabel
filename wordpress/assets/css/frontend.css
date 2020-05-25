@@ -1,7 +1,18 @@
-html {
-    opacity: 0.5 !important;
-}
 #wpadminbar #wp-admin-bar-gtbabel-frontend-editor .ab-icon:before {
     content: '\f11f';
     top: 3px;
+}
+.gtbabel-frontend-editor {
+    position: fixed;
+    top: 32px;
+    bottom: 0;
+    left: 0;
+    width: 20%;
+    z-index: 2147483647;
+    background-color: #f1f1f1;
+}
+.gtbabel-frontend-editor__iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
 }
