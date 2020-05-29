@@ -55,6 +55,7 @@ class Settings
                 '/path/in/source/lng/to/specific/page' => ['en', 'fr'],
                 '/slug1/*' => ['en'],
                 '/slug1/*/slug2' => ['fr']
+                //'/*' => ['en', 'fr'] // disable whole languages
             ],
             'exclude_urls' => ['/backend'],
             'exclude_dom' => ['.notranslate', '.lngpicker'],

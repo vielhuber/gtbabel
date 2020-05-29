@@ -54,9 +54,26 @@ $gtbabel = new Gtbabel();
 
 $gtbabel->start();
 
-// start with advanced settings
-$gtbabel->start([
-    'languages' => ['de', 'en', 'fr'],
+// any static or dynamic content
+require_once 'template.html';
+
+$gtbabel->stop();
+```
+
+## Configuration
+
+If you don't provide an initial configuration, Gtbabel starts with reasonable default settings (see below).
+You also can provide settings directly as an array of even pass a json file to overwrite (parts) of the default settings:
+
+-   `$gtbabel->start();`
+-   `$gtbabel->start(['languages' => ['de', 'en', 'fr'], ...]);`
+-   `$gtbabel->start('config.json');`
+
+The default configuration is:
+
+```php
+[
+    'languages' => gtbabel_default_language_codes(), // see below
     'lng_source' => 'de',
     'lng_target' => null, // this gets automatically determined by the current url
     'lng_folder' => '/locales',
@@ -74,18 +91,16 @@ $gtbabel->start([
     'only_show_checked_strings' => true,
     'auto_translation' => true,
     'auto_translation_service' => 'google', // google|microsoft
-    'google_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', // you can also use an array here to provide multiple keys at once
-    'microsoft_translation_api_key' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', // you can also use an array here to provide multiple keys at once
+    'google_translation_api_key' => [], // use a string or array of strings to provide multiple keys at once
+    'microsoft_translation_api_key' => [], // use a string or array of strings to provide multiple keys at once
     'stats_log' => true,
     'discovery_log' => false,
     'prevent_publish' => true,
     'prevent_publish_urls' => [
-        '/path/in/source/lng/to/specific/page' => ['en', 'fr']
-        // you can also use wildcards here
-        '/slug1/*' => ['en'],
-        '/slug1/*/slug2' => ['fr'],
-         // disable whole languages
-        '/*' => ['en','fr']
+        '/path/in/source/lng/to/specific/page' => ['en', 'fr'],
+        '/slug1/*' => ['en'], // you can also use wildcards here
+        '/slug1/*/slug2' => ['fr']
+        //'/*' => ['en', 'fr'] // disable whole languages
     ],
     'exclude_urls' => ['/backend'],
     'exclude_dom' => ['.notranslate', '.lngpicker'],
@@ -101,12 +116,7 @@ $gtbabel->start([
             'context' => 'slug'
         ]
     ]
-]);
-
-// any static or dynamic content
-require_once 'template.html';
-
-$gtbabel->stop();
+];
 ```
 
 ## Other usage
