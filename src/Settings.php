@@ -7,6 +7,7 @@ class Settings
 
     function setup($args = [])
     {
+        $args = $this->setupArgs($args);
         $args = $this->setupSettings($args);
         $args = (object) $args;
         $this->args = $args;
@@ -23,6 +24,23 @@ class Settings
             return null;
         }
         return $this->args->{$prop};
+    }
+
+    function setupArgs($args)
+    {
+        if ($args === null || $args === true || $args === false || $args == '') {
+            return [];
+        }
+        if (is_array($args)) {
+            return $args;
+        }
+        if (is_string($args) && file_exists($args)) {
+            $arr = json_decode(file_Get_contents($args), true);
+            if ($arr === true || $arr === false || $arr === null || $arr == '' || !is_array($arr)) {
+                return [];
+            }
+            return $arr;
+        }
     }
 
     function setupSettings($args = [])

@@ -68,7 +68,7 @@ You also can provide settings directly as an array or pass a path to a json file
 ```php
 $gtbabel->start(); // start with default settings
 $gtbabel->start(['languages' => ['de', 'en', 'fr'], ...]); // overwrite settings in php
-$gtbabel->start('config.json'); // overwrite settings from json
+$gtbabel->start('settings.json'); // overwrite settings from json
 ```
 
 The default configuration is:

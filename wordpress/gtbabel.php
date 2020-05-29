@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.2.6
+ * Version: 3.3.2
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -61,7 +61,7 @@ class GtbabelWordPress
 
     private function localizeJs()
     {
-        $settings = get_option('gtbabel_settings');
+        $settings = $this->getSettings();
         if (!empty($settings['localize_js'])) {
             add_action(
                 'wp_head',
@@ -93,7 +93,7 @@ class GtbabelWordPress
 
     private function start()
     {
-        $settings = get_option('gtbabel_settings');
+        $settings = $this->getSettings();
 
         // dynamically changed settings
         $settings['prevent_publish'] = !is_user_logged_in();
@@ -154,34 +154,16 @@ class GtbabelWordPress
         });
     }
 
-    private function setDefaultSettingsToOption()
-    {
-        if (get_option('gtbabel_settings') === false || get_option('gtbabel_settings') == '') {
-            $lng_source = mb_strtolower(mb_substr(get_locale(), 0, 2));
-            $languages = ['de', 'en'];
-            if (!in_array($lng_source, $languages)) {
-                $languages[] = $lng_source;
-            }
-            delete_option('gtbabel_settings'); // this is needed, because sometimes the option exists (with the value '')
-            add_option(
-                'gtbabel_settings',
-                $this->gtbabel->settings->setupSettings([
-                    'languages' => $languages,
-                    'lng_source' => $lng_source,
-                    'lng_folder' => $this->getPluginFileStorePath() . '/locales',
-                    'log_folder' => $this->getPluginFileStorePath() . '/logs',
-                    'exclude_urls' => ['/wp-admin', 'wp-login.php', 'wp-cron.php', 'wp-comments-post.php'],
-                    'exclude_dom' => ['.notranslate', '.lngpicker', '#wpadminbar']
-                ])
-            );
-        }
-    }
-
-    private function getPluginFileStorePath()
+    private function getPluginFileStorePathRelative()
     {
         return '/' .
             trim(str_replace($this->gtbabel->utils->getDocRoot(), '', wp_upload_dir()['basedir']), '/') .
             '/gtbabel';
+    }
+
+    private function getPluginFileStorePathAbsolute()
+    {
+        return rtrim(wp_upload_dir()['basedir'], '/') . '/gtbabel';
     }
 
     private function triggerPreventPublish()
@@ -222,7 +204,7 @@ class GtbabelWordPress
                 }
 
                 if ($trigger1 || $trigger2 || $trigger3) {
-                    $this->changeSetting('prevent_publish_urls', $this->gtbabel->settings->get('prevent_publish_urls'));
+                    $this->saveSetting('prevent_publish_urls', $this->gtbabel->settings->get('prevent_publish_urls'));
                 }
             },
             10,
@@ -604,7 +586,7 @@ class GtbabelWordPress
                     $settings['languages'][$settings['lng_source']] = '1';
                     $settings['languages'] = array_keys($settings['languages']);
 
-                    update_option('gtbabel_settings', $settings);
+                    $this->saveSettings($settings);
                     // refresh gtbabel with new options
                     $this->start();
                 }
@@ -615,7 +597,7 @@ class GtbabelWordPress
             }
 
             if (isset($_POST['reset_settings'])) {
-                delete_option('gtbabel_settings');
+                $this->deleteSettings();
                 $this->setDefaultSettingsToOption();
                 $this->start();
             }
@@ -630,7 +612,7 @@ class GtbabelWordPress
                 '</p></div>';
         }
 
-        $settings = get_option('gtbabel_settings');
+        $settings = $this->getSettings();
 
         echo '<div class="gtbabel gtbabel--settings wrap">';
         echo '<form class="gtbabel__form" method="post" action="' . admin_url('admin.php?page=gtbabel-settings') . '">';
@@ -1206,7 +1188,7 @@ class GtbabelWordPress
                     } else {
                         $this->gtbabel->publish->unpublish($url, $lng);
                     }
-                    $this->changeSetting('prevent_publish_urls', $this->gtbabel->settings->get('prevent_publish_urls'));
+                    $this->saveSetting('prevent_publish_urls', $this->gtbabel->settings->get('prevent_publish_urls'));
                 }
             }
             if (isset($_POST['save_publish'])) {
@@ -1226,7 +1208,7 @@ class GtbabelWordPress
                         }
                         $this->gtbabel->publish->edit($url, $lngs);
                     }
-                    $this->changeSetting('prevent_publish_urls', $this->gtbabel->settings->get('prevent_publish_urls'));
+                    $this->saveSetting('prevent_publish_urls', $this->gtbabel->settings->get('prevent_publish_urls'));
                 }
             }
             $message =
@@ -1710,18 +1692,18 @@ EOD;
                     check_admin_referer('gtbabel-wizard-step-1');
                     $settings['languages'][$this->getSetting('lng_source')] = '1';
                     $settings['languages'] = array_keys($settings['languages']);
-                    $this->changeSetting('languages', $settings['languages']);
+                    $this->saveSetting('languages', $settings['languages']);
                 }
                 if ($this->getBackendWizardStep() === 3) {
                     check_admin_referer('gtbabel-wizard-step-2');
                     $existing = $this->getSetting('google_translation_api_key');
                     $existing[0] = $settings['google_translation_api_key'];
-                    $this->changeSetting('google_translation_api_key', $existing);
-                    $this->changeSetting('auto_translation', true);
+                    $this->saveSetting('google_translation_api_key', $existing);
+                    $this->saveSetting('auto_translation', true);
                 }
                 if ($this->getBackendWizardStep() === 5) {
                     check_admin_referer('gtbabel-wizard-step-4');
-                    $this->changeSetting('wizard_finished', true);
+                    $this->saveSetting('wizard_finished', true);
                 }
 
                 // restart
@@ -1729,7 +1711,7 @@ EOD;
             }
         }
 
-        $settings = get_option('gtbabel_settings');
+        $settings = $this->getSettings();
 
         echo '<div class="gtbabel gtbabel--wizard">';
 
@@ -2041,28 +2023,6 @@ EOD;
         return $pagination;
     }
 
-    private function changeSetting($key, $value)
-    {
-        $settings = get_option('gtbabel_settings');
-        if ($settings === false) {
-            $settings = [];
-        }
-        $settings[$key] = $value;
-        update_option('gtbabel_settings', $settings);
-    }
-
-    private function getSetting($key)
-    {
-        $settings = get_option('gtbabel_settings');
-        if ($settings === false) {
-            return null;
-        }
-        if (!array_key_exists($key, $settings)) {
-            return null;
-        }
-        return $settings[$key];
-    }
-
     private function isUrlPublished($url)
     {
         /*
@@ -2339,6 +2299,79 @@ EOD;
         }
 
         echo '</div>';
+    }
+
+    private function getSettingsFilename()
+    {
+        return $this->getPluginFileStorePathAbsolute() . '/settings.json';
+    }
+
+    private function getSettings()
+    {
+        if (!file_exists($this->getSettingsFilename())) {
+            return [];
+        }
+        $settings = json_decode(@file_get_contents($this->getSettingsFilename()), true);
+        if (
+            $settings === true ||
+            $settings === false ||
+            $settings === null ||
+            $settings == '' ||
+            !is_array($settings)
+        ) {
+            return [];
+        }
+        return $settings;
+    }
+
+    private function getSetting($key)
+    {
+        $settings = $this->getSettings();
+        if (empty($settings)) {
+            return null;
+        }
+        if (!array_key_exists($key, $settings)) {
+            return null;
+        }
+        return $settings[$key];
+    }
+
+    private function saveSettings($settings)
+    {
+        file_put_contents($this->getSettingsFilename(), json_encode($settings, \JSON_PRETTY_PRINT));
+    }
+
+    private function saveSetting($key, $value)
+    {
+        $settings = $this->getSettings();
+        $settings[$key] = $value;
+        $this->saveSettings($settings);
+    }
+
+    private function deleteSettings()
+    {
+        @unlink($this->getSettingsFilename());
+    }
+
+    private function setDefaultSettingsToOption()
+    {
+        if (empty($this->getSettings())) {
+            $lng_source = mb_strtolower(mb_substr(get_locale(), 0, 2));
+            $languages = ['de', 'en'];
+            if (!in_array($lng_source, $languages)) {
+                $languages[] = $lng_source;
+            }
+            $this->saveSettings(
+                $this->gtbabel->settings->setupSettings([
+                    'languages' => $languages,
+                    'lng_source' => $lng_source,
+                    'lng_folder' => $this->getPluginFileStorePathRelative() . '/locales',
+                    'log_folder' => $this->getPluginFileStorePathRelative() . '/logs',
+                    'exclude_urls' => ['/wp-admin', 'wp-login.php', 'wp-cron.php', 'wp-comments-post.php'],
+                    'exclude_dom' => ['.notranslate', '.lngpicker', '#wpadminbar']
+                ])
+            );
+        }
     }
 }
 
