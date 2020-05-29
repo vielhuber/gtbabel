@@ -62,18 +62,20 @@ $gtbabel->stop();
 
 ## Configuration
 
-If you don't provide an initial configuration, Gtbabel starts with reasonable default settings (see below).
-You also can provide settings directly as an array of even pass a json file to overwrite (parts) of the default settings:
+If you don't provide an initial configuration, Gtbabel starts with reasonable default settings.\
+You also can provide settings directly as an array or pass a path to a json file to overwrite (parts) of the default settings:
 
--   `$gtbabel->start();`
--   `$gtbabel->start(['languages' => ['de', 'en', 'fr'], ...]);`
--   `$gtbabel->start('config.json');`
+```php
+$gtbabel->start(); // start with default settings
+$gtbabel->start(['languages' => ['de', 'en', 'fr'], ...]); // overwrite settings in php
+$gtbabel->start('config.json'); // overwrite settings from json
+```
 
 The default configuration is:
 
 ```php
 [
-    'languages' => gtbabel_default_language_codes(), // see below
+    'languages' => gtbabel_default_language_codes(), // see helper functions
     'lng_source' => 'de',
     'lng_target' => null, // this gets automatically determined by the current url
     'lng_folder' => '/locales',
