@@ -344,7 +344,7 @@ The translation apis of Google or Microsoft can be costly. Try to keep track of 
 
 ## Caveats
 
--   The source language acts as a base for every other language. It's content must be always present (one cannot publish content only in a different language.
+-   The source language acts as a base for every other language. It's content must be always present (one cannot publish content only in a different language).
 -   Gtbabel is good at translating whole pages. If you want to provide different content for different languages, Gtbabel might be the wrong tool (however you _can_ use `if( gtbabel_current_lng() === 'other-lng' ) { echo 'content in source language'; }` in your templates to achieve that).
 -   Gtbabel is designed to translate every part of the page without code changes (however you can exclude translations with the `exclude_dom`-option). It is not designed for mainly translating only certain parts of the page.
 
