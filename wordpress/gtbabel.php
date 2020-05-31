@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.3.4
+ * Version: 3.3.5
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -32,12 +32,11 @@ class GtbabelWordPress
         $this->showWizardNotice();
         $this->languagePickerWidget();
         $this->languagePickerShortcode();
+        $this->bindPotDownload();
         $this->disableAutoRedirect();
         $this->localizeJs();
-        $this->setDefaultSettingsToOption();
         $this->startHook();
         $this->stopHook();
-        $this->bindPotDownload();
     }
 
     private function disableAutoRedirect()
@@ -129,6 +128,7 @@ class GtbabelWordPress
     private function installHook()
     {
         register_activation_hook(__FILE__, function () {
+            $this->setupPluginFolder();
             $this->setDefaultSettingsToOption();
         });
     }
@@ -2108,7 +2108,18 @@ EOD;
         $urls = array_merge($urls, __::extract_urls_from_sitemap(get_bloginfo('url') . '/sitemap.xml'));
 
         $urls = array_map(function ($urls__value) {
-            return rtrim($urls__value, '/') . '/';
+            $urls__value = rtrim($urls__value, '/') . '/';
+            if ($this->gtbabel->settings->get('prefix_source_lng') === true) {
+                $urls__value = str_replace(
+                    rtrim($this->gtbabel->host->getCurrentHost(), '/'),
+                    rtrim($this->gtbabel->host->getCurrentHost(), '/') .
+                        '/' .
+                        rtrim($this->gtbabel->gettext->getSourceLngCode(), '/') .
+                        '/',
+                    $urls__value
+                );
+            }
+            return $urls__value;
         }, $urls);
 
         $urls = array_unique($urls);
@@ -2338,9 +2349,6 @@ EOD;
 
     private function saveSettings($settings)
     {
-        if (!is_dir($this->getPluginFileStorePathAbsolute())) {
-            mkdir($this->getPluginFileStorePathAbsolute(), 0777, true);
-        }
         file_put_contents($this->getSettingsFilename(), json_encode($settings, \JSON_PRETTY_PRINT));
     }
 
@@ -2354,6 +2362,16 @@ EOD;
     private function deleteSettings()
     {
         @unlink($this->getSettingsFilename());
+    }
+
+    private function setupPluginFolder()
+    {
+        if (!is_dir($this->getPluginFileStorePathAbsolute())) {
+            mkdir($this->getPluginFileStorePathAbsolute(), 0777, true);
+        }
+        if (!file_exists($this->getPluginFileStorePathAbsolute() . '/.htaccess')) {
+            file_put_contents($this->getPluginFileStorePathAbsolute() . '/.htaccess', 'Deny from all');
+        }
     }
 
     private function setDefaultSettingsToOption()

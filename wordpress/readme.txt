@@ -5,7 +5,7 @@ Donate link: https://vielhuber.de
 Requires at least: 5.3.2
 Tested up to: 5.3.2
 Requires PHP: 7.2
-Stable tag: 3.3.4
+Stable tag: 3.3.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -40,6 +40,18 @@ Yes.
 = Can I use language specific subdomains or different domains? =
 
 Currently only a path based approach is supported. However, this feature is planned in the future.
+
+= Where are my language files, logs and settings stored? =
+
+They are stored in /wp-content/uploads/gtbabel.
+
+= Should I checkout my language files, logs and settings into version control? =
+
+Yes (in order to ensure portability).
+
+= What happens to my language files, logs and settings when disabling / uninstalling? =
+
+The files are intentionally preserved.
 
 = Can I use Gtbabel without WordPress? =
 
