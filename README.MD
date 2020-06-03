@@ -88,7 +88,6 @@ The default configuration is:
     'html_hreflang_tags' => true,
     'debug_translations' => false, // surround outputted translations with "%|%" to see borders
     'auto_add_translations_to_gettext' => true,
-    'auto_add_added_date_to_gettext' => true,
     'auto_set_discovered_strings_checked' => false,
     'only_show_checked_strings' => true,
     'auto_translation' => true,

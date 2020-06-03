@@ -12,7 +12,6 @@ $gtbabel->start([
     'redirect_root_domain' => 'browser',
     'debug_translations' => true,
     'auto_add_translations_to_gettext' => false,
-    'auto_add_added_date_to_gettext' => true,
     'auto_set_discovered_strings_checked' => false,
     'only_show_checked_strings' => true,
     'auto_translation' => true,

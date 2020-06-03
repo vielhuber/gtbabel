@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.4.1
+ * Version: 3.4.2
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -2090,28 +2090,30 @@ EOD;
     {
         $urls = [];
 
-        // approach 1 (get all posts)
-        $urls[] = get_bloginfo('url');
-        $query = new \WP_Query(['post_type' => 'any', 'posts_per_page' => '-1', 'post_status' => 'publish']);
-        while ($query->have_posts()) {
-            $query->the_post();
-            $url = get_permalink();
-            $urls[] = $url;
-        }
-        $query = new \WP_Term_Query(['hide_empty' => false]);
-        if (!empty($query->terms)) {
-            foreach ($query->terms as $terms__value) {
-                $url = get_term_link($terms__value);
-                // exclude non-public
-                if (strpos($url, '?') !== false) {
-                    continue;
-                }
+        // approach 1 (parse sitemap; this also works for dynamically generated sitemaps like yoast)
+        $urls = __::extract_urls_from_sitemap(get_bloginfo('url') . '/sitemap_index.xml');
+
+        // approach 2 (get all posts)
+        if (empty($urls)) {
+            $urls[] = get_bloginfo('url');
+            $query = new \WP_Query(['post_type' => 'any', 'posts_per_page' => '-1', 'post_status' => 'publish']);
+            while ($query->have_posts()) {
+                $query->the_post();
+                $url = get_permalink();
                 $urls[] = $url;
             }
+            $query = new \WP_Term_Query(['hide_empty' => false]);
+            if (!empty($query->terms)) {
+                foreach ($query->terms as $terms__value) {
+                    $url = get_term_link($terms__value);
+                    // exclude non-public
+                    if (strpos($url, '?') !== false) {
+                        continue;
+                    }
+                    $urls[] = $url;
+                }
+            }
         }
-
-        // approach 2 (parse sitemap; this also works for dynamically generated sitemaps like yoast)
-        $urls = array_merge($urls, __::extract_urls_from_sitemap(get_bloginfo('url') . '/sitemap_index.xml'));
 
         $urls = array_filter($urls, function ($urls__value) {
             return strpos($urls__value, $this->gtbabel->host->getCurrentHost()) !== false;

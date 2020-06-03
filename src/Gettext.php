@@ -431,10 +431,6 @@ class Gettext
             [$orig, $context] = $this->getStringAndContextFromId($id);
             $translation = Translation::create($context, $orig);
             $translation->translate($str);
-            //$this->log->generalLog('creating ' . $translation->getOriginal());
-            if ($this->settings->get('auto_add_added_date_to_gettext') === true) {
-                $this->addCommentToTranslation($translation, 'added: ' . date('Y-m-d H:i:s'));
-            }
             if ($checked !== false) {
                 $this->addCommentToTranslation($translation, 'checked');
             }
@@ -757,9 +753,6 @@ class Gettext
     {
         $translation = Translation::create($context, $str);
         $translation->translate('');
-        if ($this->settings->get('auto_add_added_date_to_gettext') === true) {
-            $this->addCommentToTranslation($translation, 'added: ' . date('Y-m-d H:i:s'));
-        }
         if ($comment !== null) {
             $translation->getComments()->add($comment);
         }
@@ -775,9 +768,6 @@ class Gettext
         }
         $translation = Translation::create($context, $orig);
         $translation->translate($trans);
-        if ($this->settings->get('auto_add_added_date_to_gettext') === true) {
-            $this->addCommentToTranslation($translation, 'added: ' . date('Y-m-d H:i:s'));
-        }
         if ($comment !== null) {
             $translation->getComments()->add($comment);
         }

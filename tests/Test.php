@@ -433,7 +433,6 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['log_folder'] = '/tests/logs';
         $settings['auto_translation'] = true;
         $settings['auto_add_translations_to_gettext'] = true;
-        $settings['auto_add_added_date_to_gettext'] = false;
         $settings['only_show_checked_strings'] = false;
 
         $input = <<<'EOD'
@@ -777,7 +776,6 @@ EOD;
             'redirect_root_domain' => 'browser',
             'debug_translations' => true,
             'auto_add_translations_to_gettext' => false,
-            'auto_add_added_date_to_gettext' => true,
             'auto_set_discovered_strings_checked' => false,
             'only_show_checked_strings' => false,
             'exclude_urls' => null,
