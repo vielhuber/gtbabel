@@ -207,29 +207,7 @@ class Dom
                         $value = $nodes__value->nodeValue;
                     }
                     if ($value != '') {
-                        // (auto) determine context
-                        $context = null;
-                        if (@$include__value['context'] != '') {
-                            $context = $include__value['context'];
-                        }
-                        if (
-                            ($context === null || $context == '') &&
-                            mb_strpos($value, $this->host->getCurrentHost()) === 0
-                        ) {
-                            $context = 'slug|file';
-                        }
-                        if ($context === 'slug|file') {
-                            $value_modified = $value;
-                            if (!preg_match('/^[a-zA-Z]+?:.+$/', $value_modified)) {
-                                $value_modified = $this->host->getCurrentHost() . '/' . $value_modified;
-                            }
-                            $value_modified = str_replace(['.php', '.html'], '', $value_modified);
-                            if (preg_match('/\/.+\.[a-zA-Z\d]+$/', str_replace('://', '', $value_modified))) {
-                                $context = 'file';
-                            } else {
-                                $context = 'slug';
-                            }
-                        }
+                        $context = $this->gettext->autoDetermineContext($value, @$include__value['context']);
 
                         if (($context === 'slug' || $context === 'file') && $this->host->urlIsExcluded($value)) {
                             continue;
@@ -616,7 +594,10 @@ class Dom
             foreach ($json as $json__key => &$json__value) {
                 if (is_array($json__value) || is_object($json__value) || $json__value instanceof \Traversable) {
                     $this->traverseJson($json__value);
-                } elseif (is_string($json__value) && in_array($json__key, ['message'], true)) {
+                } elseif (is_string($json__value)) {
+                    if ($this->gettext->stringShouldNotBeTranslated($json__value)) {
+                        continue;
+                    }
                     $json__value = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
                         $json__value,
                         $this->gettext->getCurrentLanguageCode(),

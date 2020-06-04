@@ -908,9 +908,7 @@ class Gettext
     {
         // auto determine context
         if ($context === null || $context == '') {
-            if (mb_strpos($orig, 'http') === 0 && mb_strpos($orig, ' ') === false) {
-                $context = 'slug';
-            }
+            $context = $this->autoDetermineContext($orig, $context);
         }
 
         if ($context === 'slug') {
@@ -1319,6 +1317,31 @@ class Gettext
             return true;
         }
         return false;
+    }
+
+    function autoDetermineContext($value, $suggestion = null)
+    {
+        $context = $suggestion;
+        if ($context === null || $context == '') {
+            if (mb_strpos($value, $this->host->getCurrentHost()) === 0) {
+                $context = 'slug|file';
+            } elseif (mb_strpos($value, 'http') === 0 && mb_strpos($value, ' ') === false) {
+                $context = 'slug';
+            }
+        }
+        if ($context === 'slug|file') {
+            $value_modified = $value;
+            if (!preg_match('/^[a-zA-Z]+?:.+$/', $value_modified)) {
+                $value_modified = $this->host->getCurrentHost() . '/' . $value_modified;
+            }
+            $value_modified = str_replace(['.php', '.html'], '', $value_modified);
+            if (preg_match('/\/.+\.[a-zA-Z\d]+$/', str_replace('://', '', $value_modified))) {
+                $context = 'file';
+            } else {
+                $context = 'slug';
+            }
+        }
+        return $context;
     }
 
     function stringIsChecked($str, $lng, $context = null)

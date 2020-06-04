@@ -289,7 +289,7 @@ Although Gtbabel leaves static files untouched, it adds them to the template fil
 ## JSON Responses
 
 JSON responses are also automatically parsed by Gtbabel.\
-Currently only string values with the key `message` are automatically translated.
+Currently only string values are automatically translated.
 
 ## Translation management
 

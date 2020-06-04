@@ -1,1 +1,1 @@
-{"foo":{"bar":{"baz":{"message":"%|%oink-en%|%"},"gnarr":42,"foo":{"bar":["baz"]}}},"bar":[null]}
+{"foo":{"bar":{"baz":{"message":"%|%oink-en%|%"},"gnarr":42,"foo":{"bar":["%|%baz-en%|%"]}}},"bar":[null]}

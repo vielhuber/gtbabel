@@ -124,6 +124,10 @@ class Host
         ) {
             return true;
         }
+        // we surely cannot detect ajax requests; so use common patterns
+        if (strpos($this->getCurrentUrl(), 'wp-json/') !== false) {
+            return true;
+        }
         return false;
     }
 
