@@ -188,6 +188,21 @@ class Dom
                     'selector' => '*',
                     'attribute' => 'style',
                     'context' => 'file'
+                ],
+                [
+                    'selector' => '*',
+                    'attribute' => 'data-*',
+                    'context' => null
+                ],
+                [
+                    'selector' => '*',
+                    'attribute' => 'label',
+                    'context' => null
+                ],
+                [
+                    'selector' => '*',
+                    'attribute' => '*text*',
+                    'context' => null
                 ]
             ]);
         }
@@ -201,41 +216,95 @@ class Dom
                     if (array_key_exists($this->getIdOfNode($nodes__value), $this->excluded_nodes)) {
                         continue;
                     }
+
+                    $content = [];
                     if (@$include__value['attribute'] != '') {
-                        $value = $nodes__value->getAttribute($include__value['attribute']);
+                        $wildcard_pos = strpos($include__value['attribute'], '*');
+                        if ($wildcard_pos !== false) {
+                            $wildcard_query = './@*';
+                            $wildcard_count = substr_count($include__value['attribute'], '*');
+                            $wildcard_value = str_replace('*', '', $include__value['attribute']);
+                            // the following combinations currently are supported: foo* and *foo*
+                            if ($wildcard_count === 1) {
+                                $wildcard_query .= '[starts-with(name(),"' . $wildcard_value . '")]';
+                            }
+                            if ($wildcard_count === 2) {
+                                $wildcard_query .= '[contains(name(),"' . $wildcard_value . '")]';
+                            }
+                            $attrs = $this->DOMXpath->query($wildcard_query, $nodes__value);
+                            if (empty($attrs)) {
+                                continue;
+                            }
+                            foreach ($attrs as $attrs__value) {
+                                $value = $attrs__value->nodeValue;
+                                if ($value != '') {
+                                    $content[] = [
+                                        'key' => $attrs__value->nodeName,
+                                        'value' => $value,
+                                        'type' => 'attribute'
+                                    ];
+                                }
+                            }
+                        } else {
+                            $value = $nodes__value->getAttribute($include__value['attribute']);
+                            if ($value != '') {
+                                $content[] = [
+                                    'key' => $include__value['attribute'],
+                                    'value' => $value,
+                                    'type' => 'attribute'
+                                ];
+                            }
+                        }
                     } else {
                         $value = $nodes__value->nodeValue;
+                        if ($value != '') {
+                            $content[] = ['key' => null, 'value' => $nodes__value->nodeValue, 'type' => 'text'];
+                        }
                     }
-                    if ($value != '') {
-                        $context = $this->gettext->autoDetermineContext($value, @$include__value['context']);
 
-                        if (($context === 'slug' || $context === 'file') && $this->host->urlIsExcluded($value)) {
-                            continue;
-                        }
+                    if (!empty($content)) {
+                        foreach ($content as $content__value) {
+                            if ($content__value['value'] != '') {
+                                $context = $this->gettext->autoDetermineContext(
+                                    $content__value['value'],
+                                    @$include__value['context']
+                                );
 
-                        // on source only translate slugs
-                        if ($this->gettext->sourceLngIsCurrentLng() && $context !== 'slug') {
-                            continue;
-                        }
+                                if (
+                                    ($context === 'slug' || $context === 'file') &&
+                                    $this->host->urlIsExcluded($content__value['value'])
+                                ) {
+                                    continue;
+                                }
 
-                        if ($this->gettext->sourceLngIsCurrentLng()) {
-                            $trans = $this->gettext->addPrefixToLink($value, $this->gettext->getCurrentLanguageCode());
-                        } else {
-                            $trans = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
-                                $value,
-                                $this->gettext->getCurrentLanguageCode(),
-                                $context
-                            );
-                        }
+                                // on source only translate slugs
+                                if ($this->gettext->sourceLngIsCurrentLng() && $context !== 'slug') {
+                                    continue;
+                                }
 
-                        if ($trans === null) {
-                            continue;
-                        }
+                                if ($this->gettext->sourceLngIsCurrentLng()) {
+                                    $trans = $this->gettext->addPrefixToLink(
+                                        $content__value['value'],
+                                        $this->gettext->getCurrentLanguageCode()
+                                    );
+                                } else {
+                                    $trans = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
+                                        $content__value['value'],
+                                        $this->gettext->getCurrentLanguageCode(),
+                                        $context
+                                    );
+                                }
 
-                        if (@$include__value['attribute'] != '') {
-                            $nodes__value->setAttribute($include__value['attribute'], $trans);
-                        } else {
-                            $nodes__value->nodeValue = htmlspecialchars($trans);
+                                if ($trans === null) {
+                                    continue;
+                                }
+
+                                if ($content__value['type'] === 'attribute') {
+                                    $nodes__value->setAttribute($content__value['key'], $trans);
+                                } else {
+                                    $nodes__value->nodeValue = htmlspecialchars($trans);
+                                }
+                            }
                         }
                     }
                 }
@@ -369,7 +438,7 @@ class Dom
         $parts = explode(' ', $selector);
         foreach ($parts as $parts__key => $parts__value) {
             // input[placeholder] => input[@placeholder]
-            if (mb_strpos($parts__value, '[') !== false) {
+            if (mb_strpos($parts__value, '[') !== false && mb_strpos($parts__value, '@') === false) {
                 $parts__value = str_replace('[', '[@', $parts__value);
             }
             // .foo => *[contains(concat(" ", normalize-space(@class), " "), " foo ")]

@@ -205,6 +205,9 @@ By default Gtbabel translates all text and tag nodes in the following contexts:
 | `meta[name="description"]` | `content`     | description |
 | `img`                      | `src`         | file        |
 | `*`                        | `style`       | file        |
+| `*`                        | `data-*`      |             |
+| `*`                        | `label`       |             |
+| `*`                        | `*text*`      |             |
 
 To disable text/tag node transformation, provide the options:
 

@@ -125,7 +125,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test21()
     {
-        $this->runDiff('21.php', 4500);
+        $this->runDiff('21.php', 6500);
     }
 
     public function test22()
@@ -282,6 +282,11 @@ class Test extends \PHPUnit\Framework\TestCase
     public function test44()
     {
         $this->runDiff('44.html', 200);
+    }
+
+    public function test45()
+    {
+        $this->runDiff('45.html', 200);
     }
 
     public function test_translate()
