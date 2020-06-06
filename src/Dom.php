@@ -57,7 +57,7 @@ class Dom
         if ($this->settings->get('translate_text_nodes') === false) {
             return;
         }
-        if ($this->gettext->sourceLngIsCurrentLng()) {
+        if ($this->gettext->sourceLngIsCurrentLng() && $this->settings->get('prefix_source_lng') === false) {
             return;
         }
 
@@ -113,16 +113,15 @@ class Dom
 
             $originalText = $this->gettext->removeLineBreaks($originalTextRaw);
 
-            // do this check again on the whole group
-            if ($this->gettext->stringShouldNotBeTranslated($originalText)) {
-                continue;
-            }
-
             $translatedText = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
                 $originalText,
                 $this->gettext->getCurrentLanguageCode(),
                 null
             );
+
+            if ($translatedText === null) {
+                continue;
+            }
 
             $translatedText = $this->gettext->reintroduceLineBreaks($translatedText, $originalText, $originalTextRaw);
 
@@ -265,35 +264,11 @@ class Dom
                     if (!empty($content)) {
                         foreach ($content as $content__value) {
                             if ($content__value['value'] != '') {
-                                $context = $this->gettext->autoDetermineContext(
+                                $trans = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
                                     $content__value['value'],
+                                    $this->gettext->getCurrentLanguageCode(),
                                     @$include__value['context']
                                 );
-
-                                if (
-                                    ($context === 'slug' || $context === 'file') &&
-                                    $this->host->urlIsExcluded($content__value['value'])
-                                ) {
-                                    continue;
-                                }
-
-                                // on source only translate slugs
-                                if ($this->gettext->sourceLngIsCurrentLng() && $context !== 'slug') {
-                                    continue;
-                                }
-
-                                if ($this->gettext->sourceLngIsCurrentLng()) {
-                                    $trans = $this->gettext->addPrefixToLink(
-                                        $content__value['value'],
-                                        $this->gettext->getCurrentLanguageCode()
-                                    );
-                                } else {
-                                    $trans = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
-                                        $content__value['value'],
-                                        $this->gettext->getCurrentLanguageCode(),
-                                        $context
-                                    );
-                                }
 
                                 if ($trans === null) {
                                     continue;
@@ -648,7 +623,7 @@ class Dom
         if ($this->settings->get('translate_text_nodes') === false) {
             return $json;
         }
-        if ($this->gettext->sourceLngIsCurrentLng()) {
+        if ($this->gettext->sourceLngIsCurrentLng() && $this->settings->get('prefix_source_lng') === false) {
             return $json;
         }
         $json = json_decode($json);
@@ -664,14 +639,15 @@ class Dom
                 if (is_array($json__value) || is_object($json__value) || $json__value instanceof \Traversable) {
                     $this->traverseJson($json__value);
                 } elseif (is_string($json__value)) {
-                    if ($this->gettext->stringShouldNotBeTranslated($json__value)) {
-                        continue;
-                    }
-                    $json__value = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
+                    $trans = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
                         $json__value,
                         $this->gettext->getCurrentLanguageCode(),
                         null
                     );
+                    if ($trans === null) {
+                        continue;
+                    }
+                    $json__value = $trans;
                 }
             }
         }

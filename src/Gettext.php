@@ -906,9 +906,18 @@ class Gettext
 
     function prepareTranslationAndAddDynamicallyIfNeeded($orig, $lng, $context = null)
     {
-        // auto determine context
-        if ($context === null || $context == '') {
-            $context = $this->autoDetermineContext($orig, $context);
+        $context = $this->autoDetermineContext($orig, $context);
+
+        if (($context === 'slug' || $context === 'file') && $this->host->urlIsExcluded($orig)) {
+            return null;
+        }
+
+        if ($this->sourceLngIsCurrentLng() && $this->settings->getSourceLanguageCode() === $lng) {
+            if ($context !== 'slug') {
+                return null;
+            } else {
+                return $this->addPrefixToLink($orig, $this->settings->getSourceLanguageCode());
+            }
         }
 
         if ($context === 'slug') {
@@ -938,6 +947,10 @@ class Gettext
                     return $trans;
                 }
             }
+        }
+
+        if ($this->stringShouldNotBeTranslated($orig, $context)) {
+            return null;
         }
         return $this->getTranslationAndAddDynamicallyIfNeeded($orig, $lng, $context);
     }

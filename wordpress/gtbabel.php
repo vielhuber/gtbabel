@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.4.4
+ * Version: 3.4.5
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -2091,7 +2091,8 @@ EOD;
         $urls = [];
 
         // approach 1 (parse sitemap; this also works for dynamically generated sitemaps like yoast)
-        $urls = __::extract_urls_from_sitemap(get_bloginfo('url') . '/sitemap_index.xml');
+        $sitemap_url = get_bloginfo('url') . '/sitemap_index.xml?gtbabel_no_cache=1';
+        $urls = __::extract_urls_from_sitemap($sitemap_url);
 
         // approach 2 (get all posts)
         if (empty($urls)) {
@@ -2118,20 +2119,6 @@ EOD;
         $urls = array_filter($urls, function ($urls__value) {
             return strpos($urls__value, $this->gtbabel->host->getCurrentHost()) !== false;
         });
-
-        $urls = array_map(function ($urls__value) {
-            $urls__value = rtrim($urls__value, '/') . '/';
-            if ($this->gtbabel->settings->get('prefix_source_lng') === true) {
-                $urls__value = str_replace(
-                    rtrim($this->gtbabel->host->getCurrentHost(), '/'),
-                    rtrim($this->gtbabel->host->getCurrentHost(), '/') .
-                        '/' .
-                        rtrim($this->gtbabel->settings->getSourceLanguageCode(), '/'),
-                    $urls__value
-                );
-            }
-            return $urls__value;
-        }, $urls);
 
         $urls = array_unique($urls);
 
@@ -2228,6 +2215,7 @@ EOD;
         // build general queue
         $queue = [];
         $urls = $this->getAllPublicUrlsForSite();
+
         foreach ($urls as $urls__value) {
             $queue[] = ['url' => $urls__value, 'convert_to_lng' => null, 'refresh_after' => true];
             foreach ($this->gtbabel->settings->getSelectedLanguageCodesWithoutSource() as $lngs__value) {

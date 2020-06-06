@@ -67,6 +67,9 @@ class Gtbabel
             return;
         }
         $content = ob_get_contents();
+        if ($content == '') {
+            return;
+        }
         $content = $this->dom->modifyContent($content);
         ob_end_clean();
         echo $content;
