@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.4.5
+ * Version: 3.4.6
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -2091,7 +2091,7 @@ EOD;
         $urls = [];
 
         // approach 1 (parse sitemap; this also works for dynamically generated sitemaps like yoast)
-        $sitemap_url = get_bloginfo('url') . '/sitemap_index.xml?gtbabel_no_cache=1';
+        $sitemap_url = get_bloginfo('url') . '/sitemap_index.xml';
         $urls = __::extract_urls_from_sitemap($sitemap_url);
 
         // approach 2 (get all posts)
@@ -2214,7 +2214,13 @@ EOD;
 
         // build general queue
         $queue = [];
-        $urls = $this->getAllPublicUrlsForSite();
+        if ($chunk === 0 || get_transient('gtbabel_public_urls') === false) {
+            $urls = $this->getAllPublicUrlsForSite();
+            $this->gtbabel->log->generalLog('getAllPublicUrlsForSite');
+            set_transient('gtbabel_public_urls', $urls);
+        } else {
+            $urls = get_transient('gtbabel_public_urls');
+        }
 
         foreach ($urls as $urls__value) {
             $queue[] = ['url' => $urls__value, 'convert_to_lng' => null, 'refresh_after' => true];
