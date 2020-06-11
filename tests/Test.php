@@ -125,7 +125,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test21()
     {
-        $this->runDiff('21.php', 6500);
+        $this->runDiff('21.php', 7500);
     }
 
     public function test22()
@@ -297,7 +297,7 @@ class Test extends \PHPUnit\Framework\TestCase
             'lng_target' => 'en',
             'auto_translation' => true,
             'auto_translation_service' => 'google',
-            'google_translation_api_key' => getenv('GOOGLE_TRANSLATION_API_KEY')
+            'google_translation_api_key' => @$_ENV['GOOGLE_TRANSLATION_API_KEY']
         ]);
         $this->assertEquals($output, '<p>This is a test!</p>');
     }
@@ -306,14 +306,14 @@ class Test extends \PHPUnit\Framework\TestCase
     {
         $this->gtbabel = new Gtbabel();
         $this->assertEquals($this->gtbabel->tokenize('<p>Dies ist ein Test!</p>'), [
-            ['string' => 'Dies ist ein Test!', 'context' => null]
+            ['str' => 'Dies ist ein Test!', 'context' => null]
         ]);
         $this->assertEquals($this->gtbabel->tokenize('<div><p>Dies ist ein Test!</p><p>1</p></div>'), [
-            ['string' => 'Dies ist ein Test!', 'context' => null]
+            ['str' => 'Dies ist ein Test!', 'context' => null]
         ]);
         $this->assertEquals($this->gtbabel->tokenize('<div><p>Dies ist ein Test!</p><p>Wow!</p></div>'), [
-            ['string' => 'Dies ist ein Test!', 'context' => null],
-            ['string' => 'Wow!', 'context' => null]
+            ['str' => 'Dies ist ein Test!', 'context' => null],
+            ['str' => 'Wow!', 'context' => null]
         ]);
         $this->assertEquals(
             $this->gtbabel->tokenize(
@@ -327,14 +327,14 @@ class Test extends \PHPUnit\Framework\TestCase
             ),
             [
                 [
-                    'string' => '© Vorname Nachname',
+                    'str' => '© Vorname Nachname',
                     'context' => null
                 ]
             ]
         );
     }
 
-    public function test_gettext()
+    public function test_data()
     {
         __::rrmdir('./tests/locales');
         __::rrmdir('./tests/logs');
@@ -356,8 +356,7 @@ class Test extends \PHPUnit\Framework\TestCase
         $output = ob_get_contents();
         ob_end_clean();
         $this->assertEquals($output, '<p>Haus-en</p>');
-        $this->assertEquals(file_exists('./tests/locales/_template.pot') === false, true);
-        $this->assertEquals(file_exists('./tests/locales/en.po') === false, true);
+        $this->assertEquals($this->gtbabel->data->getTranslationsFromDb(), []);
         $this->gtbabel->reset();
 
         $settings['auto_translation'] = true;
@@ -370,8 +369,7 @@ class Test extends \PHPUnit\Framework\TestCase
         $output = ob_get_contents();
         ob_end_clean();
         $this->assertEquals($output, '<p>House</p>');
-        $this->assertEquals(file_exists('./tests/locales/_template.pot') === false, true);
-        $this->assertEquals(file_exists('./tests/locales/en.po') === false, true);
+        $this->assertEquals($this->gtbabel->data->getTranslationsFromDb(), []);
         $this->gtbabel->reset();
 
         $settings['auto_translation'] = true;
@@ -384,8 +382,7 @@ class Test extends \PHPUnit\Framework\TestCase
         $output = ob_get_contents();
         ob_end_clean();
         $this->assertEquals($output, '<p>House</p>');
-        $this->assertEquals(strpos(file_get_contents('./tests/locales/_template.pot'), 'msgid "Haus"') !== false, true);
-        $this->assertEquals(strpos(file_get_contents('./tests/locales/en.po'), 'msgstr "House"') !== false, true);
+        $this->assertEquals($this->gtbabel->data->getTranslationFromDb('Haus', null, 'en')['trans'] === 'House', true);
         $this->gtbabel->reset();
 
         $settings['auto_translation'] = true;
@@ -398,10 +395,9 @@ class Test extends \PHPUnit\Framework\TestCase
         $output = ob_get_contents();
         ob_end_clean();
         $this->assertEquals($output, '<p>Haus</p>');
-        $this->assertEquals(strpos(file_get_contents('./tests/locales/_template.pot'), 'msgid "Haus"') !== false, true);
-        $this->assertEquals(strpos(file_get_contents('./tests/locales/en.po'), 'msgstr "House"') !== false, true);
+        $this->assertEquals($this->gtbabel->data->getTranslationFromDb('Haus', null, 'en')['trans'] === 'House', true);
 
-        $this->gtbabel->gettext->editCheckedValue('Haus', null, 'en', true);
+        $this->gtbabel->data->editCheckedValue('Haus', null, 'en', true);
 
         ob_start();
         $this->gtbabel->start($settings);
@@ -410,13 +406,7 @@ class Test extends \PHPUnit\Framework\TestCase
         $output = ob_get_contents();
         ob_end_clean();
         $this->assertEquals($output, '<p>House</p>');
-        $this->assertEquals(
-            strpos(
-                file_get_contents('./tests/locales/en.po'),
-                '#. checked' . PHP_EOL . 'msgid "Haus"' . PHP_EOL . 'msgstr "House"'
-            ) !== false,
-            true
-        );
+        $this->assertEquals($this->gtbabel->data->getTranslationFromDb('Haus', null, 'en')['checked'] == 1, true);
         $this->gtbabel->reset();
 
         __::rrmdir('./tests/locales');
@@ -490,81 +480,23 @@ EOD;
 <a href="en/example/path/1-buch-moses"></a>
 EOD;
 
-        $expected_po = <<<'EOD'
-msgid ""
-msgstr ""
-"X-Domain: gtbabel\n"
-
-msgctxt "slug"
-msgid "datenschutz"
-msgstr "privacy"
-
-msgctxt "slug"
-msgid "beispiel-pfad11"
-msgstr "example-path11"
-
-msgctxt "slug"
-msgid "beispiel"
-msgstr "example"
-
-msgctxt "slug"
-msgid "pfad"
-msgstr "path"
-
-msgctxt "slug"
-msgid "1._Buch_Moses"
-msgstr "1-buch-moses"
-
-#. checked
-msgctxt "file"
-msgid "datenschutz/beispiel-bilddatei1.jpg"
-msgstr "datenschutz/beispiel-bilddatei1_EN.jpg"
-
-#. checked
-msgctxt "file"
-msgid "beispiel-bilddatei2.jpg"
-msgstr "beispiel-bilddatei2_EN.jpg"
-
-#. checked
-msgctxt "file"
-msgid "beispiel-bilddatei3.jpg"
-msgstr "beispiel-bilddatei3_EN.jpg"
-
-#. checked
-msgctxt "file"
-msgid "beispiel-bilddatei1.jpg"
-msgstr "beispiel-bilddatei1_EN.jpg"
-
-#. checked
-msgctxt "file"
-msgid "datenschutz/beispiel-bilddatei6.jpg"
-msgstr "datenschutz/beispiel-bilddatei6_EN.jpg"
-
-#. checked
-msgctxt "file"
-msgid "beispiel-bilddatei7.jpg"
-msgstr "beispiel-bilddatei7_EN.jpg"
-
-#. checked
-msgctxt "file"
-msgid "beispiel-bilddatei8.jpg"
-msgstr "beispiel-bilddatei8_EN.jpg"
-
-#. checked
-msgctxt "file"
-msgid "datenschutz/beispiel-bilddatei12.jpg"
-msgstr "datenschutz/beispiel-bilddatei12_EN.jpg"
-
-#. checked
-msgctxt "file"
-msgid "beispiel-bilddatei13.jpg"
-msgstr "beispiel-bilddatei13_EN.jpg"
-
-#. checked
-msgctxt "file"
-msgid "beispiel-bilddatei14.jpg"
-msgstr "beispiel-bilddatei14_EN.jpg"
-EOD;
+        $expected_data = [
+            ['datenschutz', 'slug', 'en', 'privacy', 0],
+            ['beispiel-pfad11', 'slug', 'en', 'example-path11', 0],
+            ['beispiel', 'slug', 'en', 'example', 0],
+            ['pfad', 'slug', 'en', 'path', 0],
+            ['1._Buch_Moses', 'slug', 'en', '1-buch-moses', 0],
+            ['datenschutz/beispiel-bilddatei1.jpg', 'file', 'en', 'datenschutz/beispiel-bilddatei1_EN.jpg', 1],
+            ['beispiel-bilddatei2.jpg', 'file', 'en', 'beispiel-bilddatei2_EN.jpg', 1],
+            ['beispiel-bilddatei3.jpg', 'file', 'en', 'beispiel-bilddatei3_EN.jpg', 1],
+            ['beispiel-bilddatei1.jpg', 'file', 'en', 'beispiel-bilddatei1_EN.jpg', 1],
+            ['datenschutz/beispiel-bilddatei6.jpg', 'file', 'en', 'datenschutz/beispiel-bilddatei6_EN.jpg', 1],
+            ['beispiel-bilddatei7.jpg', 'file', 'en', 'beispiel-bilddatei7_EN.jpg', 1],
+            ['beispiel-bilddatei8.jpg', 'file', 'en', 'beispiel-bilddatei8_EN.jpg', 1],
+            ['datenschutz/beispiel-bilddatei12.jpg', 'file', 'en', 'datenschutz/beispiel-bilddatei12_EN.jpg', 1],
+            ['beispiel-bilddatei13.jpg', 'file', 'en', 'beispiel-bilddatei13_EN.jpg', 1],
+            ['beispiel-bilddatei14.jpg', 'file', 'en', 'beispiel-bilddatei14_EN.jpg', 1]
+        ];
 
         ob_start();
         $this->gtbabel->start($settings);
@@ -573,70 +505,70 @@ EOD;
         ob_get_contents();
         ob_end_clean();
 
-        $this->gtbabel->gettext->editTranslation(
+        $this->gtbabel->data->editTranslation(
             'datenschutz/beispiel-bilddatei1.jpg',
             'file',
             'en',
             'datenschutz/beispiel-bilddatei1_EN.jpg',
             true
         );
-        $this->gtbabel->gettext->editTranslation(
+        $this->gtbabel->data->editTranslation(
             'beispiel-bilddatei2.jpg',
             'file',
             'en',
             'beispiel-bilddatei2_EN.jpg',
             true
         );
-        $this->gtbabel->gettext->editTranslation(
+        $this->gtbabel->data->editTranslation(
             'beispiel-bilddatei3.jpg',
             'file',
             'en',
             'beispiel-bilddatei3_EN.jpg',
             true
         );
-        $this->gtbabel->gettext->editTranslation(
+        $this->gtbabel->data->editTranslation(
             'beispiel-bilddatei1.jpg',
             'file',
             'en',
             'beispiel-bilddatei1_EN.jpg',
             true
         );
-        $this->gtbabel->gettext->editTranslation(
+        $this->gtbabel->data->editTranslation(
             'datenschutz/beispiel-bilddatei6.jpg',
             'file',
             'en',
             'datenschutz/beispiel-bilddatei6_EN.jpg',
             true
         );
-        $this->gtbabel->gettext->editTranslation(
+        $this->gtbabel->data->editTranslation(
             'beispiel-bilddatei7.jpg',
             'file',
             'en',
             'beispiel-bilddatei7_EN.jpg',
             true
         );
-        $this->gtbabel->gettext->editTranslation(
+        $this->gtbabel->data->editTranslation(
             'beispiel-bilddatei8.jpg',
             'file',
             'en',
             'beispiel-bilddatei8_EN.jpg',
             true
         );
-        $this->gtbabel->gettext->editTranslation(
+        $this->gtbabel->data->editTranslation(
             'datenschutz/beispiel-bilddatei12.jpg',
             'file',
             'en',
             'datenschutz/beispiel-bilddatei12_EN.jpg',
             true
         );
-        $this->gtbabel->gettext->editTranslation(
+        $this->gtbabel->data->editTranslation(
             'beispiel-bilddatei13.jpg',
             'file',
             'en',
             'beispiel-bilddatei13_EN.jpg',
             true
         );
-        $this->gtbabel->gettext->editTranslation(
+        $this->gtbabel->data->editTranslation(
             'beispiel-bilddatei14.jpg',
             'file',
             'en',
@@ -655,17 +587,34 @@ EOD;
             __::minify_html($this->normalize($output)),
             __::minify_html($this->normalize($expected_html))
         );
-        $this->assertEquals(
-            $this->normalize(file_get_contents('./tests/locales/en.po')),
-            $this->normalize($expected_po)
-        );
+        $translations = $this->gtbabel->data->getTranslationsFromDb();
+        $this->assertEquals(count($translations), count($expected_data));
+        foreach ($translations as $translations__key => $translations__value) {
+            $match = false;
+            foreach ($expected_data as $expected_data__value) {
+                if (
+                    $translations__value['str'] == $expected_data__value[0] &&
+                    $translations__value['context'] == $expected_data__value[1] &&
+                    $translations__value['lng'] == $expected_data__value[2] &&
+                    $translations__value['trans'] == $expected_data__value[3] &&
+                    $translations__value['checked'] == $expected_data__value[4]
+                ) {
+                    $match = true;
+                }
+            }
+            if ($match === true) {
+                $this->assertEquals(true, true);
+            } else {
+                $this->assertEquals($translations__value, []);
+            }
+        }
 
         $this->gtbabel->reset();
         __::rrmdir('./tests/locales');
         __::rrmdir('./tests/logs');
     }
 
-    public function test__router()
+    public function test_router()
     {
         __::rrmdir('./tests/locales');
         __::rrmdir('./tests/logs');
@@ -688,7 +637,7 @@ EOD;
         ob_start();
         $this->gtbabel->start($settings);
         echo '<!DOCTYPE html><html><body><div class="lngpicker">';
-        foreach ($this->gtbabel->gettext->getLanguagePickerData() as $lngpicker__value) {
+        foreach ($this->gtbabel->data->getLanguagePickerData() as $lngpicker__value) {
             echo '<a href="' . $lngpicker__value['url'] . '"></a>';
         }
         echo '</div></body></html>';
@@ -709,7 +658,7 @@ EOD;
         ob_start();
         $this->gtbabel->start($settings);
         echo '<!DOCTYPE html><html><body><div class="lngpicker">';
-        foreach ($this->gtbabel->gettext->getLanguagePickerData() as $lngpicker__value) {
+        foreach ($this->gtbabel->data->getLanguagePickerData() as $lngpicker__value) {
             echo '<a href="' . $lngpicker__value['url'] . '"></a>';
         }
         echo '</div></body></html>';
@@ -730,7 +679,7 @@ EOD;
         ob_start();
         $this->gtbabel->start($settings);
         echo '<!DOCTYPE html><html><body><div class="lngpicker">';
-        foreach ($this->gtbabel->gettext->getLanguagePickerData() as $lngpicker__value) {
+        foreach ($this->gtbabel->data->getLanguagePickerData() as $lngpicker__value) {
             echo '<a href="' . $lngpicker__value['url'] . '"></a>';
         }
         echo '</div></body></html>';
@@ -751,7 +700,7 @@ EOD;
         ob_start();
         $this->gtbabel->start($settings);
         echo '<!DOCTYPE html><html><body><div class="lngpicker">';
-        foreach ($this->gtbabel->gettext->getLanguagePickerData() as $lngpicker__value) {
+        foreach ($this->gtbabel->data->getLanguagePickerData() as $lngpicker__value) {
             echo '<a href="' . $lngpicker__value['url'] . '"></a>';
         }
         echo '</div></body></html>';
@@ -781,14 +730,14 @@ EOD;
             'redirect_root_domain' => 'browser',
             'debug_translations' => true,
             'auto_add_translations_to_gettext' => false,
-            'auto_set_discovered_strings_checked' => false,
+            'auto_set_new_strings_checked' => false,
             'only_show_checked_strings' => false,
             'exclude_urls' => null,
             'html_lang_attribute' => false,
             'html_hreflang_tags' => false,
             'auto_translation' => false,
             'auto_translation_service' => 'google',
-            'google_translation_api_key' => getenv('GOOGLE_TRANSLATION_API_KEY'),
+            'google_translation_api_key' => @$_ENV['GOOGLE_TRANSLATION_API_KEY'],
             'stats_log' => true,
             'discovery_log' => false
         ];

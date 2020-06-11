@@ -6,7 +6,7 @@ if (!function_exists('gtbabel_current_lng')) {
         if ($gtbabel === null) {
             $gtbabel = new \vielhuber\gtbabel\Gtbabel();
         }
-        return $gtbabel->gettext->getCurrentLanguageCode();
+        return $gtbabel->data->getCurrentLanguageCode();
     }
 }
 
@@ -72,7 +72,7 @@ if (!function_exists('gtbabel_languagepicker')) {
         if ($gtbabel === null) {
             $gtbabel = new \vielhuber\gtbabel\Gtbabel();
         }
-        return $gtbabel->gettext->getLanguagePickerData();
+        return $gtbabel->data->getLanguagePickerData();
     }
 }
 
@@ -83,12 +83,7 @@ if (!function_exists('gtbabel__')) {
         if ($gtbabel === null) {
             $gtbabel = new \vielhuber\gtbabel\Gtbabel();
         }
-        return $gtbabel->gettext->getTranslationInForeignLngAndAddDynamicallyIfNeeded(
-            $str,
-            $to_lng,
-            $from_lng,
-            $context
-        );
+        return $gtbabel->data->getTranslationInForeignLngAndAddDynamicallyIfNeeded($str, $to_lng, $from_lng, $context);
     }
 }
 

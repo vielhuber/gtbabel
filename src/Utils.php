@@ -38,4 +38,10 @@ class Utils
         }
         return 'html';
     }
+
+    function getCurrentTime()
+    {
+        $date = new \DateTime('now');
+        return $date->format('Y-m-d H:i:s.u');
+    }
 }

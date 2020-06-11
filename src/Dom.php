@@ -11,14 +11,14 @@ class Dom
     public $group_cache;
 
     public $utils;
-    public $gettext;
+    public $data;
     public $host;
     public $settings;
 
-    function __construct(Utils $utils = null, Gettext $gettext = null, Host $host = null, Settings $settings = null)
+    function __construct(Utils $utils = null, Data $data = null, Host $host = null, Settings $settings = null)
     {
         $this->utils = $utils ?: new Utils();
-        $this->gettext = $gettext ?: new Gettext();
+        $this->data = $data ?: new Data();
         $this->host = $host ?: new Host();
         $this->settings = $settings ?: new Settings();
     }
@@ -57,7 +57,7 @@ class Dom
         if ($this->settings->get('translate_text_nodes') === false) {
             return;
         }
-        if ($this->gettext->sourceLngIsCurrentLng() && $this->settings->get('prefix_source_lng') === false) {
+        if ($this->data->sourceLngIsCurrentLng() && $this->settings->get('prefix_source_lng') === false) {
             return;
         }
 
@@ -69,7 +69,7 @@ class Dom
             if (array_key_exists($this->getIdOfNode($textnodes__value), $this->excluded_nodes)) {
                 continue;
             }
-            if ($this->gettext->stringShouldNotBeTranslated($textnodes__value->nodeValue)) {
+            if ($this->data->stringShouldNotBeTranslated($textnodes__value->nodeValue)) {
                 continue;
             }
             if (@$textnodes__value->parentNode->tagName === 'script') {
@@ -111,11 +111,11 @@ class Dom
                 $originalTextRaw = $this->getInnerHtml($groups__value);
             }
 
-            $originalText = $this->gettext->removeLineBreaks($originalTextRaw);
+            $originalText = $this->data->removeLineBreaks($originalTextRaw);
 
-            $translatedText = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
+            $translatedText = $this->data->prepareTranslationAndAddDynamicallyIfNeeded(
                 $originalText,
-                $this->gettext->getCurrentLanguageCode(),
+                $this->data->getCurrentLanguageCode(),
                 null
             );
 
@@ -123,7 +123,7 @@ class Dom
                 continue;
             }
 
-            $translatedText = $this->gettext->reintroduceLineBreaks($translatedText, $originalText, $originalTextRaw);
+            $translatedText = $this->data->reintroduceLineBreaks($translatedText, $originalText, $originalTextRaw);
 
             if ($this->isTextNode($groups__value)) {
                 $groups__value->nodeValue = $translatedText;
@@ -135,7 +135,7 @@ class Dom
 
     function modifyTagNodes()
     {
-        if ($this->gettext->sourceLngIsCurrentLng() && $this->settings->get('prefix_source_lng') === false) {
+        if ($this->data->sourceLngIsCurrentLng() && $this->settings->get('prefix_source_lng') === false) {
             return;
         }
 
@@ -144,27 +144,27 @@ class Dom
         if ($this->settings->get('translate_default_tag_nodes') === true) {
             $include = array_merge($include, [
                 [
-                    'selector' => 'a',
+                    'selector' => 'body a',
                     'attribute' => 'href',
                     'context' => 'slug|file'
                 ],
                 [
-                    'selector' => 'form',
+                    'selector' => 'body form',
                     'attribute' => 'action',
                     'context' => 'slug'
                 ],
                 [
-                    'selector' => 'img',
+                    'selector' => 'body img',
                     'attribute' => 'alt',
                     'context' => null
                 ],
                 [
-                    'selector' => '*',
+                    'selector' => 'body *',
                     'attribute' => 'title',
                     'context' => null
                 ],
                 [
-                    'selector' => 'input',
+                    'selector' => 'body input',
                     'attribute' => 'placeholder',
                     'context' => null
                 ],
@@ -179,27 +179,27 @@ class Dom
                     'context' => 'description'
                 ],
                 [
-                    'selector' => 'img',
+                    'selector' => 'body img',
                     'attribute' => 'src',
                     'context' => 'file'
                 ],
                 [
-                    'selector' => '*',
+                    'selector' => 'body *',
                     'attribute' => 'style',
                     'context' => 'file'
                 ],
                 [
-                    'selector' => '*',
+                    'selector' => 'body *',
                     'attribute' => 'data-*',
                     'context' => null
                 ],
                 [
-                    'selector' => '*',
+                    'selector' => 'body *',
                     'attribute' => 'label',
                     'context' => null
                 ],
                 [
-                    'selector' => '*',
+                    'selector' => 'body *',
                     'attribute' => '*text*',
                     'context' => null
                 ]
@@ -264,9 +264,9 @@ class Dom
                     if (!empty($content)) {
                         foreach ($content as $content__value) {
                             if ($content__value['value'] != '') {
-                                $trans = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
+                                $trans = $this->data->prepareTranslationAndAddDynamicallyIfNeeded(
                                     $content__value['value'],
-                                    $this->gettext->getCurrentLanguageCode(),
+                                    $this->data->getCurrentLanguageCode(),
                                     @$include__value['context']
                                 );
 
@@ -377,14 +377,14 @@ class Dom
         if ($this->settings->get('html_lang_attribute') === true) {
             $html_node = $this->DOMXpath->query('/html')[0];
             if ($html_node !== null) {
-                $html_node->setAttribute('lang', $this->gettext->getCurrentLanguageCode());
+                $html_node->setAttribute('lang', $this->data->getCurrentLanguageCode());
             }
         }
 
         if ($this->settings->get('html_hreflang_tags') === true) {
             $head_node = $this->DOMXpath->query('/html/head')[0];
             if ($head_node !== null) {
-                $data = $this->gettext->getLanguagePickerData();
+                $data = $this->data->getLanguagePickerData();
                 foreach ($data as $data__value) {
                     $tag = $this->DOMDocument->createElement('link', '');
                     $tag->setAttribute('rel', 'alternate');
@@ -398,7 +398,7 @@ class Dom
 
     function setRtlAttr()
     {
-        if ($this->settings->isLanguageDirectionRtl($this->gettext->getCurrentLanguageCode())) {
+        if ($this->settings->isLanguageDirectionRtl($this->data->getCurrentLanguageCode())) {
             $html_node = $this->DOMXpath->query('/html')[0];
             if ($html_node !== null) {
                 $html_node->setAttribute('dir', 'rtl');
@@ -586,13 +586,13 @@ class Dom
                 if (!is_array($translated_strings__value)) {
                     $context = '';
                     $orig = $translated_strings__value;
-                    $trans = $this->gettext->getTranslationInForeignLngAndAddDynamicallyIfNeeded(
+                    $trans = $this->data->getTranslationInForeignLngAndAddDynamicallyIfNeeded(
                         $translated_strings__value
                     );
                 } else {
                     $context = $translated_strings__value[1];
                     $orig = $translated_strings__value[0];
-                    $trans = $this->gettext->getTranslationInForeignLngAndAddDynamicallyIfNeeded(
+                    $trans = $this->data->getTranslationInForeignLngAndAddDynamicallyIfNeeded(
                         $translated_strings__value[0],
                         null,
                         null,
@@ -623,7 +623,7 @@ class Dom
         if ($this->settings->get('translate_text_nodes') === false) {
             return $json;
         }
-        if ($this->gettext->sourceLngIsCurrentLng() && $this->settings->get('prefix_source_lng') === false) {
+        if ($this->data->sourceLngIsCurrentLng() && $this->settings->get('prefix_source_lng') === false) {
             return $json;
         }
         $json = json_decode($json);
@@ -639,9 +639,9 @@ class Dom
                 if (is_array($json__value) || is_object($json__value) || $json__value instanceof \Traversable) {
                     $this->traverseJson($json__value);
                 } elseif (is_string($json__value)) {
-                    $trans = $this->gettext->prepareTranslationAndAddDynamicallyIfNeeded(
+                    $trans = $this->data->prepareTranslationAndAddDynamicallyIfNeeded(
                         $json__value,
-                        $this->gettext->getCurrentLanguageCode(),
+                        $this->data->getCurrentLanguageCode(),
                         null
                     );
                     if ($trans === null) {

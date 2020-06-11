@@ -5,7 +5,7 @@ Donate link: https://vielhuber.de
 Requires at least: 5.3.2
 Tested up to: 5.3.2
 Requires PHP: 7.2
-Stable tag: 3.4.7
+Stable tag: 3.4.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -62,6 +62,9 @@ Yes (see [repository](https://github.com/vielhuber/gtbabel)).
 2. Setup wizard
 
 == Changelog ==
+= 3.4.8 =
+* Switch data from gettext files to sql database
+
 = 3.2.7 =
 * Add file support
 

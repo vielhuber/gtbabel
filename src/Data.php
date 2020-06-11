@@ -1,25 +1,13 @@
 <?php
 namespace vielhuber\gtbabel;
 
-use Gettext\Generator\PoGenerator;
-use Gettext\Generator\MoGenerator;
-use Gettext\Loader\PoLoader;
-use Gettext\Loader\MoLoader;
-use Gettext\Translations;
-use Gettext\Translation;
-use Gettext\Merge;
-
 use vielhuber\stringhelper\__;
+use vielhuber\dbhelper\dbhelper;
 
-class Gettext
+class Data
 {
-    public $gettext;
-    public $gettext_cache;
-    public $gettext_cache_reverse;
-    public $gettext_checked_strings;
-    public $gettext_pot;
-    public $gettext_pot_cache;
-    public $gettext_save_counter;
+    public $data;
+    public $db;
 
     public $utils;
     public $host;
@@ -44,55 +32,57 @@ class Gettext
         $this->publish = $publish ?: new Publish();
     }
 
-    function preloadGettextInCache()
+    function initDatabase()
     {
-        $this->gettext = [];
-        $this->gettext_cache = [];
-        $this->gettext_cache_reverse = [];
-        $this->gettext_checked_strings = [];
-        $this->gettext_pot = [];
-        $this->gettext_pot_cache = [];
-        $this->gettext_save_counter = [];
-
-        $poLoader = new PoLoader();
-
-        // pot
-        $filename = $this->getLngFilename('pot', '_template');
-        $this->gettext_save_counter['pot'] = false;
+        $this->db = new dbhelper();
+        $filename = $this->getDataFilename();
         if (!file_exists($filename)) {
-            $this->gettext_pot = Translations::create('gtbabel');
+            file_put_contents($filename, '');
+            $this->db->connect('pdo', 'sqlite', $filename);
+            /* we chose a flat db structure here to avoid expensive joins on every page load */
+            $this->db->query('CREATE TABLE IF NOT EXISTS translations(
+                id INTEGER PRIMARY KEY AUTOINCREMENT, 
+                str TEXT NOT NULL,
+                context VARCHAR(10),
+                lng VARCHAR(10) NOT NULL,
+                trans TEXT NOT NULL,
+                added TEXT NOT NULL,
+                checked INTEGER NOT NULL,
+                shared INTEGER NOT NULL,
+                discovered_last_time TEXT,
+                discovered_last_url_orig TEXT,
+                discovered_last_url TEXT
+            )');
+            /* add unique index so we can INSERT OR REPLACE later on */
+            $this->db->query('CREATE UNIQUE INDEX translations_idx ON translations(str, context, lng)');
         } else {
-            $this->gettext_pot = $poLoader->loadFile($filename);
-            clearstatcache();
+            $this->db->connect('pdo', 'sqlite', $filename);
         }
-        foreach ($this->gettext_pot->getTranslations() as $gettext__value) {
-            $context = $gettext__value->getContext() ?? '';
-            $this->gettext_pot_cache[$context][$gettext__value->getOriginal()] = null;
-        }
+    }
 
-        // po
-        foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
-            $this->gettext_save_counter['po'][$languages__value] = false;
-            $this->gettext_cache[$languages__value] = [];
-            $this->gettext_cache_reverse[$languages__value] = [];
-            $this->gettext_checked_strings[$languages__value] = [];
-            if (!file_exists($this->getLngFilename('po', $languages__value))) {
-                $this->gettext[$languages__value] = Translations::create('gtbabel');
-            } else {
-                $this->gettext[$languages__value] = $poLoader->loadFile($this->getLngFilename('po', $languages__value));
-                clearstatcache();
-            }
-            foreach ($this->gettext[$languages__value]->getTranslations() as $gettext__value) {
-                $context = $gettext__value->getContext() ?? '';
-                $this->gettext_cache[$languages__value][$context][
-                    $gettext__value->getOriginal()
-                ] = $gettext__value->getTranslation();
-                $this->gettext_cache_reverse[$languages__value][$context][
-                    $gettext__value->getTranslation()
-                ] = $gettext__value->getOriginal();
-                $this->gettext_checked_strings[$languages__value][$context][
-                    $gettext__value->getOriginal()
-                ] = $this->translationHasComment($gettext__value, 'checked');
+    function preloadDataInCache()
+    {
+        $this->data = [
+            'cache' => [],
+            'cache_reverse' => [],
+            'checked_strings' => [],
+            'save' => []
+        ];
+
+        if ($this->db !== null) {
+            $result = $this->db->fetch_all('SELECT * FROM translations');
+            if (!empty($result)) {
+                foreach ($result as $result__value) {
+                    $this->data['cache'][$result__value['lng'] ?? ''][$result__value['context'] ?? ''][
+                        $result__value['str']
+                    ] = $result__value['trans'];
+                    $this->data['cache_reverse'][$result__value['lng'] ?? ''][$result__value['context'] ?? ''][
+                        $result__value['trans']
+                    ] = $result__value['str'];
+                    $this->data['checked_strings'][$result__value['lng'] ?? ''][$result__value['context'] ?? ''][
+                        $result__value['str']
+                    ] = $result__value['checked'] == '1' ? true : false;
+                }
             }
         }
     }
@@ -103,116 +93,125 @@ class Gettext
             return;
         }
 
-        /*
-        we don't simply use generateFile on the whole string we have read at the beginning of the request
-        another request could potentially be in between this request we lose its contents:
-
-        No problem
-        A_begin         
-        |
-        A_end
-
-                B_begin
-                |
-                B_end
-
-        Problem (we lose changes of request B)
-        A_begin         
-        |
-        |       B_begin
-        |       |
-        |       B_end
-        |
-        A_end
-
-        Problem (we lose changes of request A)
-        A_begin         
-        |
-        |       B_begin
-        |       |
-        A_end   |
-                |
-                B_end
-
-        To overcome this issue, we save "securely" by merging the translations with the current
-        version of the file (that could be potentially changed in the meantime)
-        */
-
-        $poGenerator = new PoGenerator();
-        $moGenerator = new MoGenerator();
-        $poLoader = new PoLoader();
-
-        if ($this->gettext_save_counter['pot'] === true) {
-            // merge
-            if (file_exists($this->getLngFilename('pot', '_template'))) {
-                $this->gettext_pot = $poLoader
-                    ->loadFile($this->getLngFilename('pot', '_template'))
-                    ->mergeWith($this->gettext_pot);
-                clearstatcache();
+        $date = $this->utils->getCurrentTime();
+        $discovered_last_url_orig = $this->host->getCurrentUrlWithArgsConverted();
+        $discovered_last_url = $this->host->getCurrentUrlWithArgs();
+        foreach (['discovered_last_url_orig', 'discovered_last_url'] as $url__value) {
+            // extract path
+            ${$url__value} = str_replace($this->host->getCurrentHost(), '', ${$url__value});
+            // strip server sided requests initiated by auto translation
+            $pos = strpos(${$url__value}, '?');
+            if ($pos !== false) {
+                $args = explode('&', substr(${$url__value}, $pos + 1));
+                foreach ($args as $args__key => $args__value) {
+                    if (strpos($args__value, 'gtbabel_') === 0) {
+                        unset($args[$args__key]);
+                    }
+                }
+                ${$url__value} = substr(${$url__value}, 0, $pos);
+                if (!empty($args)) {
+                    ${$url__value} .= '?' . implode('&', $args);
+                }
             }
-            $poGenerator->generateFile($this->gettext_pot, $this->getLngFilename('pot', '_template'));
-            clearstatcache();
+            // trim
+            ${$url__value} = '/' . trim(${$url__value}, '/');
         }
 
-        foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
-            if ($this->gettext_save_counter['po'][$languages__value] === false) {
-                continue;
+        // insert batch wise (because sqlite has limits)
+        if (!empty($this->data['save']['insert'])) {
+            $batch_size = 100;
+            for ($batch_cur = 0; $batch_cur * $batch_size < count($this->data['save']['insert']); $batch_cur++) {
+                $query =
+                    'INSERT OR REPLACE INTO translations (str, context, lng, trans, added, checked, shared, discovered_last_time, discovered_last_url_orig, discovered_last_url) VALUES ';
+                $query_q = [];
+                $query_a = [];
+                foreach ($this->data['save']['insert'] as $save__key => $save__value) {
+                    if ($save__key < $batch_size * $batch_cur || $save__key >= $batch_size * ($batch_cur + 1)) {
+                        continue;
+                    }
+                    $query_q[] = '(?,?,?,?,?,?,?,?,?,?)';
+                    $query_a = array_merge($query_a, [
+                        $save__value['str'],
+                        $save__value['context'],
+                        $save__value['lng'],
+                        $save__value['trans'],
+                        $date,
+                        $save__value['checked'],
+                        $save__value['shared'],
+                        $date,
+                        $discovered_last_url_orig,
+                        $discovered_last_url
+                    ]);
+                }
+                $query .= implode(',', $query_q);
+                $this->db->query($query, $query_a);
             }
-            // merge
-            if (file_exists($this->getLngFilename('po', $languages__value))) {
-                $this->gettext[$languages__value] = $poLoader
-                    ->loadFile($this->getLngFilename('po', $languages__value))
-                    ->mergeWith($this->gettext[$languages__value]);
-                clearstatcache();
+        }
+        if (!empty($this->data['save']['discovered'])) {
+            $batch_size = 100;
+            for ($batch_cur = 0; $batch_cur * $batch_size < count($this->data['save']['discovered']); $batch_cur++) {
+                $query = '
+                    UPDATE translations SET
+                    shared = (CASE WHEN discovered_last_url_orig <> ? THEN 1 ELSE shared END),
+                    discovered_last_time = ?,
+                    discovered_last_url_orig = ?,
+                    discovered_last_url = ?
+                    WHERE
+                ';
+                $query_q = [];
+                $query_a = [];
+                $query_a = array_merge($query_a, [
+                    $discovered_last_url_orig,
+                    $date,
+                    $discovered_last_url_orig,
+                    $discovered_last_url
+                ]);
+                foreach ($this->data['save']['discovered'] as $save__key => $save__value) {
+                    if ($save__key < $batch_size * $batch_cur || $save__key >= $batch_size * ($batch_cur + 1)) {
+                        continue;
+                    }
+                    $query_q[] = 'str = ? AND context = ? AND lng = ?';
+                    $query_a = array_merge($query_a, [
+                        $save__value['str'],
+                        $save__value['context'],
+                        $save__value['lng']
+                    ]);
+                }
+                $query .= '(' . implode(') OR (', $query_q) . ')';
+                $this->db->query($query, $query_a);
             }
-            $poGenerator->generateFile(
-                $this->gettext[$languages__value],
-                $this->getLngFilename('po', $languages__value)
-            );
-            clearstatcache();
-            $moGenerator->generateFile(
-                $this->gettext[$languages__value],
-                $this->getLngFilename('mo', $languages__value)
-            );
-            clearstatcache();
         }
     }
 
-    function convertPoToMo($filename)
+    function trackDiscovered($str, $lng, $context = null)
     {
-        if (!file_exists($filename)) {
-            return false;
+        if (!($this->settings->get('discovery_log') == '1')) {
+            return;
         }
-        $loader = new PoLoader();
-        $translations = $loader->loadFile($filename);
-        clearstatcache();
-        $generator = new MoGenerator();
-        $generator->generateFile($translations, str_replace('.po', '.mo', $filename));
-        clearstatcache();
-        return true;
+        if ($this->host->currentUrlIsExcluded()) {
+            return;
+        }
+        $this->data['save']['discovered'][] = [
+            'str' => $str,
+            'context' => $context,
+            'lng' => $lng
+        ];
     }
 
     function getExistingTranslationFromCache($str, $lng, $context = null)
     {
-        // track discovery
-        $this->log->discoveryLogAdd(
-            $this->host->getCurrentUrlWithArgs(),
-            $this->host->getCurrentUrlWithArgsConverted(),
-            $str,
-            $context,
-            $lng
-        );
+        $this->trackDiscovered($str, $lng, $context);
         if (
             $str === '' ||
             $str === null ||
-            $this->gettext_cache[$lng] === null ||
-            !array_key_exists($context ?? '', $this->gettext_cache[$lng]) ||
-            !array_key_exists($str, $this->gettext_cache[$lng][$context ?? '']) ||
-            $this->gettext_cache[$lng][$context ?? ''][$str] === ''
+            !array_key_exists($lng, $this->data['cache']) ||
+            !array_key_exists($context ?? '', $this->data['cache'][$lng]) ||
+            !array_key_exists($str, $this->data['cache'][$lng][$context ?? '']) ||
+            $this->data['cache'][$lng][$context ?? ''][$str] === ''
         ) {
             return false;
         }
-        return $this->gettext_cache[$lng][$context ?? ''][$str];
+        return $this->data['cache'][$lng][$context ?? ''][$str];
     }
 
     function getExistingTranslationReverseFromCache($str, $lng, $context = null)
@@ -220,64 +219,90 @@ class Gettext
         if (
             $str === '' ||
             $str === null ||
-            $this->gettext_cache_reverse[$lng] === null ||
-            !array_key_exists($context ?? '', $this->gettext_cache_reverse[$lng]) ||
-            !array_key_exists($str, $this->gettext_cache_reverse[$lng][$context ?? '']) ||
-            $this->gettext_cache_reverse[$lng][$context ?? ''][$str] === ''
+            !array_key_exists($lng, $this->data['cache_reverse']) ||
+            !array_key_exists($context ?? '', $this->data['cache_reverse'][$lng]) ||
+            !array_key_exists($str, $this->data['cache_reverse'][$lng][$context ?? '']) ||
+            $this->data['cache_reverse'][$lng][$context ?? ''][$str] === ''
         ) {
             return false;
         }
-        return $this->gettext_cache_reverse[$lng][$context ?? ''][$str];
+        return $this->data['cache_reverse'][$lng][$context ?? ''][$str];
+    }
+
+    function getTranslationFromDb($str, $context = null, $lng = null)
+    {
+        return $this->db->fetch_row(
+            'SELECT * FROM translations WHERE str = ? AND context = ? AND lng = ?',
+            $str,
+            $context,
+            $lng
+        );
+    }
+
+    function getTranslationsFromDb()
+    {
+        return $this->db->fetch_all('SELECT * FROM translations ORDER BY id ASC');
     }
 
     function getAllTranslationsFromFiles($lng = null, $order_by_string = true)
     {
         $data = [];
-        $poLoader = new PoLoader();
-        if (!file_exists($this->getLngFilename('pot', '_template'))) {
-            return $data;
-        }
-        $pot = $poLoader->loadFile($this->getLngFilename('pot', '_template'));
-        clearstatcache();
-        $order = 0;
-        foreach ($pot->getTranslations() as $gettext__value) {
-            $data[$this->getIdFromStringAndContext($gettext__value)] = [
-                'orig' => $gettext__value->getOriginal(),
-                'context' => $gettext__value->getContext() ?? '',
-                'shared' => $this->translationHasComment($gettext__value, 'shared'),
-                'translations' => [],
-                'order' => ++$order
-            ];
-        }
+        $query = '';
+        $query_args = [];
+        $lngs = [];
         foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
             if ($lng !== null && $lng !== $languages__value) {
                 continue;
             }
-            if (!file_exists($this->getLngFilename('po', $languages__value))) {
-                continue;
-            }
-            $po = $poLoader->loadFile($this->getLngFilename('po', $languages__value));
-            clearstatcache();
-            foreach ($po->getTranslations() as $gettext__value) {
-                $data[$this->getIdFromStringAndContext($gettext__value)]['translations'][$languages__value] = [
-                    'str' => $gettext__value->getTranslation(),
-                    'checked' => $this->translationHasComment($gettext__value, 'checked')
-                ];
-            }
+            $lngs[] = $languages__value;
         }
-        uasort($data, function ($a, $b) use ($order_by_string) {
+
+        $query .= 'SELECT DISTINCT translations.str as str, translations.context as context, ';
+        foreach ($lngs as $lngs__value) {
+            $query .=
+                $lngs__value .
+                '.trans as ' .
+                $lngs__value .
+                '_trans, ' .
+                $lngs__value .
+                '.checked as ' .
+                $lngs__value .
+                '_checked, ';
+        }
+        $query .=
+            implode(
+                ' AND ',
+                array_map(function ($lngs__value) {
+                    return $lngs__value . '.shared';
+                }, $lngs)
+            ) . ' as shared ';
+        $query .= 'FROM translations ';
+        foreach ($lngs as $lngs__value) {
+            $query .=
+                'LEFT JOIN translations as ' .
+                $lngs__value .
+                ' ON ' .
+                $lngs__value .
+                '.str = translations.str AND COALESCE(' .
+                $lngs__value .
+                '.context,\'\') = COALESCE(translations.context,\'\') AND ' .
+                $lngs__value .
+                '.lng = ? ';
+            $query_args[] = $lngs__value;
+        }
+        $data = $this->db->fetch_all($query, $query_args);
+
+        usort($data, function ($a, $b) use ($order_by_string) {
             /*
             order_by_string = true (url is not set)
                 context
-                orig
+                str
             order_by_string = false (url is set)
                 shared
                 context
                 order
             */
             if ($order_by_string === false) {
-                $a['shared'] = $a['shared'] === true ? 1 : 0;
-                $b['shared'] = $b['shared'] === true ? 1 : 0;
                 if ($a['shared'] !== $b['shared']) {
                     return $a['shared'] < $b['shared'] ? -1 : 1;
                 }
@@ -310,7 +335,7 @@ class Gettext
                 return strnatcasecmp($a['context'], $b['context']);
             }
             if ($order_by_string === true) {
-                return strnatcasecmp($a['orig'], $b['orig']);
+                return strnatcasecmp($a['str'], $b['str']);
             } else {
                 return strcmp($a['order'], $b['order']);
             }
@@ -318,15 +343,8 @@ class Gettext
         return $data;
     }
 
-    function getIdFromStringAndContext($gettext, $context = false)
+    function getIdFromStringAndContext($string, $context = null)
     {
-        if ($context === false) {
-            $string = $gettext->getOriginal();
-            $context = $gettext->getContext();
-        } else {
-            $string = $gettext;
-            $context = $context;
-        }
         return base64_encode(serialize([$string, $context ?? '']));
     }
 
@@ -335,92 +353,54 @@ class Gettext
         return unserialize(base64_decode($id));
     }
 
-    function translationHasComment($gettext, $comment)
-    {
-        foreach ($gettext->getExtractedComments() as $comments__value) {
-            if ($comments__value === $comment) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    function deleteCommentFromTranslation($gettext, $comment)
-    {
-        $gettext->getExtractedComments()->delete($comment);
-    }
-
-    function addCommentToTranslation($gettext, $comment)
-    {
-        $gettext->getExtractedComments()->add($comment);
-    }
-
-    function editTranslation($orig, $context, $lng, $str = false, $checked = null)
-    {
-        return $this->editTranslationById($this->getIdFromStringAndContext($orig, $context), $lng, $str, $checked);
-    }
-
-    function editTranslationById($id, $lng, $str = false, $checked = null)
+    function editTranslation($str, $context = null, $lng, $trans = null, $checked = null)
     {
         $success = false;
-        $poLoader = new PoLoader();
-        $poGenerator = new PoGenerator();
-        $moGenerator = new MoGenerator();
-        if (!file_exists($this->getLngFilename('po', $lng))) {
-            return $success;
-        }
-        $po = $poLoader->loadFile($this->getLngFilename('po', $lng));
-        clearstatcache();
 
         // slug collission detection
-        if ($str != '') {
-            $collission = true;
+        if ($context === 'slug' && $trans != '') {
             $counter = 2;
-            while ($collission === true) {
-                $collission = false;
-                foreach ($po->getTranslations() as $gettext__value) {
-                    if ($gettext__value->getContext() === 'slug' && $gettext__value->getTranslation() === $str) {
-                        if ($counter > 2) {
-                            $str = mb_substr($str, 0, mb_strrpos($str, '-'));
-                        }
-                        $str .= '-' . $counter;
-                        $counter++;
-                        $collission = true;
-                    }
+            while (
+                $this->db->fetch_var(
+                    'SELECT COUNT(*) FROM translations WHERE str <> ? AND context = ? AND lng = ? AND trans = ?',
+                    $str,
+                    $context,
+                    $lng,
+                    $trans
+                ) > 0
+            ) {
+                if ($counter > 2) {
+                    $trans = mb_substr($trans, 0, mb_strrpos($trans, '-'));
                 }
+                $trans .= '-' . $counter;
+                $counter++;
             }
         }
 
         // get existing
-        $gettext = null;
-        foreach ($po->getTranslations() as $gettext__value) {
-            if ($this->getIdFromStringAndContext($gettext__value) !== $id) {
-                continue;
-            }
-            $gettext = $gettext__value;
-            break;
-        }
+        $gettext = $this->db->fetch_row(
+            'SELECT * FROM translations WHERE str = ? AND context = ? AND lng = ?',
+            $str,
+            $context,
+            $lng
+        );
 
-        if ($gettext !== null) {
+        if (!empty($gettext)) {
             // delete
-            if ($str !== false && ($str === null || $str === '')) {
-                //$this->log->generalLog('removing ' . $gettext->getOriginal());
-                $po->remove($gettext);
+            if ($trans === '') {
+                $this->db->delete('translations', ['id' => $gettext['id']]);
             }
             // update
             else {
-                if ($str !== false) {
-                    //$this->log->generalLog('updating translation ' . $gettext->getOriginal());
-                    $gettext->translate($str);
+                if ($trans !== null) {
+                    $this->db->update('translations', ['trans' => $trans], ['id' => $gettext['id']]);
                 }
                 if ($checked !== null) {
-                    //$this->log->generalLog('updating checked ' . $gettext->getOriginal());
-                    if ($checked === true) {
-                        $this->addCommentToTranslation($gettext, 'checked');
-                    }
-                    if ($checked === false) {
-                        $this->deleteCommentFromTranslation($gettext, 'checked');
-                    }
+                    $this->db->update(
+                        'translations',
+                        ['checked' => $checked === true ? 1 : 0],
+                        ['id' => $gettext['id']]
+                    );
                 }
             }
             $success = true;
@@ -428,363 +408,94 @@ class Gettext
 
         // create
         else {
-            [$orig, $context] = $this->getStringAndContextFromId($id);
-            $translation = Translation::create($context, $orig);
-            $translation->translate($str);
-            if ($checked !== false) {
-                $this->addCommentToTranslation($translation, 'checked');
-            }
-            $po->add($translation);
+            $this->db->insert('translations', [
+                'str' => $str,
+                'context' => $context,
+                'lng' => $lng,
+                'trans' => $trans ?? '',
+                'added' => $this->utils->getCurrentTime(),
+                'checked' => $checked ?? 0,
+                'shared' => 0,
+                'discovered_last_time' => null,
+                'discovered_last_url_orig' => null,
+                'discovered_last_url' => null
+            ]);
             $success = true;
         }
 
-        if ($success === true) {
-            $poGenerator->generateFile($po, $this->getLngFilename('po', $lng));
-            clearstatcache();
-            $moGenerator->generateFile($po, $this->getLngFilename('mo', $lng));
-            clearstatcache();
-        }
         return $success;
     }
 
     function setCheckedToAllStringsFromFiles()
     {
-        $success = true;
-        $poLoader = new PoLoader();
-        $poGenerator = new PoGenerator();
-        $moGenerator = new MoGenerator();
-        foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
-            if (!file_exists($this->getLngFilename('po', $languages__value))) {
-                continue;
-            }
-            $po = $poLoader->loadFile($this->getLngFilename('po', $languages__value));
-            clearstatcache();
-            foreach ($po->getTranslations() as $gettext__value) {
-                $this->addCommentToTranslation($gettext__value, 'checked');
-                $success_this = true;
-            }
-            if ($success_this === true) {
-                $poGenerator->generateFile($po, $this->getLngFilename('po', $languages__value));
-                clearstatcache();
-                $moGenerator->generateFile($po, $this->getLngFilename('mo', $languages__value));
-                clearstatcache();
-            } else {
-                $success = false;
-            }
-        }
-        return $success;
+        $this->db->query('UPDATE translations SET checked = ?', 1);
+        return true;
     }
 
-    function editCheckedValue($orig, $context, $lng, $checked)
+    function editCheckedValue($str, $context = null, $lng, $checked)
     {
-        return $this->editCheckedValueById($this->getIdFromStringAndContext($orig, $context), $lng, $checked);
+        $this->db->query(
+            'UPDATE translations SET checked = ? WHERE str = ? AND context = ? AND lng = ?',
+            $checked === true ? 1 : 0,
+            $str,
+            $context,
+            $lng
+        );
+        return true;
     }
 
-    function editCheckedValueById($id, $lng, $checked)
+    function resetSharedValues()
     {
-        $success = false;
-        $poLoader = new PoLoader();
-        $poGenerator = new PoGenerator();
-        $moGenerator = new MoGenerator();
-        if (!file_exists($this->getLngFilename('po', $lng))) {
-            return $success;
-        }
-        $po = $poLoader->loadFile($this->getLngFilename('po', $lng));
-        clearstatcache();
-        foreach ($po->getTranslations() as $gettext__value) {
-            if ($this->getIdFromStringAndContext($gettext__value) !== $id) {
-                continue;
-            }
-            if ($checked === true) {
-                $this->addCommentToTranslation($gettext__value, 'checked');
-            }
-            if ($checked === false) {
-                $this->deleteCommentFromTranslation($gettext__value, 'checked');
-            }
-            $success = true;
-        }
-        if ($success === true) {
-            $poGenerator->generateFile($po, $this->getLngFilename('po', $lng));
-            clearstatcache();
-            $moGenerator->generateFile($po, $this->getLngFilename('mo', $lng));
-            clearstatcache();
-        }
-        return $success;
+        $this->db->query('UPDATE translations SET shared = ?', 0);
     }
 
-    function setAllDiscoveredStringsToChecked()
+    function deleteStringFromGettext($str, $context, $lng = null)
     {
-        if ($this->settings->get('auto_set_discovered_strings_checked') !== true) {
-            return;
-        }
-        if ($this->log->discovery_log_to_save === null) {
-            return;
-        }
-        foreach ($this->log->discovery_log_to_save as $discovery_log_to_save__value) {
-            $translation = $this->gettext[$discovery_log_to_save__value['lng']]->find(
-                $discovery_log_to_save__value['context'],
-                $discovery_log_to_save__value['string']
-            );
-            if ($translation !== null) {
-                $this->addCommentToTranslation($translation, 'checked');
-                $this->gettext_save_counter['po'][$discovery_log_to_save__value['lng']] = true;
-            }
-        }
-    }
-
-    function editSharedValue($orig, $context, $shared)
-    {
-        return $this->editSharedValueById($this->getIdFromStringAndContext($orig, $context), $shared);
-    }
-
-    function editSharedValueById($id, $shared)
-    {
-        $success = false;
-        $poLoader = new PoLoader();
-        $poGenerator = new PoGenerator();
-        if (!file_exists($this->getLngFilename('pot', '_template'))) {
-            return $success;
-        }
-        $pot = $poLoader->loadFile($this->getLngFilename('pot', '_template'));
-        clearstatcache();
-        foreach ($pot->getTranslations() as $gettext__value) {
-            if ($this->getIdFromStringAndContext($gettext__value) !== $id) {
-                continue;
-            }
-            if ($shared === true) {
-                $this->addCommentToTranslation($gettext__value, 'shared');
-            }
-            if ($shared === false) {
-                $this->deleteCommentFromTranslation($gettext__value, 'shared');
-            }
-            $success = true;
-        }
-        if ($success === true) {
-            $poGenerator->generateFile($pot, $this->getLngFilename('pot', '_template'));
-            clearstatcache();
-        }
-        return $success;
-    }
-
-    function autoEditSharedValues($strings = null)
-    {
-        $success = false;
-        $poLoader = new PoLoader();
-        $poGenerator = new PoGenerator();
-        if (!file_exists($this->getLngFilename('pot', '_template'))) {
-            return $success;
-        }
-        $pot = $poLoader->loadFile($this->getLngFilename('pot', '_template'));
-        clearstatcache();
-        $data = [];
-
-        $filename = $this->log->discoveryLogFilename();
-        if (!file_exists($filename)) {
-            return $success;
-        }
-        $db = new \PDO('sqlite:' . $filename);
-        $query = '';
-        $query .= '
-            SELECT string, context, COUNT(string) as count FROM (
-                SELECT string, context, url_orig FROM logs';
         $args = [];
-        if ($strings !== null && !empty($strings)) {
-            $query .= ' WHERE string IN (' . str_repeat('?,', count($strings) - 1) . '?)';
-            $args = array_merge(
-                $args,
-                array_map(function ($strings__value) {
-                    return $strings__value['string'];
-                }, $strings)
-            );
+        $args['str'] = $str;
+        $args['context'] = $context;
+        if ($lng !== null) {
+            $args['lng'] = $lng;
         }
-        $query .= '
-                GROUP BY string, context, url_orig
-            ) as t GROUP BY string, context
-        ';
-        $statement = $db->prepare($query);
-        $statement->execute($args);
-        $results = $statement->fetchAll(\PDO::FETCH_ASSOC);
-
-        foreach ($results as $results__value) {
-            $data[$this->getIdFromStringAndContext($results__value['string'], $results__value['context'])] =
-                $results__value['count'] > 1;
-        }
-
-        foreach ($pot->getTranslations() as $gettext__value) {
-            $id = $this->getIdFromStringAndContext($gettext__value);
-            if (!array_key_exists($id, $data)) {
-                continue;
-            }
-            if ($data[$id] === true) {
-                $this->addCommentToTranslation($gettext__value, 'shared');
-            } else {
-                $this->deleteCommentFromTranslation($gettext__value, 'shared');
-            }
-            $success = true;
-        }
-        if ($success === true) {
-            $poGenerator->generateFile($pot, $this->getLngFilename('pot', '_template'));
-            clearstatcache();
-        }
-        return $success;
+        $this->db->delete('translations', $args);
+        return true;
     }
 
-    function deleteStringFromGettext($orig, $context)
+    function addTranslationToPoFileAndToCache($str, $trans, $lng, $context = null)
     {
-        return $this->deleteStringFromGettextById($this->getIdFromStringAndContext($orig, $context));
-    }
-
-    function deleteStringFromGettextById($id)
-    {
-        $success = false;
-        $poLoader = new PoLoader();
-        $poGenerator = new PoGenerator();
-        $moGenerator = new MoGenerator();
-        if (!file_exists($this->getLngFilename('pot', '_template'))) {
-            return $success;
-        }
-        $pot = $poLoader->loadFile($this->getLngFilename('pot', '_template'));
-        clearstatcache();
-        $to_remove = null;
-        foreach ($pot->getTranslations() as $gettext__value) {
-            if ($this->getIdFromStringAndContext($gettext__value) !== $id) {
-                continue;
-            }
-            $to_remove = $gettext__value;
-            break;
-        }
-        if ($to_remove !== null) {
-            $pot->remove($to_remove);
-            $poGenerator->generateFile($pot, $this->getLngFilename('pot', '_template'));
-            clearstatcache();
-            $success = true;
-        }
-
-        foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
-            if (!file_exists($this->getLngFilename('po', $languages__value))) {
-                continue;
-            }
-            $po = $poLoader->loadFile($this->getLngFilename('po', $languages__value));
-            clearstatcache();
-            $to_remove = null;
-            foreach ($po->getTranslations() as $gettext__value) {
-                if ($this->getIdFromStringAndContext($gettext__value) !== $id) {
-                    continue;
-                }
-                $to_remove = $gettext__value;
-                break;
-            }
-            if ($to_remove !== null) {
-                $po->remove($to_remove);
-                $poGenerator->generateFile($po, $this->getLngFilename('po', $languages__value));
-                clearstatcache();
-                $moGenerator->generateFile($po, $this->getLngFilename('mo', $languages__value));
-                clearstatcache();
-                $success = true;
-            }
-            $po = null;
-        }
-        return $success;
-    }
-
-    function deleteUnusedTranslations($since_time)
-    {
-        $deleted = 0;
-        $discovery_strings = array_map(function ($a) {
-            return $a['string'] . '#' . $a['context'];
-        }, $this->log->discoveryLogGet($since_time));
-
-        $poLoader = new PoLoader();
-        $poGenerator = new PoGenerator();
-        $moGenerator = new MoGenerator();
-        if (!file_exists($this->getLngFilename('pot', '_template'))) {
-            return $deleted;
-        }
-        $pot = $poLoader->loadFile($this->getLngFilename('pot', '_template'));
-        clearstatcache();
-        $to_remove = [];
-        foreach ($pot->getTranslations() as $gettext__value) {
-            if (in_array($gettext__value->getOriginal() . '#' . $gettext__value->getContext(), $discovery_strings)) {
-                continue;
-            }
-            //$this->log->generalLog('removing ' . $gettext__value->getOriginal() . '#' . $gettext__value->getContext());
-            $to_remove[] = $gettext__value;
-        }
-        if (!empty($to_remove)) {
-            foreach ($to_remove as $to_remove__value) {
-                $pot->remove($to_remove__value);
-                $deleted++;
-            }
-            $poGenerator->generateFile($pot, $this->getLngFilename('pot', '_template'));
-            clearstatcache();
-        }
-
-        foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
-            if (!file_exists($this->getLngFilename('po', $languages__value))) {
-                continue;
-            }
-            $po = $poLoader->loadFile($this->getLngFilename('po', $languages__value));
-            clearstatcache();
-            $to_remove = [];
-            foreach ($po->getTranslations() as $gettext__value) {
-                if (
-                    in_array($gettext__value->getOriginal() . '#' . $gettext__value->getContext(), $discovery_strings)
-                ) {
-                    continue;
-                }
-                //$this->log->generalLog('removing ' . $gettext__value->getOriginal() . '#' . $gettext__value->getContext());
-                $to_remove[] = $gettext__value;
-            }
-            if (!empty($to_remove)) {
-                foreach ($to_remove as $to_remove__value) {
-                    $po->remove($to_remove__value);
-                    $deleted++;
-                }
-                $poGenerator->generateFile($po, $this->getLngFilename('po', $languages__value));
-                clearstatcache();
-                $moGenerator->generateFile($po, $this->getLngFilename('mo', $languages__value));
-                clearstatcache();
-            }
-        }
-        return $deleted;
-    }
-
-    function addStringToPotFileAndToCache($str, $context, $comment = null)
-    {
-        $translation = Translation::create($context, $str);
-        $translation->translate('');
-        if ($comment !== null) {
-            $translation->getComments()->add($comment);
-        }
-        $this->gettext_pot->add($translation);
-        $this->gettext_pot_cache[$context][$str] = null;
-        $this->gettext_save_counter['pot'] = true;
-    }
-
-    function addTranslationToPoFileAndToCache($orig, $trans, $lng, $context = null, $comment = null)
-    {
-        if ($lng === $this->settings->getSourceLanguageCode() || empty(@$this->gettext[$lng])) {
+        if ($lng === $this->settings->getSourceLanguageCode()) {
             return;
         }
-        $translation = Translation::create($context, $orig);
-        $translation->translate($trans);
-        if ($comment !== null) {
-            $translation->getComments()->add($comment);
+        $this->data['save']['insert'][] = [
+            'str' => $str,
+            'context' => $context,
+            'lng' => $lng,
+            'trans' => $trans,
+            'checked' => $this->settings->get('auto_set_new_strings_checked') === true ? 1 : 0,
+            'shared' => 0
+        ];
+        $this->data['cache'][$lng][$context ?? ''][$str] = $trans;
+        $this->data['cache_reverse'][$lng][$context ?? ''][$trans] = $str;
+    }
+
+    function setupLngFolder()
+    {
+        if (!is_dir($this->getLngFolder())) {
+            mkdir($this->getLngFolder(), 0777, true);
         }
-        $this->gettext[$lng]->add($translation);
-        $this->gettext_cache[$lng][$context ?? ''][$orig] = $trans;
-        $this->gettext_cache_reverse[$lng][$context ?? ''][$trans] = $orig;
-        $this->gettext_save_counter['po'][$lng] = true;
+        if (!file_exists($this->getLngFolder() . '/.htaccess')) {
+            file_put_contents($this->getLngFolder() . '/.htaccess', 'Deny from all');
+        }
     }
 
     function getLngFolder()
     {
-        return $this->utils->getDocRoot() . '/' . trim($this->settings->get('lng_folder'), '/');
+        return rtrim($this->utils->getDocRoot(), '/') . '/' . trim($this->settings->get('lng_folder'), '/');
     }
 
-    function getLngFilename($type, $lng)
+    function getDataFilename()
     {
-        return $this->getLngFolder() . '/' . $lng . '.' . $type;
+        return $this->getLngFolder() . '/data.db';
     }
 
     function getLngFolderPublic()
@@ -799,28 +510,81 @@ class Gettext
 
     function resetTranslations()
     {
-        $files = glob($this->getLngFolder() . '/*'); // get all file names
-        foreach ($files as $files__value) {
-            if (is_file($files__value)) {
-                if (
-                    mb_strpos($files__value, '.pot') !== false ||
-                    mb_strpos($files__value, '.po') !== false ||
-                    mb_strpos($files__value, '.mo') !== false
-                ) {
-                    @unlink($files__value);
-                }
+        // if deletion is not possible, clear
+        $this->db->clear('translations');
+        @unlink($this->getDataFilename());
+    }
+
+    function discoveryLogGet($time = null, $after = true, $url = null, $slim_output = true, $delete = false)
+    {
+        if ($this->db === null) {
+            return;
+        }
+        $urls = null;
+        if ($url !== null) {
+            if (is_array($url)) {
+                $urls = $url;
             }
+            if (is_string($url)) {
+                $urls = [$url];
+            }
+        }
+        if ($urls !== null) {
+            $current_host = $this->host->getCurrentHost();
+            $urls = array_map(function ($urls__value) use ($current_host) {
+                return '/' . trim(str_replace($current_host, '', $urls__value), '/');
+            }, $urls);
+        }
+        $query = '';
+        if ($delete === false) {
+            $query .= 'SELECT';
+            if ($slim_output === false) {
+                $query .= ' *';
+            } else {
+                $query .= ' DISTINCT str, context';
+            }
+        } else {
+            $query .= 'DELETE';
+        }
+        $query .= ' FROM translations WHERE 1=1';
+        $args = [];
+        if ($urls !== null) {
+            $query .= ' AND discovered_last_url IN (' . str_repeat('?,', count($urls) - 1) . '?)';
+            $args = array_merge($args, $urls);
+        }
+        if ($time !== null) {
+            $query .= ' AND discovered_last_time ' . ($after === true ? '>=' : '<') . ' ?';
+            $args[] = $time;
+        }
+        if ($delete === false) {
+            $query .= ' ORDER BY context ASC, discovered_last_time ASC';
+        }
+
+        if ($delete === false) {
+            return $this->db->fetch_all($query, $args);
+        } else {
+            return $this->db->query($query, $args);
         }
     }
 
-    function setupLngFolder()
+    function discoveryLogGetAfter($time = null, $url = null, $slim_output = true)
     {
-        if (!is_dir($this->getLngFolder())) {
-            mkdir($this->getLngFolder(), 0777, true);
-        }
-        if (!file_exists($this->getLngFolder() . '/.htaccess')) {
-            file_put_contents($this->getLngFolder() . '/.htaccess', 'Deny from all');
-        }
+        return $this->discoveryLogGet($time, true, $url, $slim_output, false);
+    }
+
+    function discoveryLogGetBefore($time = null, $url = null, $slim_output = true)
+    {
+        return $this->discoveryLogGet($time, false, $url, $slim_output, false);
+    }
+
+    function discoveryLogDeleteAfter($time = null, $url = null)
+    {
+        return $this->discoveryLogGet($time, true, $url, false, true);
+    }
+
+    function discoveryLogDeleteBefore($time = null, $url = null)
+    {
+        return $this->discoveryLogGet($time, false, $url, false, true);
     }
 
     function getCurrentPrefix()
@@ -1036,10 +800,6 @@ class Gettext
             $urls[] = $orig;
         }
         foreach ($urls as $urls__value) {
-            if ($urls__value === '/beispiel-bilddatei14.jpg') {
-                var_dump($urls__value);
-                die();
-            }
             // always submit relative urls
             foreach (
                 [
@@ -1064,7 +824,7 @@ class Gettext
             }
             $trans = $this->getExistingTranslationFromCache($urls__value, $lng, 'file');
             if ($trans === false) {
-                $this->addStringToPotFileAndToCache($urls__value, 'file');
+                $this->addTranslationToPoFileAndToCache($urls__value, $urls__value, $lng, 'file');
             } elseif ($this->stringIsChecked($urls__value, $lng, 'file')) {
                 $orig = str_replace($urls__value, $trans, $orig);
             }
@@ -1115,7 +875,6 @@ class Gettext
             $transWithIds = $this->autoTranslateString($origWithIds, $lng, $context);
             if ($transWithIds !== null) {
                 $transWithoutAttributes = $this->tags->removeAttributesExceptIrregularIds($transWithIds);
-                $this->addStringToPotFileAndToCache($origWithoutAttributes, $context);
                 $this->addTranslationToPoFileAndToCache(
                     $origWithoutAttributes,
                     $transWithoutAttributes,
@@ -1368,10 +1127,10 @@ class Gettext
         if (
             $str === '' ||
             $str === null ||
-            $this->gettext_checked_strings[$lng] === null ||
-            !array_key_exists($context ?? '', $this->gettext_checked_strings[$lng]) ||
-            !array_key_exists($str, $this->gettext_checked_strings[$lng][$context ?? '']) ||
-            $this->gettext_checked_strings[$lng][$context ?? ''][$str] != '1'
+            !array_key_exists($lng, $this->data['checked_strings']) ||
+            !array_key_exists($context ?? '', $this->data['checked_strings'][$lng]) ||
+            !array_key_exists($str, $this->data['checked_strings'][$lng][$context ?? '']) ||
+            $this->data['checked_strings'][$lng][$context ?? ''][$str] != '1'
         ) {
             return false;
         }
@@ -1450,7 +1209,6 @@ class Gettext
             }
             $trans = $this->autoTranslateString($str_in_source, $to_lng, $context, $from_lng);
             if ($trans !== null) {
-                $this->addStringToPotFileAndToCache($str_in_source, $context);
                 $this->addTranslationToPoFileAndToCache($str_in_source, $str, $from_lng, $context);
                 $this->addTranslationToPoFileAndToCache($str_in_source, $trans, $to_lng, $context);
             } else {

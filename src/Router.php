@@ -3,14 +3,14 @@ namespace vielhuber\gtbabel;
 
 class Router
 {
-    public $gettext;
+    public $data;
     public $host;
     public $settings;
     public $publish;
 
-    function __construct(Gettext $gettext = null, Host $host = null, Settings $settings = null, Publish $publish = null)
+    function __construct(Data $data = null, Host $host = null, Settings $settings = null, Publish $publish = null)
     {
-        $this->gettext = $gettext ?: new Gettext();
+        $this->data = $data ?: new Data();
         $this->host = $host ?: new Host();
         $this->settings = $settings ?: new Settings();
         $this->publish = $publish ?: new Publish();
@@ -18,16 +18,16 @@ class Router
 
     function redirectPrefixedSourceLng()
     {
-        if (!$this->gettext->sourceLngIsCurrentLng()) {
+        if (!$this->data->sourceLngIsCurrentLng()) {
             return;
         }
         if (
             $this->settings->get('prefix_source_lng') === false &&
-            $this->gettext->getCurrentPrefix() !== $this->settings->getSourceLanguageCode()
+            $this->data->getCurrentPrefix() !== $this->settings->getSourceLanguageCode()
         ) {
             return;
         }
-        if ($this->settings->get('prefix_source_lng') === true && $this->gettext->getCurrentPrefix() !== null) {
+        if ($this->settings->get('prefix_source_lng') === true && $this->data->getCurrentPrefix() !== null) {
             return;
         }
         if ($this->settings->get('prefix_source_lng') === false) {
@@ -47,10 +47,10 @@ class Router
             $url .= trim($this->host->getCurrentHost(), '/');
             $url .= '/';
             if ($this->host->isAjaxRequest() && @$_SERVER['HTTP_REFERER'] != '') {
-                $url .= $this->gettext->getLngFromUrl($_SERVER['HTTP_REFERER']);
+                $url .= $this->data->getLngFromUrl($_SERVER['HTTP_REFERER']);
             } else {
                 if ($this->settings->get('redirect_root_domain') === 'browser') {
-                    $url .= $this->gettext->getBrowserLng();
+                    $url .= $this->data->getBrowserLng();
                 } else {
                     $url .= $this->settings->getSourceLanguageCode();
                 }
@@ -92,7 +92,7 @@ class Router
 
     function initMagicRouter()
     {
-        if ($this->gettext->sourceLngIsCurrentLng()) {
+        if ($this->data->sourceLngIsCurrentLng()) {
             if ($this->settings->get('prefix_source_lng') === false) {
                 return;
             }
@@ -109,7 +109,7 @@ class Router
                 );
             }
         } else {
-            $path = $this->gettext->getPathTranslationInLanguage($this->settings->getSourceLanguageCode(), true);
+            $path = $this->data->getPathTranslationInLanguage($this->settings->getSourceLanguageCode(), true);
             $path = trim($path, '/');
             $path = '/' . $path;
         }
@@ -118,14 +118,14 @@ class Router
 
     function redirectUnpublished()
     {
-        if ($this->gettext->sourceLngIsCurrentLng()) {
+        if ($this->data->sourceLngIsCurrentLng()) {
             return;
         }
         $url = $this->host->getCurrentUrl();
-        $source_url = $this->gettext->getUrlTranslationInLanguage($this->settings->getSourceLanguageCode(), $url);
+        $source_url = $this->data->getUrlTranslationInLanguage($this->settings->getSourceLanguageCode(), $url);
         if (
             !$this->publish->isActive() ||
-            !$this->publish->isPrevented($source_url, $this->gettext->getCurrentLanguageCode())
+            !$this->publish->isPrevented($source_url, $this->data->getCurrentLanguageCode())
         ) {
             return;
         }

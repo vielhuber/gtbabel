@@ -14,7 +14,8 @@
         "gettext/gettext": "*",
         "vlucas/phpdotenv": "*",
         "cocur/slugify": "*",
-        "vielhuber/stringhelper": "*"
+        "vielhuber/stringhelper": "*",
+        "vielhuber/dbhelper": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "*"

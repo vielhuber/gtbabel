@@ -88,7 +88,7 @@ The default configuration is:
     'html_hreflang_tags' => true,
     'debug_translations' => false, // surround outputted translations with "%|%" to see borders
     'auto_add_translations_to_gettext' => true,
-    'auto_set_discovered_strings_checked' => false,
+    'auto_set_new_strings_checked' => false,
     'only_show_checked_strings' => true,
     'auto_translation' => true,
     'auto_translation_service' => 'google', // google|microsoft
@@ -194,20 +194,20 @@ Instead you can also can use [wp_localize_script](https://codex.wordpress.org/Fu
 
 By default Gtbabel translates all text and tag nodes in the following contexts:
 
-| selector                   | attribute     | context     |
-| -------------------------- | ------------- | ----------- |
-| `a`                        | `href`        | slug\|file  |
-| `form`                     | `action`      | slug        |
-| `img`                      | `alt`         |             |
-| `*`                        | `title`       |             |
-| `input`                    | `placeholder` |             |
-| `head title`               |               | title       |
-| `meta[name="description"]` | `content`     | description |
-| `img`                      | `src`         | file        |
-| `*`                        | `style`       | file        |
-| `*`                        | `data-*`      |             |
-| `*`                        | `label`       |             |
-| `*`                        | `*text*`      |             |
+| selector                        | attribute     | context     |
+| ------------------------------- | ------------- | ----------- |
+| `body a`                        | `href`        | slug\|file  |
+| `body form`                     | `action`      | slug        |
+| `body img`                      | `alt`         |             |
+| `body *`                        | `title`       |             |
+| `body input`                    | `placeholder` |             |
+| `head title`                    |               | title       |
+| `head meta[name="description"]` | `content`     | description |
+| `body img`                      | `src`         | file        |
+| `body *`                        | `style`       | file        |
+| `body *`                        | `data-*`      |             |
+| `body *`                        | `label`       |             |
+| `body *`                        | `*text*`      |             |
 
 To disable text/tag node transformation, provide the options:
 

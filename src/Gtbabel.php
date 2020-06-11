@@ -12,6 +12,7 @@ class Gtbabel
     public $dom;
     public $router;
     public $gettext;
+    public $data;
 
     public $started;
 
@@ -24,7 +25,7 @@ class Gtbabel
         Log $log = null,
         Dom $dom = null,
         Router $router = null,
-        Gettext $gettext = null
+        Data $data = null
     ) {
         $this->settings = $settings ?: new Settings();
         $this->utils = $utils ?: new Utils();
@@ -32,11 +33,10 @@ class Gtbabel
         $this->host = $host ?: new Host($this->settings);
         $this->publish = $publish ?: new Publish($this->settings, $this->host);
         $this->log = $log ?: new Log($this->utils, $this->settings, $this->host);
-        $this->gettext =
-            $gettext ?:
-            new Gettext($this->utils, $this->host, $this->settings, $this->tags, $this->log, $this->publish);
-        $this->dom = $dom ?: new Dom($this->utils, $this->gettext, $this->host, $this->settings);
-        $this->router = $router ?: new Router($this->gettext, $this->host, $this->settings, $this->publish);
+        $this->data =
+            $data ?: new Data($this->utils, $this->host, $this->settings, $this->tags, $this->log, $this->publish);
+        $this->dom = $dom ?: new Dom($this->utils, $this->data, $this->host, $this->settings);
+        $this->router = $router ?: new Router($this->data, $this->host, $this->settings, $this->publish);
     }
 
     function start($args = [])
@@ -45,8 +45,9 @@ class Gtbabel
         $this->settings->setup($args);
         $this->host->setup();
         $this->log->setup();
-        $this->gettext->setupLngFolder();
-        $this->gettext->preloadGettextInCache();
+        $this->data->setupLngFolder();
+        $this->data->initDatabase();
+        $this->data->preloadDataInCache();
         if ($this->host->currentUrlIsExcluded()) {
             return;
         }
@@ -54,7 +55,7 @@ class Gtbabel
         $this->router->addTrailingSlash();
         $this->router->redirectUnpublished();
         $this->router->initMagicRouter();
-        $this->gettext->addCurrentUrlToTranslations();
+        $this->data->addCurrentUrlToTranslations();
         ob_start();
     }
 
@@ -73,18 +74,15 @@ class Gtbabel
         $content = $this->dom->modifyContent($content);
         ob_end_clean();
         echo $content;
-        $this->gettext->setAllDiscoveredStringsToChecked();
-        $this->gettext->generateGettextFiles();
+        $this->data->generateGettextFiles();
         $this->log->statsLogSave();
-        $this->log->discoveryLogSave();
     }
 
     function reset()
     {
-        $this->gettext->resetTranslations();
+        $this->data->resetTranslations();
         $this->log->statsLogReset();
         $this->log->generalLogReset();
-        $this->log->discoveryLogReset();
     }
 
     function translate($content, $args = [])
@@ -93,7 +91,7 @@ class Gtbabel
         $this->settings->setup($args);
         $this->host->setup();
         $this->log->setup();
-        $this->gettext->preloadGettextInCache();
+        $this->data->preloadDataInCache();
         $content = $this->dom->modifyContent($content);
         return $content;
     }
@@ -107,12 +105,15 @@ class Gtbabel
         $this->settings->setup($args);
         $this->host->setup();
         $this->log->setup();
-        $this->gettext->preloadGettextInCache();
-        $since_time = microtime(true);
+        $this->data->setupLngFolder();
+        $this->data->initDatabase();
+        $this->data->preloadDataInCache();
+        $time = $this->utils->getCurrentTime();
         $content = $this->dom->modifyContent($content);
+        $this->data->generateGettextFiles();
         $this->log->statsLogSave();
-        $this->log->discoveryLogSave();
-        $data = $this->log->discoveryLogGet($since_time);
+        $data = $this->data->discoveryLogGetAfter($time, null, true);
+        $this->data->discoveryLogDeleteAfter($time);
         return $data;
     }
 }

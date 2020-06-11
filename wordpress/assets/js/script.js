@@ -53,10 +53,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 href += '&gtbabel_delete_unused=1';
             }
             if (
-                document.querySelector('#gtbabel_auto_set_discovered_strings_checked') === null || // on wizard, if checkbox is not available
-                document.querySelector('#gtbabel_auto_set_discovered_strings_checked').checked === true
+                document.querySelector('#gtbabel_auto_set_new_strings_checked') === null || // on wizard, if checkbox is not available
+                document.querySelector('#gtbabel_auto_set_new_strings_checked').checked === true
             ) {
-                href += '&gtbabel_auto_set_discovered_strings_checked=1';
+                href += '&gtbabel_auto_set_new_strings_checked=1';
             }
             el.remove();
             fetchNextAutoTranslate(href);

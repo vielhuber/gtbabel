@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.4.7
+ * Version: 3.4.8
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -28,7 +28,6 @@ class GtbabelWordPress
         $this->initBackend();
         $this->triggerPreventPublish();
         $this->addGutenbergSidebar();
-        $this->initFrontendEditor();
         $this->showWizardNotice();
         $this->languagePickerWidget();
         $this->languagePickerShortcode();
@@ -101,7 +100,7 @@ class GtbabelWordPress
         foreach (
             [
                 'discovery_log',
-                'auto_set_discovered_strings_checked',
+                'auto_set_new_strings_checked',
                 'auto_add_translations_to_gettext',
                 'redirect_root_domain'
             ]
@@ -117,7 +116,7 @@ class GtbabelWordPress
 
         // define wpml fallback constant
         if (!defined('ICL_LANGUAGE_CODE')) {
-            define('ICL_LANGUAGE_CODE', $this->gtbabel->gettext->getCurrentLanguageCode());
+            define('ICL_LANGUAGE_CODE', $this->gtbabel->data->getCurrentLanguageCode());
         }
     }
 
@@ -150,12 +149,15 @@ class GtbabelWordPress
     {
         add_action('after_setup_theme', function () {
             if (isset($_GET['download']) && $_GET['download'] === 'pot') {
-                $filename = $this->gtbabel->gettext->getLngFilename('pot', '_template');
+                /* TODO */
+                /*
+                $filename = $this->gtbabel->data->getLngFilename('pot', '_template');
                 header('Content-Type: application/octet-stream');
                 header('Content-Transfer-Encoding: Binary');
                 header('Content-disposition: attachment; filename="' . basename($filename) . '"');
                 readfile($filename);
                 die();
+                */
             }
         });
     }
@@ -203,10 +205,6 @@ class GtbabelWordPress
                 // if a slug is changed, preserve settings in prevent publish
                 if ($trigger3) {
                     $this->gtbabel->publish->change($post_before_url, $post_after_url);
-                }
-                // if a slug is changed, change old url to new in discovery log
-                if ($trigger3) {
-                    $this->gtbabel->log->discoveryLogChangeUrl($post_before_url, $post_after_url);
                 }
 
                 if ($trigger1 || $trigger2 || $trigger3) {
@@ -268,43 +266,6 @@ class GtbabelWordPress
         });
     }
 
-    private function initFrontendEditor()
-    {
-        add_action(
-            'admin_bar_menu',
-            function ($wp_admin_bar) {
-                if (is_admin() || !is_user_logged_in() || $this->gtbabel->gettext->sourceLngIsCurrentLng()) {
-                    return;
-                }
-                $wp_admin_bar->add_node([
-                    'id' => 'gtbabel-frontend-editor',
-                    'parent' => null,
-                    'group' => null,
-                    'title' => '<span class="ab-icon"></span>' . __('Translate page', 'gtbabel-plugin'),
-                    'href' => admin_url(
-                        'admin.php?page=gtbabel-trans&lng=' .
-                            $this->gtbabel->gettext->getCurrentLanguageCode() .
-                            '&url=' .
-                            urlencode(
-                                $this->gtbabel->gettext->getUrlTranslationInLanguage(
-                                    $this->gtbabel->settings->getSourceLanguageCode()
-                                )
-                            )
-                    ),
-                    'meta' => ['target' => '_blank']
-                ]);
-            },
-            999
-        );
-        add_action('wp_enqueue_scripts', function () {
-            if (is_admin() || !is_user_logged_in()) {
-                return;
-            }
-            wp_enqueue_style('gtbabel-frontend-css', plugins_url('assets/css/frontend.css', __FILE__));
-            wp_enqueue_script('gtbabel-frontend-js', plugins_url('assets/js/frontend.js', __FILE__));
-        });
-    }
-
     private function languagePickerWidget()
     {
         add_action('widgets_init', function () {
@@ -316,7 +277,7 @@ class GtbabelWordPress
         add_shortcode('gtbabel_languagepicker', function () {
             $html = '';
             $html .= '<ul class="lngpicker">';
-            foreach ($this->gtbabel->gettext->getLanguagePickerData() as $languagepicker__value) {
+            foreach ($this->gtbabel->data->getLanguagePickerData() as $languagepicker__value) {
                 $html .= '<li>';
                 $html .=
                     '<a href="' .
@@ -385,12 +346,12 @@ class GtbabelWordPress
 
             $submenu = add_submenu_page(
                 'gtbabel-settings',
-                __('Translation services', 'gtbabel-plugin'),
-                __('Translation services', 'gtbabel-plugin'),
+                __('Gettext', 'gtbabel-plugin'),
+                __('Gettext', 'gtbabel-plugin'),
                 'manage_options',
-                'gtbabel-services',
+                'gtbabel-gettext',
                 function () {
-                    $this->initBackendTranslationServices();
+                    $this->initBackendGettext();
                 }
             );
             $menus[] = $submenu;
@@ -409,10 +370,10 @@ class GtbabelWordPress
 
             foreach ($menus as $menus__value) {
                 add_action('admin_print_styles-' . $menus__value, function () {
-                    wp_enqueue_style('gtbabel-backend-css', plugins_url('assets/css/backend.css', __FILE__));
+                    wp_enqueue_style('gtbabel-css', plugins_url('assets/css/style.css', __FILE__));
                 });
                 add_action('admin_print_scripts-' . $menus__value, function () {
-                    wp_enqueue_script('gtbabel-backend-js', plugins_url('assets/js/backend.js', __FILE__));
+                    wp_enqueue_script('gtbabel-js', plugins_url('assets/js/script.js', __FILE__));
                 });
             }
         });
@@ -599,7 +560,7 @@ class GtbabelWordPress
             }
 
             if (isset($_POST['check_all_strings'])) {
-                $this->gtbabel->gettext->setCheckedToAllStringsFromFiles();
+                $this->gtbabel->data->setCheckedToAllStringsFromFiles();
             }
 
             if (isset($_POST['reset_settings'])) {
@@ -1053,11 +1014,11 @@ class GtbabelWordPress
         echo '</div>';
         echo '</li>';
         echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_auto_set_discovered_strings_checked" class="gtbabel__label">';
-        echo __('Auto set to checked', 'gtbabel-plugin');
+        echo '<label for="gtbabel_auto_set_new_strings_checked" class="gtbabel__label">';
+        echo __('Auto set new strings to checked', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" id="gtbabel_auto_set_discovered_strings_checked" type="checkbox" checked="checked" value="1" />';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" id="gtbabel_auto_set_new_strings_checked" type="checkbox" checked="checked" value="1" />';
         echo '</div>';
         echo '</li>';
         echo '</ul>';
@@ -1152,39 +1113,40 @@ class GtbabelWordPress
                     // sanitize
                     $_POST['gtbabel'] = __::array_map_deep($_POST['gtbabel'], function (
                         $settings__value,
-                        $settings__key,
-                        $key_chain
+                        $settings__key
                     ) {
-                        if (in_array('str', $key_chain)) {
+                        if (__::decode_data($settings__key)['field'] === 'trans') {
                             return wp_kses_post($settings__value);
                         }
                         return sanitize_textarea_field($settings__value);
                     });
 
                     foreach ($_POST['gtbabel'] as $post__key => $post__value) {
-                        if (!empty(@$post__value['translations'])) {
-                            foreach ($post__value['translations'] as $translations__key => $translations__value) {
-                                $this->gtbabel->gettext->editTranslationById(
-                                    $post__key,
-                                    $translations__key,
-                                    isset($translations__value['str']) ? $translations__value['str'] : false,
-                                    isset($translations__value['checked']) && $translations__value['checked'] == '1'
-                                        ? true
-                                        : (isset($translations__value['checked']) &&
-                                        $translations__value['checked'] == '0'
-                                            ? false
-                                            : null)
-                                );
-                            }
-                        }
-                        if (@$post__value['delete'] == '1') {
-                            $this->gtbabel->gettext->deleteStringFromGettextById($post__key);
-                        }
-                        if (array_key_exists('shared', $post__value)) {
-                            $this->gtbabel->gettext->editSharedValueById(
-                                $post__key,
-                                $post__value['shared'] == '1' ? true : false
+                        $input_data = __::decode_data($post__key);
+                        if (@$input_data['field'] === 'trans') {
+                            $this->gtbabel->data->editTranslation(
+                                $input_data['str'],
+                                $input_data['context'],
+                                $input_data['lng'],
+                                isset($post__value) ? $post__value : false,
+                                null
                             );
+                        }
+                        if (@$input_data['field'] === 'checked') {
+                            $this->gtbabel->data->editTranslation(
+                                $input_data['str'],
+                                $input_data['context'],
+                                $input_data['lng'],
+                                null,
+                                isset($post__value) && $post__value == '1'
+                                    ? true
+                                    : (isset($post__value) && $post__value == '0'
+                                        ? false
+                                        : null)
+                            );
+                        }
+                        if (@$input_data['field'] === 'delete' && $post__value == '1') {
+                            $this->gtbabel->data->deleteStringFromGettext($input_data['str'], $input_data['context']);
                         }
                     }
                 }
@@ -1246,7 +1208,7 @@ class GtbabelWordPress
             if ($lng === null || $this->gtbabel->settings->getSourceLanguageCode() === $lng) {
                 $link_public = $url;
             } else {
-                $link_public = $this->gtbabel->gettext->getUrlTranslationInLanguage($lng, $url);
+                $link_public = $this->gtbabel->data->getUrlTranslationInLanguage($lng, $url);
             }
             echo '<a href="' . $link_public . '" target="_blank">' . $link_public . '</a>';
             echo '</p>';
@@ -1367,16 +1329,14 @@ class GtbabelWordPress
             echo '</tr>';
             echo '</thead>';
             echo '<tbody class="gtbabel__table-body">';
-            foreach ($translations as $translations__key => $translations__value) {
+            foreach ($translations as $translations__value) {
                 echo '<tr class="gtbabel__table-row">';
                 echo '<td class="gtbabel__table-cell">';
-                echo '<textarea class="gtbabel__input gtbabel__input--textarea" name="gtbabel[' .
-                    $translations__key .
-                    '][orig]" disabled="disabled">' .
-                    $translations__value['orig'] .
+                echo '<textarea class="gtbabel__input gtbabel__input--textarea" disabled="disabled">' .
+                    $translations__value['str'] .
                     '</textarea>';
                 if ($translations__value['context'] === 'file') {
-                    $this->initBackendStringTranslationShowFile($translations__value['orig'], false);
+                    $this->initBackendStringTranslationShowFile($translations__value['str'], false);
                 }
                 echo '</td>';
                 foreach (
@@ -1387,52 +1347,56 @@ class GtbabelWordPress
                         continue;
                     }
                     echo '<td class="gtbabel__table-cell">';
-                    if ($translations__value['translations'][$languages__key]['str'] != '') {
+                    if (@$translations__value[$languages__key . '_trans'] != '') {
                         echo '<input title="' .
                             __('String checked', 'gtbabel-plugin') .
                             '" class="gtbabel__input gtbabel__input--checkbox gtbabel__input--on-change gtbabel__input--submit-unchecked gtbabel__input--check-translation" type="checkbox" data-name="gtbabel[' .
-                            $translations__key .
-                            '][translations][' .
-                            $languages__key .
-                            '][checked]" value="1"' .
-                            ($translations__value['translations'][$languages__key]['checked'] == '1'
-                                ? ' checked="checked"'
-                                : '') .
+                            __::encode_data([
+                                'str' => $translations__value['str'],
+                                'context' => $translations__value['context'],
+                                'lng' => $languages__key,
+                                'field' => 'checked'
+                            ]) .
+                            ']" value="1"' .
+                            (@$translations__value[$languages__key . '_checked'] == '1' ? ' checked="checked"' : '') .
                             ' />';
                     }
                     echo '<textarea class="gtbabel__input gtbabel__input--textarea gtbabel__input--on-change" data-name="gtbabel[' .
-                        $translations__key .
-                        '][translations][' .
-                        $languages__key .
-                        '][str]">' .
-                        $translations__value['translations'][$languages__key]['str'] .
+                        __::encode_data([
+                            'str' => $translations__value['str'],
+                            'context' => $translations__value['context'],
+                            'lng' => $languages__key,
+                            'field' => 'trans'
+                        ]) .
+                        ']">' .
+                        $translations__value[$languages__key . '_trans'] .
                         '</textarea>';
                     if ($translations__value['context'] === 'file') {
                         $this->initBackendStringTranslationShowFile(
-                            $translations__value['translations'][$languages__key]['str'],
+                            $translations__value[$languages__key . '_trans'],
                             true
                         );
                     }
                     echo '</td>';
                 }
                 echo '<td class="gtbabel__table-cell">';
-                echo '<textarea class="gtbabel__input gtbabel__input--textarea" name="gtbabel[' .
-                    $translations__key .
-                    '][context]" disabled="disabled">' .
+                echo '<textarea class="gtbabel__input gtbabel__input--textarea" disabled="disabled">' .
                     $translations__value['context'] .
                     '</textarea>';
                 echo '</td>';
                 echo '<td class="gtbabel__table-cell">';
-                echo '<input disabled="disabled" class="gtbabel__input gtbabel__input--checkbox gtbabel__input--on-change gtbabel__input--submit-unchecked" type="checkbox" data-name="gtbabel[' .
-                    $translations__key .
-                    '][shared]" value="1"' .
-                    ($translations__value['shared'] == '1' ? ' checked="checked"' : '') .
+                echo '<input disabled="disabled" class="gtbabel__input gtbabel__input--checkbox gtbabel__input--on-change gtbabel__input--submit-unchecked" type="checkbox" value="1"' .
+                    (@$translations__value['shared'] == '1' ? ' checked="checked"' : '') .
                     ' />';
                 echo '</td>';
                 echo '<td class="gtbabel__table-cell">';
                 echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" name="gtbabel[' .
-                    $translations__key .
-                    '][delete]" value="1" />';
+                    __::encode_data([
+                        'str' => $translations__value['str'],
+                        'context' => $translations__value['context'],
+                        'field' => 'delete'
+                    ]) .
+                    ']" value="1" />';
                 echo '</td>';
                 echo '</tr>';
             }
@@ -1470,7 +1434,7 @@ class GtbabelWordPress
         echo '</div>';
     }
 
-    private function initBackendTranslationServices()
+    private function initBackendGettext()
     {
         $message = '';
 
@@ -1485,6 +1449,8 @@ class GtbabelWordPress
                 $_FILES['gtbabel'] = __::array_map_deep($_FILES['gtbabel'], function ($settings__value) {
                     return sanitize_textarea_field($settings__value);
                 });
+                /* TODO */
+                /*
                 if (@$_POST['gtbabel']['language'] != '' && @$_FILES['gtbabel']['name']['file'] != '') {
                     $extension = strtolower(end(explode('.', $_FILES['gtbabel']['name']['file'])));
                     $allowed_extension = [
@@ -1498,10 +1464,10 @@ class GtbabelWordPress
                     ) {
                         move_uploaded_file(
                             $_FILES['gtbabel']['tmp_name']['file'],
-                            $this->gtbabel->gettext->getLngFilename('po', $_POST['gtbabel']['language'])
+                            $this->gtbabel->data->getLngFilename('po', $_POST['gtbabel']['language'])
                         );
-                        $this->gtbabel->gettext->convertPoToMo(
-                            $this->gtbabel->gettext->getLngFilename('po', $_POST['gtbabel']['language'])
+                        $this->gtbabel->data->convertPoToMo(
+                            $this->gtbabel->data->getLngFilename('po', $_POST['gtbabel']['language'])
                         );
                         $message =
                             '<div class="gtbabel__notice notice notice-success is-dismissible"><p>' .
@@ -1514,12 +1480,59 @@ class GtbabelWordPress
                             '</p></div>';
                     }
                 }
+                */
             }
         }
 
-        echo '<div class="gtbabel gtbabel--services wrap">';
+        echo '<div class="gtbabel gtbabel--gettext wrap">';
         echo '<h1 class="gtbabel__title">🦜 Gtbabel 🦜</h1>';
         echo $message;
+
+        echo '<h2 class="gtbabel__subtitle">' . __('Export', 'gtbabel-plugin') . '</h2>';
+
+        echo '<p class="gtbabel__paragraph">';
+        echo 'TODO';
+        echo '</p>';
+
+        echo '<h2 class="gtbabel__subtitle">' . __('Import', 'gtbabel-plugin') . '</h2>';
+
+        echo '<form enctype="multipart/form-data" class="gtbabel__form" method="post" action="' .
+            admin_url('admin.php?page=gtbabel-services') .
+            '">';
+        wp_nonce_field('gtbabel-services-upload-file');
+        echo '<ul class="gtbabel__fields">';
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_language" class="gtbabel__label">';
+        echo __('Language', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<select required="required" class="gtbabel__input gtbabel__input--select" id="gtbabel_language" name="gtbabel[language]">';
+        echo '<option value="">&ndash;&ndash;</option>';
+        foreach (
+            $this->gtbabel->settings->getSelectedLanguagesWithoutSource()
+            as $languages__key => $languages__value
+        ) {
+            echo '<option value="' . $languages__key . '">' . $languages__value . '</option>';
+        }
+        echo '</select>';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_file" class="gtbabel__label">';
+        echo __('.po-File', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input required="required" class="gtbabel__input gtbabel__input--file" type="file" name="gtbabel[file]" id="gtbabel_file" accept=".po" />';
+        echo '</div>';
+        echo '</li>';
+        echo '</ul>';
+
+        echo '<input class="gtbabel__submit button button-primary" name="upload_file" value="' .
+            __('Upload', 'gtbabel-plugin') .
+            '" type="submit" />';
+        echo '</form>';
+
         echo '<h2 class="gtbabel__subtitle">' . __('Translation services', 'gtbabel-plugin') . '</h2>';
 
         echo '<ol class="gtbabel__list">';
@@ -1561,44 +1574,6 @@ class GtbabelWordPress
         echo '</li>';
         echo '</ol>';
 
-        echo '<h2 class="gtbabel__subtitle">' . __('File upload', 'gtbabel-plugin') . '</h2>';
-
-        echo '<form enctype="multipart/form-data" class="gtbabel__form" method="post" action="' .
-            admin_url('admin.php?page=gtbabel-services') .
-            '">';
-        wp_nonce_field('gtbabel-services-upload-file');
-        echo '<ul class="gtbabel__fields">';
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_language" class="gtbabel__label">';
-        echo __('Language', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<select required="required" class="gtbabel__input gtbabel__input--select" id="gtbabel_language" name="gtbabel[language]">';
-        echo '<option value="">&ndash;&ndash;</option>';
-        foreach (
-            $this->gtbabel->settings->getSelectedLanguagesWithoutSource()
-            as $languages__key => $languages__value
-        ) {
-            echo '<option value="' . $languages__key . '">' . $languages__value . '</option>';
-        }
-        echo '</select>';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_file" class="gtbabel__label">';
-        echo __('.po-File', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input required="required" class="gtbabel__input gtbabel__input--file" type="file" name="gtbabel[file]" id="gtbabel_file" accept=".po" />';
-        echo '</div>';
-        echo '</li>';
-        echo '</ul>';
-
-        echo '<input class="gtbabel__submit button button-primary" name="upload_file" value="' .
-            __('Upload', 'gtbabel-plugin') .
-            '" type="submit" />';
-        echo '</form>';
         echo '</div>';
     }
 
@@ -1905,7 +1880,7 @@ EOD;
         if ($url !== null) {
             $urls = [];
             $urls[] = $url;
-            $since_time = microtime(true);
+            $time = $this->gtbabel->utils->getCurrentTime();
             $this->fetch($this->buildFetchUrl($url));
             // subsequent urls are now available (we need to refresh the current session)
             $this->start();
@@ -1913,40 +1888,36 @@ EOD;
                 if ($lng !== null && $lngs__value !== $lng) {
                     continue;
                 }
-                $url_trans = $this->gtbabel->gettext->getUrlTranslationInLanguage($lngs__value, $url);
+                $url_trans = $this->gtbabel->data->getUrlTranslationInLanguage($lngs__value, $url);
                 $this->fetch($this->buildFetchUrl($url_trans));
                 $urls[] = $url_trans;
             }
             // restart again
             $this->start();
-            $discovery_strings = $this->gtbabel->log->discoveryLogGet($since_time, $urls, false);
-            $discovery_strings_map = [];
-            foreach ($discovery_strings as $discovery_strings__key => $discovery_strings__value) {
-                $discovery_strings_map[
-                    $this->gtbabel->gettext->getIdFromStringAndContext(
-                        $discovery_strings__value['string'],
-                        $discovery_strings__value['context']
-                    )
-                ] = $discovery_strings__key;
-            }
-            // now auto set shared values
-            $this->start();
-            $this->gtbabel->gettext->autoEditSharedValues($discovery_strings);
+            $discovery_strings = $this->gtbabel->data->discoveryLogGetAfter($time, $urls, false);
+            $discovery_strings_index = array_map(function ($discovery_strings__value) {
+                return __::encode_data([$discovery_strings__value['str'], $discovery_strings__value['context']]);
+            }, $discovery_strings);
         }
 
-        $translations = $this->gtbabel->gettext->getAllTranslationsFromFiles($lng, $url === null);
+        $translations = $this->gtbabel->data->getAllTranslationsFromFiles($lng, $url === null);
 
         // filter
         if ($url !== null) {
             foreach ($translations as $translations__key => $translations__value) {
-                if (!array_key_exists($translations__key, $discovery_strings_map)) {
+                if (
+                    !in_array(
+                        __::encode_data([$translations__value['str'], $translations__value['context']]),
+                        $discovery_strings_index
+                    )
+                ) {
                     unset($translations[$translations__key]);
                 }
             }
         }
         if (@$_GET['s'] != '') {
             foreach ($translations as $translations__key => $translations__value) {
-                if (mb_stripos($translations__value['orig'], wp_kses_post($_GET['s'])) === false) {
+                if (mb_stripos($translations__value['str'], wp_kses_post($_GET['s'])) === false) {
                     unset($translations[$translations__key]);
                 }
             }
@@ -1954,8 +1925,8 @@ EOD;
         if (@$_GET['shared'] != '') {
             foreach ($translations as $translations__key => $translations__value) {
                 if (
-                    ($_GET['shared'] == '0' && $translations__value['shared'] === true) ||
-                    ($_GET['shared'] == '1' && $translations__value['shared'] !== true)
+                    ($_GET['shared'] == '0' && $translations__value['shared'] == '1') ||
+                    ($_GET['shared'] == '1' && $translations__value['shared'] != '1')
                 ) {
                     unset($translations[$translations__key]);
                 }
@@ -1964,8 +1935,11 @@ EOD;
         if (@$_GET['checked'] != '') {
             foreach ($translations as $translations__key => $translations__value) {
                 $all_checked = true;
-                foreach ($translations__value['translations'] as $translations__value__value) {
-                    if ($translations__value__value['checked'] !== true) {
+                foreach ($translations__value as $translations__value__key => $translations__value__value) {
+                    if (strpos($translations__value__key, 'checked') === false) {
+                        continue;
+                    }
+                    if ($translations__value__value != '1') {
                         $all_checked = false;
                         break;
                     }
@@ -2054,14 +2028,14 @@ EOD;
         $url,
         $bypass_cache = true,
         $discovery_log = true,
-        $auto_set_discovered_strings_checked = false,
+        $auto_set_new_strings_checked = false,
         $auto_add_translations_to_gettext = true,
         $redirect_root_domain = 'source'
     ) {
         if (
             $bypass_cache === true ||
             $discovery_log === true ||
-            $auto_set_discovered_strings_checked === true ||
+            $auto_set_new_strings_checked === true ||
             $auto_add_translations_to_gettext === true
         ) {
             $url .= mb_strpos($url, '?') === false ? '?' : '&';
@@ -2073,8 +2047,8 @@ EOD;
         if ($discovery_log === true) {
             $args[] = 'gtbabel_discovery_log=1';
         }
-        if ($auto_set_discovered_strings_checked === true) {
-            $args[] = 'gtbabel_auto_set_discovered_strings_checked=1';
+        if ($auto_set_new_strings_checked === true) {
+            $args[] = 'gtbabel_auto_set_new_strings_checked=1';
         }
         if ($auto_add_translations_to_gettext === true) {
             $args[] = 'gtbabel_auto_add_translations_to_gettext=1';
@@ -2199,18 +2173,23 @@ EOD;
         if (@$_GET['gtbabel_delete_unused'] == '1') {
             $delete_unused = true;
         }
-        $auto_set_discovered_strings_checked = false;
-        if (@$_GET['gtbabel_auto_set_discovered_strings_checked'] == '1') {
-            $auto_set_discovered_strings_checked = true;
+        $auto_set_new_strings_checked = false;
+        if (@$_GET['gtbabel_auto_set_new_strings_checked'] == '1') {
+            $auto_set_new_strings_checked = true;
         }
-        $since_time = null;
-        if (__::x(@$_GET['gtbabel_since_time'])) {
-            $since_time = floatval($_GET['gtbabel_since_time']);
+        $time = null;
+        if (__::x(@$_GET['gtbabel_time'])) {
+            $time = $_GET['gtbabel_time'];
         } else {
-            $since_time = microtime(true);
+            $time = $this->gtbabel->utils->getCurrentTime();
         }
 
         echo '<div class="gtbabel__auto-translate">';
+
+        // reset shared values (they are set subsequently when discovery_log=1)
+        if ($chunk === 0) {
+            $this->gtbabel->data->resetSharedValues();
+        }
 
         // build general queue
         $queue = [];
@@ -2239,7 +2218,7 @@ EOD;
             // therefore we refresh gtbabel after every main url
             $url = $queue[$i]['url'];
             if ($queue[$i]['convert_to_lng'] !== null) {
-                $url = $this->gtbabel->gettext->getUrlTranslationInLanguage($queue[$i]['convert_to_lng'], $url);
+                $url = $this->gtbabel->data->getUrlTranslationInLanguage($queue[$i]['convert_to_lng'], $url);
             }
 
             $this->fetch(
@@ -2247,7 +2226,7 @@ EOD;
                     $url,
                     true, // bypass caching
                     true, // general_log
-                    $auto_set_discovered_strings_checked,
+                    $auto_set_new_strings_checked,
                     true, // auto_add_translations_to_gettext
                     'source' // redirect_root_domain
                 )
@@ -2270,10 +2249,10 @@ EOD;
         $progress = round($progress, 2);
         echo '<strong>';
         echo __('Duration', 'gtbabel-plugin');
-        echo ': ' . gmdate('H:i:s', round(microtime(true) - $since_time));
+        echo ': ' . gmdate('H:i:s', strtotime('now') - strtotime($time));
         echo '<br/>';
         echo __('Estimated time remaining', 'gtbabel-plugin');
-        echo ': ' . gmdate('H:i:s', ((microtime(true) - $since_time) / $progress) * (100 - $progress));
+        echo ': ' . gmdate('H:i:s', ((strtotime('now') - strtotime($time)) / $progress) * (100 - $progress));
         echo '<br/>';
         echo __('Progress', 'gtbabel-plugin');
         echo ': ' . number_format($progress, 2, ',', '') . '%';
@@ -2282,11 +2261,8 @@ EOD;
 
         // if finished
         if ($chunk_size * $chunk + $chunk_size > count($queue) - 1) {
-            $this->gtbabel->gettext->autoEditSharedValues();
-
-            //$this->gtbabel->log->generalLog('calling $this->gtbabel->gettext->deleteUnusedTranslations(' . $since_time . ')');
             if ($delete_unused === true) {
-                $deleted = $this->gtbabel->gettext->deleteUnusedTranslations($since_time);
+                $deleted = $this->gtbabel->data->discoveryLogDeleteBefore($time);
                 echo __('Deleted strings', 'gtbabel-plugin') . ': ' . $deleted;
                 echo '<br/>';
             }
@@ -2302,10 +2278,8 @@ EOD;
                     '&gtbabel_auto_translate=1&gtbabel_auto_translate_chunk=' .
                     ($chunk + 1) .
                     ($delete_unused === true ? '&gtbabel_delete_unused=1' : '') .
-                    ($auto_set_discovered_strings_checked === true
-                        ? '&gtbabel_auto_set_discovered_strings_checked=1'
-                        : '') .
-                    (__::x($since_time) ? '&gtbabel_since_time=' . $since_time : '')
+                    ($auto_set_new_strings_checked === true ? '&gtbabel_auto_set_new_strings_checked=1' : '') .
+                    (__::x($time) ? '&gtbabel_time=' . $time : '')
             );
             echo '<a href="' . $redirect_url . '" class="gtbabel__auto-translate-next"></a>';
             echo '<img class="gtbabel__auto-translate-loading" src="' .
@@ -2318,7 +2292,7 @@ EOD;
 
     private function getSettingsFilename()
     {
-        return $this->getPluginFileStorePathAbsolute() . '/settings.json';
+        return $this->getPluginFileStorePathAbsolute() . '/settings/settings.json';
     }
 
     private function getSettings()
@@ -2373,8 +2347,11 @@ EOD;
         if (!is_dir($this->getPluginFileStorePathAbsolute())) {
             mkdir($this->getPluginFileStorePathAbsolute(), 0777, true);
         }
-        if (!file_exists($this->getPluginFileStorePathAbsolute() . '/.htaccess')) {
-            file_put_contents($this->getPluginFileStorePathAbsolute() . '/.htaccess', 'Deny from all');
+        if (!is_dir($this->getPluginFileStorePathAbsolute() . '/settings')) {
+            mkdir($this->getPluginFileStorePathAbsolute() . '/settings', 0777, true);
+        }
+        if (!file_exists($this->getPluginFileStorePathAbsolute() . '/settings/.htaccess')) {
+            file_put_contents($this->getPluginFileStorePathAbsolute() . '/settings/.htaccess', 'Deny from all');
         }
     }
 
