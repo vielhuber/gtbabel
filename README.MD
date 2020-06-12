@@ -78,7 +78,21 @@ The default configuration is:
     'languages' => gtbabel_default_language_codes(), // see helper functions
     'lng_source' => 'de',
     'lng_target' => null, // this gets automatically determined by the current url
-    'lng_folder' => '/locales',
+    'database' => [
+        'type' => 'sqlite',
+        'filename' => 'data.db',
+        'table' => 'translations'
+        // mysql/pgsql is also supported
+        /*
+        'type' => 'mysql',
+        'host' => '127.0.0.1',
+        'username' => 'xxxxxx',
+        'password' => 'xxxxxx',
+        'database' => 'xxxxxx',
+        'port' => 3306,
+        'table' => 'translations'
+        */
+    ],
     'log_folder' => '/logs',
     'prefix_source_lng' => true,
     'redirect_root_domain' => 'browser', // 'browser'|'source' (only relevant if prefix_source_lng=true)
@@ -312,8 +326,8 @@ gtbabel_languages() // ['de','en']
 gtbabel_default_language_codes() // ['de','en','fr','af','am','ar','az','be','bg','bn','bs','ca','ceb','co','cs','cy','da','el','eo','es','et','eu','fa','fi','ga','gd','gl','gu','ha','haw','he','hi','hmn','hr','ht','hu','hy','id','ig','is','it','ja','jv','ka','kk','km','kn','ko','ku','ky','la','lb','lo','lt','lv','mg','mi','mk','ml','mn','mr','ms','mt','my','ne','nl','no','ny','pa','pl','ps','pt','ro','ru','sd','si','sk','sl','sm','sn','so','sq','sr','su','sv','ta','te','tg','th','tr','uk','ur','uz','vi','xh','yi','yo','zh-cn','zh-tw','zu']
 gtbabel_default_languages() // ['de' => 'Deutsch', 'en' => 'English', ...]
 gtbabel_language_label('en') // 'English'
-gtbabel_default_settings() // ['languages' => ['de', 'en', 'fr'], 'lng_folder' => '/locales', ...]
-gtbabel_default_settings(['lng_folder' => '/foo']) // ['languages' => ['de', 'en', 'fr'], 'lng_folder' => '/foo', ...]
+gtbabel_default_settings() // ['languages' => ['de', 'en', 'fr'], 'log_folder' => '/logs', ...]
+gtbabel_default_settings(['log_folder' => '/foo']) // ['languages' => ['de', 'en', 'fr'], 'log_folder' => '/foo', ...]
 
 gtbabel_languagepicker() // [['code' => 'de', 'label' => 'Deutsch', 'url' => 'https://tld.com/de/nudel', 'active' => true], ['code' => 'en', 'label' => 'English', 'url' => 'https://tld.com/en/noodle', 'active' => false], ...]
 

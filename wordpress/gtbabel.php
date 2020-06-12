@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.4.8
+ * Version: 3.4.9
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -94,6 +94,16 @@ class GtbabelWordPress
         $settings = $this->getSettings();
 
         // dynamically changed settings
+        global $wpdb;
+        $settings['database'] = [
+            'type' => 'mysql',
+            'host' => \DB_HOST,
+            'username' => \DB_USER,
+            'password' => \DB_PASSWORD,
+            'database' => \DB_NAME,
+            'port' => 3306,
+            'table' => $wpdb->prefix . 'translations'
+        ];
         $settings['prevent_publish'] = !is_user_logged_in();
 
         // settings that can be changed via url
@@ -397,7 +407,6 @@ class GtbabelWordPress
                         [
                             'languages',
                             'lng_source',
-                            'lng_folder',
                             'log_folder',
                             'debug_translations',
                             'hide_languages',
@@ -632,17 +641,6 @@ class GtbabelWordPress
                 '</option>';
         }
         echo '</select>';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_lng_folder" class="gtbabel__label">';
-        echo __('Language folder', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input" type="text" id="gtbabel_lng_folder" name="gtbabel[lng_folder]" value="' .
-            $settings['lng_folder'] .
-            '" />';
         echo '</div>';
         echo '</li>';
 
@@ -2367,7 +2365,6 @@ EOD;
                 $this->gtbabel->settings->setupSettings([
                     'languages' => $languages,
                     'lng_source' => $lng_source,
-                    'lng_folder' => $this->getPluginFileStorePathRelative() . '/locales',
                     'log_folder' => $this->getPluginFileStorePathRelative() . '/logs',
                     'exclude_urls' => ['/wp-admin', 'wp-login.php', 'wp-cron.php', 'wp-comments-post.php'],
                     'exclude_dom' => ['.notranslate', '.lngpicker', '#wpadminbar']

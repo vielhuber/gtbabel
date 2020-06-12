@@ -45,7 +45,6 @@ class Gtbabel
         $this->settings->setup($args);
         $this->host->setup();
         $this->log->setup();
-        $this->data->setupLngFolder();
         $this->data->initDatabase();
         $this->data->preloadDataInCache();
         if ($this->host->currentUrlIsExcluded()) {
@@ -105,15 +104,13 @@ class Gtbabel
         $this->settings->setup($args);
         $this->host->setup();
         $this->log->setup();
-        $this->data->setupLngFolder();
         $this->data->initDatabase();
         $this->data->preloadDataInCache();
         $time = $this->utils->getCurrentTime();
         $content = $this->dom->modifyContent($content);
         $this->data->generateGettextFiles();
-        $this->log->statsLogSave();
         $data = $this->data->discoveryLogGetAfter($time, null, true);
-        $this->data->discoveryLogDeleteAfter($time);
+        $this->reset();
         return $data;
     }
 }

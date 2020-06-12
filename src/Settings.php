@@ -49,7 +49,11 @@ class Settings
             'languages' => $this->getDefaultLanguageCodes(),
             'lng_source' => 'de',
             'lng_target' => null,
-            'lng_folder' => '/locales',
+            'database' => [
+                'type' => 'sqlite',
+                'filename' => 'data.db',
+                'table' => 'translations'
+            ],
             'log_folder' => '/logs',
             'prefix_source_lng' => true,
             'redirect_root_domain' => 'browser',

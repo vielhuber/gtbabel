@@ -336,15 +336,10 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test_data()
     {
-        __::rrmdir('./tests/locales');
-        __::rrmdir('./tests/logs');
-
         $this->gtbabel = new Gtbabel();
         $settings = $this->getDefaultSettings();
         $settings['languages'] = ['de', 'en'];
         $settings['debug_translations'] = false;
-        $settings['lng_folder'] = '/tests/locales';
-        $settings['log_folder'] = '/tests/logs';
 
         $settings['auto_translation'] = false;
         $settings['auto_add_translations_to_gettext'] = false;
@@ -408,24 +403,16 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->assertEquals($output, '<p>House</p>');
         $this->assertEquals($this->gtbabel->data->getTranslationFromDb('Haus', null, 'en')['checked'] == 1, true);
         $this->gtbabel->reset();
-
-        __::rrmdir('./tests/locales');
-        __::rrmdir('./tests/logs');
     }
 
     public function test_file()
     {
-        __::rrmdir('./tests/locales');
-        __::rrmdir('./tests/logs');
-
         $this->gtbabel = new Gtbabel();
         $settings = $this->getDefaultSettings();
         $settings['languages'] = ['de', 'en'];
         $settings['lng_source'] = 'de';
         $settings['lng_target'] = 'en';
         $settings['debug_translations'] = false;
-        $settings['lng_folder'] = '/tests/locales';
-        $settings['log_folder'] = '/tests/logs';
         $settings['auto_translation'] = true;
         $settings['auto_add_translations_to_gettext'] = true;
         $settings['only_show_checked_strings'] = false;
@@ -610,23 +597,16 @@ EOD;
         }
 
         $this->gtbabel->reset();
-        __::rrmdir('./tests/locales');
-        __::rrmdir('./tests/logs');
     }
 
     public function test_router()
     {
-        __::rrmdir('./tests/locales');
-        __::rrmdir('./tests/logs');
-
         $this->gtbabel = new Gtbabel();
         $settings = $this->getDefaultSettings();
         $settings['languages'] = ['de', 'en'];
         $settings['exclude_dom'] = ['.notranslate', '.lngpicker'];
         $settings['lng_source'] = 'de';
         $settings['lng_target'] = null;
-        $settings['lng_folder'] = '/tests/locales';
-        $settings['log_folder'] = '/tests/logs';
         $settings['debug_translations'] = false;
         $settings['auto_translation'] = true;
         $settings['auto_add_translations_to_gettext'] = true;
@@ -715,9 +695,6 @@ EOD;
             true
         );
         $this->gtbabel->reset();
-
-        __::rrmdir('./tests/locales');
-        __::rrmdir('./tests/logs');
     }
 
     public function getDefaultSettings()
@@ -726,6 +703,11 @@ EOD;
             'languages' => gtbabel_default_language_codes(),
             'lng_source' => 'de',
             'lng_target' => 'en',
+            'database' => [
+                'type' => 'sqlite',
+                'filename' => './tests/data.db',
+                'table' => 'translations'
+            ],
             'prefix_source_lng' => false,
             'redirect_root_domain' => 'browser',
             'debug_translations' => true,

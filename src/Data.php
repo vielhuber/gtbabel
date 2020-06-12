@@ -8,6 +8,7 @@ class Data
 {
     public $data;
     public $db;
+    public $table;
 
     public $utils;
     public $host;
@@ -34,29 +35,82 @@ class Data
 
     function initDatabase()
     {
+        /* we need to connect to the database and initialize the whole database (in case of sqlite) and table */
+        /* performance here is not crucial: the following operations take ~1/1000s */
+        /* we chose a flat db structure to avoid expensive joins on every page load */
+        /* we also add unique index so we can INSERT OR REPLACE later on */
         $this->db = new dbhelper();
-        $filename = $this->getDataFilename();
-        if (!file_exists($filename)) {
-            file_put_contents($filename, '');
-            $this->db->connect('pdo', 'sqlite', $filename);
-            /* we chose a flat db structure here to avoid expensive joins on every page load */
-            $this->db->query('CREATE TABLE IF NOT EXISTS translations(
-                id INTEGER PRIMARY KEY AUTOINCREMENT, 
-                str TEXT NOT NULL,
-                context VARCHAR(10),
-                lng VARCHAR(10) NOT NULL,
-                trans TEXT NOT NULL,
-                added TEXT NOT NULL,
-                checked INTEGER NOT NULL,
-                shared INTEGER NOT NULL,
-                discovered_last_time TEXT,
-                discovered_last_url_orig TEXT,
-                discovered_last_url TEXT
-            )');
-            /* add unique index so we can INSERT OR REPLACE later on */
-            $this->db->query('CREATE UNIQUE INDEX translations_idx ON translations(str, context, lng)');
+        $db_settings = $this->settings->get('database');
+        $this->table = $db_settings['table'];
+
+        if ($db_settings['type'] === 'sqlite') {
+            $filename = $db_settings['filename'];
+            if (!file_exists($filename)) {
+                file_put_contents($filename, '');
+                $this->db->connect('pdo', 'sqlite', $filename);
+                $this->db->query(
+                    'CREATE TABLE IF NOT EXISTS ' .
+                        $this->table .
+                        '(
+                            id INTEGER PRIMARY KEY AUTOINCREMENT, 
+                            str TEXT NOT NULL,
+                            context VARCHAR(20),
+                            lng VARCHAR(20) NOT NULL,
+                            trans TEXT NOT NULL,
+                            added TEXT NOT NULL,
+                            checked INTEGER NOT NULL,
+                            shared INTEGER NOT NULL,
+                            discovered_last_time TEXT,
+                            discovered_last_url_orig TEXT,
+                            discovered_last_url TEXT
+                        )'
+                );
+                $this->db->query(
+                    'CREATE UNIQUE INDEX ' . $this->table . '_idx ON ' . $this->table . '(str, context, lng)'
+                );
+            } else {
+                $this->db->connect('pdo', 'sqlite', $filename);
+            }
         } else {
-            $this->db->connect('pdo', 'sqlite', $filename);
+            if (isset($db_settings['port'])) {
+                $port = $db_settings['port'];
+            } elseif ($db_settings['type'] === 'mysql') {
+                $port = 3306;
+            } elseif ($db_settings['type'] === 'postgres') {
+                $port = 5432;
+            }
+            $this->db->connect(
+                'pdo',
+                $db_settings['type'],
+                $db_settings['host'],
+                $db_settings['username'],
+                $db_settings['password'],
+                $db_settings['database'],
+                $port
+            );
+            $this->db->query(
+                'CREATE TABLE IF NOT EXISTS ' .
+                    $this->table .
+                    '(
+                        id BIGINT PRIMARY KEY AUTO_INCREMENT, 
+                        str TEXT NOT NULL,
+                        context VARCHAR(20),
+                        lng VARCHAR(20) NOT NULL,
+                        trans TEXT NOT NULL,
+                        added TEXT NOT NULL,
+                        checked TINYINT NOT NULL,
+                        shared TINYINT NOT NULL,
+                        discovered_last_time TEXT,
+                        discovered_last_url_orig TEXT,
+                        discovered_last_url TEXT
+                    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'
+            );
+            try {
+                $this->db->query(
+                    'CREATE UNIQUE INDEX ' . $this->table . '_idx ON ' . $this->table . '(str(255), context, lng)'
+                );
+            } catch (\Exception $e) {
+            }
         }
     }
 
@@ -70,7 +124,7 @@ class Data
         ];
 
         if ($this->db !== null) {
-            $result = $this->db->fetch_all('SELECT * FROM translations');
+            $result = $this->db->fetch_all('SELECT * FROM ' . $this->table . '');
             if (!empty($result)) {
                 foreach ($result as $result__value) {
                     $this->data['cache'][$result__value['lng'] ?? ''][$result__value['context'] ?? ''][
@@ -121,8 +175,17 @@ class Data
         if (!empty($this->data['save']['insert'])) {
             $batch_size = 100;
             for ($batch_cur = 0; $batch_cur * $batch_size < count($this->data['save']['insert']); $batch_cur++) {
-                $query =
-                    'INSERT OR REPLACE INTO translations (str, context, lng, trans, added, checked, shared, discovered_last_time, discovered_last_url_orig, discovered_last_url) VALUES ';
+                $query = '';
+                $query .= 'INSERT';
+                if ($this->db->sql->engine === 'sqlite') {
+                    $query .= ' OR REPLACE';
+                } else {
+                    $query .= ' IGNORE';
+                }
+                $query .=
+                    ' INTO ' .
+                    $this->table .
+                    ' (str, context, lng, trans, added, checked, shared, discovered_last_time, discovered_last_url_orig, discovered_last_url) VALUES ';
                 $query_q = [];
                 $query_a = [];
                 foreach ($this->data['save']['insert'] as $save__key => $save__value) {
@@ -150,8 +213,11 @@ class Data
         if (!empty($this->data['save']['discovered'])) {
             $batch_size = 100;
             for ($batch_cur = 0; $batch_cur * $batch_size < count($this->data['save']['discovered']); $batch_cur++) {
-                $query = '
-                    UPDATE translations SET
+                $query =
+                    '
+                    UPDATE ' .
+                    $this->table .
+                    ' SET
                     shared = (CASE WHEN discovered_last_url_orig <> ? THEN 1 ELSE shared END),
                     discovered_last_time = ?,
                     discovered_last_url_orig = ?,
@@ -232,7 +298,7 @@ class Data
     function getTranslationFromDb($str, $context = null, $lng = null)
     {
         return $this->db->fetch_row(
-            'SELECT * FROM translations WHERE str = ? AND context = ? AND lng = ?',
+            'SELECT * FROM ' . $this->table . ' WHERE str = ? AND context = ? AND lng = ?',
             $str,
             $context,
             $lng
@@ -241,7 +307,7 @@ class Data
 
     function getTranslationsFromDb()
     {
-        return $this->db->fetch_all('SELECT * FROM translations ORDER BY id ASC');
+        return $this->db->fetch_all('SELECT * FROM ' . $this->table . ' ORDER BY id ASC');
     }
 
     function getAllTranslationsFromFiles($lng = null, $order_by_string = true)
@@ -257,7 +323,7 @@ class Data
             $lngs[] = $languages__value;
         }
 
-        $query .= 'SELECT DISTINCT translations.str as str, translations.context as context, ';
+        $query .= 'SELECT DISTINCT ' . $this->table . '.str as str, ' . $this->table . '.context as context, ';
         foreach ($lngs as $lngs__value) {
             $query .=
                 $lngs__value .
@@ -276,16 +342,22 @@ class Data
                     return $lngs__value . '.shared';
                 }, $lngs)
             ) . ' as shared ';
-        $query .= 'FROM translations ';
+        $query .= 'FROM ' . $this->table . ' ';
         foreach ($lngs as $lngs__value) {
             $query .=
-                'LEFT JOIN translations as ' .
+                'LEFT JOIN ' .
+                $this->table .
+                ' as ' .
                 $lngs__value .
                 ' ON ' .
                 $lngs__value .
-                '.str = translations.str AND COALESCE(' .
+                '.str = ' .
+                $this->table .
+                '.str AND COALESCE(' .
                 $lngs__value .
-                '.context,\'\') = COALESCE(translations.context,\'\') AND ' .
+                '.context,\'\') = COALESCE(' .
+                $this->table .
+                '.context,\'\') AND ' .
                 $lngs__value .
                 '.lng = ? ';
             $query_args[] = $lngs__value;
@@ -362,7 +434,9 @@ class Data
             $counter = 2;
             while (
                 $this->db->fetch_var(
-                    'SELECT COUNT(*) FROM translations WHERE str <> ? AND context = ? AND lng = ? AND trans = ?',
+                    'SELECT COUNT(*) FROM ' .
+                        $this->table .
+                        ' WHERE str <> ? AND context = ? AND lng = ? AND trans = ?',
                     $str,
                     $context,
                     $lng,
@@ -379,7 +453,7 @@ class Data
 
         // get existing
         $gettext = $this->db->fetch_row(
-            'SELECT * FROM translations WHERE str = ? AND context = ? AND lng = ?',
+            'SELECT * FROM ' . $this->table . ' WHERE str = ? AND context = ? AND lng = ?',
             $str,
             $context,
             $lng
@@ -388,19 +462,15 @@ class Data
         if (!empty($gettext)) {
             // delete
             if ($trans === '') {
-                $this->db->delete('translations', ['id' => $gettext['id']]);
+                $this->db->delete($this->table, ['id' => $gettext['id']]);
             }
             // update
             else {
                 if ($trans !== null) {
-                    $this->db->update('translations', ['trans' => $trans], ['id' => $gettext['id']]);
+                    $this->db->update($this->table, ['trans' => $trans], ['id' => $gettext['id']]);
                 }
                 if ($checked !== null) {
-                    $this->db->update(
-                        'translations',
-                        ['checked' => $checked === true ? 1 : 0],
-                        ['id' => $gettext['id']]
-                    );
+                    $this->db->update($this->table, ['checked' => $checked === true ? 1 : 0], ['id' => $gettext['id']]);
                 }
             }
             $success = true;
@@ -408,7 +478,7 @@ class Data
 
         // create
         else {
-            $this->db->insert('translations', [
+            $this->db->insert($this->table, [
                 'str' => $str,
                 'context' => $context,
                 'lng' => $lng,
@@ -428,14 +498,14 @@ class Data
 
     function setCheckedToAllStringsFromFiles()
     {
-        $this->db->query('UPDATE translations SET checked = ?', 1);
+        $this->db->query('UPDATE ' . $this->table . ' SET checked = ?', 1);
         return true;
     }
 
     function editCheckedValue($str, $context = null, $lng, $checked)
     {
         $this->db->query(
-            'UPDATE translations SET checked = ? WHERE str = ? AND context = ? AND lng = ?',
+            'UPDATE ' . $this->table . ' SET checked = ? WHERE str = ? AND context = ? AND lng = ?',
             $checked === true ? 1 : 0,
             $str,
             $context,
@@ -446,7 +516,7 @@ class Data
 
     function resetSharedValues()
     {
-        $this->db->query('UPDATE translations SET shared = ?', 0);
+        $this->db->query('UPDATE ' . $this->table . ' SET shared = ?', 0);
     }
 
     function deleteStringFromGettext($str, $context, $lng = null)
@@ -457,7 +527,7 @@ class Data
         if ($lng !== null) {
             $args['lng'] = $lng;
         }
-        $this->db->delete('translations', $args);
+        $this->db->delete($this->table, $args);
         return true;
     }
 
@@ -478,41 +548,13 @@ class Data
         $this->data['cache_reverse'][$lng][$context ?? ''][$trans] = $str;
     }
 
-    function setupLngFolder()
-    {
-        if (!is_dir($this->getLngFolder())) {
-            mkdir($this->getLngFolder(), 0777, true);
-        }
-        if (!file_exists($this->getLngFolder() . '/.htaccess')) {
-            file_put_contents($this->getLngFolder() . '/.htaccess', 'Deny from all');
-        }
-    }
-
-    function getLngFolder()
-    {
-        return rtrim($this->utils->getDocRoot(), '/') . '/' . trim($this->settings->get('lng_folder'), '/');
-    }
-
-    function getDataFilename()
-    {
-        return $this->getLngFolder() . '/data.db';
-    }
-
-    function getLngFolderPublic()
-    {
-        return $this->host->getCurrentHost() . '/' . trim($this->settings->get('lng_folder'), '/');
-    }
-
-    function getLngFilenamePublic($type, $lng)
-    {
-        return $this->getLngFolderPublic() . '/' . $lng . '.' . $type;
-    }
-
     function resetTranslations()
     {
-        // if deletion is not possible, clear
-        $this->db->clear('translations');
-        @unlink($this->getDataFilename());
+        if ($this->db->sql->engine === 'sqlite') {
+            @unlink($this->settings->get('database')['filename']);
+        } else {
+            $this->db->delete_table($this->table);
+        }
     }
 
     function discoveryLogGet($time = null, $after = true, $url = null, $slim_output = true, $delete = false)
@@ -546,7 +588,7 @@ class Data
         } else {
             $query .= 'DELETE';
         }
-        $query .= ' FROM translations WHERE 1=1';
+        $query .= ' FROM ' . $this->table . ' WHERE 1=1';
         $args = [];
         if ($urls !== null) {
             $query .= ' AND discovered_last_url IN (' . str_repeat('?,', count($urls) - 1) . '?)';
