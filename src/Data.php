@@ -236,7 +236,7 @@ class Data
                     if ($save__key < $batch_size * $batch_cur || $save__key >= $batch_size * ($batch_cur + 1)) {
                         continue;
                     }
-                    $query_q[] = 'str = ? AND context = ? AND lng = ?';
+                    $query_q[] = $this->caseSensitiveCol('str') . ' = ? AND context = ? AND lng = ?';
                     $query_a = array_merge($query_a, [
                         $save__value['str'],
                         $save__value['context'],
@@ -247,6 +247,14 @@ class Data
                 $this->db->query($query, $query_a);
             }
         }
+    }
+
+    function caseSensitiveCol($col)
+    {
+        if ($this->db->sql->engine === 'sqlite') {
+            return $col;
+        }
+        return 'BINARY ' . $col;
     }
 
     function trackDiscovered($str, $lng, $context = null)
@@ -298,7 +306,11 @@ class Data
     function getTranslationFromDb($str, $context = null, $lng = null)
     {
         return $this->db->fetch_row(
-            'SELECT * FROM ' . $this->table . ' WHERE str = ? AND context = ? AND lng = ?',
+            'SELECT * FROM ' .
+                $this->table .
+                ' WHERE ' .
+                $this->caseSensitiveCol('str') .
+                ' = ? AND context = ? AND lng = ?',
             $str,
             $context,
             $lng
@@ -323,17 +335,27 @@ class Data
             $lngs[] = $languages__value;
         }
 
-        $query .= 'SELECT DISTINCT ' . $this->table . '.str as str, ' . $this->table . '.context as context, ';
+        $query .=
+            'SELECT DISTINCT (' .
+            $this->caseSensitiveCol($this->table . '.str') .
+            ') as str, ' .
+            $this->table .
+            '.context as context, ';
         foreach ($lngs as $lngs__value) {
-            $query .=
-                $lngs__value .
-                '.trans as ' .
-                $lngs__value .
-                '_trans, ' .
-                $lngs__value .
-                '.checked as ' .
-                $lngs__value .
-                '_checked, ';
+            foreach (
+                [
+                    'trans',
+                    'added',
+                    'checked',
+                    'shared',
+                    'discovered_last_time',
+                    'discovered_last_url_orig',
+                    'discovered_last_url'
+                ]
+                as $cols__value
+            ) {
+                $query .= $lngs__value . '.' . $cols__value . ' as ' . $lngs__value . '_' . $cols__value . ', ';
+            }
         }
         $query .=
             implode(
@@ -350,10 +372,10 @@ class Data
                 ' as ' .
                 $lngs__value .
                 ' ON ' .
-                $lngs__value .
-                '.str = ' .
-                $this->table .
-                '.str AND COALESCE(' .
+                $this->caseSensitiveCol($lngs__value . '.str') .
+                ' = ' .
+                $this->caseSensitiveCol($this->table . '.str') .
+                ' AND COALESCE(' .
                 $lngs__value .
                 '.context,\'\') = COALESCE(' .
                 $this->table .
@@ -415,18 +437,18 @@ class Data
         return $data;
     }
 
-    function getIdFromStringAndContext($string, $context = null)
-    {
-        return base64_encode(serialize([$string, $context ?? '']));
-    }
-
-    function getStringAndContextFromId($id)
-    {
-        return unserialize(base64_decode($id));
-    }
-
-    function editTranslation($str, $context = null, $lng, $trans = null, $checked = null)
-    {
+    function editTranslation(
+        $str,
+        $context = null,
+        $lng,
+        $trans = null,
+        $checked = null,
+        $shared = null,
+        $added = null,
+        $discovered_last_time = null,
+        $discovered_last_url_orig = null,
+        $discovered_last_url = null
+    ) {
         $success = false;
 
         // slug collission detection
@@ -453,7 +475,11 @@ class Data
 
         // get existing
         $gettext = $this->db->fetch_row(
-            'SELECT * FROM ' . $this->table . ' WHERE str = ? AND context = ? AND lng = ?',
+            'SELECT * FROM ' .
+                $this->table .
+                ' WHERE ' .
+                $this->caseSensitiveCol('str') .
+                ' = ? AND context = ? AND lng = ?',
             $str,
             $context,
             $lng
@@ -469,8 +495,22 @@ class Data
                 if ($trans !== null) {
                     $this->db->update($this->table, ['trans' => $trans], ['id' => $gettext['id']]);
                 }
-                if ($checked !== null) {
-                    $this->db->update($this->table, ['checked' => $checked === true ? 1 : 0], ['id' => $gettext['id']]);
+                foreach (['checked', 'shared'] as $cols__value) {
+                    if (${$cols__value} !== null) {
+                        $this->db->update(
+                            $this->table,
+                            [$cols__value => ${$cols__value} === true || ${$cols__value} == 1 ? 1 : 0],
+                            ['id' => $gettext['id']]
+                        );
+                    }
+                }
+                foreach (
+                    ['added', 'discovered_last_time', 'discovered_last_url_orig', 'discovered_last_url']
+                    as $cols__value
+                ) {
+                    if (${$cols__value} !== null) {
+                        $this->db->update($this->table, [$cols__value => ${$cols__value}], ['id' => $gettext['id']]);
+                    }
                 }
             }
             $success = true;
@@ -483,12 +523,12 @@ class Data
                 'context' => $context,
                 'lng' => $lng,
                 'trans' => $trans ?? '',
-                'added' => $this->utils->getCurrentTime(),
-                'checked' => $checked ?? 0,
-                'shared' => 0,
-                'discovered_last_time' => null,
-                'discovered_last_url_orig' => null,
-                'discovered_last_url' => null
+                'added' => $added ?? $this->utils->getCurrentTime(),
+                'checked' => $checked === true || $checked == 1 ? 1 : 0,
+                'shared' => $shared === true || $shared == 1 ? 1 : 0,
+                'discovered_last_time' => $discovered_last_time,
+                'discovered_last_url_orig' => $discovered_last_url_orig,
+                'discovered_last_url' => $discovered_last_url
             ]);
             $success = true;
         }
@@ -505,7 +545,11 @@ class Data
     function editCheckedValue($str, $context = null, $lng, $checked)
     {
         $this->db->query(
-            'UPDATE ' . $this->table . ' SET checked = ? WHERE str = ? AND context = ? AND lng = ?',
+            'UPDATE ' .
+                $this->table .
+                ' SET checked = ? WHERE ' .
+                $this->caseSensitiveCol('str') .
+                ' = ? AND context = ? AND lng = ?',
             $checked === true ? 1 : 0,
             $str,
             $context,
@@ -554,6 +598,15 @@ class Data
             @unlink($this->settings->get('database')['filename']);
         } else {
             $this->db->delete_table($this->table);
+        }
+    }
+
+    function clearTable($lng = null)
+    {
+        if ($lng === null) {
+            $this->db->clear($this->table);
+        } else {
+            $this->db->delete($this->table, ['lng' => $lng]);
         }
     }
 

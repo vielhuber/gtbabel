@@ -23,9 +23,10 @@ class Gtbabel
         Host $host = null,
         Publish $publish = null,
         Log $log = null,
+        Data $data = null,
         Dom $dom = null,
         Router $router = null,
-        Data $data = null
+        Gettext $gettext = null
     ) {
         $this->settings = $settings ?: new Settings();
         $this->utils = $utils ?: new Utils();
@@ -37,6 +38,7 @@ class Gtbabel
             $data ?: new Data($this->utils, $this->host, $this->settings, $this->tags, $this->log, $this->publish);
         $this->dom = $dom ?: new Dom($this->utils, $this->data, $this->host, $this->settings);
         $this->router = $router ?: new Router($this->data, $this->host, $this->settings, $this->publish);
+        $this->gettext = $gettext ?: new Gettext($this->data, $this->settings);
     }
 
     function start($args = [])

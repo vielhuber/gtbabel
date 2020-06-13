@@ -25,18 +25,46 @@ class Dom
 
     function preloadExcludedNodes()
     {
+        /* excluded nodes are nodes that are excluded beforehand and contain also attributes of nodes that are already translated */
         $this->excluded_nodes = [];
         if ($this->settings->get('exclude_dom') !== null) {
             foreach ($this->settings->get('exclude_dom') as $exclude__value) {
                 $nodes = $this->DOMXpath->query($this->transformSelectorToXpath($exclude__value));
                 foreach ($nodes as $nodes__value) {
-                    $this->excluded_nodes[$this->getIdOfNode($nodes__value)] = true;
+                    $this->addToExcludedNodes($nodes__value);
                     foreach ($this->getChildrenOfNodeIncludingWhitespace($nodes__value) as $nodes__value__value) {
-                        $this->excluded_nodes[$this->getIdOfNode($nodes__value__value)] = true;
+                        $this->addToExcludedNodes($nodes__value__value);
                     }
                 }
             }
         }
+    }
+
+    function addToExcludedNodes($node, $attr = null)
+    {
+        if (array_key_exists($this->getIdOfNode($node), $this->excluded_nodes)) {
+            if ($this->excluded_nodes[$this->getIdOfNode($node)] === true) {
+                return;
+            }
+            $this->excluded_nodes[$this->getIdOfNode($node)][] = $attr;
+        } else {
+            $this->excluded_nodes[$this->getIdOfNode($node)] = $attr === null ? true : [$attr];
+        }
+    }
+
+    function nodeIsExcluded($node, $attr = null)
+    {
+        if (array_key_exists($this->getIdOfNode($node), $this->excluded_nodes)) {
+            $val = $this->excluded_nodes[$this->getIdOfNode($node)];
+            if ($val === true) {
+                return true;
+            }
+            if (in_array($attr, $val)) {
+                return true;
+            }
+            return false;
+        }
+        return false;
     }
 
     function preloadForceTokenize()
@@ -66,7 +94,7 @@ class Dom
         $to_delete = [];
         $textnodes = $this->DOMXpath->query('/html/body//text()');
         foreach ($textnodes as $textnodes__value) {
-            if (array_key_exists($this->getIdOfNode($textnodes__value), $this->excluded_nodes)) {
+            if ($this->nodeIsExcluded($textnodes__value)) {
                 continue;
             }
             if ($this->data->stringShouldNotBeTranslated($textnodes__value->nodeValue)) {
@@ -212,7 +240,7 @@ class Dom
             $nodes = $this->DOMXpath->query($this->transformSelectorToXpath($include__value['selector']));
             if (!empty($nodes)) {
                 foreach ($nodes as $nodes__value) {
-                    if (array_key_exists($this->getIdOfNode($nodes__value), $this->excluded_nodes)) {
+                    if ($this->nodeIsExcluded($nodes__value)) {
                         continue;
                     }
 
@@ -264,6 +292,12 @@ class Dom
                     if (!empty($content)) {
                         foreach ($content as $content__value) {
                             if ($content__value['value'] != '') {
+                                if (
+                                    $content__value['type'] === 'attribute' &&
+                                    $this->nodeIsExcluded($nodes__value, $content__value['key'])
+                                ) {
+                                    continue;
+                                }
                                 $trans = $this->data->prepareTranslationAndAddDynamicallyIfNeeded(
                                     $content__value['value'],
                                     $this->data->getCurrentLanguageCode(),
@@ -276,8 +310,10 @@ class Dom
 
                                 if ($content__value['type'] === 'attribute') {
                                     $nodes__value->setAttribute($content__value['key'], $trans);
+                                    $this->addToExcludedNodes($nodes__value, $content__value['key']);
                                 } else {
                                     $nodes__value->nodeValue = htmlspecialchars($trans);
+                                    $this->addToExcludedNodes($nodes__value);
                                 }
                             }
                         }
