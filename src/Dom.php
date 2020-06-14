@@ -14,13 +14,20 @@ class Dom
     public $data;
     public $host;
     public $settings;
+    public $log;
 
-    function __construct(Utils $utils = null, Data $data = null, Host $host = null, Settings $settings = null)
-    {
+    function __construct(
+        Utils $utils = null,
+        Data $data = null,
+        Host $host = null,
+        Settings $settings = null,
+        Log $log = null
+    ) {
         $this->utils = $utils ?: new Utils();
         $this->data = $data ?: new Data();
         $this->host = $host ?: new Host();
         $this->settings = $settings ?: new Settings();
+        $this->log = $log ?: new Log();
     }
 
     function preloadExcludedNodes()
@@ -42,27 +49,16 @@ class Dom
 
     function addToExcludedNodes($node, $attr = null)
     {
-        if (array_key_exists($this->getIdOfNode($node), $this->excluded_nodes)) {
-            if ($this->excluded_nodes[$this->getIdOfNode($node)] === true) {
-                return;
-            }
-            $this->excluded_nodes[$this->getIdOfNode($node)][] = $attr;
-        } else {
-            $this->excluded_nodes[$this->getIdOfNode($node)] = $attr === null ? true : [$attr];
+        if (!array_key_exists($this->getIdOfNode($node), $this->excluded_nodes)) {
+            $this->excluded_nodes[$this->getIdOfNode($node)] = [];
         }
+        $this->excluded_nodes[$this->getIdOfNode($node)][] = $attr === null ? true : $attr;
     }
 
     function nodeIsExcluded($node, $attr = null)
     {
         if (array_key_exists($this->getIdOfNode($node), $this->excluded_nodes)) {
-            $val = $this->excluded_nodes[$this->getIdOfNode($node)];
-            if ($val === true) {
-                return true;
-            }
-            if (in_array($attr, $val)) {
-                return true;
-            }
-            return false;
+            return in_array($attr === null ? true : $attr, $this->excluded_nodes[$this->getIdOfNode($node)]);
         }
         return false;
     }
@@ -80,19 +76,10 @@ class Dom
         }
     }
 
-    function modifyTextNodes()
+    function getGroupsForTextNodes($textnodes)
     {
-        if ($this->settings->get('translate_text_nodes') === false) {
-            return;
-        }
-        if ($this->data->sourceLngIsCurrentLng() && $this->settings->get('prefix_source_lng') === false) {
-            return;
-        }
-
         $groups = [];
-
         $to_delete = [];
-        $textnodes = $this->DOMXpath->query('/html/body//text()');
         foreach ($textnodes as $textnodes__value) {
             if ($this->nodeIsExcluded($textnodes__value)) {
                 continue;
@@ -131,37 +118,10 @@ class Dom
             }
         }
         $groups = array_values($groups);
-
-        foreach ($groups as $groups__value) {
-            if ($this->isTextNode($groups__value)) {
-                $originalTextRaw = $groups__value->nodeValue;
-            } else {
-                $originalTextRaw = $this->getInnerHtml($groups__value);
-            }
-
-            $originalText = $this->data->removeLineBreaks($originalTextRaw);
-
-            $translatedText = $this->data->prepareTranslationAndAddDynamicallyIfNeeded(
-                $originalText,
-                $this->data->getCurrentLanguageCode(),
-                null
-            );
-
-            if ($translatedText === null) {
-                continue;
-            }
-
-            $translatedText = $this->data->reintroduceLineBreaks($translatedText, $originalText, $originalTextRaw);
-
-            if ($this->isTextNode($groups__value)) {
-                $groups__value->nodeValue = $translatedText;
-            } else {
-                $this->setInnerHtml($groups__value, $translatedText);
-            }
-        }
+        return $groups;
     }
 
-    function modifyTagNodes()
+    function modifyNodes()
     {
         if ($this->data->sourceLngIsCurrentLng() && $this->settings->get('prefix_source_lng') === false) {
             return;
@@ -169,123 +129,125 @@ class Dom
 
         $include = [];
 
+        $include = array_merge($include, $this->settings->get('include_dom'));
+
         if ($this->settings->get('translate_default_tag_nodes') === true) {
             $include = array_merge($include, [
                 [
-                    'selector' => 'body a',
+                    'selector' => '/html/body//text()',
+                    'attribute' => null,
+                    'context' => null
+                ],
+                [
+                    'selector' => '/html/body//a[@href]',
                     'attribute' => 'href',
                     'context' => 'slug|file'
                 ],
                 [
-                    'selector' => 'body form',
+                    'selector' => '/html/body//form[@action]',
                     'attribute' => 'action',
                     'context' => 'slug'
                 ],
                 [
-                    'selector' => 'body img',
+                    'selector' => '/html/body//img[@alt]',
                     'attribute' => 'alt',
                     'context' => null
                 ],
                 [
-                    'selector' => 'body *',
+                    'selector' => '/html/body//*[@title]',
                     'attribute' => 'title',
                     'context' => null
                 ],
                 [
-                    'selector' => 'body input',
+                    'selector' => '/html/body//input[@placeholder]',
                     'attribute' => 'placeholder',
                     'context' => null
                 ],
                 [
-                    'selector' => 'head title',
+                    'selector' => '/html/head//title',
                     'attribute' => null,
                     'context' => 'title'
                 ],
                 [
-                    'selector' => 'head meta[name="description"]',
+                    'selector' => '/html/head//meta[@name="description"][@content]',
                     'attribute' => 'content',
                     'context' => 'description'
                 ],
                 [
-                    'selector' => 'body img',
+                    'selector' => '/html/body//img[@src]',
                     'attribute' => 'src',
                     'context' => 'file'
                 ],
                 [
-                    'selector' => 'body *',
+                    'selector' => '/html/body//*[@style]',
                     'attribute' => 'style',
                     'context' => 'file'
                 ],
                 [
-                    'selector' => 'body *',
-                    'attribute' => 'data-*',
+                    'selector' => '/html/body//@*[starts-with(name(), \'data-\')]/parent::*', // data-*
+                    'attribute' => '(?! data-context=)(?: (data-.+?)="([^"]+?)")', // data-* (except data-context)
                     'context' => null
                 ],
                 [
-                    'selector' => 'body *',
+                    'selector' => '/html/body//*[@label]',
                     'attribute' => 'label',
                     'context' => null
                 ],
                 [
-                    'selector' => 'body *',
-                    'attribute' => '*text*',
+                    'selector' => '/html/body//@*[contains(name(), \'text\')]/parent::*', // *text*
+                    'attribute' => '(?! data-context=)(?: ([a-zA-Z-]*?text[a-zA-Z-]*?)="([^"]+?)")', // *text* (except data-context)
                     'context' => null
                 ]
             ]);
         }
 
-        $include = array_merge($include, $this->settings->get('include_dom'));
-
         foreach ($include as $include__value) {
-            $nodes = $this->DOMXpath->query($this->transformSelectorToXpath($include__value['selector']));
+            $xpath = $this->transformSelectorToXpath($include__value['selector']);
+            $nodes = $this->DOMXpath->query($xpath);
+            if (strpos($include__value['selector'], 'text()') !== false) {
+                $nodes = $this->getGroupsForTextNodes($nodes);
+            }
+
             if (!empty($nodes)) {
                 foreach ($nodes as $nodes__value) {
-                    if ($this->nodeIsExcluded($nodes__value)) {
-                        continue;
-                    }
-
                     $content = [];
-                    if (@$include__value['attribute'] != '') {
-                        $wildcard_pos = strpos($include__value['attribute'], '*');
-                        if ($wildcard_pos !== false) {
-                            $wildcard_query = './@*';
-                            $wildcard_count = substr_count($include__value['attribute'], '*');
-                            $wildcard_value = str_replace('*', '', $include__value['attribute']);
-                            // the following combinations currently are supported: foo* and *foo*
-                            if ($wildcard_count === 1) {
-                                $wildcard_query .= '[starts-with(name(),"' . $wildcard_value . '")]';
-                            }
-                            if ($wildcard_count === 2) {
-                                $wildcard_query .= '[contains(name(),"' . $wildcard_value . '")]';
-                            }
-                            $attrs = $this->DOMXpath->query($wildcard_query, $nodes__value);
-                            if (empty($attrs)) {
-                                continue;
-                            }
-                            foreach ($attrs as $attrs__value) {
-                                $value = $attrs__value->nodeValue;
-                                if ($value != '') {
+                    if ($this->isTextNode($nodes__value)) {
+                        $content[] = ['key' => null, 'value' => $nodes__value->nodeValue, 'type' => 'text'];
+                    } else {
+                        if (@$include__value['attribute'] != '') {
+                            // regex
+                            if (strpos($include__value['attribute'], '(') !== false) {
+                                $opening_tag = $this->getOuterHtml($nodes__value);
+                                $opening_tag = substr($opening_tag, 0, strpos($opening_tag, '>') + 1);
+                                preg_match_all(
+                                    '/' . $include__value['attribute'] . '/',
+                                    $opening_tag,
+                                    $matches,
+                                    PREG_SET_ORDER
+                                );
+                                if (empty($matches)) {
+                                    continue;
+                                }
+                                foreach ($matches as $matches__value) {
                                     $content[] = [
-                                        'key' => $attrs__value->nodeName,
-                                        'value' => $value,
+                                        'key' => $matches__value[1],
+                                        'value' => $matches__value[2],
                                         'type' => 'attribute'
                                     ];
                                 }
-                            }
-                        } else {
-                            $value = $nodes__value->getAttribute($include__value['attribute']);
-                            if ($value != '') {
+                            } else {
                                 $content[] = [
                                     'key' => $include__value['attribute'],
-                                    'value' => $value,
+                                    'value' => $nodes__value->getAttribute($include__value['attribute']),
                                     'type' => 'attribute'
                                 ];
                             }
-                        }
-                    } else {
-                        $value = $nodes__value->nodeValue;
-                        if ($value != '') {
-                            $content[] = ['key' => null, 'value' => $nodes__value->nodeValue, 'type' => 'text'];
+                        } else {
+                            $content[] = [
+                                'key' => null,
+                                'value' => $this->getInnerHtml($nodes__value),
+                                'type' => 'text'
+                            ];
                         }
                     }
 
@@ -293,27 +255,50 @@ class Dom
                         foreach ($content as $content__value) {
                             if ($content__value['value'] != '') {
                                 if (
-                                    $content__value['type'] === 'attribute' &&
-                                    $this->nodeIsExcluded($nodes__value, $content__value['key'])
+                                    $this->nodeIsExcluded(
+                                        $nodes__value,
+                                        $content__value['type'] === 'attribute' ? $content__value['key'] : null
+                                    )
                                 ) {
                                     continue;
                                 }
+
+                                $context = null;
+                                if (isset($include__value['context']) && $include__value['context'] != '') {
+                                    $context = $include__value['context'];
+                                } elseif (
+                                    $this->isTextNode($nodes__value) &&
+                                    $nodes__value->parentNode->getAttribute('data-context') != ''
+                                ) {
+                                    $context = $nodes__value->parentNode->getAttribute('data-context');
+                                }
+
+                                $str_with_lb = $content__value['value'];
+                                $str_without_lb = $this->data->removeLineBreaks($str_with_lb);
+
                                 $trans = $this->data->prepareTranslationAndAddDynamicallyIfNeeded(
-                                    $content__value['value'],
+                                    $str_without_lb,
                                     $this->data->getCurrentLanguageCode(),
-                                    @$include__value['context']
+                                    $context
                                 );
 
                                 if ($trans === null) {
                                     continue;
                                 }
 
-                                if ($content__value['type'] === 'attribute') {
-                                    $nodes__value->setAttribute($content__value['key'], $trans);
-                                    $this->addToExcludedNodes($nodes__value, $content__value['key']);
-                                } else {
-                                    $nodes__value->nodeValue = htmlspecialchars($trans);
+                                $trans = $this->data->reintroduceLineBreaks($trans, $str_without_lb, $str_with_lb);
+
+                                if ($this->isTextNode($nodes__value)) {
+                                    $nodes__value->nodeValue = $trans;
                                     $this->addToExcludedNodes($nodes__value);
+                                } else {
+                                    if ($content__value['type'] === 'attribute') {
+                                        $nodes__value->setAttribute($content__value['key'], $trans);
+                                        $this->addToExcludedNodes($nodes__value, $content__value['key']);
+                                    } else {
+                                        $this->setInnerHtml($nodes__value, $trans);
+                                        $this->addToExcludedNodes($nodes__value);
+                                    }
                                 }
                             }
                         }
@@ -340,8 +325,7 @@ class Dom
         $this->setRtlAttr();
         $this->preloadExcludedNodes();
         $this->preloadForceTokenize();
-        $this->modifyTextNodes();
-        $this->modifyTagNodes();
+        $this->modifyNodes();
         $html = $this->finishDomDocument($html);
         return $html;
     }
@@ -444,6 +428,10 @@ class Dom
 
     function transformSelectorToXpath($selector)
     {
+        if (strpos($selector, '/') === 0 || strpos($selector, './') === 0) {
+            return $selector;
+        }
+
         $xpath = './/';
 
         $parts = explode(' ', $selector);
@@ -499,6 +487,13 @@ class Dom
             return false;
         }
         return in_array($node->tagName, ['a', 'br', 'strong', 'b', 'small', 'i', 'span']);
+    }
+
+    function getOuterHtml($node)
+    {
+        $doc = new \DOMDocument();
+        $doc->appendChild($doc->importNode($node, true));
+        return $doc->saveHTML();
     }
 
     function getInnerHtml($node)
@@ -656,9 +651,6 @@ class Dom
 
     function modifyJson($json)
     {
-        if ($this->settings->get('translate_text_nodes') === false) {
-            return $json;
-        }
         if ($this->data->sourceLngIsCurrentLng() && $this->settings->get('prefix_source_lng') === false) {
             return $json;
         }

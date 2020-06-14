@@ -96,7 +96,6 @@ The default configuration is:
     'log_folder' => '/logs',
     'prefix_source_lng' => true,
     'redirect_root_domain' => 'browser', // 'browser'|'source' (only relevant if prefix_source_lng=true)
-    'translate_text_nodes' => true,
     'translate_default_tag_nodes' => true,
     'html_lang_attribute' => true,
     'html_hreflang_tags' => true,
@@ -122,7 +121,7 @@ The default configuration is:
     'force_tokenize' => ['.force-tokenize'],
     'include_dom' => [
         [
-            'selector' => '.search-submit',
+            'selector' => '.search-submit', // css or xpath selectors supported
             'attribute' => 'value'
         ],
         [
@@ -206,29 +205,31 @@ Instead you can also can use [wp_localize_script](https://codex.wordpress.org/Fu
 
 ## Modified nodes
 
-By default Gtbabel translates all text and tag nodes in the following contexts:
+By default Gtbabel translates all text and tag nodes with the following rules:
 
-| selector                        | attribute     | context     |
-| ------------------------------- | ------------- | ----------- |
-| `body a`                        | `href`        | slug\|file  |
-| `body form`                     | `action`      | slug        |
-| `body img`                      | `alt`         |             |
-| `body *`                        | `title`       |             |
-| `body input`                    | `placeholder` |             |
-| `head title`                    |               | title       |
-| `head meta[name="description"]` | `content`     | description |
-| `body img`                      | `src`         | file        |
-| `body *`                        | `style`       | file        |
-| `body *`                        | `data-*`      |             |
-| `body *`                        | `label`       |             |
-| `body *`                        | `*text*`      |             |
+| selector                        | text | attribute     | context          |
+| ------------------------------- | ---- | ------------- | ---------------- |
+| `body *`                        | ✓    | ✗             |                  |
+| `body a`                        | ✗    | `href`        | `'slug'\|'file'` |
+| `body form`                     | ✗    | `action`      | `'slug'`         |
+| `body img`                      | ✗    | `alt`         |                  |
+| `body *`                        | ✗    | `title`       |                  |
+| `body input`                    | ✗    | `placeholder` |                  |
+| `head title`                    | ✓    | ✗             | `'title'`        |
+| `head meta[name="description"]` | ✗    | `content`     | `'description'`  |
+| `body img`                      | ✗    | `src`         | `'file'`         |
+| `body *`                        | ✗    | `style`       | `'file'`         |
+| `body *`                        | ✗    | `data-*`      |                  |
+| `body *`                        | ✗    | `label`       |                  |
+| `body *`                        | ✗    | `*text*`      |                  |
 
-To disable text/tag node transformation, provide the options:
+To disable text/tag node transformation, provide the option:
 
--   `'translate_text_nodes' => false`
 -   `'translate_default_tag_nodes' => false`
 
 You can add your own tag node transformations via the `include_dom` option.
+
+Be aware that the rules are processed sequentially and attribute names are never transformed twice.
 
 Gtbabel automatically groups together reasonable parts.\
 The following code gets converted to 1 token (not 3):
@@ -292,6 +293,40 @@ where "2" stands for the second tag of the original string.
 The string then finally gets correctly translated to
 
 `I <a href="https://2.com">miss</a> German <a href="https://1.com">bread</a> the most.`
+
+## Ambiguous translations and plural forms
+
+Consider the following example:
+
+```html
+<ul>
+    <li>Bank</li>
+    <!-- bank -->
+    <li>Bank</li>
+    <!-- bench -->
+    <li>Schlüssel</li>
+    <!-- key (singular) -->
+    <li>Schlüssel</li>
+    <!-- keys (plural) -->
+</ul>
+```
+
+Normally Gtbabel would create 2 translations from this and cannot distinguish between ambiguous translations and singular/plural forms.
+
+In order to get that use the special `data-context`-attribute to force sensible contexts:
+
+```html
+<ul>
+    <li data-context="finance">Bank</li>
+    <!-- bank -->
+    <li data-context="furniture">Bank</li>
+    <!-- bench -->
+    <li data-context="singular">Schlüssel</li>
+    <!-- key (singular) -->
+    <li data-context="plural">Schlüssel</li>
+    <!-- keys (plural) -->
+</ul>
+```
 
 ## Router
 

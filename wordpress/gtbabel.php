@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.5.0
+ * Version: 3.5.1
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -397,7 +397,6 @@ class GtbabelWordPress
                             'hide_languages',
                             'prefix_source_lng',
                             'redirect_root_domain',
-                            'translate_text_nodes',
                             'translate_default_tag_nodes',
                             'html_lang_attribute',
                             'html_hreflang_tags',
@@ -432,7 +431,6 @@ class GtbabelWordPress
                     foreach (
                         [
                             'prefix_source_lng',
-                            'translate_text_nodes',
                             'translate_default_tag_nodes',
                             'html_lang_attribute',
                             'html_hreflang_tags',
@@ -719,17 +717,6 @@ class GtbabelWordPress
             __('Source language', 'gtbabel-plugin') .
             '</option>';
         echo '</select>';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_translate_text_nodes" class="gtbabel__label">';
-        echo __('Translate text nodes', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_translate_text_nodes" name="gtbabel[translate_text_nodes]" value="1"' .
-            ($settings['translate_text_nodes'] == '1' ? ' checked="checked"' : '') .
-            ' />';
         echo '</div>';
         echo '</li>';
 

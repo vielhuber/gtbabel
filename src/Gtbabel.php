@@ -36,7 +36,7 @@ class Gtbabel
         $this->log = $log ?: new Log($this->utils, $this->settings, $this->host);
         $this->data =
             $data ?: new Data($this->utils, $this->host, $this->settings, $this->tags, $this->log, $this->publish);
-        $this->dom = $dom ?: new Dom($this->utils, $this->data, $this->host, $this->settings);
+        $this->dom = $dom ?: new Dom($this->utils, $this->data, $this->host, $this->settings, $this->log);
         $this->router = $router ?: new Router($this->data, $this->host, $this->settings, $this->publish);
         $this->gettext = $gettext ?: new Gettext($this->data, $this->settings);
     }
@@ -70,6 +70,7 @@ class Gtbabel
         }
         $content = ob_get_contents();
         if ($content == '') {
+            ob_end_clean();
             return;
         }
         $content = $this->dom->modifyContent($content);

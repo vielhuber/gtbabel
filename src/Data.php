@@ -794,24 +794,35 @@ class Data
             return $trans;
         }
         if ($context === 'title') {
-            foreach (['|', '·', '•', '>', '-', '–', '—', ':', '*', '⋆', '~', '«', '»', '<'] as $delimiters__value) {
-                $orig = str_replace(' ', ' ', $orig); // replace hidden &nbsp; chars
-                if (mb_strpos($orig, ' ' . $delimiters__value . ' ') !== false) {
-                    $orig_parts = explode(' ' . $delimiters__value . ' ', $orig);
-                    foreach ($orig_parts as $orig_parts__key => $orig_parts__value) {
-                        $trans = $this->getTranslationAndAddDynamicallyIfNeeded($orig_parts__value, $lng, $context);
-                        $orig_parts[$orig_parts__key] = $trans;
-                    }
-                    $trans = implode(' ' . $delimiters__value . ' ', $orig_parts);
-                    return $trans;
-                }
+            $trans = $this->getTranslationOfTitleAndAddDynamicallyIfNeeded($orig, $lng);
+            if ($trans === null) {
+                return $orig;
             }
+            return $trans;
         }
 
         if ($this->stringShouldNotBeTranslated($orig, $context)) {
             return null;
         }
         return $this->getTranslationAndAddDynamicallyIfNeeded($orig, $lng, $context);
+    }
+
+    function getTranslationOfTitleAndAddDynamicallyIfNeeded($orig, $lng)
+    {
+        $orig = str_replace(' ', ' ', $orig); // replace hidden &nbsp; chars
+        $orig = html_entity_decode($orig);
+        foreach (['|', '·', '•', '>', '-', '–', '—', ':', '*', '⋆', '~', '«', '»', '<'] as $delimiters__value) {
+            if (mb_strpos($orig, ' ' . $delimiters__value . ' ') !== false) {
+                $orig_parts = explode(' ' . $delimiters__value . ' ', $orig);
+                foreach ($orig_parts as $orig_parts__key => $orig_parts__value) {
+                    $trans = $this->getTranslationAndAddDynamicallyIfNeeded($orig_parts__value, $lng, 'title');
+                    $orig_parts[$orig_parts__key] = $trans;
+                }
+                $trans = implode(' ' . $delimiters__value . ' ', $orig_parts);
+                return $trans;
+            }
+        }
+        return $this->getTranslationAndAddDynamicallyIfNeeded($orig, $lng, 'title');
     }
 
     function addPrefixToLink($link, $lng)
@@ -1116,9 +1127,9 @@ class Data
             if ($to_lng === $this->settings->getSourceLanguageCode()) {
                 return $str;
             }
-            return $str . '-' . $to_lng;
+            return $str . ($context != '' ? '-' . $context : '') . '-' . $to_lng;
         }
-        return $str . '-' . $to_lng;
+        return $str . ($context != '' ? '-' . $context : '') . '-' . $to_lng;
     }
 
     function stringShouldNotBeTranslated($str, $context = null)

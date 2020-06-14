@@ -289,6 +289,11 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->runDiff('45.html', 200);
     }
 
+    public function test46()
+    {
+        $this->runDiff('46.html', 200);
+    }
+
     public function test_translate()
     {
         $this->gtbabel = new Gtbabel();
@@ -340,6 +345,9 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings = $this->getDefaultSettings();
         $settings['languages'] = ['de', 'en'];
         $settings['debug_translations'] = false;
+        $this->gtbabel->start($settings);
+        $this->gtbabel->stop();
+        $this->gtbabel->reset();
 
         $settings['auto_translation'] = false;
         $settings['auto_add_translations_to_gettext'] = false;
@@ -708,6 +716,7 @@ EOD;
                 'filename' => './tests/data.db',
                 'table' => 'translations'
             ],
+            'log_folder' => './tests/logs',
             'prefix_source_lng' => false,
             'redirect_root_domain' => 'browser',
             'debug_translations' => true,
