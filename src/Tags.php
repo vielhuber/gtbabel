@@ -28,8 +28,20 @@ class Tags
     {
         foreach ($this->catchOpeningTags($str) as $matches__key => $matches__value) {
             $id = $matches__key + 1;
-            $pos = mb_strrpos($matches__value, '>');
-            $new = mb_substr($matches__value, 0, $pos) . ' p="' . $id . '"' . mb_substr($matches__value, $pos);
+            // consider tags like <br/>
+            $pos = mb_strrpos($matches__value, '/>');
+            $shift = true;
+            if ($pos === false) {
+                $pos = mb_strrpos($matches__value, '>');
+                $shift = false;
+            }
+            $new =
+                mb_substr($matches__value, 0, $pos) .
+                ' p="' .
+                $id .
+                '"' .
+                ($shift === true ? ' ' : '') .
+                mb_substr($matches__value, $pos);
             $str = __::str_replace_first($matches__value, $new, $str);
         }
         return $str;

@@ -128,8 +128,11 @@ class Log
         @unlink($this->generalLogFilename());
     }
 
-    function generalLog($msg)
+    function generalLog(...$msg)
     {
+        if (is_array($msg) && count($msg) === 1) {
+            $msg = reset($msg);
+        }
         $filename = $this->generalLogFilename();
         if (!file_exists($filename)) {
             file_put_contents($filename, '');
