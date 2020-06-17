@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.5.4
+ * Version: 3.5.5
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -1171,7 +1171,7 @@ class GtbabelWordPress
 
         $translations = $this->initBackendTranslations($url, $lng);
 
-        $pagination = $this->initBackendPagination($translations);
+        $pagination = $this->initBackendPagination($translations, $lng);
 
         if ($pagination->count > 0) {
             $translations = array_slice(
@@ -1884,7 +1884,7 @@ EOD;
             }, $discovery_strings);
         }
 
-        $translations = $this->gtbabel->data->getAllTranslationsFromFiles($lng, $url === null);
+        $translations = $this->gtbabel->data->getGroupedTranslationsFromDb($lng, $url === null);
 
         // filter
         if ($url !== null) {
@@ -1958,10 +1958,10 @@ EOD;
         );
     }
 
-    private function initBackendPagination($translations)
+    private function initBackendPagination($translations, $lng)
     {
         $pagination = (object) [];
-        $pagination->per_page = 30;
+        $pagination->per_page = $lng !== null ? 30 : 15;
         $pagination->count = count($translations);
         $pagination->cur = @$_GET['p'] != '' ? intval($_GET['p']) : 1;
         $pagination->max = ceil($pagination->count / $pagination->per_page);

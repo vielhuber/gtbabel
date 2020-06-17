@@ -36,7 +36,8 @@ class Data
     function initDatabase()
     {
         /* we need to connect to the database and initialize the whole database (in case of sqlite) and table */
-        /* performance here is not crucial: the following operations take ~1/1000s */
+        /* performance here is not crucial: the following operations take ~2/1000s
+         /* (so we can call them on every page load to avoid manually calling setup functions beforehand) */
         /* we chose a flat db structure to avoid expensive joins on every page load */
         /* we also add unique index so we can INSERT OR REPLACE later on */
         $this->db = new dbhelper();
@@ -107,7 +108,11 @@ class Data
             );
             try {
                 $this->db->query(
-                    'CREATE UNIQUE INDEX ' . $this->table . '_idx ON ' . $this->table . '(str(255), context, lng)'
+                    'CREATE UNIQUE INDEX ' .
+                        $this->table .
+                        '_str_context_lng ON ' .
+                        $this->table .
+                        '(str(100), context, lng)'
                 );
             } catch (\Exception $e) {
             }
@@ -322,69 +327,47 @@ class Data
         return $this->db->fetch_all('SELECT * FROM ' . $this->table . ' ORDER BY id ASC');
     }
 
-    function getAllTranslationsFromFiles($lng = null, $order_by_string = true)
+    function getGroupedTranslationsFromDb($lng = null, $order_by_string = true)
     {
         $data = [];
-        $query = '';
-        $query_args = [];
-        $lngs = [];
-        foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
-            if ($lng !== null && $lng !== $languages__value) {
-                continue;
-            }
-            $lngs[] = $languages__value;
-        }
 
-        $query .=
-            'SELECT DISTINCT (' .
-            $this->caseSensitiveCol($this->table . '.str') .
-            ') as str, ' .
-            $this->table .
-            '.context as context, ';
-        foreach ($lngs as $lngs__value) {
-            foreach (
-                [
-                    'trans',
-                    'added',
-                    'checked',
-                    'shared',
-                    'discovered_last_time',
-                    'discovered_last_url_orig',
-                    'discovered_last_url'
-                ]
-                as $cols__value
-            ) {
-                $query .= $lngs__value . '.' . $cols__value . ' as ' . $lngs__value . '_' . $cols__value . ', ';
+        /* the following approach is (surprisingly) much faster than a group by / join of a lot of columns via sql */
+        $query = 'SELECT * FROM ' . $this->table . '';
+        $query_args = [];
+        if ($lng !== null) {
+            $query .= ' WHERE lng = ?';
+            $query_args[] = $lng;
+        }
+        $result = $this->db->fetch_all($query, $query_args);
+        $data_grouped = [];
+        if (!empty($result)) {
+            foreach ($result as $result__value) {
+                $data_grouped[$result__value['str']][$result__value['context']]['str'] = $result__value['str'];
+                $data_grouped[$result__value['str']][$result__value['context']]['context'] = $result__value['context'];
+                $data_grouped[$result__value['str']][$result__value['context']][$result__value['lng'] . '_trans'] =
+                    $result__value['trans'];
+                $data_grouped[$result__value['str']][$result__value['context']][$result__value['lng'] . '_added'] =
+                    $result__value['added'];
+                $data_grouped[$result__value['str']][$result__value['context']][$result__value['lng'] . '_checked'] =
+                    $result__value['checked'];
+                $data_grouped[$result__value['str']][$result__value['context']][$result__value['lng'] . '_shared'] =
+                    $result__value['shared'];
+                $data_grouped[$result__value['str']][$result__value['context']][
+                    $result__value['lng'] . '_discovered_last_time'
+                ] = $result__value['discovered_last_time'];
+                $data_grouped[$result__value['str']][$result__value['context']][
+                    $result__value['lng'] . '_discovered_last_url_orig'
+                ] = $result__value['discovered_last_url_orig'];
+                $data_grouped[$result__value['str']][$result__value['context']][
+                    $result__value['lng'] . '_discovered_last_url'
+                ] = $result__value['discovered_last_url'];
             }
         }
-        $query .=
-            implode(
-                ' AND ',
-                array_map(function ($lngs__value) {
-                    return $lngs__value . '.shared';
-                }, $lngs)
-            ) . ' as shared ';
-        $query .= 'FROM ' . $this->table . ' ';
-        foreach ($lngs as $lngs__value) {
-            $query .=
-                'LEFT JOIN ' .
-                $this->table .
-                ' as ' .
-                $lngs__value .
-                ' ON ' .
-                $this->caseSensitiveCol($lngs__value . '.str') .
-                ' = ' .
-                $this->caseSensitiveCol($this->table . '.str') .
-                ' AND COALESCE(' .
-                $lngs__value .
-                '.context,\'\') = COALESCE(' .
-                $this->table .
-                '.context,\'\') AND ' .
-                $lngs__value .
-                '.lng = ? ';
-            $query_args[] = $lngs__value;
+        foreach ($data_grouped as $data_grouped__value) {
+            foreach ($data_grouped__value as $data_grouped__value__value) {
+                $data[] = $data_grouped__value__value;
+            }
         }
-        $data = $this->db->fetch_all($query, $query_args);
 
         usort($data, function ($a, $b) use ($order_by_string) {
             /*

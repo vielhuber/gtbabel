@@ -364,6 +364,7 @@ class Test extends \PHPUnit\Framework\TestCase
         ob_end_clean();
         $this->assertEquals($output, '<p>Haus-en</p>');
         $this->assertEquals($this->gtbabel->data->getTranslationsFromDb(), []);
+        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDb(), []);
         $this->gtbabel->reset();
 
         $settings['auto_translation'] = true;
@@ -377,6 +378,7 @@ class Test extends \PHPUnit\Framework\TestCase
         ob_end_clean();
         $this->assertEquals($output, '<p>House</p>');
         $this->assertEquals($this->gtbabel->data->getTranslationsFromDb(), []);
+        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDb(), []);
         $this->gtbabel->reset();
 
         $settings['auto_translation'] = true;
@@ -390,6 +392,7 @@ class Test extends \PHPUnit\Framework\TestCase
         ob_end_clean();
         $this->assertEquals($output, '<p>House</p>');
         $this->assertEquals($this->gtbabel->data->getTranslationFromDb('Haus', null, 'en')['trans'] === 'House', true);
+        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDb()[0]['en_trans'], 'House');
         $this->gtbabel->reset();
 
         $settings['auto_translation'] = true;
@@ -403,6 +406,7 @@ class Test extends \PHPUnit\Framework\TestCase
         ob_end_clean();
         $this->assertEquals($output, '<p>Haus</p>');
         $this->assertEquals($this->gtbabel->data->getTranslationFromDb('Haus', null, 'en')['trans'] === 'House', true);
+        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDb()[0]['en_trans'], 'House');
 
         $this->gtbabel->data->editCheckedValue('Haus', null, 'en', true);
 
@@ -414,6 +418,7 @@ class Test extends \PHPUnit\Framework\TestCase
         ob_end_clean();
         $this->assertEquals($output, '<p>House</p>');
         $this->assertEquals($this->gtbabel->data->getTranslationFromDb('Haus', null, 'en')['checked'] == 1, true);
+        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDb()[0]['en_checked'], 1);
         $this->gtbabel->reset();
     }
 
