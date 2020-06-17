@@ -19,7 +19,7 @@ $gtbabel->start([
     'google_translation_api_key' => @$_ENV['GOOGLE_TRANSLATION_API_KEY'],
     'microsoft_translation_api_key' => @$_ENV['MICROSOFT_TRANSLATION_API_KEY'],
     'exclude_urls' => null,
-    'languages' => ['de', 'en', 'fr'],
+    'languages' => [['code' => 'de', 'label' => 'Deutsch'], ['code' => 'en', 'label' => 'English']],
     'html_lang_attribute' => true,
     'html_hreflang_tags' => true
 ]);

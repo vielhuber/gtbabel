@@ -1137,12 +1137,11 @@ class Data
         if ($str === null || $str === true || $str === false || $str === '') {
             return true;
         }
-        $str = trim($str);
-        $str = trim($str, '"');
-        $str = trim($str, '\'');
+        $str = trim($str, ' \'"');
         if ($str == '') {
             return true;
         }
+        $length = mb_strlen($str);
         // numbers
         if (is_numeric($str)) {
             return true;
@@ -1155,10 +1154,8 @@ class Data
             return true;
         }
         // lng codes
-        foreach ($this->settings->getSelectedLanguageCodes() as $languages__value) {
-            if ($languages__value === trim(mb_strtolower($str))) {
-                return true;
-            }
+        if (in_array(strtolower($str), $this->settings->getSelectedLanguageCodes())) {
+            return true;
         }
         if ($context === 'slug') {
             if (mb_strpos(trim($str, '/'), '#') === 0) {
@@ -1180,18 +1177,14 @@ class Data
             return true;
         }
         // detect print_r outputs
-        if (
-            mb_strpos($str, '(') === 0 &&
-            mb_strrpos($str, ')') === mb_strlen($str) - 1 &&
-            mb_strpos($str, '=') !== false
-        ) {
+        if (mb_strpos($str, '(') === 0 && mb_strrpos($str, ')') === $length - 1 && mb_strpos($str, '=') !== false) {
             return true;
         }
         // detect mathjax/latex
-        if (mb_strpos($str, '$$') === 0 && mb_strrpos($str, '$$') === mb_strlen($str) - 2) {
+        if (mb_strpos($str, '$$') === 0 && mb_strrpos($str, '$$') === $length - 2) {
             return true;
         }
-        if (mb_strpos($str, '\\(') === 0 && mb_strrpos($str, '\\)') === mb_strlen($str) - 2) {
+        if (mb_strpos($str, '\\(') === 0 && mb_strrpos($str, '\\)') === $length - 2) {
             return true;
         }
         return false;

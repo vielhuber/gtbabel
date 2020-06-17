@@ -117,7 +117,11 @@ class Test extends \PHPUnit\Framework\TestCase
     public function test20()
     {
         $this->runDiff('20.html', 200, [
-            'languages' => ['de', 'en', 'fr'],
+            'languages' => [
+                ['code' => 'de', 'label' => 'Deutsch'],
+                ['code' => 'en', 'label' => 'English'],
+                ['code' => 'fr', 'label' => 'Français']
+            ],
             'html_lang_attribute' => true,
             'html_hreflang_tags' => true
         ]);
@@ -343,7 +347,7 @@ class Test extends \PHPUnit\Framework\TestCase
     {
         $this->gtbabel = new Gtbabel();
         $settings = $this->getDefaultSettings();
-        $settings['languages'] = ['de', 'en'];
+        $settings['languages'] = [['code' => 'de', 'label' => 'Deutsch'], ['code' => 'en', 'label' => 'English']];
         $settings['debug_translations'] = false;
         $this->gtbabel->start($settings);
         $this->gtbabel->stop();
@@ -417,7 +421,7 @@ class Test extends \PHPUnit\Framework\TestCase
     {
         $this->gtbabel = new Gtbabel();
         $settings = $this->getDefaultSettings();
-        $settings['languages'] = ['de', 'en'];
+        $settings['languages'] = [['code' => 'de', 'label' => 'Deutsch'], ['code' => 'en', 'label' => 'English']];
         $settings['lng_source'] = 'de';
         $settings['lng_target'] = 'en';
         $settings['debug_translations'] = false;
@@ -611,7 +615,7 @@ EOD;
     {
         $this->gtbabel = new Gtbabel();
         $settings = $this->getDefaultSettings();
-        $settings['languages'] = ['de', 'en'];
+        $settings['languages'] = [['code' => 'de', 'label' => 'Deutsch'], ['code' => 'en', 'label' => 'English']];
         $settings['exclude_dom'] = ['.notranslate', '.lngpicker'];
         $settings['lng_source'] = 'de';
         $settings['lng_target'] = null;
@@ -708,7 +712,6 @@ EOD;
     public function getDefaultSettings()
     {
         return [
-            'languages' => gtbabel_default_language_codes(),
             'lng_source' => 'de',
             'lng_target' => 'en',
             'database' => [

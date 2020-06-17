@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.5.2
+ * Version: 3.5.3
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -542,8 +542,16 @@ class GtbabelWordPress
                         }
                     }
 
-                    $settings['languages'][$settings['lng_source']] = '1';
-                    $settings['languages'] = array_keys($settings['languages']);
+                    if (!isset($settings['languages'])) {
+                        $settings = array_merge(['languages' => []], $settings);
+                    }
+                    $settings['languages'] = array_map(function ($settings__value) {
+                        return __::decode_data($settings__value);
+                    }, $settings['languages']);
+                    array_unshift(
+                        $settings['languages'],
+                        $this->gtbabel->settings->getLanguageDataForCode($settings['lng_source'])
+                    );
 
                     $this->saveSettings($settings);
                     // refresh gtbabel with new options
@@ -589,17 +597,23 @@ class GtbabelWordPress
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
         echo '<ul class="gtbabel__languagelist">';
-        foreach ($this->gtbabel->settings->getDefaultLanguages() as $languages__key => $languages__value) {
+        foreach ($this->gtbabel->settings->getDefaultLanguages() as $languages__value) {
             echo '<li class="gtbabel__languagelist-item">';
             echo '<label class="gtbabel__languagelist-label">';
-            echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" name="gtbabel[languages][' .
-                $languages__key .
-                ']"' .
-                (in_array($languages__key, $settings['languages']) == '1' ? ' checked="checked"' : '') .
-                ' value="1"' .
-                ($settings['lng_source'] === $languages__key ? ' disabled="disabled"' : '') .
+            echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" name="gtbabel[languages][]"' .
+                (!empty(
+                    array_filter($settings['languages'], function ($settings__value) use ($languages__value) {
+                        return $settings__value['code'] === $languages__value['code'];
+                    })
+                )
+                    ? ' checked="checked"'
+                    : '') .
+                ' value="' .
+                __::encode_data($languages__value) .
+                '"' .
+                ($settings['lng_source'] === $languages__value['code'] ? ' disabled="disabled"' : '') .
                 ' />';
-            echo '<span class="gtbabel__languagelist-label-inner">' . $languages__value . '</span>';
+            echo '<span class="gtbabel__languagelist-label-inner">' . $languages__value['label'] . '</span>';
             echo '</label>';
             echo '</li>';
         }
@@ -614,13 +628,13 @@ class GtbabelWordPress
         echo '<div class="gtbabel__inputbox">';
         echo '<select class="gtbabel__input gtbabel__input--select" id="gtbabel_lng_source" name="gtbabel[lng_source]">';
         echo '<option value="">&ndash;&ndash;</option>';
-        foreach ($this->gtbabel->settings->getDefaultLanguages() as $languages__key => $languages__value) {
+        foreach ($this->gtbabel->settings->getDefaultLanguages() as $languages__value) {
             echo '<option value="' .
-                $languages__key .
+                $languages__value['code'] .
                 '"' .
-                ($settings['lng_source'] == $languages__key ? ' selected="selected"' : '') .
+                ($settings['lng_source'] == $languages__value['code'] ? ' selected="selected"' : '') .
                 '>' .
-                $languages__value .
+                $languages__value['label'] .
                 '</option>';
         }
         echo '</select>';
@@ -1627,8 +1641,16 @@ EOD;
                 // make changes
                 if ($this->getBackendWizardStep() === 2) {
                     check_admin_referer('gtbabel-wizard-step-1');
-                    $settings['languages'][$this->getSetting('lng_source')] = '1';
-                    $settings['languages'] = array_keys($settings['languages']);
+                    if (!isset($settings['languages'])) {
+                        $settings = array_merge(['languages' => []], $settings);
+                    }
+                    $settings['languages'] = array_map(function ($settings__value) {
+                        return __::decode_data($settings__value);
+                    }, $settings['languages']);
+                    array_unshift(
+                        $settings['languages'],
+                        $this->gtbabel->settings->getLanguageDataForCode($this->getSetting('lng_source'))
+                    );
                     $this->saveSetting('languages', $settings['languages']);
                 }
                 if ($this->getBackendWizardStep() === 3) {
@@ -1672,17 +1694,23 @@ EOD;
             echo '<div class="gtbabel__wizard-step">';
             echo '<h2 class="gtbabel__wizard-steptitle">' . __('Choose languages', 'gtbabel-plugin') . '</h2>';
             echo '<ul class="gtbabel__languagelist">';
-            foreach ($this->gtbabel->settings->getDefaultLanguages() as $languages__key => $languages__value) {
+            foreach ($this->gtbabel->settings->getDefaultLanguages() as $languages__value) {
                 echo '<li class="gtbabel__languagelist-item">';
                 echo '<label class="gtbabel__languagelist-label">';
-                echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" name="gtbabel[languages][' .
-                    $languages__key .
-                    ']"' .
-                    (in_array($languages__key, $settings['languages']) == '1' ? ' checked="checked"' : '') .
-                    ' value="1"' .
-                    ($settings['lng_source'] === $languages__key ? ' disabled="disabled"' : '') .
+                echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" name="gtbabel[languages][]"' .
+                    (!empty(
+                        array_filter($settings['languages'], function ($settings__value) use ($languages__value) {
+                            return $settings__value['code'] === $languages__value['code'];
+                        })
+                    )
+                        ? ' checked="checked"'
+                        : '') .
+                    ' value="' .
+                    __::encode_data($languages__value) .
+                    '"' .
+                    ($settings['lng_source'] === $languages__value['code'] ? ' disabled="disabled"' : '') .
                     ' />';
-                echo '<span class="gtbabel__languagelist-label-inner">' . $languages__value . '</span>';
+                echo '<span class="gtbabel__languagelist-label-inner">' . $languages__value['label'] . '</span>';
                 echo '</label>';
                 echo '</li>';
             }
@@ -2315,9 +2343,12 @@ EOD;
     {
         if (empty($this->getSettings())) {
             $lng_source = mb_strtolower(mb_substr(get_locale(), 0, 2));
-            $languages = ['de', 'en'];
-            if (!in_array($lng_source, $languages)) {
-                $languages[] = $lng_source;
+            $languages = [['code' => 'de', 'label' => 'Deutsch'], ['code' => 'en', 'label' => 'English']];
+            if (!in_array($lng_source, ['de', 'en'])) {
+                $languages[] = $this->gtbabel->settings->getLanguageDataForCode($lng_source) ?? [
+                    'code' => $lng_source,
+                    'label' => $lng_source
+                ];
             }
             $this->saveSettings(
                 $this->gtbabel->settings->setupSettings([
