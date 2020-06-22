@@ -316,6 +316,14 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->assertEquals($output, '<p>This is a test!</p>');
     }
 
+    public function test_google_translate()
+    {
+        __o(__::translate_google('Dies ist ein Test!', 'de', 'en', @$_ENV['GOOGLE_TRANSLATION_API_KEY']));
+        __o(__::translate_google('Dies ist ein Test!', 'de', 'en', 'free'));
+        //die();
+        $this->assertEquals(true, false);
+    }
+
     public function test_tokenize()
     {
         $this->gtbabel = new Gtbabel();
