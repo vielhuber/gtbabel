@@ -146,9 +146,9 @@ class Data
         }
     }
 
-    function generateGettextFiles()
+    function saveCacheToDatabase()
     {
-        if ($this->settings->get('auto_add_translations_to_gettext') === false) {
+        if ($this->settings->get('auto_add_translations') === false) {
             return;
         }
 
@@ -325,12 +325,12 @@ class Data
         );
     }
 
-    function getTranslationsFromDb()
+    function getTranslationsFromDatabase()
     {
         return $this->db->fetch_all('SELECT * FROM ' . $this->table . ' ORDER BY id ASC');
     }
 
-    function getGroupedTranslationsFromDb($lng = null, $order_by_string = true)
+    function getGroupedTranslationsFromDatabase($lng = null, $order_by_string = true)
     {
         $data = [];
 
@@ -522,7 +522,7 @@ class Data
         return $success;
     }
 
-    function setCheckedToAllStringsFromFiles()
+    function setAllStringsToChecked()
     {
         $this->db->query('UPDATE ' . $this->table . ' SET checked = ?', 1);
         return true;
@@ -549,7 +549,7 @@ class Data
         $this->db->query('UPDATE ' . $this->table . ' SET shared = ?', 0);
     }
 
-    function deleteStringFromGettext($str, $context, $lng = null)
+    function deleteStringFromDatabase($str, $context, $lng = null)
     {
         $args = [];
         $args['str'] = $str;
@@ -720,7 +720,7 @@ class Data
     function getLanguagePickerData()
     {
         $data = [];
-        foreach ($this->settings->getSelectedLanguages() as $languages__key => $languages__value) {
+        foreach ($this->settings->getSelectedLanguageCodesLabels() as $languages__key => $languages__value) {
             if (!$this->host->responseCodeIsSuccessful()) {
                 continue;
             }

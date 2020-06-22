@@ -359,7 +359,7 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->gtbabel->reset();
 
         $settings['auto_translation'] = false;
-        $settings['auto_add_translations_to_gettext'] = false;
+        $settings['auto_add_translations'] = false;
         $settings['only_show_checked_strings'] = false;
         ob_start();
         $this->gtbabel->start($settings);
@@ -368,12 +368,12 @@ class Test extends \PHPUnit\Framework\TestCase
         $output = ob_get_contents();
         ob_end_clean();
         $this->assertEquals($output, '<p>Haus-en</p>');
-        $this->assertEquals($this->gtbabel->data->getTranslationsFromDb(), []);
-        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDb(), []);
+        $this->assertEquals($this->gtbabel->data->getTranslationsFromDatabase(), []);
+        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase(), []);
         $this->gtbabel->reset();
 
         $settings['auto_translation'] = true;
-        $settings['auto_add_translations_to_gettext'] = false;
+        $settings['auto_add_translations'] = false;
         $settings['only_show_checked_strings'] = false;
         ob_start();
         $this->gtbabel->start($settings);
@@ -382,12 +382,12 @@ class Test extends \PHPUnit\Framework\TestCase
         $output = ob_get_contents();
         ob_end_clean();
         $this->assertEquals($output, '<p>House</p>');
-        $this->assertEquals($this->gtbabel->data->getTranslationsFromDb(), []);
-        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDb(), []);
+        $this->assertEquals($this->gtbabel->data->getTranslationsFromDatabase(), []);
+        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase(), []);
         $this->gtbabel->reset();
 
         $settings['auto_translation'] = true;
-        $settings['auto_add_translations_to_gettext'] = true;
+        $settings['auto_add_translations'] = true;
         $settings['only_show_checked_strings'] = false;
         ob_start();
         $this->gtbabel->start($settings);
@@ -397,11 +397,11 @@ class Test extends \PHPUnit\Framework\TestCase
         ob_end_clean();
         $this->assertEquals($output, '<p>House</p>');
         $this->assertEquals($this->gtbabel->data->getTranslationFromDb('Haus', null, 'en')['trans'] === 'House', true);
-        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDb()[0]['en_trans'], 'House');
+        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase()[0]['en_trans'], 'House');
         $this->gtbabel->reset();
 
         $settings['auto_translation'] = true;
-        $settings['auto_add_translations_to_gettext'] = true;
+        $settings['auto_add_translations'] = true;
         $settings['only_show_checked_strings'] = true;
         ob_start();
         $this->gtbabel->start($settings);
@@ -411,7 +411,7 @@ class Test extends \PHPUnit\Framework\TestCase
         ob_end_clean();
         $this->assertEquals($output, '<p>Haus</p>');
         $this->assertEquals($this->gtbabel->data->getTranslationFromDb('Haus', null, 'en')['trans'] === 'House', true);
-        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDb()[0]['en_trans'], 'House');
+        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase()[0]['en_trans'], 'House');
 
         $this->gtbabel->data->editCheckedValue('Haus', null, 'en', true);
 
@@ -423,7 +423,7 @@ class Test extends \PHPUnit\Framework\TestCase
         ob_end_clean();
         $this->assertEquals($output, '<p>House</p>');
         $this->assertEquals($this->gtbabel->data->getTranslationFromDb('Haus', null, 'en')['checked'] == 1, true);
-        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDb()[0]['en_checked'], 1);
+        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase()[0]['en_checked'], 1);
         $this->gtbabel->reset();
     }
 
@@ -436,7 +436,7 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['lng_target'] = 'en';
         $settings['debug_translations'] = false;
         $settings['auto_translation'] = true;
-        $settings['auto_add_translations_to_gettext'] = true;
+        $settings['auto_add_translations'] = true;
         $settings['only_show_checked_strings'] = false;
 
         $input = <<<'EOD'
@@ -598,7 +598,7 @@ EOD;
             __::minify_html($this->normalize($output)),
             __::minify_html($this->normalize($expected_html))
         );
-        $translations = $this->gtbabel->data->getTranslationsFromDb();
+        $translations = $this->gtbabel->data->getTranslationsFromDatabase();
         $this->assertEquals(count($translations), count($expected_data));
         foreach ($translations as $translations__value) {
             $match = false;
@@ -633,7 +633,7 @@ EOD;
         $settings['lng_target'] = null;
         $settings['debug_translations'] = false;
         $settings['auto_translation'] = true;
-        $settings['auto_add_translations_to_gettext'] = true;
+        $settings['auto_add_translations'] = true;
         $settings['only_show_checked_strings'] = false;
 
         $settings['prefix_source_lng'] = false;
@@ -735,7 +735,7 @@ EOD;
             'prefix_source_lng' => false,
             'redirect_root_domain' => 'browser',
             'debug_translations' => true,
-            'auto_add_translations_to_gettext' => false,
+            'auto_add_translations' => false,
             'auto_set_new_strings_checked' => false,
             'auto_set_discovered_strings_checked' => false,
             'only_show_checked_strings' => false,

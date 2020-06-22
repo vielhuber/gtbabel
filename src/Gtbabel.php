@@ -76,7 +76,7 @@ class Gtbabel
         $content = $this->dom->modifyContent($content);
         ob_end_clean();
         echo $content;
-        $this->data->generateGettextFiles();
+        $this->data->saveCacheToDatabase();
         $this->log->statsLogSave();
     }
 
@@ -111,7 +111,7 @@ class Gtbabel
         $this->data->preloadDataInCache();
         $time = $this->utils->getCurrentTime();
         $content = $this->dom->modifyContent($content);
-        $this->data->generateGettextFiles();
+        $this->data->saveCacheToDatabase();
         $data = $this->data->discoveryLogGetAfter($time, null, true);
         $this->reset();
         return $data;

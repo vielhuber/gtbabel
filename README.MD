@@ -13,7 +13,7 @@ Gtbabel automatically translates your HTML/PHP pages – server sided!
 
 ## Features
 
--   Lightweight: only ~2500 lines of code.
+-   Lightweight: only ~3500 lines of code.
 -   Embraces the power of [gettext](https://www.gnu.org/software/gettext/) (e.g. using extracted comments and template files).
 -   Framework agnostic: works with nearly any PHP based cms or static site.
 -   Fast: once all translations are available, Gtbabel reaches a throughput of ~4000 words/s.
@@ -100,7 +100,7 @@ The default configuration is:
     'html_lang_attribute' => true,
     'html_hreflang_tags' => true,
     'debug_translations' => false, // surround outputted translations with "%|%" to see borders
-    'auto_add_translations_to_gettext' => true,
+    'auto_add_translations' => true,
     'auto_set_new_strings_checked' => false,
     'auto_set_discovered_strings_checked' => false,
     'only_show_checked_strings' => true,

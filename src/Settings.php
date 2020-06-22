@@ -62,7 +62,7 @@ class Settings
             'html_lang_attribute' => true,
             'html_hreflang_tags' => true,
             'debug_translations' => false,
-            'auto_add_translations_to_gettext' => true,
+            'auto_add_translations' => true,
             'auto_set_new_strings_checked' => false,
             'auto_set_discovered_strings_checked' => false,
             'only_show_checked_strings' => true,
@@ -241,7 +241,13 @@ class Settings
 
     function isLanguageDirectionRtl($lng)
     {
-        return in_array($lng, ['ar', 'fa', 'ha', 'he', 'ku', 'ps', 'ur', 'yi']);
+        return !empty(
+            array_filter($this->getSelectedLanguages(), function ($languages__value) use ($lng) {
+                return $languages__value['code'] == $lng &&
+                    isset($languages__value['rtl']) &&
+                    $languages__value['rtl'] === true;
+            })
+        );
     }
 
     function getDefaultLanguageCodes()
@@ -280,6 +286,11 @@ class Settings
         return null;
     }
 
+    function getSelectedLanguages()
+    {
+        return $this->get('languages');
+    }
+
     function getSelectedLanguageCodes()
     {
         // be careful, this function gets called >100 times
@@ -287,7 +298,7 @@ class Settings
         return $this->get('languages_codes');
     }
 
-    function getSelectedLanguages()
+    function getSelectedLanguageCodesLabels()
     {
         $return = [];
         // use order of default languages
@@ -305,10 +316,10 @@ class Settings
         return $return;
     }
 
-    function getSelectedLanguagesWithoutSource()
+    function getSelectedLanguagesCodesLabelsWithoutSource()
     {
         $lng = [];
-        foreach ($this->getSelectedLanguages() as $languages__key => $languages__value) {
+        foreach ($this->getSelectedLanguageCodesLabels() as $languages__key => $languages__value) {
             if ($languages__key === $this->getSourceLanguageCode()) {
                 continue;
             }

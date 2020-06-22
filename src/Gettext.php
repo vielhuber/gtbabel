@@ -21,7 +21,7 @@ class Gettext
         $files = [];
         $filename_prefix_tmp = tempnam(sys_get_temp_dir(), 'gtbabel_');
         $filename_zip = $filename_prefix_tmp . '.zip';
-        $translations = $this->data->getGroupedTranslationsFromDb();
+        $translations = $this->data->getGroupedTranslationsFromDatabase();
 
         $export['template'] = Translations::create('gtbabel');
         foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {

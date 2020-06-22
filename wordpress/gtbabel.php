@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.5.5
+ * Version: 3.5.8
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -110,12 +110,7 @@ class GtbabelWordPress
 
         // settings that can be changed via url
         foreach (
-            [
-                'discovery_log',
-                'auto_set_discovered_strings_checked',
-                'auto_add_translations_to_gettext',
-                'redirect_root_domain'
-            ]
+            ['discovery_log', 'auto_set_discovered_strings_checked', 'auto_add_translations', 'redirect_root_domain']
             as $parameters__value
         ) {
             if (isset($_GET['gtbabel_' . $parameters__value]) && $_GET['gtbabel_' . $parameters__value] != '') {
@@ -241,7 +236,7 @@ class GtbabelWordPress
                 function ($post) {
                     echo '<ul>';
                     foreach (
-                        $this->gtbabel->settings->getSelectedLanguagesWithoutSource()
+                        $this->gtbabel->settings->getSelectedLanguagesCodesLabelsWithoutSource()
                         as $languages__key => $languages__value
                     ) {
                         echo '<li><a href="' .
@@ -400,7 +395,7 @@ class GtbabelWordPress
                             'translate_default_tag_nodes',
                             'html_lang_attribute',
                             'html_hreflang_tags',
-                            'auto_add_translations_to_gettext',
+                            'auto_add_translations',
                             'only_show_checked_strings',
                             'auto_set_new_strings_checked',
                             'auto_translation',
@@ -436,7 +431,7 @@ class GtbabelWordPress
                             'html_lang_attribute',
                             'html_hreflang_tags',
                             'debug_translations',
-                            'auto_add_translations_to_gettext',
+                            'auto_add_translations',
                             'only_show_checked_strings',
                             'auto_set_new_strings_checked',
                             'auto_translation',
@@ -562,7 +557,7 @@ class GtbabelWordPress
             }
 
             if (isset($_POST['check_all_strings'])) {
-                $this->gtbabel->data->setCheckedToAllStringsFromFiles();
+                $this->gtbabel->data->setAllStringsToChecked();
             }
 
             if (isset($_POST['reset_settings'])) {
@@ -672,7 +667,7 @@ class GtbabelWordPress
         echo '<div class="gtbabel__inputbox">';
         echo '<ul class="gtbabel__languagelist">';
         foreach (
-            $this->gtbabel->settings->getSelectedLanguagesWithoutSource()
+            $this->gtbabel->settings->getSelectedLanguagesCodesLabelsWithoutSource()
             as $languages__key => $languages__value
         ) {
             $checked = false;
@@ -770,12 +765,12 @@ class GtbabelWordPress
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_auto_add_translations_to_gettext" class="gtbabel__label">';
+        echo '<label for="gtbabel_auto_add_translations" class="gtbabel__label">';
         echo __('Auto add translations to gettext', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_auto_add_translations_to_gettext" name="gtbabel[auto_add_translations_to_gettext]" value="1"' .
-            ($settings['auto_add_translations_to_gettext'] == '1' ? ' checked="checked"' : '') .
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_auto_add_translations" name="gtbabel[auto_add_translations]" value="1"' .
+            ($settings['auto_add_translations'] == '1' ? ' checked="checked"' : '') .
             ' />';
         echo '</div>';
         echo '</li>';
@@ -1143,7 +1138,7 @@ class GtbabelWordPress
                             );
                         }
                         if (@$input_data['field'] === 'delete' && $post__value == '1') {
-                            $this->gtbabel->data->deleteStringFromGettext($input_data['str'], $input_data['context']);
+                            $this->gtbabel->data->deleteStringFromDatabase($input_data['str'], $input_data['context']);
                         }
                     }
                 }
@@ -1231,7 +1226,7 @@ class GtbabelWordPress
             echo '</a>';
             echo '</li>';
         }
-        foreach ($this->gtbabel->settings->getSelectedLanguagesWithoutSource() as $lng__key => $lng__value) {
+        foreach ($this->gtbabel->settings->getSelectedLanguagesCodesLabelsWithoutSource() as $lng__key => $lng__value) {
             echo '<li class="gtbabel__transmeta-listitem">';
             if ($lng !== $lng__key) {
                 echo '<a class="gtbabel__transmeta-listitem-link" href="' .
@@ -1312,7 +1307,7 @@ class GtbabelWordPress
             echo '<tr class="gtbabel__table-row">';
             echo '<td class="gtbabel__table-cell">' . $this->gtbabel->settings->getSourceLanguageLabel() . '</td>';
             foreach (
-                $this->gtbabel->settings->getSelectedLanguagesWithoutSource()
+                $this->gtbabel->settings->getSelectedLanguagesCodesLabelsWithoutSource()
                 as $languages__key => $languages__value
             ) {
                 if ($lng !== null && $lng !== $languages__key) {
@@ -1337,7 +1332,7 @@ class GtbabelWordPress
                 }
                 echo '</td>';
                 foreach (
-                    $this->gtbabel->settings->getSelectedLanguagesWithoutSource()
+                    $this->gtbabel->settings->getSelectedLanguagesCodesLabelsWithoutSource()
                     as $languages__key => $languages__value
                 ) {
                     if ($lng !== null && $lng !== $languages__key) {
@@ -1501,7 +1496,7 @@ class GtbabelWordPress
         echo '<select required="required" class="gtbabel__input gtbabel__input--select" id="gtbabel_language" name="gtbabel[language]">';
         echo '<option value="">&ndash;&ndash;</option>';
         foreach (
-            $this->gtbabel->settings->getSelectedLanguagesWithoutSource()
+            $this->gtbabel->settings->getSelectedLanguagesCodesLabelsWithoutSource()
             as $languages__key => $languages__value
         ) {
             echo '<option value="' . $languages__key . '">' . $languages__value . '</option>';
@@ -1897,7 +1892,7 @@ EOD;
             }, $discovery_strings);
         }
 
-        $translations = $this->gtbabel->data->getGroupedTranslationsFromDb($lng, $url === null);
+        $translations = $this->gtbabel->data->getGroupedTranslationsFromDatabase($lng, $url === null);
 
         // filter
         if ($url !== null) {
@@ -2033,14 +2028,14 @@ EOD;
         $bypass_cache = true,
         $discovery_log = true,
         $auto_set_discovered_strings_checked = false,
-        $auto_add_translations_to_gettext = true,
+        $auto_add_translations = true,
         $redirect_root_domain = 'source'
     ) {
         if (
             $bypass_cache === true ||
             $discovery_log === true ||
             $auto_set_discovered_strings_checked === true ||
-            $auto_add_translations_to_gettext === true
+            $auto_add_translations === true
         ) {
             $url .= mb_strpos($url, '?') === false ? '?' : '&';
         }
@@ -2054,8 +2049,8 @@ EOD;
         if ($auto_set_discovered_strings_checked === true) {
             $args[] = 'gtbabel_auto_set_discovered_strings_checked=1';
         }
-        if ($auto_add_translations_to_gettext === true) {
-            $args[] = 'gtbabel_auto_add_translations_to_gettext=1';
+        if ($auto_add_translations === true) {
+            $args[] = 'gtbabel_auto_add_translations=1';
         }
         if ($redirect_root_domain !== null) {
             $args[] = 'gtbabel_redirect_root_domain=' . $redirect_root_domain;
@@ -2231,7 +2226,7 @@ EOD;
                     true, // bypass caching
                     true, // general_log
                     $auto_set_discovered_strings_checked,
-                    true, // auto_add_translations_to_gettext
+                    true, // auto_add_translations
                     'source' // redirect_root_domain
                 )
             );
