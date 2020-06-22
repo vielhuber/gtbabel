@@ -766,7 +766,7 @@ class GtbabelWordPress
 
         echo '<li class="gtbabel__field">';
         echo '<label for="gtbabel_auto_add_translations" class="gtbabel__label">';
-        echo __('Auto add translations to gettext', 'gtbabel-plugin');
+        echo __('Auto add translations', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
         echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_auto_add_translations" name="gtbabel[auto_add_translations]" value="1"' .
@@ -1970,12 +1970,12 @@ EOD;
     {
         $pagination = (object) [];
 
-        if ($lng === null) {
+        if ($lng !== null) {
             $shown_cols = 1;
         } else {
             $shown_cols = count($this->gtbabel->settings->getSelectedLanguageCodesWithoutSource());
         }
-        $pagination->per_page = round(100 / $shown_cols);
+        $pagination->per_page = round(100 / pow($shown_cols, 1/3));
 
         $pagination->count = count($translations);
         $pagination->cur = @$_GET['p'] != '' ? intval($_GET['p']) : 1;
