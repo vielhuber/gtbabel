@@ -9,12 +9,12 @@ Gtbabel automatically translates your HTML/PHP pages – server sided!
 -   Gtbabel extracts on every page load any page into logical paragraph tokens.
 -   Static and dynamic content is deliberately treated the same.
 -   All tokens are replaced (if available) by it's translation before rendered.
--   The tokens get dumped (if not available) into gettext, where they can be translated.
+-   The tokens get dumped (if not available), where they can be translated.
 
 ## Features
 
 -   Lightweight: only ~2500 lines of code.
--   Embraces the power of [gettext](https://www.gnu.org/software/gettext/) (e.g. using contexts and template files).
+-   Embraces the power of [gettext](https://www.gnu.org/software/gettext/) (e.g. using extracted comments and template files).
 -   Framework agnostic: works with nearly any PHP based cms or static site.
 -   Fast: once all translations are available, Gtbabel reaches a throughput of ~4000 words/s.
 -   Auto translation: use the power of [Google Translation API](https://cloud.google.com/translate/docs) or [Microsoft Translation API](https://azure.microsoft.com/de-de/services/cognitive-services/translator-text-api/) to auto translate your pages and links into any language.
@@ -171,16 +171,12 @@ The following features are included:
 -   Control publish status of posts/pages (slug changes are auto-reflected in the `prevent_publish_urls`-option)
 -   Possibility to replace files per language via the media library
 
-## Gettext
+## Database and Gettext
 
 -   The final html gets parsed and is split up in reasonable strings.
--   All new strings are appended to a template pot-file.
--   If you disable auto translation:
-    -   The strings in the pot-file can be translated by hand (just put your mo-files inside the locales folder).
--   If you enable auto translation:
-    -   Po- and mo-files are automatically generated (and loaded on the next request).
-    -   New strings are automatically appended.
-    -   You can modify these auto generated files afterwards, modified strings won't be overwritten.
+-   Gtbabel operates on a database layer (e.g. sqlite) to ensure fast load times.
+-   The database structure reflects the structure of [GNU gettext](https://www.gnu.org/software/gettext/).
+-   You can export and import the data at any time.
 
 ## JavaScript
 
