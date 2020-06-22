@@ -13,6 +13,7 @@ $gtbabel->start([
     'debug_translations' => true,
     'auto_add_translations_to_gettext' => false,
     'auto_set_new_strings_checked' => false,
+    'auto_set_discovered_strings_checked' => false,
     'only_show_checked_strings' => true,
     'auto_translation' => true,
     'auto_translation_service' => 'google',

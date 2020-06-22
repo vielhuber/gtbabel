@@ -112,7 +112,7 @@ class GtbabelWordPress
         foreach (
             [
                 'discovery_log',
-                'auto_set_new_strings_checked',
+                'auto_set_discovered_strings_checked',
                 'auto_add_translations_to_gettext',
                 'redirect_root_domain'
             ]
@@ -402,6 +402,7 @@ class GtbabelWordPress
                             'html_hreflang_tags',
                             'auto_add_translations_to_gettext',
                             'only_show_checked_strings',
+                            'auto_set_new_strings_checked',
                             'auto_translation',
                             'auto_translation_service',
                             'google_translation_api_key',
@@ -437,6 +438,7 @@ class GtbabelWordPress
                             'debug_translations',
                             'auto_add_translations_to_gettext',
                             'only_show_checked_strings',
+                            'auto_set_new_strings_checked',
                             'auto_translation',
                             'stats_log',
                             'wizard_finished'
@@ -790,6 +792,17 @@ class GtbabelWordPress
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_auto_set_new_strings_checked" class="gtbabel__label">';
+        echo __('Auto set new strings to checked', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_auto_set_new_strings_checked" name="gtbabel[auto_set_new_strings_checked]" value="1"' .
+            ($settings['auto_set_new_strings_checked'] == '1' ? ' checked="checked"' : '') .
+            ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
         echo '<label for="gtbabel_auto_translation" class="gtbabel__label">';
         echo __('Enable automatic translation', 'gtbabel-plugin');
         echo '</label>';
@@ -998,11 +1011,11 @@ class GtbabelWordPress
         echo '</div>';
         echo '</li>';
         echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_auto_set_new_strings_checked" class="gtbabel__label">';
-        echo __('Auto set new strings to checked', 'gtbabel-plugin');
+        echo '<label for="gtbabel_auto_set_discovered_strings_checked" class="gtbabel__label">';
+        echo __('Auto set discovered strings to checked', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" id="gtbabel_auto_set_new_strings_checked" type="checkbox" checked="checked" value="1" />';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" id="gtbabel_auto_set_discovered_strings_checked" type="checkbox" checked="checked" value="1" />';
         echo '</div>';
         echo '</li>';
         echo '</ul>';
@@ -1961,7 +1974,14 @@ EOD;
     private function initBackendPagination($translations, $lng)
     {
         $pagination = (object) [];
-        $pagination->per_page = $lng !== null ? 30 : 15;
+
+        if ($lng === null) {
+            $shown_cols = 1;
+        } else {
+            $shown_cols = count($this->gtbabel->settings->getSelectedLanguageCodesWithoutSource());
+        }
+        $pagination->per_page = round(100 / $shown_cols);
+
         $pagination->count = count($translations);
         $pagination->cur = @$_GET['p'] != '' ? intval($_GET['p']) : 1;
         $pagination->max = ceil($pagination->count / $pagination->per_page);
@@ -2012,14 +2032,14 @@ EOD;
         $url,
         $bypass_cache = true,
         $discovery_log = true,
-        $auto_set_new_strings_checked = false,
+        $auto_set_discovered_strings_checked = false,
         $auto_add_translations_to_gettext = true,
         $redirect_root_domain = 'source'
     ) {
         if (
             $bypass_cache === true ||
             $discovery_log === true ||
-            $auto_set_new_strings_checked === true ||
+            $auto_set_discovered_strings_checked === true ||
             $auto_add_translations_to_gettext === true
         ) {
             $url .= mb_strpos($url, '?') === false ? '?' : '&';
@@ -2031,8 +2051,8 @@ EOD;
         if ($discovery_log === true) {
             $args[] = 'gtbabel_discovery_log=1';
         }
-        if ($auto_set_new_strings_checked === true) {
-            $args[] = 'gtbabel_auto_set_new_strings_checked=1';
+        if ($auto_set_discovered_strings_checked === true) {
+            $args[] = 'gtbabel_auto_set_discovered_strings_checked=1';
         }
         if ($auto_add_translations_to_gettext === true) {
             $args[] = 'gtbabel_auto_add_translations_to_gettext=1';
@@ -2157,9 +2177,9 @@ EOD;
         if (@$_GET['gtbabel_delete_unused'] == '1') {
             $delete_unused = true;
         }
-        $auto_set_new_strings_checked = false;
-        if (@$_GET['gtbabel_auto_set_new_strings_checked'] == '1') {
-            $auto_set_new_strings_checked = true;
+        $auto_set_discovered_strings_checked = false;
+        if (@$_GET['gtbabel_auto_set_discovered_strings_checked'] == '1') {
+            $auto_set_discovered_strings_checked = true;
         }
         $time = null;
         if (__::x(@$_GET['gtbabel_time'])) {
@@ -2210,7 +2230,7 @@ EOD;
                     $url,
                     true, // bypass caching
                     true, // general_log
-                    $auto_set_new_strings_checked,
+                    $auto_set_discovered_strings_checked,
                     true, // auto_add_translations_to_gettext
                     'source' // redirect_root_domain
                 )
@@ -2262,7 +2282,9 @@ EOD;
                     '&gtbabel_auto_translate=1&gtbabel_auto_translate_chunk=' .
                     ($chunk + 1) .
                     ($delete_unused === true ? '&gtbabel_delete_unused=1' : '') .
-                    ($auto_set_new_strings_checked === true ? '&gtbabel_auto_set_new_strings_checked=1' : '') .
+                    ($auto_set_discovered_strings_checked === true
+                        ? '&gtbabel_auto_set_discovered_strings_checked=1'
+                        : '') .
                     (__::x($time) ? '&gtbabel_time=' . $time : '')
             );
             echo '<a href="' . $redirect_url . '" class="gtbabel__auto-translate-next"></a>';

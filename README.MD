@@ -102,6 +102,7 @@ The default configuration is:
     'debug_translations' => false, // surround outputted translations with "%|%" to see borders
     'auto_add_translations_to_gettext' => true,
     'auto_set_new_strings_checked' => false,
+    'auto_set_discovered_strings_checked' => false,
     'only_show_checked_strings' => true,
     'auto_translation' => true,
     'auto_translation_service' => 'google', // google|microsoft
@@ -207,21 +208,22 @@ Instead you can also can use [wp_localize_script](https://codex.wordpress.org/Fu
 
 By default Gtbabel translates all text and tag nodes with the following rules:
 
-| selector                        | text | attribute     | context          |
-| ------------------------------- | ---- | ------------- | ---------------- |
-| `body *`                        | ✓    | ✗             |                  |
-| `body a`                        | ✗    | `href`        | `'slug'\|'file'` |
-| `body form`                     | ✗    | `action`      | `'slug'`         |
-| `body img`                      | ✗    | `alt`         |                  |
-| `body *`                        | ✗    | `title`       |                  |
-| `body input`                    | ✗    | `placeholder` |                  |
-| `head title`                    | ✓    | ✗             | `'title'`        |
-| `head meta[name="description"]` | ✗    | `content`     | `'description'`  |
-| `body img`                      | ✗    | `src`         | `'file'`         |
-| `body *`                        | ✗    | `style`       | `'file'`         |
-| `body *`                        | ✗    | `data-*`      |                  |
-| `body *`                        | ✗    | `label`       |                  |
-| `body *`                        | ✗    | `*text*`      |                  |
+| selector                        | text | attribute        | context          |
+| ------------------------------- | ---- | ---------------- | ---------------- |
+| `body *`                        | ✓    | ✗                | `auto`           |
+| `body a`                        | ✗    | `href^="mailto"` | `email`          |
+| `body a`                        | ✗    | `href`           | `'slug'\|'file'` |
+| `body form`                     | ✗    | `action`         | `'slug'`         |
+| `body img`                      | ✗    | `alt`            | `auto`           |
+| `body *`                        | ✗    | `title`          | `auto`           |
+| `body input`                    | ✗    | `placeholder`    | `auto`           |
+| `head title`                    | ✓    | ✗                | `'title'`        |
+| `head meta[name="description"]` | ✗    | `content`        | `'description'`  |
+| `body img`                      | ✗    | `src`            | `'file'`         |
+| `body *`                        | ✗    | `style`          | `'file'`         |
+| `body *`                        | ✗    | `data-*`         | `auto`           |
+| `body *`                        | ✗    | `label`          | `auto`           |
+| `body *`                        | ✗    | `*text*`         | `auto`           |
 
 To disable text/tag node transformation, provide the option:
 
@@ -327,6 +329,8 @@ In order to get that use the special `data-context`-attribute to force sensible 
     <!-- keys (plural) -->
 </ul>
 ```
+
+This way you can provide different translations.
 
 ## Router
 

@@ -298,6 +298,11 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->runDiff('46.html', 200);
     }
 
+    public function test47()
+    {
+        $this->runDiff('47.html', 200);
+    }
+
     public function test_translate()
     {
         $this->gtbabel = new Gtbabel();
@@ -469,7 +474,7 @@ EOD;
 <img src="http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei6_EN.jpg" alt="">
 <img src="/beispiel-bilddatei7_EN.jpg" alt="">
 <img src="beispiel-bilddatei8_EN.jpg" alt="">
-<a href="mailto:david@vielhuber.de"></a>
+<a href="mailto:david@vielhuber.de_EN"></a>
 <a href="tel:+4989111312113"></a>
 <a href="http://test.de/beispiel-bilddatei9.jpg"></a>
 <a href="http://test.de/beispiel-pfad10"></a>
@@ -497,6 +502,7 @@ EOD;
             ['datenschutz/beispiel-bilddatei6.jpg', 'file', 'en', 'datenschutz/beispiel-bilddatei6_EN.jpg', 1],
             ['beispiel-bilddatei7.jpg', 'file', 'en', 'beispiel-bilddatei7_EN.jpg', 1],
             ['beispiel-bilddatei8.jpg', 'file', 'en', 'beispiel-bilddatei8_EN.jpg', 1],
+            ['david@vielhuber.de', 'email', 'en', 'david@vielhuber.de_EN', 1],
             ['datenschutz/beispiel-bilddatei12.jpg', 'file', 'en', 'datenschutz/beispiel-bilddatei12_EN.jpg', 1],
             ['beispiel-bilddatei13.jpg', 'file', 'en', 'beispiel-bilddatei13_EN.jpg', 1],
             ['beispiel-bilddatei14.jpg', 'file', 'en', 'beispiel-bilddatei14_EN.jpg', 1]
@@ -558,6 +564,7 @@ EOD;
             'beispiel-bilddatei8_EN.jpg',
             true
         );
+        $this->gtbabel->data->editTranslation('david@vielhuber.de', 'email', 'en', 'david@vielhuber.de_EN', true);
         $this->gtbabel->data->editTranslation(
             'datenschutz/beispiel-bilddatei12.jpg',
             'file',
@@ -593,7 +600,7 @@ EOD;
         );
         $translations = $this->gtbabel->data->getTranslationsFromDb();
         $this->assertEquals(count($translations), count($expected_data));
-        foreach ($translations as $translations__key => $translations__value) {
+        foreach ($translations as $translations__value) {
             $match = false;
             foreach ($expected_data as $expected_data__value) {
                 if (
@@ -730,6 +737,7 @@ EOD;
             'debug_translations' => true,
             'auto_add_translations_to_gettext' => false,
             'auto_set_new_strings_checked' => false,
+            'auto_set_discovered_strings_checked' => false,
             'only_show_checked_strings' => false,
             'exclude_urls' => null,
             'html_lang_attribute' => false,

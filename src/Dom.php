@@ -38,27 +38,28 @@ class Dom
             foreach ($this->settings->get('exclude_dom') as $exclude__value) {
                 $nodes = $this->DOMXpath->query($this->transformSelectorToXpath($exclude__value));
                 foreach ($nodes as $nodes__value) {
-                    $this->addToExcludedNodes($nodes__value);
+                    $this->addToExcludedNodes($nodes__value, '*');
                     foreach ($this->getChildrenOfNodeIncludingWhitespace($nodes__value) as $nodes__value__value) {
-                        $this->addToExcludedNodes($nodes__value__value);
+                        $this->addToExcludedNodes($nodes__value__value, '*');
                     }
                 }
             }
         }
     }
 
-    function addToExcludedNodes($node, $attr = null)
+    function addToExcludedNodes($node, $attr)
     {
         if (!array_key_exists($this->getIdOfNode($node), $this->excluded_nodes)) {
             $this->excluded_nodes[$this->getIdOfNode($node)] = [];
         }
-        $this->excluded_nodes[$this->getIdOfNode($node)][] = $attr === null ? true : $attr;
+        $this->excluded_nodes[$this->getIdOfNode($node)][] = $attr;
     }
 
-    function nodeIsExcluded($node, $attr = null)
+    function nodeIsExcluded($node, $attr)
     {
         if (array_key_exists($this->getIdOfNode($node), $this->excluded_nodes)) {
-            return in_array($attr === null ? true : $attr, $this->excluded_nodes[$this->getIdOfNode($node)]);
+            return in_array('*', $this->excluded_nodes[$this->getIdOfNode($node)]) ||
+                in_array($attr, $this->excluded_nodes[$this->getIdOfNode($node)]);
         }
         return false;
     }
@@ -81,7 +82,7 @@ class Dom
         $groups = [];
         $to_delete = [];
         foreach ($textnodes as $textnodes__value) {
-            if ($this->nodeIsExcluded($textnodes__value)) {
+            if ($this->nodeIsExcluded($textnodes__value, 'text()')) {
                 continue;
             }
             if ($this->data->stringShouldNotBeTranslated($textnodes__value->nodeValue)) {
@@ -137,6 +138,11 @@ class Dom
                     'selector' => '/html/body//text()',
                     'attribute' => null,
                     'context' => null
+                ],
+                [
+                    'selector' => '/html/body//a[starts-with(@href, \'mailto:\')]',
+                    'attribute' => 'href',
+                    'context' => 'email'
                 ],
                 [
                     'selector' => '/html/body//a[@href]',
@@ -257,7 +263,7 @@ class Dom
                                 if (
                                     $this->nodeIsExcluded(
                                         $nodes__value,
-                                        $content__value['type'] === 'attribute' ? $content__value['key'] : null
+                                        $content__value['type'] === 'attribute' ? $content__value['key'] : 'text()'
                                     )
                                 ) {
                                     continue;
@@ -290,14 +296,14 @@ class Dom
 
                                 if ($this->isTextNode($nodes__value)) {
                                     $nodes__value->nodeValue = $trans;
-                                    $this->addToExcludedNodes($nodes__value);
+                                    $this->addToExcludedNodes($nodes__value, 'text()');
                                 } else {
                                     if ($content__value['type'] === 'attribute') {
                                         $nodes__value->setAttribute($content__value['key'], $trans);
                                         $this->addToExcludedNodes($nodes__value, $content__value['key']);
                                     } else {
                                         $this->setInnerHtml($nodes__value, $trans);
-                                        $this->addToExcludedNodes($nodes__value);
+                                        $this->addToExcludedNodes($nodes__value, 'text()');
                                     }
                                 }
                             }

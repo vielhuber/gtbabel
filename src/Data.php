@@ -224,6 +224,9 @@ class Data
                     $this->table .
                     ' SET
                     shared = (CASE WHEN discovered_last_url_orig <> ? THEN 1 ELSE shared END),
+                    ' .
+                    ($this->settings->get('auto_set_discovered_strings_checked') === true ? 'checked = 1,' : '') .
+                    '
                     discovered_last_time = ?,
                     discovered_last_url_orig = ?,
                     discovered_last_url = ?
@@ -558,7 +561,7 @@ class Data
         return true;
     }
 
-    function addTranslationToPoFileAndToCache($str, $trans, $lng, $context = null)
+    function addTranslationToDatabaseAndToCache($str, $trans, $lng, $context = null)
     {
         if ($lng === $this->settings->getSourceLanguageCode()) {
             return;
@@ -776,6 +779,13 @@ class Data
             }
             return $trans;
         }
+        if ($context === 'email') {
+            $trans = $this->getTranslationOfEmailAndAddDynamicallyIfNeeded($orig, $lng);
+            if ($trans === null) {
+                return $orig;
+            }
+            return $trans;
+        }
         if ($context === 'title') {
             $trans = $this->getTranslationOfTitleAndAddDynamicallyIfNeeded($orig, $lng);
             if ($trans === null) {
@@ -913,12 +923,27 @@ class Data
             }
             $trans = $this->getExistingTranslationFromCache($urls__value, $lng, 'file');
             if ($trans === false) {
-                $this->addTranslationToPoFileAndToCache($urls__value, $urls__value, $lng, 'file');
+                $this->addTranslationToDatabaseAndToCache($urls__value, $urls__value, $lng, 'file');
             } elseif ($this->stringIsChecked($urls__value, $lng, 'file')) {
                 $orig = str_replace($urls__value, $trans, $orig);
             }
         }
         return $orig;
+    }
+
+    function getTranslationOfEmailAndAddDynamicallyIfNeeded($orig, $lng)
+    {
+        $is_link = strpos($orig, 'mailto:') === 0;
+        if ($is_link) {
+            $orig = str_replace('mailto:', '', $orig);
+        }
+        $trans = $this->getExistingTranslationFromCache($orig, $lng, 'email');
+        if ($trans === false) {
+            $this->addTranslationToDatabaseAndToCache($orig, $orig, $lng, 'email');
+        } elseif ($this->stringIsChecked($orig, $lng, 'email')) {
+            return ($is_link ? 'mailto:' : '') . $trans;
+        }
+        return ($is_link ? 'mailto:' : '') . $orig;
     }
 
     function getTranslationAndAddDynamicallyIfNeeded($orig, $lng, $context = null)
@@ -964,7 +989,7 @@ class Data
             $transWithIds = $this->autoTranslateString($origWithIds, $lng, $context);
             if ($transWithIds !== null) {
                 $transWithoutAttributes = $this->tags->removeAttributesExceptIrregularIds($transWithIds);
-                $this->addTranslationToPoFileAndToCache(
+                $this->addTranslationToDatabaseAndToCache(
                     $origWithoutAttributes,
                     $transWithoutAttributes,
                     $lng,
@@ -1132,10 +1157,6 @@ class Data
         if (preg_match('/[a-zA-Z]/', $str) !== 1) {
             return true;
         }
-        // email adresses
-        if (filter_var($str, FILTER_VALIDATE_EMAIL)) {
-            return true;
-        }
         // lng codes
         if (in_array(strtolower($str), $this->settings->getSelectedLanguageCodes())) {
             return true;
@@ -1177,7 +1198,9 @@ class Data
     {
         $context = $suggestion;
         if ($context === null || $context == '') {
-            if (mb_strpos($value, $this->host->getCurrentHost()) === 0) {
+            if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                $context = 'email';
+            } elseif (mb_strpos($value, $this->host->getCurrentHost()) === 0) {
                 $context = 'slug|file';
             } elseif (mb_strpos($value, 'http') === 0 && mb_strpos($value, ' ') === false) {
                 $context = 'slug';
@@ -1291,8 +1314,8 @@ class Data
             }
             $trans = $this->autoTranslateString($str_in_source, $to_lng, $context, $from_lng);
             if ($trans !== null) {
-                $this->addTranslationToPoFileAndToCache($str_in_source, $str, $from_lng, $context);
-                $this->addTranslationToPoFileAndToCache($str_in_source, $trans, $to_lng, $context);
+                $this->addTranslationToDatabaseAndToCache($str_in_source, $str, $from_lng, $context);
+                $this->addTranslationToDatabaseAndToCache($str_in_source, $trans, $to_lng, $context);
             } else {
                 $trans = $str;
             }
