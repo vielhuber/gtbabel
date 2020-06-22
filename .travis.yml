@@ -9,4 +9,4 @@ os:
     #- windows (currently no support for php in travis ci)
 before_script:
     - composer install
-script: ./vendor/bin/phpunit --filter test_google_translate
+script: ./vendor/bin/phpunit
