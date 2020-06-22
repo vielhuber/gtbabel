@@ -311,16 +311,9 @@ class Test extends \PHPUnit\Framework\TestCase
             'lng_target' => 'en',
             'auto_translation' => true,
             'auto_translation_service' => 'google',
-            'google_translation_api_key' => @$_ENV['GOOGLE_TRANSLATION_API_KEY']
+            'google_translation_api_key' => @$_SERVER['GOOGLE_TRANSLATION_API_KEY']
         ]);
         $this->assertEquals($output, '<p>This is a test!</p>');
-    }
-
-    public function test_google_translate()
-    {
-        __o(@$_ENV['GOOGLE_TRANSLATION_API_KEY'], @$_SERVER['GOOGLE_TRANSLATION_API_KEY']);
-        //die();
-        $this->assertEquals(true, false);
     }
 
     public function test_tokenize()
@@ -751,7 +744,7 @@ EOD;
             'html_hreflang_tags' => false,
             'auto_translation' => false,
             'auto_translation_service' => 'google',
-            'google_translation_api_key' => @$_ENV['GOOGLE_TRANSLATION_API_KEY'],
+            'google_translation_api_key' => @$_SERVER['GOOGLE_TRANSLATION_API_KEY'],
             'stats_log' => true,
             'discovery_log' => false
         ];
