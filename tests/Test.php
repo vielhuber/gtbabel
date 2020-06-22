@@ -318,8 +318,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test_google_translate()
     {
-        __o(__::translate_google('Dies ist ein Test!', 'de', 'en', @$_ENV['GOOGLE_TRANSLATION_API_KEY']));
-        __o(__::translate_google('Dies ist ein Test!', 'de', 'en', 'free'));
+        __o(@$_ENV['GOOGLE_TRANSLATION_API_KEY']);
         //die();
         $this->assertEquals(true, false);
     }
