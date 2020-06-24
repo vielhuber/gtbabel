@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.5.8
+ * Version: 3.6.6
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -402,6 +402,7 @@ class GtbabelWordPress
                             'auto_translation_service',
                             'google_translation_api_key',
                             'microsoft_translation_api_key',
+                            'deepl_translation_api_key',
                             'stats_log',
                             'prevent_publish_urls',
                             'exclude_urls',
@@ -452,7 +453,8 @@ class GtbabelWordPress
                             'exclude_dom',
                             'force_tokenize',
                             'google_translation_api_key',
-                            'microsoft_translation_api_key'
+                            'microsoft_translation_api_key',
+                            'deepl_translation_api_key'
                         ]
                         as $exclude__value
                     ) {
@@ -821,6 +823,9 @@ class GtbabelWordPress
         echo '<option value="microsoft"' .
             ($settings['auto_translation_service'] == 'microsoft' ? ' selected="selected"' : '') .
             '>Microsoft</option>';
+        echo '<option value="deepl"' .
+            ($settings['auto_translation_service'] == 'deepl' ? ' selected="selected"' : '') .
+            '>DeepL</option>';
         echo '</select>';
         echo '</div>';
         echo '</li>';
@@ -853,6 +858,22 @@ class GtbabelWordPress
             (is_array($settings['microsoft_translation_api_key'])
                 ? implode(PHP_EOL, $settings['microsoft_translation_api_key'])
                 : $settings['microsoft_translation_api_key']) .
+            '</textarea>';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_deepl_translation_api_key" class="gtbabel__label">';
+        echo __('DeepL Translation API Key', 'gtbabel-plugin') .
+            ' (<a href="https://www.deepl.com/pro#developer" target="_blank">' .
+            __('Link', 'gtbabel-plugin') .
+            '</a>)';
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<textarea class="gtbabel__input gtbabel__input--textarea" id="gtbabel_deepl_translation_api_key" name="gtbabel[deepl_translation_api_key]">' .
+            (is_array($settings['deepl_translation_api_key'])
+                ? implode(PHP_EOL, $settings['deepl_translation_api_key'])
+                : $settings['deepl_translation_api_key']) .
             '</textarea>';
         echo '</div>';
         echo '</li>';
@@ -1119,6 +1140,7 @@ class GtbabelWordPress
                             $this->gtbabel->data->editTranslation(
                                 $input_data['str'],
                                 $input_data['context'],
+                                $this->gtbabel->settings->getSourceLanguageCode(),
                                 $input_data['lng'],
                                 isset($post__value) ? $post__value : false,
                                 null
@@ -1128,6 +1150,7 @@ class GtbabelWordPress
                             $this->gtbabel->data->editTranslation(
                                 $input_data['str'],
                                 $input_data['context'],
+                                $this->gtbabel->settings->getSourceLanguageCode(),
                                 $input_data['lng'],
                                 null,
                                 isset($post__value) && $post__value == '1'
@@ -1138,7 +1161,11 @@ class GtbabelWordPress
                             );
                         }
                         if (@$input_data['field'] === 'delete' && $post__value == '1') {
-                            $this->gtbabel->data->deleteStringFromDatabase($input_data['str'], $input_data['context']);
+                            $this->gtbabel->data->deleteStringFromDatabase(
+                                $input_data['str'],
+                                $input_data['context'],
+                                $this->gtbabel->settings->getSourceLanguageCode()
+                            );
                         }
                     }
                 }
@@ -1200,7 +1227,11 @@ class GtbabelWordPress
             if ($lng === null || $this->gtbabel->settings->getSourceLanguageCode() === $lng) {
                 $link_public = $url;
             } else {
-                $link_public = $this->gtbabel->data->getUrlTranslationInLanguage($lng, $url);
+                $link_public = $this->gtbabel->data->getUrlTranslationInLanguage(
+                    $this->gtbabel->settings->getSourceLanguageCode(),
+                    $lng,
+                    $url
+                );
             }
             echo '<a href="' . $link_public . '" target="_blank">' . $link_public . '</a>';
             echo '</p>';
@@ -1454,6 +1485,7 @@ class GtbabelWordPress
                     ) {
                         $this->gtbabel->gettext->import(
                             $_FILES['gtbabel']['tmp_name']['file'],
+                            $this->gtbabel->settings->getSourceLanguageCode(),
                             $_POST['gtbabel']['language']
                         );
                         $message =
@@ -1880,7 +1912,11 @@ EOD;
                 if ($lng !== null && $lngs__value !== $lng) {
                     continue;
                 }
-                $url_trans = $this->gtbabel->data->getUrlTranslationInLanguage($lngs__value, $url);
+                $url_trans = $this->gtbabel->data->getUrlTranslationInLanguage(
+                    $this->gtbabel->settings->getSourceLanguageCode(),
+                    $lngs__value,
+                    $url
+                );
                 $this->fetch($this->buildFetchUrl($url_trans));
                 $urls[] = $url_trans;
             }
@@ -1892,7 +1928,11 @@ EOD;
             }, $discovery_strings);
         }
 
-        $translations = $this->gtbabel->data->getGroupedTranslationsFromDatabase($lng, $url === null);
+        $translations = $this->gtbabel->data->getGroupedTranslationsFromDatabase(
+            $this->gtbabel->settings->getSourceLanguageCode(),
+            $lng,
+            $url === null
+        );
 
         // filter
         if ($url !== null) {
@@ -1975,7 +2015,7 @@ EOD;
         } else {
             $shown_cols = count($this->gtbabel->settings->getSelectedLanguageCodesWithoutSource());
         }
-        $pagination->per_page = round(100 / pow($shown_cols, 1/3));
+        $pagination->per_page = round(100 / pow($shown_cols, 1 / 3));
 
         $pagination->count = count($translations);
         $pagination->cur = @$_GET['p'] != '' ? intval($_GET['p']) : 1;
@@ -2121,7 +2161,11 @@ EOD;
     {
         echo '<ul>';
         foreach (
-            ['google' => 'Google Translation API', 'microsoft' => 'Microsoft Translation API']
+            [
+                'google' => 'Google Translation API',
+                'microsoft' => 'Microsoft Translation API',
+                'deepl' => 'DeepL Translation API'
+            ]
             as $service__key => $service__value
         ) {
             if ($service !== null && $service__key !== $service) {
@@ -2139,6 +2183,9 @@ EOD;
             }
             if ($service__value === 'microsoft') {
                 $costs = $cur * (8.433 / 1000000);
+            }
+            if ($service__value === 'deepl') {
+                $costs = $cur * (20 / 1000000);
             }
             echo ' (~' . number_format(round($costs, 2), 2, ',', '.') . ' €)';
             echo '</li>';
@@ -2217,7 +2264,11 @@ EOD;
             // therefore we refresh gtbabel after every main url
             $url = $queue[$i]['url'];
             if ($queue[$i]['convert_to_lng'] !== null) {
-                $url = $this->gtbabel->data->getUrlTranslationInLanguage($queue[$i]['convert_to_lng'], $url);
+                $url = $this->gtbabel->data->getUrlTranslationInLanguage(
+                    $this->gtbabel->settings->getSourceLanguageCode(),
+                    $queue[$i]['convert_to_lng'],
+                    $url
+                );
             }
 
             $this->fetch(

@@ -109,7 +109,11 @@ class Router
                 );
             }
         } else {
-            $path = $this->data->getPathTranslationInLanguage($this->settings->getSourceLanguageCode(), true);
+            $path = $this->data->getPathTranslationInLanguage(
+                $this->data->getCurrentLanguageCode(),
+                $this->settings->getSourceLanguageCode(),
+                true
+            );
             $path = trim($path, '/');
             $path = '/' . $path;
         }
@@ -122,7 +126,11 @@ class Router
             return;
         }
         $url = $this->host->getCurrentUrl();
-        $source_url = $this->data->getUrlTranslationInLanguage($this->settings->getSourceLanguageCode(), $url);
+        $source_url = $this->data->getUrlTranslationInLanguage(
+            $this->data->getCurrentLanguageCode(),
+            $this->settings->getSourceLanguageCode(),
+            $url
+        );
         if (
             !$this->publish->isActive() ||
             !$this->publish->isPrevented($source_url, $this->data->getCurrentLanguageCode())

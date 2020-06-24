@@ -21,7 +21,7 @@ class Gettext
         $files = [];
         $filename_prefix_tmp = tempnam(sys_get_temp_dir(), 'gtbabel_');
         $filename_zip = $filename_prefix_tmp . '.zip';
-        $translations = $this->data->getGroupedTranslationsFromDatabase();
+        $translations = $this->data->getGroupedTranslationsFromDatabase($this->settings->getSourceLanguageCode());
 
         $export['template'] = Translations::create('gtbabel');
         foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
@@ -89,9 +89,9 @@ class Gettext
         die();
     }
 
-    function import($filename, $lng)
+    function import($filename, $lng_source, $lng_target)
     {
-        $this->data->clearTable($lng);
+        $this->data->clearTable($lng_source, $lng_target);
         $loader = new PoLoader();
         $translations = $loader->loadFile($filename);
         foreach ($translations as $translations__value) {
@@ -128,7 +128,8 @@ class Gettext
             $this->data->editTranslation(
                 $str,
                 $context,
-                $lng,
+                $lng_source,
+                $lng_target,
                 $trans,
                 $checked,
                 $shared,

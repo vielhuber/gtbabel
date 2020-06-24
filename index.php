@@ -19,6 +19,7 @@ $gtbabel->start([
     'auto_translation_service' => 'google',
     'google_translation_api_key' => @$_SERVER['GOOGLE_TRANSLATION_API_KEY'],
     'microsoft_translation_api_key' => @$_SERVER['MICROSOFT_TRANSLATION_API_KEY'],
+    'deepl_translation_api_key' => @$_SERVER['DEEPL_TRANSLATION_API_KEY'],
     'exclude_urls' => null,
     'languages' => [['code' => 'de', 'label' => 'Deutsch'], ['code' => 'en', 'label' => 'English']],
     'html_lang_attribute' => true,

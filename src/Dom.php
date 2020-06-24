@@ -284,6 +284,7 @@ class Dom
 
                                 $trans = $this->data->prepareTranslationAndAddDynamicallyIfNeeded(
                                     $str_without_lb,
+                                    $this->settings->getSourceLanguageCode(),
                                     $this->data->getCurrentLanguageCode(),
                                     $context
                                 );
@@ -316,6 +317,9 @@ class Dom
 
     function modifyContent($content)
     {
+        if ($content == '') {
+            return $content;
+        }
         if ($this->utils->getContentType($content) === 'html') {
             $content = $this->modifyHtml($content);
         } elseif ($this->utils->getContentType($content) === 'json') {
@@ -675,6 +679,7 @@ class Dom
                 } elseif (is_string($json__value)) {
                     $trans = $this->data->prepareTranslationAndAddDynamicallyIfNeeded(
                         $json__value,
+                        $this->settings->getSourceLanguageCode(),
                         $this->data->getCurrentLanguageCode(),
                         null
                     );

@@ -17,7 +17,7 @@ Gtbabel automatically translates your HTML/PHP pages – server sided!
 -   Embraces the power of [gettext](https://www.gnu.org/software/gettext/) (e.g. using extracted comments and template files).
 -   Framework agnostic: works with nearly any PHP based cms or static site.
 -   Fast: once all translations are available, Gtbabel reaches a throughput of ~4000 words/s.
--   Auto translation: use the power of [Google Translation API](https://cloud.google.com/translate/docs) or [Microsoft Translation API](https://azure.microsoft.com/de-de/services/cognitive-services/translator-text-api/) to auto translate your pages and links into any language.
+-   Auto translation: use the power of [Google Translation API](https://cloud.google.com/translate/docs), [Microsoft Translation API](https://azure.microsoft.com/de-de/services/cognitive-services/translator-text-api/) or [DeepL](https://www.deepl.com) to auto translate your pages and links into any language.
 -   Router included: spoof your request uri and let the magic happen, links are automatically converted (with slug collission detection).
 -   Helper functions for current language and all languages available.
 -   Basic seo considered: title tags, seo descriptions, html lang attribute, hreflang tags included.
@@ -105,9 +105,10 @@ The default configuration is:
     'auto_set_discovered_strings_checked' => false,
     'only_show_checked_strings' => true,
     'auto_translation' => true,
-    'auto_translation_service' => 'google', // google|microsoft
+    'auto_translation_service' => 'google', // google|microsoft|deepl
     'google_translation_api_key' => [], // use a string or array of strings to provide multiple keys at once
     'microsoft_translation_api_key' => [], // use a string or array of strings to provide multiple keys at once
+    'deepl_translation_api_key' => [], // use a string or array of strings to provide multiple keys at once
     'stats_log' => true,
     'discovery_log' => false,
     'prevent_publish' => true,
@@ -236,7 +237,7 @@ The following code gets converted to 1 token (not 3):
 
 If you want to influence that behaviour, use the `force_tokenize` option and provide the selector of the parent element in order to not tokenize its children.
 
-If you want to influence that special tags should not be auto translated by the Google/Microsoft Translation API, use a special class:
+If you want to influence that special tags should not be auto translated by the Google/Microsoft/DeepL Translation API, use a special class:
 
 `<p>Das ist das <span class="notranslate">Haus</span> vom Nikolaus</p>`
 
@@ -391,7 +392,7 @@ If you use the auto translation feature for example with the help of the Google 
 
 ## API usage costs
 
-The translation apis of Google or Microsoft can be costly. Try to keep track of your current usage stats. Gtbabel helps you by tracking the total amount of translated chars (see the `stats_log` option). You can also provide multiple api keys, Gtbabel then distributes the calls uniformly.
+The translation apis of Google, Microsoft or DeepL can be costly. Try to keep track of your current usage stats. Gtbabel helps you by tracking the total amount of translated chars (see the `stats_log` option). You can also provide multiple api keys, Gtbabel then distributes the calls uniformly.
 
 ## Caveats
 

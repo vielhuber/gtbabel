@@ -65,14 +65,11 @@ class Gtbabel
         if ($this->started !== true) {
             return;
         }
+        $this->started = false;
         if ($this->host->currentUrlIsExcluded()) {
             return;
         }
         $content = ob_get_contents();
-        if ($content == '') {
-            ob_end_clean();
-            return;
-        }
         $content = $this->dom->modifyContent($content);
         ob_end_clean();
         echo $content;

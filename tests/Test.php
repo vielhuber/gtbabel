@@ -369,7 +369,7 @@ class Test extends \PHPUnit\Framework\TestCase
         ob_end_clean();
         $this->assertEquals($output, '<p>Haus-en</p>');
         $this->assertEquals($this->gtbabel->data->getTranslationsFromDatabase(), []);
-        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase(), []);
+        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase('de'), []);
         $this->gtbabel->reset();
 
         $settings['auto_translation'] = true;
@@ -383,7 +383,7 @@ class Test extends \PHPUnit\Framework\TestCase
         ob_end_clean();
         $this->assertEquals($output, '<p>House</p>');
         $this->assertEquals($this->gtbabel->data->getTranslationsFromDatabase(), []);
-        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase(), []);
+        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase('de'), []);
         $this->gtbabel->reset();
 
         $settings['auto_translation'] = true;
@@ -396,8 +396,11 @@ class Test extends \PHPUnit\Framework\TestCase
         $output = ob_get_contents();
         ob_end_clean();
         $this->assertEquals($output, '<p>House</p>');
-        $this->assertEquals($this->gtbabel->data->getTranslationFromDb('Haus', null, 'en')['trans'] === 'House', true);
-        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase()[0]['en_trans'], 'House');
+        $this->assertEquals(
+            $this->gtbabel->data->getTranslationFromDatabase('Haus', null, 'de', 'en')['trans'] === 'House',
+            true
+        );
+        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase('de')[0]['en_trans'], 'House');
         $this->gtbabel->reset();
 
         $settings['auto_translation'] = true;
@@ -410,10 +413,13 @@ class Test extends \PHPUnit\Framework\TestCase
         $output = ob_get_contents();
         ob_end_clean();
         $this->assertEquals($output, '<p>Haus</p>');
-        $this->assertEquals($this->gtbabel->data->getTranslationFromDb('Haus', null, 'en')['trans'] === 'House', true);
-        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase()[0]['en_trans'], 'House');
+        $this->assertEquals(
+            $this->gtbabel->data->getTranslationFromDatabase('Haus', null, 'de', 'en')['trans'] === 'House',
+            true
+        );
+        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase('de')[0]['en_trans'], 'House');
 
-        $this->gtbabel->data->editCheckedValue('Haus', null, 'en', true);
+        $this->gtbabel->data->editCheckedValue('Haus', null, 'de', 'en', true);
 
         ob_start();
         $this->gtbabel->start($settings);
@@ -422,8 +428,11 @@ class Test extends \PHPUnit\Framework\TestCase
         $output = ob_get_contents();
         ob_end_clean();
         $this->assertEquals($output, '<p>House</p>');
-        $this->assertEquals($this->gtbabel->data->getTranslationFromDb('Haus', null, 'en')['checked'] == 1, true);
-        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase()[0]['en_checked'], 1);
+        $this->assertEquals(
+            $this->gtbabel->data->getTranslationFromDatabase('Haus', null, 'de', 'en')['checked'] == 1,
+            true
+        );
+        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase('de')[0]['en_checked'], 1);
         $this->gtbabel->reset();
     }
 
@@ -490,22 +499,22 @@ EOD;
 EOD;
 
         $expected_data = [
-            ['datenschutz', 'slug', 'en', 'privacy', 0],
-            ['beispiel-pfad11', 'slug', 'en', 'example-path11', 0],
-            ['beispiel', 'slug', 'en', 'example', 0],
-            ['pfad', 'slug', 'en', 'path', 0],
-            ['1._Buch_Moses', 'slug', 'en', '1-buch-moses', 0],
-            ['datenschutz/beispiel-bilddatei1.jpg', 'file', 'en', 'datenschutz/beispiel-bilddatei1_EN.jpg', 1],
-            ['beispiel-bilddatei2.jpg', 'file', 'en', 'beispiel-bilddatei2_EN.jpg', 1],
-            ['beispiel-bilddatei3.jpg', 'file', 'en', 'beispiel-bilddatei3_EN.jpg', 1],
-            ['beispiel-bilddatei1.jpg', 'file', 'en', 'beispiel-bilddatei1_EN.jpg', 1],
-            ['datenschutz/beispiel-bilddatei6.jpg', 'file', 'en', 'datenschutz/beispiel-bilddatei6_EN.jpg', 1],
-            ['beispiel-bilddatei7.jpg', 'file', 'en', 'beispiel-bilddatei7_EN.jpg', 1],
-            ['beispiel-bilddatei8.jpg', 'file', 'en', 'beispiel-bilddatei8_EN.jpg', 1],
-            ['david@vielhuber.de', 'email', 'en', 'david@vielhuber.de_EN', 1],
-            ['datenschutz/beispiel-bilddatei12.jpg', 'file', 'en', 'datenschutz/beispiel-bilddatei12_EN.jpg', 1],
-            ['beispiel-bilddatei13.jpg', 'file', 'en', 'beispiel-bilddatei13_EN.jpg', 1],
-            ['beispiel-bilddatei14.jpg', 'file', 'en', 'beispiel-bilddatei14_EN.jpg', 1]
+            ['datenschutz', 'slug', 'de', 'en', 'privacy', 0],
+            ['beispiel-pfad11', 'slug', 'de', 'en', 'example-path11', 0],
+            ['beispiel', 'slug', 'de', 'en', 'example', 0],
+            ['pfad', 'slug', 'de', 'en', 'path', 0],
+            ['1._Buch_Moses', 'slug', 'de', 'en', '1-buch-moses', 0],
+            ['datenschutz/beispiel-bilddatei1.jpg', 'file', 'de', 'en', 'datenschutz/beispiel-bilddatei1_EN.jpg', 1],
+            ['beispiel-bilddatei2.jpg', 'file', 'de', 'en', 'beispiel-bilddatei2_EN.jpg', 1],
+            ['beispiel-bilddatei3.jpg', 'file', 'de', 'en', 'beispiel-bilddatei3_EN.jpg', 1],
+            ['beispiel-bilddatei1.jpg', 'file', 'de', 'en', 'beispiel-bilddatei1_EN.jpg', 1],
+            ['datenschutz/beispiel-bilddatei6.jpg', 'file', 'de', 'en', 'datenschutz/beispiel-bilddatei6_EN.jpg', 1],
+            ['beispiel-bilddatei7.jpg', 'file', 'de', 'en', 'beispiel-bilddatei7_EN.jpg', 1],
+            ['beispiel-bilddatei8.jpg', 'file', 'de', 'en', 'beispiel-bilddatei8_EN.jpg', 1],
+            ['david@vielhuber.de', 'email', 'de', 'en', 'david@vielhuber.de_EN', 1],
+            ['datenschutz/beispiel-bilddatei12.jpg', 'file', 'de', 'en', 'datenschutz/beispiel-bilddatei12_EN.jpg', 1],
+            ['beispiel-bilddatei13.jpg', 'file', 'de', 'en', 'beispiel-bilddatei13_EN.jpg', 1],
+            ['beispiel-bilddatei14.jpg', 'file', 'de', 'en', 'beispiel-bilddatei14_EN.jpg', 1]
         ];
 
         ob_start();
@@ -518,6 +527,7 @@ EOD;
         $this->gtbabel->data->editTranslation(
             'datenschutz/beispiel-bilddatei1.jpg',
             'file',
+            'de',
             'en',
             'datenschutz/beispiel-bilddatei1_EN.jpg',
             true
@@ -525,6 +535,7 @@ EOD;
         $this->gtbabel->data->editTranslation(
             'beispiel-bilddatei2.jpg',
             'file',
+            'de',
             'en',
             'beispiel-bilddatei2_EN.jpg',
             true
@@ -532,6 +543,7 @@ EOD;
         $this->gtbabel->data->editTranslation(
             'beispiel-bilddatei3.jpg',
             'file',
+            'de',
             'en',
             'beispiel-bilddatei3_EN.jpg',
             true
@@ -539,6 +551,7 @@ EOD;
         $this->gtbabel->data->editTranslation(
             'beispiel-bilddatei1.jpg',
             'file',
+            'de',
             'en',
             'beispiel-bilddatei1_EN.jpg',
             true
@@ -546,6 +559,7 @@ EOD;
         $this->gtbabel->data->editTranslation(
             'datenschutz/beispiel-bilddatei6.jpg',
             'file',
+            'de',
             'en',
             'datenschutz/beispiel-bilddatei6_EN.jpg',
             true
@@ -553,6 +567,7 @@ EOD;
         $this->gtbabel->data->editTranslation(
             'beispiel-bilddatei7.jpg',
             'file',
+            'de',
             'en',
             'beispiel-bilddatei7_EN.jpg',
             true
@@ -560,14 +575,16 @@ EOD;
         $this->gtbabel->data->editTranslation(
             'beispiel-bilddatei8.jpg',
             'file',
+            'de',
             'en',
             'beispiel-bilddatei8_EN.jpg',
             true
         );
-        $this->gtbabel->data->editTranslation('david@vielhuber.de', 'email', 'en', 'david@vielhuber.de_EN', true);
+        $this->gtbabel->data->editTranslation('david@vielhuber.de', 'email', 'de', 'en', 'david@vielhuber.de_EN', true);
         $this->gtbabel->data->editTranslation(
             'datenschutz/beispiel-bilddatei12.jpg',
             'file',
+            'de',
             'en',
             'datenschutz/beispiel-bilddatei12_EN.jpg',
             true
@@ -575,6 +592,7 @@ EOD;
         $this->gtbabel->data->editTranslation(
             'beispiel-bilddatei13.jpg',
             'file',
+            'de',
             'en',
             'beispiel-bilddatei13_EN.jpg',
             true
@@ -582,6 +600,7 @@ EOD;
         $this->gtbabel->data->editTranslation(
             'beispiel-bilddatei14.jpg',
             'file',
+            'de',
             'en',
             'beispiel-bilddatei14_EN.jpg',
             true
@@ -606,9 +625,10 @@ EOD;
                 if (
                     $translations__value['str'] == $expected_data__value[0] &&
                     $translations__value['context'] == $expected_data__value[1] &&
-                    $translations__value['lng'] == $expected_data__value[2] &&
-                    $translations__value['trans'] == $expected_data__value[3] &&
-                    $translations__value['checked'] == $expected_data__value[4]
+                    $translations__value['lng_source'] == $expected_data__value[2] &&
+                    $translations__value['lng_target'] == $expected_data__value[3] &&
+                    $translations__value['trans'] == $expected_data__value[4] &&
+                    $translations__value['checked'] == $expected_data__value[5]
                 ) {
                     $match = true;
                 }
@@ -718,6 +738,144 @@ EOD;
             ) !== false,
             true
         );
+        $this->gtbabel->reset();
+
+        $settings['prefix_source_lng'] = true;
+        $settings['languages'] = [
+            ['code' => 'de', 'label' => 'Deutsch'],
+            ['code' => 'en', 'label' => 'English'],
+            ['code' => 'fr', 'label' => 'Français']
+        ];
+        $settings['only_show_checked_strings'] = false;
+        $_SERVER['REQUEST_URI'] = '/de/impressum/';
+        $this->gtbabel->start($settings);
+        $this->gtbabel->stop();
+
+        $_SERVER['REQUEST_URI'] = '/en/imprint/';
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo '<!DOCTYPE html><html><body><div class="lngpicker">';
+        foreach ($this->gtbabel->data->getLanguagePickerData() as $lngpicker__value) {
+            echo '<a href="' . $lngpicker__value['url'] . '"></a>';
+        }
+        echo '</div></body></html>';
+        $this->gtbabel->stop();
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertEquals(
+            strpos(
+                $output,
+                '<a href="http://gtbabel.local.vielhuber.de/de/impressum/"></a><a href="http://gtbabel.local.vielhuber.de/en/imprint/"></a><a href="http://gtbabel.local.vielhuber.de/fr/imprimer/"></a>'
+            ) !== false,
+            true
+        );
+
+        $_SERVER['REQUEST_URI'] = '/fr/imprimer/';
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo '<!DOCTYPE html><html><body><div class="lngpicker">';
+        foreach ($this->gtbabel->data->getLanguagePickerData() as $lngpicker__value) {
+            echo '<a href="' . $lngpicker__value['url'] . '"></a>';
+        }
+        echo '</div></body></html>';
+        $this->gtbabel->stop();
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertEquals(
+            strpos(
+                $output,
+                '<a href="http://gtbabel.local.vielhuber.de/de/impressum/"></a><a href="http://gtbabel.local.vielhuber.de/en/imprint/"></a><a href="http://gtbabel.local.vielhuber.de/fr/imprimer/"></a>'
+            ) !== false,
+            true
+        );
+        $this->gtbabel->reset();
+
+        $settings['only_show_checked_strings'] = true;
+        $settings['prefix_source_lng'] = false;
+        $_SERVER['REQUEST_URI'] = '/impressum/';
+        $this->gtbabel->start($settings);
+        $this->gtbabel->stop();
+
+        $_SERVER['REQUEST_URI'] = '/en/impressum/';
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo '<!DOCTYPE html><html><body><div class="lngpicker">';
+        foreach ($this->gtbabel->data->getLanguagePickerData() as $lngpicker__value) {
+            echo '<a href="' . $lngpicker__value['url'] . '"></a>';
+        }
+        echo '</div></body></html>';
+        $this->gtbabel->stop();
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertEquals(
+            strpos(
+                $output,
+                '<a href="http://gtbabel.local.vielhuber.de/impressum/"></a><a href="http://gtbabel.local.vielhuber.de/en/impressum/"></a><a href="http://gtbabel.local.vielhuber.de/fr/impressum/"></a>'
+            ) !== false,
+            true
+        );
+
+        $_SERVER['REQUEST_URI'] = '/fr/impressum/';
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo '<!DOCTYPE html><html><body><div class="lngpicker">';
+        foreach ($this->gtbabel->data->getLanguagePickerData() as $lngpicker__value) {
+            echo '<a href="' . $lngpicker__value['url'] . '"></a>';
+        }
+        echo '</div></body></html>';
+        $this->gtbabel->stop();
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertEquals(
+            strpos(
+                $output,
+                '<a href="http://gtbabel.local.vielhuber.de/impressum/"></a><a href="http://gtbabel.local.vielhuber.de/en/impressum/"></a><a href="http://gtbabel.local.vielhuber.de/fr/impressum/"></a>'
+            ) !== false,
+            true
+        );
+
+        $this->gtbabel->data->editCheckedValue('impressum', 'slug', 'de', 'en', true);
+
+        $_SERVER['REQUEST_URI'] = '/en/imprint/';
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo '<!DOCTYPE html><html><body><div class="lngpicker">';
+        foreach ($this->gtbabel->data->getLanguagePickerData() as $lngpicker__value) {
+            echo '<a href="' . $lngpicker__value['url'] . '"></a>';
+        }
+        echo '</div></body></html>';
+        $this->gtbabel->stop();
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertEquals(
+            strpos(
+                $output,
+                '<a href="http://gtbabel.local.vielhuber.de/impressum/"></a><a href="http://gtbabel.local.vielhuber.de/en/imprint/"></a><a href="http://gtbabel.local.vielhuber.de/fr/impressum/"></a>'
+            ) !== false,
+            true
+        );
+
+        $this->gtbabel->data->editCheckedValue('impressum', 'slug', 'de', 'fr', true);
+
+        $_SERVER['REQUEST_URI'] = '/fr/imprimer/';
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo '<!DOCTYPE html><html><body><div class="lngpicker">';
+        foreach ($this->gtbabel->data->getLanguagePickerData() as $lngpicker__value) {
+            echo '<a href="' . $lngpicker__value['url'] . '"></a>';
+        }
+        echo '</div></body></html>';
+        $this->gtbabel->stop();
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertEquals(
+            strpos(
+                $output,
+                '<a href="http://gtbabel.local.vielhuber.de/impressum/"></a><a href="http://gtbabel.local.vielhuber.de/en/imprint/"></a><a href="http://gtbabel.local.vielhuber.de/fr/imprimer/"></a>'
+            ) !== false,
+            true
+        );
+
         $this->gtbabel->reset();
     }
 

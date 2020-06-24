@@ -56,7 +56,8 @@ class Data
                             id INTEGER PRIMARY KEY AUTOINCREMENT, 
                             str TEXT NOT NULL,
                             context VARCHAR(20),
-                            lng VARCHAR(20) NOT NULL,
+                            lng_source VARCHAR(20) NOT NULL,
+                            lng_target VARCHAR(20) NOT NULL,
                             trans TEXT NOT NULL,
                             added TEXT NOT NULL,
                             checked INTEGER NOT NULL,
@@ -67,7 +68,11 @@ class Data
                         )'
                 );
                 $this->db->query(
-                    'CREATE UNIQUE INDEX ' . $this->table . '_idx ON ' . $this->table . '(str, context, lng)'
+                    'CREATE UNIQUE INDEX ' .
+                        $this->table .
+                        '_idx ON ' .
+                        $this->table .
+                        '(str, context, lng_source, lng_target)'
                 );
             } else {
                 $this->db->connect('pdo', 'sqlite', $filename);
@@ -96,7 +101,8 @@ class Data
                         id BIGINT PRIMARY KEY AUTO_INCREMENT, 
                         str TEXT NOT NULL,
                         context VARCHAR(20),
-                        lng VARCHAR(20) NOT NULL,
+                        lng_source VARCHAR(20) NOT NULL,
+                        lng_target VARCHAR(20) NOT NULL,
                         trans TEXT NOT NULL,
                         added TEXT NOT NULL,
                         checked TINYINT NOT NULL,
@@ -112,7 +118,7 @@ class Data
                         $this->table .
                         '_str_context_lng ON ' .
                         $this->table .
-                        '(str(100), context, lng)'
+                        '(str(100), context, lng_source, lng_target)'
                 );
             } catch (\Exception $e) {
             }
@@ -132,15 +138,16 @@ class Data
             $result = $this->db->fetch_all('SELECT * FROM ' . $this->table . '');
             if (!empty($result)) {
                 foreach ($result as $result__value) {
-                    $this->data['cache'][$result__value['lng'] ?? ''][$result__value['context'] ?? ''][
-                        $result__value['str']
-                    ] = $result__value['trans'];
-                    $this->data['cache_reverse'][$result__value['lng'] ?? ''][$result__value['context'] ?? ''][
-                        $result__value['trans']
-                    ] = $result__value['str'];
-                    $this->data['checked_strings'][$result__value['lng'] ?? ''][$result__value['context'] ?? ''][
-                        $result__value['str']
-                    ] = $result__value['checked'] == '1' ? true : false;
+                    $this->data['cache'][$result__value['lng_source'] ?? ''][$result__value['lng_target'] ?? ''][
+                        $result__value['context'] ?? ''
+                    ][$result__value['str']] = $result__value['trans'];
+                    $this->data['cache_reverse'][$result__value['lng_source'] ?? ''][
+                        $result__value['lng_target'] ?? ''
+                    ][$result__value['context'] ?? ''][$result__value['trans']] = $result__value['str'];
+                    $this->data['checked_strings'][$result__value['lng_source'] ?? ''][
+                        $result__value['lng_target'] ?? ''
+                    ][$result__value['context'] ?? ''][$result__value['str']] =
+                        $result__value['checked'] == '1' ? true : false;
                 }
             }
         }
@@ -190,18 +197,19 @@ class Data
                 $query .=
                     ' INTO ' .
                     $this->table .
-                    ' (str, context, lng, trans, added, checked, shared, discovered_last_time, discovered_last_url_orig, discovered_last_url) VALUES ';
+                    ' (str, context, lng_source, lng_target, trans, added, checked, shared, discovered_last_time, discovered_last_url_orig, discovered_last_url) VALUES ';
                 $query_q = [];
                 $query_a = [];
                 foreach ($this->data['save']['insert'] as $save__key => $save__value) {
                     if ($save__key < $batch_size * $batch_cur || $save__key >= $batch_size * ($batch_cur + 1)) {
                         continue;
                     }
-                    $query_q[] = '(?,?,?,?,?,?,?,?,?,?)';
+                    $query_q[] = '(?,?,?,?,?,?,?,?,?,?,?)';
                     $query_a = array_merge($query_a, [
                         $save__value['str'],
                         $save__value['context'],
-                        $save__value['lng'],
+                        $save__value['lng_source'],
+                        $save__value['lng_target'],
                         $save__value['trans'],
                         $date,
                         $save__value['checked'],
@@ -244,11 +252,13 @@ class Data
                     if ($save__key < $batch_size * $batch_cur || $save__key >= $batch_size * ($batch_cur + 1)) {
                         continue;
                     }
-                    $query_q[] = $this->caseSensitiveCol('str') . ' = ? AND context = ? AND lng = ?';
+                    $query_q[] =
+                        $this->caseSensitiveCol('str') . ' = ? AND context = ? AND lng_source = ? AND lng_target = ?';
                     $query_a = array_merge($query_a, [
                         $save__value['str'],
                         $save__value['context'],
-                        $save__value['lng']
+                        $save__value['lng_source'],
+                        $save__value['lng_target']
                     ]);
                 }
                 $query .= '(' . implode(') OR (', $query_q) . ')';
@@ -265,7 +275,7 @@ class Data
         return 'BINARY ' . $col;
     }
 
-    function trackDiscovered($str, $lng, $context = null)
+    function trackDiscovered($str, $lng_source, $lng_target, $context = null)
     {
         if (!($this->settings->get('discovery_log') == '1')) {
             return;
@@ -276,52 +286,56 @@ class Data
         $this->data['save']['discovered'][] = [
             'str' => $str,
             'context' => $context,
-            'lng' => $lng
+            'lng_source' => $lng_source,
+            'lng_target' => $lng_target
         ];
     }
 
-    function getExistingTranslationFromCache($str, $lng, $context = null)
+    function getExistingTranslationFromCache($str, $lng_source, $lng_target, $context = null)
     {
-        $this->trackDiscovered($str, $lng, $context);
+        $this->trackDiscovered($str, $lng_source, $lng_target, $context);
         if (
             $str === '' ||
             $str === null ||
-            !array_key_exists($lng, $this->data['cache']) ||
-            !array_key_exists($context ?? '', $this->data['cache'][$lng]) ||
-            !array_key_exists($str, $this->data['cache'][$lng][$context ?? '']) ||
-            $this->data['cache'][$lng][$context ?? ''][$str] === ''
+            !array_key_exists($lng_source, $this->data['cache']) ||
+            !array_key_exists($lng_target, $this->data['cache'][$lng_source]) ||
+            !array_key_exists($context ?? '', $this->data['cache'][$lng_source][$lng_target]) ||
+            !array_key_exists($str, $this->data['cache'][$lng_source][$lng_target][$context ?? '']) ||
+            $this->data['cache'][$lng_source][$lng_target][$context ?? ''][$str] === ''
         ) {
             return false;
         }
-        return $this->data['cache'][$lng][$context ?? ''][$str];
+        return $this->data['cache'][$lng_source][$lng_target][$context ?? ''][$str];
     }
 
-    function getExistingTranslationReverseFromCache($str, $lng, $context = null)
+    function getExistingTranslationReverseFromCache($str, $lng_source, $lng_target, $context = null)
     {
         if (
             $str === '' ||
             $str === null ||
-            !array_key_exists($lng, $this->data['cache_reverse']) ||
-            !array_key_exists($context ?? '', $this->data['cache_reverse'][$lng]) ||
-            !array_key_exists($str, $this->data['cache_reverse'][$lng][$context ?? '']) ||
-            $this->data['cache_reverse'][$lng][$context ?? ''][$str] === ''
+            !array_key_exists($lng_source, $this->data['cache_reverse']) ||
+            !array_key_exists($lng_target, $this->data['cache_reverse'][$lng_source]) ||
+            !array_key_exists($context ?? '', $this->data['cache_reverse'][$lng_source][$lng_target]) ||
+            !array_key_exists($str, $this->data['cache_reverse'][$lng_source][$lng_target][$context ?? '']) ||
+            $this->data['cache_reverse'][$lng_source][$lng_target][$context ?? ''][$str] === ''
         ) {
             return false;
         }
-        return $this->data['cache_reverse'][$lng][$context ?? ''][$str];
+        return $this->data['cache_reverse'][$lng_source][$lng_target][$context ?? ''][$str];
     }
 
-    function getTranslationFromDb($str, $context = null, $lng = null)
+    function getTranslationFromDatabase($str, $context = null, $lng_source = null, $lng_target = null)
     {
         return $this->db->fetch_row(
             'SELECT * FROM ' .
                 $this->table .
                 ' WHERE ' .
                 $this->caseSensitiveCol('str') .
-                ' = ? AND context = ? AND lng = ?',
+                ' = ? AND context = ? AND lng_source = ? AND lng_target = ?',
             $str,
             $context,
-            $lng
+            $lng_source,
+            $lng_target
         );
     }
 
@@ -330,16 +344,17 @@ class Data
         return $this->db->fetch_all('SELECT * FROM ' . $this->table . ' ORDER BY id ASC');
     }
 
-    function getGroupedTranslationsFromDatabase($lng = null, $order_by_string = true)
+    function getGroupedTranslationsFromDatabase($lng_source, $lng_target = null, $order_by_string = true)
     {
         $data = [];
 
         /* the following approach is (surprisingly) much faster than a group by / join of a lot of columns via sql */
-        $query = 'SELECT * FROM ' . $this->table . '';
+        $query = 'SELECT * FROM ' . $this->table . ' WHERE lng_source = ?';
         $query_args = [];
-        if ($lng !== null) {
-            $query .= ' WHERE lng = ?';
-            $query_args[] = $lng;
+        $query_args[] = $lng_source;
+        if ($lng_target !== null) {
+            $query .= ' AND lng_target = ?';
+            $query_args[] = $lng_target;
         }
         $result = $this->db->fetch_all($query, $query_args);
         $data_grouped = [];
@@ -347,22 +362,32 @@ class Data
             foreach ($result as $result__value) {
                 $data_grouped[$result__value['str']][$result__value['context']]['str'] = $result__value['str'];
                 $data_grouped[$result__value['str']][$result__value['context']]['context'] = $result__value['context'];
-                $data_grouped[$result__value['str']][$result__value['context']][$result__value['lng'] . '_trans'] =
-                    $result__value['trans'];
-                $data_grouped[$result__value['str']][$result__value['context']][$result__value['lng'] . '_added'] =
-                    $result__value['added'];
-                $data_grouped[$result__value['str']][$result__value['context']][$result__value['lng'] . '_checked'] =
-                    $result__value['checked'];
-                $data_grouped[$result__value['str']][$result__value['context']][$result__value['lng'] . '_shared'] =
-                    $result__value['shared'];
+                if (!isset($data_grouped[$result__value['str']][$result__value['context']]['shared'])) {
+                    $data_grouped[$result__value['str']][$result__value['context']]['shared'] = 0;
+                }
+                if ($result__value['shared'] == 1) {
+                    $data_grouped[$result__value['str']][$result__value['context']]['shared'] = 1;
+                }
                 $data_grouped[$result__value['str']][$result__value['context']][
-                    $result__value['lng'] . '_discovered_last_time'
+                    $result__value['lng_target'] . '_trans'
+                ] = $result__value['trans'];
+                $data_grouped[$result__value['str']][$result__value['context']][
+                    $result__value['lng_target'] . '_added'
+                ] = $result__value['added'];
+                $data_grouped[$result__value['str']][$result__value['context']][
+                    $result__value['lng_target'] . '_checked'
+                ] = $result__value['checked'];
+                $data_grouped[$result__value['str']][$result__value['context']][
+                    $result__value['lng_target'] . '_shared'
+                ] = $result__value['shared'];
+                $data_grouped[$result__value['str']][$result__value['context']][
+                    $result__value['lng_target'] . '_discovered_last_time'
                 ] = $result__value['discovered_last_time'];
                 $data_grouped[$result__value['str']][$result__value['context']][
-                    $result__value['lng'] . '_discovered_last_url_orig'
+                    $result__value['lng_target'] . '_discovered_last_url_orig'
                 ] = $result__value['discovered_last_url_orig'];
                 $data_grouped[$result__value['str']][$result__value['context']][
-                    $result__value['lng'] . '_discovered_last_url'
+                    $result__value['lng_target'] . '_discovered_last_url'
                 ] = $result__value['discovered_last_url'];
             }
         }
@@ -426,7 +451,8 @@ class Data
     function editTranslation(
         $str,
         $context = null,
-        $lng,
+        $lng_source,
+        $lng_target,
         $trans = null,
         $checked = null,
         $shared = null,
@@ -444,10 +470,11 @@ class Data
                 $this->db->fetch_var(
                     'SELECT COUNT(*) FROM ' .
                         $this->table .
-                        ' WHERE str <> ? AND context = ? AND lng = ? AND trans = ?',
+                        ' WHERE str <> ? AND context = ? AND lng_source = ? AND lng_target = ? AND trans = ?',
                     $str,
                     $context,
-                    $lng,
+                    $lng_source,
+                    $lng_target,
                     $trans
                 ) > 0
             ) {
@@ -465,10 +492,11 @@ class Data
                 $this->table .
                 ' WHERE ' .
                 $this->caseSensitiveCol('str') .
-                ' = ? AND context = ? AND lng = ?',
+                ' = ? AND context = ? AND lng_source = ? AND lng_target = ?',
             $str,
             $context,
-            $lng
+            $lng_source,
+            $lng_target
         );
 
         if (!empty($gettext)) {
@@ -507,7 +535,8 @@ class Data
             $this->db->insert($this->table, [
                 'str' => $str,
                 'context' => $context,
-                'lng' => $lng,
+                'lng_source' => $lng_source,
+                'lng_target' => $lng_target,
                 'trans' => $trans ?? '',
                 'added' => $added ?? $this->utils->getCurrentTime(),
                 'checked' => $checked === true || $checked == 1 ? 1 : 0,
@@ -528,18 +557,19 @@ class Data
         return true;
     }
 
-    function editCheckedValue($str, $context = null, $lng, $checked)
+    function editCheckedValue($str, $context = null, $lng_source, $lng_target, $checked)
     {
         $this->db->query(
             'UPDATE ' .
                 $this->table .
                 ' SET checked = ? WHERE ' .
                 $this->caseSensitiveCol('str') .
-                ' = ? AND context = ? AND lng = ?',
+                ' = ? AND context = ? AND lng_source = ? AND lng_target = ?',
             $checked === true ? 1 : 0,
             $str,
             $context,
-            $lng
+            $lng_source,
+            $lng_target
         );
         return true;
     }
@@ -549,33 +579,35 @@ class Data
         $this->db->query('UPDATE ' . $this->table . ' SET shared = ?', 0);
     }
 
-    function deleteStringFromDatabase($str, $context, $lng = null)
+    function deleteStringFromDatabase($str, $context, $lng_source, $lng_target = null)
     {
         $args = [];
         $args['str'] = $str;
         $args['context'] = $context;
-        if ($lng !== null) {
-            $args['lng'] = $lng;
+        $args['lng_source'] = $lng_source;
+        if ($lng_target !== null) {
+            $args['lng_target'] = $lng_target;
         }
         $this->db->delete($this->table, $args);
         return true;
     }
 
-    function addTranslationToDatabaseAndToCache($str, $trans, $lng, $context = null)
+    function addTranslationToDatabaseAndToCache($str, $trans, $lng_source, $lng_target, $context = null)
     {
-        if ($lng === $this->settings->getSourceLanguageCode()) {
+        if ($lng_target === $this->settings->getSourceLanguageCode()) {
             return;
         }
         $this->data['save']['insert'][] = [
             'str' => $str,
             'context' => $context,
-            'lng' => $lng,
+            'lng_source' => $lng_source,
+            'lng_target' => $lng_target,
             'trans' => $trans,
             'checked' => $this->settings->get('auto_set_new_strings_checked') === true ? 1 : 0,
             'shared' => 0
         ];
-        $this->data['cache'][$lng][$context ?? ''][$str] = $trans;
-        $this->data['cache_reverse'][$lng][$context ?? ''][$trans] = $str;
+        $this->data['cache'][$lng_source][$lng_target][$context ?? ''][$str] = $trans;
+        $this->data['cache_reverse'][$lng_source][$lng_target][$context ?? ''][$trans] = $str;
     }
 
     function resetTranslations()
@@ -587,12 +619,19 @@ class Data
         }
     }
 
-    function clearTable($lng = null)
+    function clearTable($lng_source = null, $lng_target = null)
     {
-        if ($lng === null) {
+        if ($lng_source === null && $lng_target === null) {
             $this->db->clear($this->table);
         } else {
-            $this->db->delete($this->table, ['lng' => $lng]);
+            $args = [];
+            if ($lng_source !== null) {
+                $args['lng_source'] = $lng_source;
+            }
+            if ($lng_target !== null) {
+                $args['lng_target'] = $lng_target;
+            }
+            $this->db->delete($this->table, $args);
         }
     }
 
@@ -724,7 +763,7 @@ class Data
             if (!$this->host->responseCodeIsSuccessful()) {
                 continue;
             }
-            $url = $this->getUrlTranslationInLanguage($languages__key);
+            $url = $this->getUrlTranslationInLanguage($this->getCurrentLanguageCode(), $languages__key);
             if (
                 $this->publish->isActive() &&
                 $this->publish->isPrevented($this->host->getCurrentUrl(), $languages__key)
@@ -749,7 +788,7 @@ class Data
         return false;
     }
 
-    function prepareTranslationAndAddDynamicallyIfNeeded($orig, $lng, $context = null)
+    function prepareTranslationAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, $context = null)
     {
         $context = $this->autoDetermineContext($orig, $context);
 
@@ -757,37 +796,37 @@ class Data
             return null;
         }
 
-        if ($this->sourceLngIsCurrentLng() && $this->settings->getSourceLanguageCode() === $lng) {
+        if ($this->sourceLngIsCurrentLng() && $this->settings->getSourceLanguageCode() === $lng_target) {
             if ($context !== 'slug') {
                 return null;
             } else {
-                return $this->addPrefixToLink($orig, $this->settings->getSourceLanguageCode());
+                return $this->addPrefixToLink($orig, $lng_source, $lng_target);
             }
         }
 
         if ($context === 'slug') {
-            $trans = $this->getTranslationOfLinkHrefAndAddDynamicallyIfNeeded($orig, $lng);
+            $trans = $this->getTranslationOfLinkHrefAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target);
             if ($trans === null) {
                 return $orig;
             }
             return $trans;
         }
         if ($context === 'file') {
-            $trans = $this->getTranslationOfFileAndAddDynamicallyIfNeeded($orig, $lng);
+            $trans = $this->getTranslationOfFileAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target);
             if ($trans === null) {
                 return $orig;
             }
             return $trans;
         }
         if ($context === 'email') {
-            $trans = $this->getTranslationOfEmailAndAddDynamicallyIfNeeded($orig, $lng);
+            $trans = $this->getTranslationOfEmailAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target);
             if ($trans === null) {
                 return $orig;
             }
             return $trans;
         }
         if ($context === 'title') {
-            $trans = $this->getTranslationOfTitleAndAddDynamicallyIfNeeded($orig, $lng);
+            $trans = $this->getTranslationOfTitleAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target);
             if ($trans === null) {
                 return $orig;
             }
@@ -797,10 +836,10 @@ class Data
         if ($this->stringShouldNotBeTranslated($orig, $context)) {
             return null;
         }
-        return $this->getTranslationAndAddDynamicallyIfNeeded($orig, $lng, $context);
+        return $this->getTranslationAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, $context);
     }
 
-    function getTranslationOfTitleAndAddDynamicallyIfNeeded($orig, $lng)
+    function getTranslationOfTitleAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target)
     {
         $orig = str_replace(' ', ' ', $orig); // replace hidden &nbsp; chars
         $orig = html_entity_decode($orig);
@@ -808,28 +847,47 @@ class Data
             if (mb_strpos($orig, ' ' . $delimiters__value . ' ') !== false) {
                 $orig_parts = explode(' ' . $delimiters__value . ' ', $orig);
                 foreach ($orig_parts as $orig_parts__key => $orig_parts__value) {
-                    $trans = $this->getTranslationAndAddDynamicallyIfNeeded($orig_parts__value, $lng, 'title');
+                    $trans = $this->getTranslationAndAddDynamicallyIfNeeded(
+                        $orig_parts__value,
+                        $lng_source,
+                        $lng_target,
+                        'title'
+                    );
                     $orig_parts[$orig_parts__key] = $trans;
                 }
                 $trans = implode(' ' . $delimiters__value . ' ', $orig_parts);
                 return $trans;
             }
         }
-        return $this->getTranslationAndAddDynamicallyIfNeeded($orig, $lng, 'title');
+        return $this->getTranslationAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, 'title');
     }
 
-    function addPrefixToLink($link, $lng)
+    function addPrefixToLink($link, $lng_source, $lng_target)
     {
-        return $this->addPrefixToLinkAndGetTranslationOfLinkHrefAndAddDynamicallyIfNeeded($link, $lng, false);
+        return $this->addPrefixToLinkAndGetTranslationOfLinkHrefAndAddDynamicallyIfNeeded(
+            $link,
+            $lng_source,
+            $lng_target,
+            false
+        );
     }
 
-    function getTranslationOfLinkHrefAndAddDynamicallyIfNeeded($link, $lng)
+    function getTranslationOfLinkHrefAndAddDynamicallyIfNeeded($link, $lng_source, $lng_target)
     {
-        return $this->addPrefixToLinkAndGetTranslationOfLinkHrefAndAddDynamicallyIfNeeded($link, $lng, true);
+        return $this->addPrefixToLinkAndGetTranslationOfLinkHrefAndAddDynamicallyIfNeeded(
+            $link,
+            $lng_source,
+            $lng_target,
+            true
+        );
     }
 
-    function addPrefixToLinkAndGetTranslationOfLinkHrefAndAddDynamicallyIfNeeded($link, $lng, $translate)
-    {
+    function addPrefixToLinkAndGetTranslationOfLinkHrefAndAddDynamicallyIfNeeded(
+        $link,
+        $lng_source,
+        $lng_target,
+        $translate
+    ) {
         if ($link === null || trim($link) === '') {
             return $link;
         }
@@ -873,20 +931,21 @@ class Data
                 }
                 $url_parts[$url_parts__key] = $this->getTranslationAndAddDynamicallyIfNeeded(
                     $url_parts__value,
-                    $lng,
+                    $lng_source,
+                    $lng_target,
                     'slug'
                 );
             }
             $link = implode('/', $url_parts);
         }
-        $link = (mb_strpos($link, '/') === 0 ? '/' : '') . $lng . '/' . ltrim($link, '/');
+        $link = (mb_strpos($link, '/') === 0 ? '/' : '') . $lng_target . '/' . ltrim($link, '/');
         if ($is_absolute_link === true) {
             $link = rtrim($this->host->getCurrentHost(), '/') . '/' . ltrim($link, '/');
         }
         return $link;
     }
 
-    function getTranslationOfFileAndAddDynamicallyIfNeeded($orig, $lng)
+    function getTranslationOfFileAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target)
     {
         $urls = [];
         // extract urls from style tag
@@ -921,32 +980,32 @@ class Data
             if ($this->stringShouldNotBeTranslated($urls__value, 'file')) {
                 continue;
             }
-            $trans = $this->getExistingTranslationFromCache($urls__value, $lng, 'file');
+            $trans = $this->getExistingTranslationFromCache($urls__value, $lng_source, $lng_target, 'file');
             if ($trans === false) {
-                $this->addTranslationToDatabaseAndToCache($urls__value, $urls__value, $lng, 'file');
-            } elseif ($this->stringIsChecked($urls__value, $lng, 'file')) {
+                $this->addTranslationToDatabaseAndToCache($urls__value, $urls__value, $lng_source, $lng_target, 'file');
+            } elseif ($this->stringIsChecked($urls__value, $lng_source, $lng_target, 'file')) {
                 $orig = str_replace($urls__value, $trans, $orig);
             }
         }
         return $orig;
     }
 
-    function getTranslationOfEmailAndAddDynamicallyIfNeeded($orig, $lng)
+    function getTranslationOfEmailAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target)
     {
         $is_link = strpos($orig, 'mailto:') === 0;
         if ($is_link) {
             $orig = str_replace('mailto:', '', $orig);
         }
-        $trans = $this->getExistingTranslationFromCache($orig, $lng, 'email');
+        $trans = $this->getExistingTranslationFromCache($orig, $lng_source, $lng_target, 'email');
         if ($trans === false) {
-            $this->addTranslationToDatabaseAndToCache($orig, $orig, $lng, 'email');
-        } elseif ($this->stringIsChecked($orig, $lng, 'email')) {
+            $this->addTranslationToDatabaseAndToCache($orig, $orig, $lng_source, $lng_target, 'email');
+        } elseif ($this->stringIsChecked($orig, $lng_source, $lng_target, 'email')) {
             return ($is_link ? 'mailto:' : '') . $trans;
         }
         return ($is_link ? 'mailto:' : '') . $orig;
     }
 
-    function getTranslationAndAddDynamicallyIfNeeded($orig, $lng, $context = null)
+    function getTranslationAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, $context = null)
     {
         /*
         $orig
@@ -982,17 +1041,23 @@ class Data
 
         [$origWithoutAttributes, $mappingTable] = $this->tags->removeAttributesAndSaveMapping($orig);
 
-        $transWithoutAttributes = $this->getExistingTranslationFromCache($origWithoutAttributes, $lng, $context);
+        $transWithoutAttributes = $this->getExistingTranslationFromCache(
+            $origWithoutAttributes,
+            $lng_source,
+            $lng_target,
+            $context
+        );
 
         if ($transWithoutAttributes === false) {
             $origWithIds = $this->tags->addIds($orig);
-            $transWithIds = $this->autoTranslateString($origWithIds, $lng, $context);
+            $transWithIds = $this->autoTranslateString($origWithIds, $lng_source, $lng_target, $context);
             if ($transWithIds !== null) {
                 $transWithoutAttributes = $this->tags->removeAttributesExceptIrregularIds($transWithIds);
                 $this->addTranslationToDatabaseAndToCache(
                     $origWithoutAttributes,
                     $transWithoutAttributes,
-                    $lng,
+                    $lng_source,
+                    $lng_target,
                     $context
                 );
             } else {
@@ -1002,17 +1067,17 @@ class Data
 
         $trans = $this->tags->addAttributesAndRemoveIds($transWithoutAttributes, $mappingTable);
 
-        if (!$this->stringIsChecked($origWithoutAttributes, $lng, $context)) {
+        if (!$this->stringIsChecked($origWithoutAttributes, $lng_source, $lng_target, $context)) {
             return $origWithoutAttributes;
         }
 
         return $trans;
     }
 
-    function autoTranslateString($orig, $to_lng, $context = null, $from_lng = null)
+    function autoTranslateString($orig, $lng_source, $lng_target, $context = null)
     {
-        if ($from_lng === null) {
-            $from_lng = $this->settings->getSourceLanguageCode();
+        if ($lng_source === null) {
+            $lng_source = $this->settings->getSourceLanguageCode();
         }
 
         $trans = null;
@@ -1028,11 +1093,11 @@ class Data
                 $tries = 0;
                 while ($tries < 10) {
                     try {
-                        $trans = __::translate_google($orig, $from_lng, $to_lng, $api_key);
-                        //$this->log->generalLog(['SUCCESSFUL TRANSLATION', $orig, $from_lng, $to_lng, $api_key, $trans]);
+                        $trans = __::translate_google($orig, $lng_source, $lng_target, $api_key);
+                        //$this->log->generalLog(['SUCCESSFUL TRANSLATION', $orig, $lng_source, $lng_target, $api_key, $trans]);
                         break;
                     } catch (\Throwable $t) {
-                        //$this->log->generalLog(['FAILED TRANSLATION (TRIES: ' . $tries . ')',$t->getMessage(),$orig,$from_lng,$to_lng,$api_key,$trans]);
+                        //$this->log->generalLog(['FAILED TRANSLATION (TRIES: ' . $tries . ')',$t->getMessage(),$orig,$lng_source,$lng_target,$api_key,$trans]);
                         if (strpos($t->getMessage(), 'PERMISSION_DENIED') !== false) {
                             break;
                         }
@@ -1049,23 +1114,43 @@ class Data
                 if (is_array($api_key)) {
                     $api_key = $api_key[array_rand($api_key)];
                 }
-                $trans = __::translate_microsoft($orig, $from_lng, $to_lng, $api_key);
+                try {
+                    $trans = __::translate_microsoft($orig, $lng_source, $lng_target, $api_key);
+                } catch (\Throwable $t) {
+                    $trans = null;
+                }
                 if ($trans === null || $trans === '') {
                     return null;
                 }
                 $this->log->statsLogIncrease('microsoft', mb_strlen($orig));
+            } elseif ($this->settings->get('auto_translation_service') === 'deepl') {
+                $api_key = $this->settings->get('deepl_translation_api_key');
+                if (is_array($api_key)) {
+                    $api_key = $api_key[array_rand($api_key)];
+                }
+                try {
+                    $trans = __::translate_deepl($orig, $lng_source, $lng_target, $api_key);
+                } catch (\Throwable $t) {
+                    $trans = null;
+                }
+                if ($trans === null || $trans === '') {
+                    return null;
+                }
+                $this->log->statsLogIncrease('deepl', mb_strlen($orig));
             }
             if ($context === 'slug') {
-                $trans = $this->utils->slugify($trans, $orig, $to_lng);
+                $trans = $this->utils->slugify($trans, $orig, $lng_target);
             }
         } else {
-            $trans = $this->translateStringMock($orig, $to_lng, $context, $from_lng);
+            $trans = $this->translateStringMock($orig, $lng_source, $lng_target, $context);
         }
 
         // slug collission detection
         if ($context === 'slug') {
             $counter = 2;
-            while ($this->getExistingTranslationReverseFromCache($trans, $to_lng, $context) !== false) {
+            while (
+                $this->getExistingTranslationReverseFromCache($trans, $lng_source, $lng_target, $context) !== false
+            ) {
                 if ($counter > 2) {
                     $trans = mb_substr($trans, 0, mb_strrpos($trans, '-'));
                 }
@@ -1122,22 +1207,22 @@ class Data
         return $str;
     }
 
-    function translateStringMock($str, $to_lng, $context = null, $from_lng = null)
+    function translateStringMock($str, $lng_source, $lng_target, $context = null)
     {
-        if ($from_lng === null) {
-            $from_lng = $this->settings->getSourceLanguageCode();
+        if ($lng_source === null) {
+            $lng_source = $this->settings->getSourceLanguageCode();
         }
         if ($context === 'slug') {
-            $pos = mb_strlen($str) - mb_strlen('-' . $from_lng);
-            if (mb_strrpos($str, '-' . $from_lng) === $pos) {
+            $pos = mb_strlen($str) - mb_strlen('-' . $lng_source);
+            if (mb_strrpos($str, '-' . $lng_source) === $pos) {
                 $str = mb_substr($str, 0, $pos);
             }
-            if ($to_lng === $this->settings->getSourceLanguageCode()) {
+            if ($lng_target === $this->settings->getSourceLanguageCode()) {
                 return $str;
             }
-            return $str . ($context != '' ? '-' . $context : '') . '-' . $to_lng;
+            return $str . ($context != '' ? '-' . $context : '') . '-' . $lng_target;
         }
-        return $str . ($context != '' ? '-' . $context : '') . '-' . $to_lng;
+        return $str . ($context != '' ? '-' . $context : '') . '-' . $lng_target;
     }
 
     function stringShouldNotBeTranslated($str, $context = null)
@@ -1221,28 +1306,29 @@ class Data
         return $context;
     }
 
-    function stringIsChecked($str, $lng, $context = null)
+    function stringIsChecked($str, $lng_source, $lng_target, $context = null)
     {
         if ($this->settings->get('only_show_checked_strings') !== true) {
             return true;
         }
-        if ($lng === $this->settings->getSourceLanguageCode()) {
+        if ($lng_target === $this->settings->getSourceLanguageCode()) {
             return true;
         }
         if (
             $str === '' ||
             $str === null ||
-            !array_key_exists($lng, $this->data['checked_strings']) ||
-            !array_key_exists($context ?? '', $this->data['checked_strings'][$lng]) ||
-            !array_key_exists($str, $this->data['checked_strings'][$lng][$context ?? '']) ||
-            $this->data['checked_strings'][$lng][$context ?? ''][$str] != '1'
+            !array_key_exists($lng_source, $this->data['checked_strings']) ||
+            !array_key_exists($lng_target, $this->data['checked_strings'][$lng_source]) ||
+            !array_key_exists($context ?? '', $this->data['checked_strings'][$lng_source][$lng_target]) ||
+            !array_key_exists($str, $this->data['checked_strings'][$lng_source][$lng_target][$context ?? '']) ||
+            $this->data['checked_strings'][$lng_source][$lng_target][$context ?? ''][$str] != '1'
         ) {
             return false;
         }
         return true;
     }
 
-    function getUrlTranslationInLanguage($lng, $url = null)
+    function getUrlTranslationInLanguage($from_lng, $to_lng, $url = null)
     {
         $path = null;
         if ($url !== null) {
@@ -1253,7 +1339,7 @@ class Data
         return trim(
             trim($this->host->getCurrentHost(), '/') .
                 '/' .
-                trim($this->getPathTranslationInLanguage($lng, false, $path), '/'),
+                trim($this->getPathTranslationInLanguage($from_lng, $to_lng, false, $path), '/'),
             '/'
         ) . (mb_strpos($path, '?') === false ? '/' : '');
     }
@@ -1269,7 +1355,12 @@ class Data
         if ($from_lng === $this->settings->getSourceLanguageCode()) {
             $data['str_in_source_lng'] = $str;
         } else {
-            $data['str_in_source_lng'] = $this->getExistingTranslationReverseFromCache($str, $from_lng, $context); // str in source lng
+            $data['str_in_source_lng'] = $this->getExistingTranslationReverseFromCache(
+                $str,
+                $this->settings->getSourceLanguageCode(),
+                $from_lng,
+                $context
+            );
         }
         if ($data['str_in_source_lng'] === false) {
             return $data;
@@ -1281,41 +1372,56 @@ class Data
             $data['trans'] = $data['str_in_source_lng'];
             return $data;
         }
-        $data['checked_from'] = $this->stringIsChecked($data['str_in_source_lng'], $from_lng, $context);
-        $data['checked_to'] = $this->stringIsChecked($data['str_in_source_lng'], $to_lng, $context);
-        $data['trans'] = $this->getExistingTranslationFromCache($data['str_in_source_lng'], $to_lng, $context);
+        $data['checked_from'] = $this->stringIsChecked(
+            $data['str_in_source_lng'],
+            $this->settings->getSourceLanguageCode(),
+            $from_lng,
+            $context
+        );
+        $data['checked_to'] = $this->stringIsChecked(
+            $data['str_in_source_lng'],
+            $this->settings->getSourceLanguageCode(),
+            $to_lng,
+            $context
+        );
+        $data['trans'] = $this->getExistingTranslationFromCache(
+            $data['str_in_source_lng'],
+            $this->settings->getSourceLanguageCode(),
+            $to_lng,
+            $context
+        );
         return $data;
     }
 
     function getTranslationInForeignLngAndAddDynamicallyIfNeeded(
         $str,
-        $to_lng = null,
-        $from_lng = null,
+        $lng_target = null,
+        $lng_source = null,
         $context = null
     ) {
-        if ($to_lng === null) {
-            $to_lng = $this->getCurrentLanguageCode();
+        if ($lng_target === null) {
+            $lng_target = $this->getCurrentLanguageCode();
         }
-        if ($from_lng === null) {
-            $from_lng = $this->settings->getSourceLanguageCode();
+        if ($lng_source === null) {
+            $lng_source = $this->settings->getSourceLanguageCode();
         }
-        $data = $this->getTranslationInForeignLng($str, $to_lng, $from_lng, $context);
+        $data = $this->getTranslationInForeignLng($str, $lng_target, $lng_source, $context);
         $trans = $data['trans'];
         if ($trans === false) {
-            if ($from_lng === $this->settings->getSourceLanguageCode()) {
+            if ($lng_source === $this->settings->getSourceLanguageCode()) {
                 $str_in_source = $str;
             } else {
                 $str_in_source = $this->autoTranslateString(
                     $str,
+                    $lng_source,
                     $this->settings->getSourceLanguageCode(),
-                    $context,
-                    $from_lng
+                    $context
                 );
             }
-            $trans = $this->autoTranslateString($str_in_source, $to_lng, $context, $from_lng);
+            $trans = $this->autoTranslateString($str_in_source, $lng_source, $lng_target, $context);
             if ($trans !== null) {
-                $this->addTranslationToDatabaseAndToCache($str_in_source, $str, $from_lng, $context);
-                $this->addTranslationToDatabaseAndToCache($str_in_source, $trans, $to_lng, $context);
+                $this->addTranslationToDatabaseAndToCache($str_in_source, $str, $lng_target, $lng_source, $context);
+                $this->addTranslationToDatabaseAndToCache($str_in_source, $trans, $lng_source, $lng_target, $context);
             } else {
                 $trans = $str;
             }
@@ -1326,12 +1432,12 @@ class Data
         return $trans;
     }
 
-    function getPathTranslationInLanguage($lng, $always_remove_prefix = false, $path = null)
+    function getPathTranslationInLanguage($from_lng, $to_lng, $always_remove_prefix = false, $path = null)
     {
         if ($path === null) {
             $path = $this->host->getCurrentPathWithArgs();
         }
-        if ($this->getCurrentLanguageCode() === $lng) {
+        if ($from_lng === $to_lng) {
             return $path;
         }
         $path_parts = explode('/', $path);
@@ -1345,16 +1451,17 @@ class Data
         // prefix
         if (
             $always_remove_prefix === true ||
-            ($this->settings->getSourceLanguageCode() === $lng && $this->settings->get('prefix_source_lng') === false)
+            ($this->settings->getSourceLanguageCode() === $to_lng &&
+                $this->settings->get('prefix_source_lng') === false)
         ) {
-            if (@$path_parts[0] === $this->getCurrentLanguageCode()) {
+            if (@$path_parts[0] === $from_lng) {
                 unset($path_parts[0]);
             }
         } else {
-            if (@$path_parts[0] === $this->getCurrentLanguageCode()) {
-                $path_parts[0] = $lng;
+            if (@$path_parts[0] === $from_lng) {
+                $path_parts[0] = $to_lng;
             } else {
-                array_unshift($path_parts, $lng);
+                array_unshift($path_parts, $to_lng);
             }
         }
 
@@ -1362,23 +1469,13 @@ class Data
             if (in_array($path_parts__value, $this->settings->getSelectedLanguageCodes())) {
                 continue;
             }
-            $data = $this->getTranslationInForeignLng(
-                $path_parts__value,
-                $lng,
-                $this->getCurrentLanguageCode(),
-                'slug'
-            );
+            $data = $this->getTranslationInForeignLng($path_parts__value, $to_lng, $from_lng, 'slug');
             if ($this->settings->get('only_show_checked_strings') === true) {
                 // no string has been found in general (unchecked or checked)
                 // this is always the case, if you are on a unchecked url (like /en/impressum)
                 // and try to translate that e.g. from english to french
                 if ($data['trans'] === false) {
-                    $data = $this->getTranslationInForeignLng(
-                        $path_parts__value,
-                        $lng,
-                        $this->settings->getSourceLanguageCode(),
-                        'slug'
-                    );
+                    $data = $this->getTranslationInForeignLng($path_parts__value, $to_lng, $from_lng, 'slug');
                 }
                 if ($data['checked_from'] === false && $data['checked_to'] === false) {
                     $trans = false;
@@ -1412,7 +1509,12 @@ class Data
             return;
         }
         foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
-            $this->prepareTranslationAndAddDynamicallyIfNeeded($this->host->getCurrentUrl(), $languages__value, 'slug');
+            $this->prepareTranslationAndAddDynamicallyIfNeeded(
+                $this->host->getCurrentUrl(),
+                $this->settings->getSourceLanguageCode(),
+                $languages__value,
+                'slug'
+            );
         }
     }
 }
