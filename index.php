@@ -21,7 +21,22 @@ $gtbabel->start([
     'microsoft_translation_api_key' => @$_SERVER['MICROSOFT_TRANSLATION_API_KEY'],
     'deepl_translation_api_key' => @$_SERVER['DEEPL_TRANSLATION_API_KEY'],
     'exclude_urls' => null,
-    'languages' => [['code' => 'de', 'label' => 'Deutsch'], ['code' => 'en', 'label' => 'English']],
+    'languages' => [
+        [
+            'code' => 'de',
+            'label' => 'Deutsch',
+            'google_translation_code' => 'de',
+            'microsoft_translation_code' => 'de',
+            'deepl_translation_code' => 'de'
+        ],
+        [
+            'code' => 'en',
+            'label' => 'English',
+            'google_translation_code' => 'en',
+            'microsoft_translation_code' => 'en',
+            'deepl_translation_code' => 'en'
+        ]
+    ],
     'html_lang_attribute' => true,
     'html_hreflang_tags' => true
 ]);

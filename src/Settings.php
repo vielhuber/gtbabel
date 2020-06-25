@@ -114,6 +114,10 @@ class Settings
         $args['languages_codes'] = array_map(function ($languages__value) {
             return $languages__value['code'];
         }, $args['languages']);
+        $args['languages_keyed'] = [];
+        foreach ($args['languages'] as $languages__value) {
+            $args['languages_keyed'][$languages__value['code']] = $languages__value;
+        }
         return $args;
     }
 
@@ -958,15 +962,19 @@ class Settings
         return $data;
     }
 
+    function getLanguageDataForCode($lng)
+    {
+        return @$this->get('languages_keyed')[$lng] ?? null;
+    }
+
     function isLanguageDirectionRtl($lng)
     {
-        return !empty(
-            array_filter($this->getSelectedLanguages(), function ($languages__value) use ($lng) {
-                return $languages__value['code'] == $lng &&
-                    isset($languages__value['rtl']) &&
-                    $languages__value['rtl'] === true;
-            })
-        );
+        return @$this->getLanguageDataForCode($lng)['rtl'] === true;
+    }
+
+    function getApiLngCodeForService($service, $lng)
+    {
+        return @$this->getLanguageDataForCode($lng)[$service . '_translation_code'] ?? $lng;
     }
 
     function getDefaultLanguageCodes()
@@ -983,26 +991,9 @@ class Settings
         }, $this->getDefaultLanguages());
     }
 
-    function getLabelForLanguageCode($code)
+    function getLabelForLanguageCode($lng)
     {
-        $languages = $this->getDefaultLanguages();
-        foreach ($languages as $languages__value) {
-            if ($languages__value['code'] === $code) {
-                return $languages__value['label'];
-            }
-        }
-        return '';
-    }
-
-    function getLanguageDataForCode($code)
-    {
-        $languages = $this->getDefaultLanguages();
-        foreach ($languages as $languages__value) {
-            if ($languages__value['code'] === $code) {
-                return $languages__value;
-            }
-        }
-        return null;
+        return @$this->getLanguageDataForCode($lng)['label'] ?? '';
     }
 
     function getSelectedLanguages()

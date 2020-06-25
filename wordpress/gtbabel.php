@@ -2411,11 +2411,29 @@ EOD;
     {
         if (empty($this->getSettings())) {
             $lng_source = mb_strtolower(mb_substr(get_locale(), 0, 2));
-            $languages = [['code' => 'de', 'label' => 'Deutsch'], ['code' => 'en', 'label' => 'English']];
+            $languages = [
+                [
+                    'code' => 'de',
+                    'label' => 'Deutsch',
+                    'google_translation_code' => 'de',
+                    'microsoft_translation_code' => 'de',
+                    'deepl_translation_code' => 'de'
+                ],
+                [
+                    'code' => 'en',
+                    'label' => 'English',
+                    'google_translation_code' => 'en',
+                    'microsoft_translation_code' => 'en',
+                    'deepl_translation_code' => 'en'
+                ]
+            ];
             if (!in_array($lng_source, ['de', 'en'])) {
                 $languages[] = $this->gtbabel->settings->getLanguageDataForCode($lng_source) ?? [
                     'code' => $lng_source,
-                    'label' => $lng_source
+                    'label' => $lng_source,
+                    'google_translation_code' => $lng_source,
+                    'microsoft_translation_code' => $lng_source,
+                    'deepl_translation_code' => $lng_source
                 ];
             }
             $this->saveSettings(

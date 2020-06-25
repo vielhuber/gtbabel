@@ -1083,6 +1083,17 @@ class Data
         $trans = null;
 
         if ($this->settings->get('auto_translation') === true) {
+            $lng_source_service = $this->settings->getApiLngCodeForService(
+                $this->settings->get('auto_translation_service'),
+                $lng_source
+            );
+            $lng_target_service = $this->settings->getApiLngCodeForService(
+                $this->settings->get('auto_translation_service'),
+                $lng_target
+            );
+            if ($lng_source_service === null || $lng_target_service === null) {
+                return null;
+            }
             if ($this->settings->get('auto_translation_service') === 'google') {
                 $api_key = $this->settings->get('google_translation_api_key');
                 if (is_array($api_key)) {
@@ -1093,7 +1104,7 @@ class Data
                 $tries = 0;
                 while ($tries < 10) {
                     try {
-                        $trans = __::translate_google($orig, $lng_source, $lng_target, $api_key);
+                        $trans = __::translate_google($orig, $lng_source_service, $lng_target_service, $api_key);
                         //$this->log->generalLog(['SUCCESSFUL TRANSLATION', $orig, $lng_source, $lng_target, $api_key, $trans]);
                         break;
                     } catch (\Throwable $t) {
@@ -1115,7 +1126,7 @@ class Data
                     $api_key = $api_key[array_rand($api_key)];
                 }
                 try {
-                    $trans = __::translate_microsoft($orig, $lng_source, $lng_target, $api_key);
+                    $trans = __::translate_microsoft($orig, $lng_source_service, $lng_target_service, $api_key);
                 } catch (\Throwable $t) {
                     $trans = null;
                 }
@@ -1129,7 +1140,7 @@ class Data
                     $api_key = $api_key[array_rand($api_key)];
                 }
                 try {
-                    $trans = __::translate_deepl($orig, $lng_source, $lng_target, $api_key);
+                    $trans = __::translate_deepl($orig, $lng_source_service, $lng_target_service, $api_key);
                 } catch (\Throwable $t) {
                     $trans = null;
                 }
