@@ -303,6 +303,28 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->runDiff('47.html', 200);
     }
 
+    public function test48()
+    {
+        $this->runDiff('48.html', 1500, [
+            'lng_source' => 'en',
+            'lng_target' => 'de',
+            'debug_translations' => false,
+            'auto_translation' => true,
+            'prefix_source_lng' => true
+        ]);
+    }
+
+    public function test49()
+    {
+        $this->runDiff('49.html', 1500, [
+            'lng_source' => 'de',
+            'lng_target' => 'en',
+            'debug_translations' => false,
+            'auto_translation' => true,
+            'prefix_source_lng' => true
+        ]);
+    }
+
     public function test_translate()
     {
         $this->gtbabel = new Gtbabel();
@@ -436,6 +458,57 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->gtbabel->reset();
     }
 
+    public function test_multiple_source_lngs()
+    {
+        $this->gtbabel = new Gtbabel();
+        $settings = $this->getDefaultSettings();
+        $settings['languages'] = [
+            ['code' => 'de', 'label' => 'Deutsch'],
+            ['code' => 'en', 'label' => 'English'],
+            ['code' => 'fr', 'label' => 'Français']
+        ];
+        $settings['lng_source'] = 'en';
+        $settings['lng_target'] = 'de';
+        $settings['debug_translations'] = false;
+        $settings['auto_translation'] = true;
+        $settings['auto_add_translations'] = true;
+        $settings['only_show_checked_strings'] = false;
+
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo '<!DOCTYPE html><html lang="en"><body>
+            <p>
+                Some content in english.
+            </p>
+            <div lang="fr">
+                Contenu en français.
+            </div>
+            <p>
+                Some other content in english.
+            </p>
+            <p lang="en">
+                Some other content in english.
+            </p>
+        </body></html>';
+        $this->gtbabel->stop();
+        ob_end_clean();
+
+        $translations = $this->gtbabel->data->getTranslationsFromDatabase();
+        $this->assertEquals($translations[0]['str'], 'Some content in english.');
+        $this->assertEquals($translations[0]['lng_source'], 'en');
+        $this->assertEquals($translations[0]['lng_target'], 'de');
+        $this->assertEquals($translations[0]['trans'], 'Einige Inhalte in Englisch.');
+        $this->assertEquals($translations[1]['str'], 'Contenu en français.');
+        $this->assertEquals($translations[1]['lng_source'], 'fr');
+        $this->assertEquals($translations[1]['lng_target'], 'de');
+        $this->assertEquals($translations[1]['trans'], 'Inhalt in Französisch.');
+        $this->assertEquals($translations[2]['str'], 'Some other content in english.');
+        $this->assertEquals($translations[2]['lng_source'], 'en');
+        $this->assertEquals($translations[2]['lng_target'], 'de');
+        $this->assertEquals($translations[2]['trans'], 'Einige andere Inhalte in Englisch.');
+
+        $this->gtbabel->reset();
+    }
     public function test_file()
     {
         $this->gtbabel = new Gtbabel();

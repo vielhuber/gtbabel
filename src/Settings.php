@@ -974,7 +974,12 @@ class Settings
 
     function getApiLngCodeForService($service, $lng)
     {
-        return @$this->getLanguageDataForCode($lng)[$service . '_translation_code'] ?? $lng;
+        $data = $this->getLanguageDataForCode($lng);
+        // if nothing is set, pretend lng code (we can set null and show that the service does not provide that language)
+        if (!array_key_exists($service . '_translation_code', $data)) {
+            return $lng;
+        }
+        return $this->getLanguageDataForCode($lng)[$service . '_translation_code'];
     }
 
     function getDefaultLanguageCodes()

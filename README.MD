@@ -27,6 +27,7 @@ Gtbabel automatically translates your HTML/PHP pages – server sided!
 -   Works seamlessly with caching/preloading plugins.
 -   Besides plain html does also handle and translate xml (like in dynamically generated sitemaps) and json (like in ajax responses).
 -   PHPUnit e2e tests available.
+-   Multiple source languages supported concurrently.
 
 ## Requirements
 
@@ -1145,6 +1146,47 @@ In order to get that use the special `data-context`-attribute to force sensible 
 ```
 
 This way you can provide different translations.
+
+## Multiple source languages
+
+Gtbabel is not restricted to use one single source language for the whole content.\
+In fact, parts of the content can be marked language-specific:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+    <body>
+        <p>
+            Some content in english.
+        </p>
+        <div lang="fr">
+            Contenu en français.
+        </div>
+        <p>
+            Some other content in english.
+        </p>
+    </body>
+</html>
+```
+
+This all gets translated correctly to the target language (in our case `de`):
+
+```html
+<!DOCTYPE html>
+<html lang="de">
+    <body>
+        <p>
+            Einige Inhalte in Englisch.
+        </p>
+        <div lang="de">
+            Inhalt auf Französisch.
+        </div>
+        <p>
+            Einige andere Inhalte in Englisch.
+        </p>
+    </body>
+</html>
+```
 
 ## Router
 

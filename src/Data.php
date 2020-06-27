@@ -796,12 +796,15 @@ class Data
             return null;
         }
 
-        if ($this->sourceLngIsCurrentLng() && $this->settings->getSourceLanguageCode() === $lng_target) {
-            if ($context !== 'slug') {
-                return null;
-            } else {
+        if ($lng_source === $lng_target) {
+            if (
+                $context === 'slug' &&
+                $this->settings->getSourceLanguageCode() === $lng_source &&
+                $this->settings->get('prefix_source_lng') === true
+            ) {
                 return $this->addPrefixToLink($orig, $lng_source, $lng_target);
             }
+            return null;
         }
 
         if ($context === 'slug') {

@@ -77,6 +77,19 @@ class Dom
         }
     }
 
+    function preloadLngAreas()
+    {
+        $this->lng_areas = [];
+        $nodes = $this->DOMXpath->query('/html/body//*[@lang]');
+        foreach ($nodes as $nodes__value) {
+            $lng = $nodes__value->getAttribute('lang');
+            $this->lng_areas[$this->getIdOfNode($nodes__value)] = $lng;
+            foreach ($this->getChildrenOfNodeIncludingWhitespace($nodes__value) as $nodes__value__value) {
+                $this->lng_areas[$this->getIdOfNode($nodes__value__value)] = $lng;
+            }
+        }
+    }
+
     function getGroupsForTextNodes($textnodes)
     {
         $groups = [];
@@ -124,10 +137,6 @@ class Dom
 
     function modifyNodes()
     {
-        if ($this->data->sourceLngIsCurrentLng() && $this->settings->get('prefix_source_lng') === false) {
-            return;
-        }
-
         $include = [];
 
         $include = array_merge($include, $this->settings->get('include_dom'));
@@ -214,7 +223,7 @@ class Dom
                 $nodes = $this->getGroupsForTextNodes($nodes);
             }
 
-            if (!empty($nodes)) {
+            if (count($nodes) > 0) {
                 foreach ($nodes as $nodes__value) {
                     $content = [];
                     if ($this->isTextNode($nodes__value)) {
@@ -269,6 +278,14 @@ class Dom
                                     continue;
                                 }
 
+                                if (array_key_exists($this->getIdOfNode($nodes__value), $this->lng_areas)) {
+                                    $lng_source = $this->lng_areas[$this->getIdOfNode($nodes__value)];
+                                } else {
+                                    $lng_source = $this->settings->getSourceLanguageCode();
+                                }
+
+                                $lng_target = $this->data->getCurrentLanguageCode();
+
                                 $context = null;
                                 if (isset($include__value['context']) && $include__value['context'] != '') {
                                     $context = $include__value['context'];
@@ -284,8 +301,8 @@ class Dom
 
                                 $trans = $this->data->prepareTranslationAndAddDynamicallyIfNeeded(
                                     $str_without_lb,
-                                    $this->settings->getSourceLanguageCode(),
-                                    $this->data->getCurrentLanguageCode(),
+                                    $lng_source,
+                                    $lng_target,
                                     $context
                                 );
 
@@ -335,6 +352,7 @@ class Dom
         $this->setRtlAttr();
         $this->preloadExcludedNodes();
         $this->preloadForceTokenize();
+        $this->preloadLngAreas();
         $this->modifyNodes();
         $html = $this->finishDomDocument($html);
         return $html;

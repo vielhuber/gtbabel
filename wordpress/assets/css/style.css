@@ -47,14 +47,14 @@
 }
 .gtbabel__languagelist {
     column-count: 20;
-    column-width: 130px;
+    column-width: 140px;
     column-gap: 0px;
     margin-top: 3px;
     margin-bottom: 2px;
 }
 .gtbabel__languagelist-item {
     break-inside: avoid-column;
-    line-height: 1rem;
+    line-height: 0.9rem;
     padding: 3px 0;
     margin-bottom: 0;
 }
