@@ -344,23 +344,26 @@ class Data
         return $this->db->fetch_all('SELECT * FROM ' . $this->table . ' ORDER BY id ASC');
     }
 
-    function getGroupedTranslationsFromDatabase($lng_source, $lng_target = null, $order_by_string = true)
+    function getGroupedTranslationsFromDatabaseNEW($lng_target = null, $order_by_string = true)
     {
         $data = [];
 
         /* the following approach is (surprisingly) much faster than a group by / join of a lot of columns via sql */
-        $query = 'SELECT * FROM ' . $this->table . ' WHERE lng_source = ?';
+        $query = 'SELECT * FROM ' . $this->table . '';
         $query_args = [];
-        $query_args[] = $lng_source;
         if ($lng_target !== null) {
-            $query .= ' AND lng_target = ?';
+            $query .= ' WHERE lng_target = ?';
             $query_args[] = $lng_target;
         }
+        $query .= ' ORDER BY id ASC';
         $result = $this->db->fetch_all($query, $query_args);
         $data_grouped = [];
         if (!empty($result)) {
-            foreach ($result as $result__value) {
-                $data_grouped[$result__value['str']][$result__value['context']]['str'] = $result__value['str'];
+            foreach ($result as $result__key => $result__value) {
+                $data_grouped[$result__value['str']][$result__value['context']]['lng_source'] =
+                    $result__value['lng_source'];
+                $data_grouped[$result__value['str']][$result__value['context']][$result__value['lng_source']] =
+                    $result__value['str'];
                 $data_grouped[$result__value['str']][$result__value['context']]['context'] = $result__value['context'];
                 if (!isset($data_grouped[$result__value['str']][$result__value['context']]['shared'])) {
                     $data_grouped[$result__value['str']][$result__value['context']]['shared'] = 0;
@@ -368,9 +371,11 @@ class Data
                 if ($result__value['shared'] == 1) {
                     $data_grouped[$result__value['str']][$result__value['context']]['shared'] = 1;
                 }
-                $data_grouped[$result__value['str']][$result__value['context']][
-                    $result__value['lng_target'] . '_trans'
-                ] = $result__value['trans'];
+                if (!isset($data_grouped[$result__value['str']][$result__value['context']]['order'])) {
+                    $data_grouped[$result__value['str']][$result__value['context']]['order'] = $result__key;
+                }
+                $data_grouped[$result__value['str']][$result__value['context']][$result__value['lng_target']] =
+                    $result__value['trans'];
                 $data_grouped[$result__value['str']][$result__value['context']][
                     $result__value['lng_target'] . '_added'
                 ] = $result__value['added'];
@@ -397,7 +402,8 @@ class Data
             }
         }
 
-        usort($data, function ($a, $b) use ($order_by_string) {
+        $lng_source = $this->settings->getSourceLanguageCode();
+        usort($data, function ($a, $b) use ($order_by_string, $lng_source) {
             /*
             order_by_string = true (url is not set)
                 context
@@ -440,11 +446,14 @@ class Data
                 return strnatcasecmp($a['context'], $b['context']);
             }
             if ($order_by_string === true) {
-                return strnatcasecmp($a['str'], $b['str']);
+                return strnatcasecmp(@$a[$lng_source], @$b[$lng_source]);
             } else {
-                return strcmp($a['order'], $b['order']);
+                return $a['order'] - $b['order'];
             }
         });
+        foreach ($data as $data__key => $data__value) {
+            unset($data[$data__key]['order']);
+        }
         return $data;
     }
 
@@ -594,7 +603,7 @@ class Data
 
     function addTranslationToDatabaseAndToCache($str, $trans, $lng_source, $lng_target, $context = null)
     {
-        if ($lng_target === $this->settings->getSourceLanguageCode()) {
+        if ($lng_target === $lng_source) {
             return;
         }
         $this->data['save']['insert'][] = [
@@ -800,7 +809,7 @@ class Data
             if (
                 $context === 'slug' &&
                 $this->settings->getSourceLanguageCode() === $lng_source &&
-                $this->settings->get('prefix_source_lng') === true
+                $this->settings->get('prefix_lng_source') === true
             ) {
                 return $this->addPrefixToLink($orig, $lng_source, $lng_target);
             }
@@ -1231,7 +1240,7 @@ class Data
             if (mb_strrpos($str, '-' . $lng_source) === $pos) {
                 $str = mb_substr($str, 0, $pos);
             }
-            if ($lng_target === $this->settings->getSourceLanguageCode()) {
+            if ($lng_target === $lng_source) {
                 return $str;
             }
             return $str . ($context != '' ? '-' . $context : '') . '-' . $lng_target;
@@ -1325,7 +1334,7 @@ class Data
         if ($this->settings->get('only_show_checked_strings') !== true) {
             return true;
         }
-        if ($lng_target === $this->settings->getSourceLanguageCode()) {
+        if ($lng_target === $lng_source) {
             return true;
         }
         if (
@@ -1362,44 +1371,44 @@ class Data
     {
         $data = [
             'trans' => false,
-            'str_in_source_lng' => false,
+            'str_in_lng_source' => false,
             'checked_from' => true,
             'checked_to' => true
         ];
         if ($from_lng === $this->settings->getSourceLanguageCode()) {
-            $data['str_in_source_lng'] = $str;
+            $data['str_in_lng_source'] = $str;
         } else {
-            $data['str_in_source_lng'] = $this->getExistingTranslationReverseFromCache(
+            $data['str_in_lng_source'] = $this->getExistingTranslationReverseFromCache(
                 $str,
                 $this->settings->getSourceLanguageCode(),
                 $from_lng,
                 $context
             );
         }
-        if ($data['str_in_source_lng'] === false) {
+        if ($data['str_in_lng_source'] === false) {
             return $data;
         }
         if (
             $to_lng === $this->settings->getSourceLanguageCode() ||
-            $this->stringShouldNotBeTranslated($data['str_in_source_lng'], $context)
+            $this->stringShouldNotBeTranslated($data['str_in_lng_source'], $context)
         ) {
-            $data['trans'] = $data['str_in_source_lng'];
+            $data['trans'] = $data['str_in_lng_source'];
             return $data;
         }
         $data['checked_from'] = $this->stringIsChecked(
-            $data['str_in_source_lng'],
+            $data['str_in_lng_source'],
             $this->settings->getSourceLanguageCode(),
             $from_lng,
             $context
         );
         $data['checked_to'] = $this->stringIsChecked(
-            $data['str_in_source_lng'],
+            $data['str_in_lng_source'],
             $this->settings->getSourceLanguageCode(),
             $to_lng,
             $context
         );
         $data['trans'] = $this->getExistingTranslationFromCache(
-            $data['str_in_source_lng'],
+            $data['str_in_lng_source'],
             $this->settings->getSourceLanguageCode(),
             $to_lng,
             $context
@@ -1466,7 +1475,7 @@ class Data
         if (
             $always_remove_prefix === true ||
             ($this->settings->getSourceLanguageCode() === $to_lng &&
-                $this->settings->get('prefix_source_lng') === false)
+                $this->settings->get('prefix_lng_source') === false)
         ) {
             if (@$path_parts[0] === $from_lng) {
                 unset($path_parts[0]);
@@ -1494,7 +1503,7 @@ class Data
                 if ($data['checked_from'] === false && $data['checked_to'] === false) {
                     $trans = false;
                 } elseif ($data['checked_from'] === true && $data['checked_to'] === false) {
-                    $trans = $data['str_in_source_lng'];
+                    $trans = $data['str_in_lng_source'];
                 } elseif ($data['checked_from'] === false && $data['checked_to'] === true) {
                     $trans = false;
                 } elseif ($data['checked_from'] === true && $data['checked_to'] === true) {

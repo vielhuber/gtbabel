@@ -22,15 +22,15 @@ class Router
             return;
         }
         if (
-            $this->settings->get('prefix_source_lng') === false &&
+            $this->settings->get('prefix_lng_source') === false &&
             $this->data->getCurrentPrefix() !== $this->settings->getSourceLanguageCode()
         ) {
             return;
         }
-        if ($this->settings->get('prefix_source_lng') === true && $this->data->getCurrentPrefix() !== null) {
+        if ($this->settings->get('prefix_lng_source') === true && $this->data->getCurrentPrefix() !== null) {
             return;
         }
-        if ($this->settings->get('prefix_source_lng') === false) {
+        if ($this->settings->get('prefix_lng_source') === false) {
             $url =
                 trim($this->host->getCurrentHost(), '/') .
                 '/' .
@@ -93,7 +93,7 @@ class Router
     function initMagicRouter()
     {
         if ($this->data->sourceLngIsCurrentLng()) {
-            if ($this->settings->get('prefix_source_lng') === false) {
+            if ($this->settings->get('prefix_lng_source') === false) {
                 return;
             }
             if (

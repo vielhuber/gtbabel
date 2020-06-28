@@ -679,7 +679,7 @@ class Dom
 
     function modifyJson($json)
     {
-        if ($this->data->sourceLngIsCurrentLng() && $this->settings->get('prefix_source_lng') === false) {
+        if ($this->data->sourceLngIsCurrentLng() && $this->settings->get('prefix_lng_source') === false) {
             return $json;
         }
         $json = json_decode($json);

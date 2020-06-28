@@ -14,7 +14,6 @@ Gtbabel automatically translates your HTML/PHP pages – server sided!
 ## Features
 
 -   Lightweight: only ~3500 lines of code.
--   Embraces the power of [gettext](https://www.gnu.org/software/gettext/) (e.g. using extracted comments and template files).
 -   Framework agnostic: works with nearly any PHP based cms or static site.
 -   Fast: once all translations are available, Gtbabel reaches a throughput of ~4000 words/s.
 -   Auto translation: use the power of [Google Translation API](https://cloud.google.com/translate/docs), [Microsoft Translation API](https://azure.microsoft.com/de-de/services/cognitive-services/translator-text-api/) or [DeepL](https://www.deepl.com) to auto translate your pages and links into any language.
@@ -27,6 +26,7 @@ Gtbabel automatically translates your HTML/PHP pages – server sided!
 -   Works seamlessly with caching/preloading plugins.
 -   Besides plain html does also handle and translate xml (like in dynamically generated sitemaps) and json (like in ajax responses).
 -   PHPUnit e2e tests available.
+-   Exports and imports directly to [gettext](https://www.gnu.org/software/gettext/) (using extracted comments and template files).
 -   Multiple source languages supported concurrently.
 
 ## Requirements
@@ -912,8 +912,8 @@ The default configuration is:
         */
     ],
     'log_folder' => '/logs',
-    'prefix_source_lng' => true,
-    'redirect_root_domain' => 'browser', // 'browser'|'source' (only relevant if prefix_source_lng=true)
+    'prefix_lng_source' => true,
+    'redirect_root_domain' => 'browser', // 'browser'|'source' (only relevant if prefix_lng_source=true)
     'translate_default_tag_nodes' => true,
     'html_lang_attribute' => true,
     'html_hreflang_tags' => true,
@@ -1256,9 +1256,9 @@ The translation apis of Google, Microsoft or DeepL can be costly. Try to keep tr
 
 ## Caveats
 
--   The source language acts as a base for every other language. It's content must be always present (one cannot publish content only in a different language).
 -   Gtbabel is good at translating whole pages. If you want to provide different content for different languages, Gtbabel might be the wrong tool (however you _can_ use `if( gtbabel_current_lng() === 'other-lng' ) { echo 'content in source language'; }` in your templates to achieve that).
--   Gtbabel is designed to translate every part of the page without code changes (however you can exclude translations with the `exclude_dom`-option). It is not designed for mainly translating only certain parts of the page.
+-   The source language acts as a base for every other language (however, you _can_ mark parts of a page with a different source language).
+-   Gtbabel is designed to translate every part of the page without code changes (however you can exclude translations with the `exclude_dom`-option).
 
 ## Credits
 

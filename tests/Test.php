@@ -263,7 +263,7 @@ class Test extends \PHPUnit\Framework\TestCase
             'lng_target' => 'de',
             'debug_translations' => false,
             'auto_translation' => true,
-            'prefix_source_lng' => true
+            'prefix_lng_source' => true
         ]);
     }
 
@@ -274,7 +274,7 @@ class Test extends \PHPUnit\Framework\TestCase
             'lng_target' => 'de',
             'debug_translations' => false,
             'auto_translation' => true,
-            'prefix_source_lng' => true
+            'prefix_lng_source' => true
         ]);
     }
 
@@ -310,7 +310,7 @@ class Test extends \PHPUnit\Framework\TestCase
             'lng_target' => 'de',
             'debug_translations' => false,
             'auto_translation' => true,
-            'prefix_source_lng' => true
+            'prefix_lng_source' => true
         ]);
     }
 
@@ -321,7 +321,7 @@ class Test extends \PHPUnit\Framework\TestCase
             'lng_target' => 'en',
             'debug_translations' => false,
             'auto_translation' => true,
-            'prefix_source_lng' => true
+            'prefix_lng_source' => true
         ]);
     }
 
@@ -391,7 +391,7 @@ class Test extends \PHPUnit\Framework\TestCase
         ob_end_clean();
         $this->assertEquals($output, '<p>Haus-en</p>');
         $this->assertEquals($this->gtbabel->data->getTranslationsFromDatabase(), []);
-        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase('de'), []);
+        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabaseNEW(), []);
         $this->gtbabel->reset();
 
         $settings['auto_translation'] = true;
@@ -405,7 +405,7 @@ class Test extends \PHPUnit\Framework\TestCase
         ob_end_clean();
         $this->assertEquals($output, '<p>House</p>');
         $this->assertEquals($this->gtbabel->data->getTranslationsFromDatabase(), []);
-        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase('de'), []);
+        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabaseNEW(), []);
         $this->gtbabel->reset();
 
         $settings['auto_translation'] = true;
@@ -422,7 +422,7 @@ class Test extends \PHPUnit\Framework\TestCase
             $this->gtbabel->data->getTranslationFromDatabase('Haus', null, 'de', 'en')['trans'] === 'House',
             true
         );
-        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase('de')[0]['en_trans'], 'House');
+        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabaseNEW()[0]['en'], 'House');
         $this->gtbabel->reset();
 
         $settings['auto_translation'] = true;
@@ -439,7 +439,7 @@ class Test extends \PHPUnit\Framework\TestCase
             $this->gtbabel->data->getTranslationFromDatabase('Haus', null, 'de', 'en')['trans'] === 'House',
             true
         );
-        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase('de')[0]['en_trans'], 'House');
+        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabaseNEW()[0]['en'], 'House');
 
         $this->gtbabel->data->editCheckedValue('Haus', null, 'de', 'en', true);
 
@@ -454,11 +454,11 @@ class Test extends \PHPUnit\Framework\TestCase
             $this->gtbabel->data->getTranslationFromDatabase('Haus', null, 'de', 'en')['checked'] == 1,
             true
         );
-        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase('de')[0]['en_checked'], 1);
+        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabaseNEW()[0]['en_checked'], 1);
         $this->gtbabel->reset();
     }
 
-    public function test_multiple_source_lngs()
+    public function test_multiple_sources()
     {
         $this->gtbabel = new Gtbabel();
         $settings = $this->getDefaultSettings();
@@ -509,6 +509,57 @@ class Test extends \PHPUnit\Framework\TestCase
 
         $this->gtbabel->reset();
     }
+
+    public function test_gettext()
+    {
+        $this->gtbabel = new Gtbabel();
+        $settings = $this->getDefaultSettings();
+        $settings['languages'] = [
+            ['code' => 'de', 'label' => 'Deutsch'],
+            ['code' => 'en', 'label' => 'English'],
+            ['code' => 'fr', 'label' => 'Français']
+        ];
+        $settings['lng_source'] = 'en';
+        $settings['lng_target'] = 'de';
+        $settings['debug_translations'] = false;
+        $settings['auto_translation'] = true;
+        $settings['auto_add_translations'] = true;
+        $settings['only_show_checked_strings'] = false;
+
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo '<!DOCTYPE html><html lang="en"><body>
+            <p>
+                Some content in english.
+            </p>
+            <div lang="fr">
+                Contenu en français.
+            </div>
+            <p>
+                Some other content in english.
+            </p>
+            <p lang="en">
+                Some other content in english.
+            </p>
+        </body></html>';
+        $this->gtbabel->stop();
+        ob_end_clean();
+
+        $data1 = $this->gtbabel->data->getGroupedTranslationsFromDatabaseNEW();
+        $files = $this->gtbabel->gettext->export(false);
+        $this->gtbabel->gettext->import($files[2], 'en', 'de');
+        $this->gtbabel->gettext->import($files[6], 'fr', 'de');
+        $data2 = $this->gtbabel->data->getGroupedTranslationsFromDatabaseNEW();
+        $this->assertEquals($data1, $data2);
+        $this->assertEquals(strpos(file_get_contents($files[2]), 'msgid "Some content in english."') !== false, true);
+        $this->assertEquals(
+            strpos(file_get_contents($files[2]), 'msgstr "Einige Inhalte in Englisch."') !== false,
+            true
+        );
+
+        $this->gtbabel->reset();
+    }
+
     public function test_file()
     {
         $this->gtbabel = new Gtbabel();
@@ -729,7 +780,7 @@ EOD;
         $settings['auto_add_translations'] = true;
         $settings['only_show_checked_strings'] = false;
 
-        $settings['prefix_source_lng'] = false;
+        $settings['prefix_lng_source'] = false;
         $_SERVER['REQUEST_URI'] = '/impressum/';
         ob_start();
         $this->gtbabel->start($settings);
@@ -750,7 +801,7 @@ EOD;
         );
         $this->gtbabel->reset();
 
-        $settings['prefix_source_lng'] = true;
+        $settings['prefix_lng_source'] = true;
         $_SERVER['REQUEST_URI'] = '/de/impressum/';
         ob_start();
         $this->gtbabel->start($settings);
@@ -813,7 +864,7 @@ EOD;
         );
         $this->gtbabel->reset();
 
-        $settings['prefix_source_lng'] = true;
+        $settings['prefix_lng_source'] = true;
         $settings['languages'] = [
             ['code' => 'de', 'label' => 'Deutsch'],
             ['code' => 'en', 'label' => 'English'],
@@ -864,7 +915,7 @@ EOD;
         $this->gtbabel->reset();
 
         $settings['only_show_checked_strings'] = true;
-        $settings['prefix_source_lng'] = false;
+        $settings['prefix_lng_source'] = false;
         $_SERVER['REQUEST_URI'] = '/impressum/';
         $this->gtbabel->start($settings);
         $this->gtbabel->stop();
@@ -963,7 +1014,7 @@ EOD;
                 'table' => 'translations'
             ],
             'log_folder' => './tests/logs',
-            'prefix_source_lng' => false,
+            'prefix_lng_source' => false,
             'redirect_root_domain' => 'browser',
             'debug_translations' => true,
             'auto_add_translations' => false,

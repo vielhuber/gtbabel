@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.6.6
+ * Version: 3.7.0
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -13,6 +13,8 @@ if (file_exists(__DIR__ . '/vendor/scoper-autoload.php')) {
 } else {
     require_once __DIR__ . '/vendor/autoload.php';
 }
+
+use SebastianBergmann\Type\NullType;
 use vielhuber\gtbabel\Gtbabel;
 use vielhuber\stringhelper\__;
 
@@ -27,6 +29,7 @@ class GtbabelWordPress
         $this->localizePlugin();
         $this->initBackend();
         $this->triggerPreventPublish();
+        $this->addTopBarItem();
         $this->addGutenbergSidebar();
         $this->showWizardNotice();
         $this->languagePickerWidget();
@@ -227,6 +230,34 @@ class GtbabelWordPress
         });
     }
 
+    private function addTopBarItem()
+    {
+        add_action(
+            'admin_bar_menu',
+            function ($admin_bar) {
+                if (is_admin()) {
+                    return;
+                }
+                echo '<style>#wpadminbar #wp-admin-bar-gtbabel-translate .ab-icon:before { content: "\f11f"; top: 3px; }</style>';
+                $html = '<span class="ab-icon"></span>' . __('Translate now', 'gtbabel-plugin');
+                $url = $this->gtbabel->host->getCurrentUrl();
+                $lng = $this->gtbabel->data->sourceLngIsCurrentLng()
+                    ? null
+                    : $this->gtbabel->data->getCurrentLanguageCode();
+
+                $admin_bar->add_menu([
+                    'id' => 'gtbabel-translate',
+                    'parent' => null,
+                    'group' => null,
+                    'title' => $html,
+                    'href' => admin_url('admin.php?page=gtbabel-trans&url=' . urlencode($url) . '&lng=' . $lng),
+                    'meta' => ['target' => '_blank']
+                ]);
+            },
+            500
+        );
+    }
+
     private function addGutenbergSidebar()
     {
         add_action('add_meta_boxes', function () {
@@ -236,7 +267,7 @@ class GtbabelWordPress
                 function ($post) {
                     echo '<ul>';
                     foreach (
-                        $this->gtbabel->settings->getSelectedLanguagesCodesLabelsWithoutSource()
+                        $this->gtbabel->settings->getSelectedLanguageCodesLabelsWithoutSource()
                         as $languages__key => $languages__value
                     ) {
                         echo '<li><a href="' .
@@ -390,7 +421,7 @@ class GtbabelWordPress
                             'log_folder',
                             'debug_translations',
                             'hide_languages',
-                            'prefix_source_lng',
+                            'prefix_lng_source',
                             'redirect_root_domain',
                             'translate_default_tag_nodes',
                             'html_lang_attribute',
@@ -427,7 +458,7 @@ class GtbabelWordPress
 
                     foreach (
                         [
-                            'prefix_source_lng',
+                            'prefix_lng_source',
                             'translate_default_tag_nodes',
                             'html_lang_attribute',
                             'html_hreflang_tags',
@@ -669,7 +700,7 @@ class GtbabelWordPress
         echo '<div class="gtbabel__inputbox">';
         echo '<ul class="gtbabel__languagelist">';
         foreach (
-            $this->gtbabel->settings->getSelectedLanguagesCodesLabelsWithoutSource()
+            $this->gtbabel->settings->getSelectedLanguageCodesLabelsWithoutSource()
             as $languages__key => $languages__value
         ) {
             $checked = false;
@@ -703,12 +734,12 @@ class GtbabelWordPress
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_prefix_source_lng" class="gtbabel__label">';
+        echo '<label for="gtbabel_prefix_lng_source" class="gtbabel__label">';
         echo __('Prefix source language urls', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_prefix_source_lng" name="gtbabel[prefix_source_lng]" value="1"' .
-            ($settings['prefix_source_lng'] == '1' ? ' checked="checked"' : '') .
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_prefix_lng_source" name="gtbabel[prefix_lng_source]" value="1"' .
+            ($settings['prefix_lng_source'] == '1' ? ' checked="checked"' : '') .
             ' />';
         echo '</div>';
         echo '</li>';
@@ -1140,7 +1171,7 @@ class GtbabelWordPress
                             $this->gtbabel->data->editTranslation(
                                 $input_data['str'],
                                 $input_data['context'],
-                                $this->gtbabel->settings->getSourceLanguageCode(),
+                                $input_data['lng_source'],
                                 $input_data['lng'],
                                 isset($post__value) ? $post__value : false,
                                 null
@@ -1150,7 +1181,7 @@ class GtbabelWordPress
                             $this->gtbabel->data->editTranslation(
                                 $input_data['str'],
                                 $input_data['context'],
-                                $this->gtbabel->settings->getSourceLanguageCode(),
+                                $input_data['lng_source'],
                                 $input_data['lng'],
                                 null,
                                 isset($post__value) && $post__value == '1'
@@ -1164,7 +1195,7 @@ class GtbabelWordPress
                             $this->gtbabel->data->deleteStringFromDatabase(
                                 $input_data['str'],
                                 $input_data['context'],
-                                $this->gtbabel->settings->getSourceLanguageCode()
+                                $input_data['lng_source']
                             );
                         }
                     }
@@ -1228,7 +1259,7 @@ class GtbabelWordPress
                 $link_public = $url;
             } else {
                 $link_public = $this->gtbabel->data->getUrlTranslationInLanguage(
-                    $this->gtbabel->settings->getSourceLanguageCode(),
+                    $this->gtbabel->data->getLngFromUrl($url),
                     $lng,
                     $url
                 );
@@ -1237,19 +1268,27 @@ class GtbabelWordPress
             echo '</p>';
         }
         echo '<ul class="gtbabel__transmeta-list">';
-        if ($url === null) {
-            echo '<li class="gtbabel__transmeta-listitem">';
-            if ($lng !== null) {
-                echo '<a class="gtbabel__transmeta-listitem-link" href="' .
-                    admin_url('admin.php?page=gtbabel-trans') .
-                    '">';
+        echo '<li class="gtbabel__transmeta-listitem">';
+        if ($lng !== null) {
+            $lng_link = 'admin.php?page=gtbabel-trans';
+            if ($post_id !== null) {
+                $lng_link .= '&post_id=' . $post_id;
+            } elseif ($url !== null) {
+                $lng_link .=
+                    '&url=' .
+                    $this->gtbabel->data->getUrlTranslationInLanguage(
+                        $this->gtbabel->data->getLngFromUrl($url),
+                        $this->gtbabel->settings->getSourceLanguageCode(),
+                        $url
+                    );
             }
-            echo __('All languages', 'gtbabel-plugin');
-            if ($lng !== null) {
-                echo '</a>';
-            }
-            echo '</li>';
+            echo '<a class="gtbabel__transmeta-listitem-link" href="' . admin_url($lng_link) . '">';
         }
+        echo __('All languages', 'gtbabel-plugin');
+        if ($lng !== null) {
+            echo '</a>';
+        }
+        echo '</li>';
         if ($post_id !== null) {
             echo '<li class="gtbabel__transmeta-listitem">';
             echo '<a class="gtbabel__transmeta-listitem-link" href="' . get_edit_post_link($post_id) . '">';
@@ -1257,20 +1296,25 @@ class GtbabelWordPress
             echo '</a>';
             echo '</li>';
         }
-        foreach ($this->gtbabel->settings->getSelectedLanguagesCodesLabelsWithoutSource() as $lng__key => $lng__value) {
+        foreach ($this->gtbabel->settings->getSelectedLanguageCodesLabelsWithoutSource() as $lng__key => $lng__value) {
             echo '<li class="gtbabel__transmeta-listitem">';
-            if ($lng !== $lng__key) {
-                echo '<a class="gtbabel__transmeta-listitem-link" href="' .
-                    admin_url(
-                        'admin.php?page=gtbabel-trans&lng=' .
-                            $lng__key .
-                            '' .
-                            ($post_id !== null ? '&post_id=' . $post_id : '')
-                    ) .
-                    '">';
+            if ($lng === null || $lng !== $lng__key) {
+                $lng_link = 'admin.php?page=gtbabel-trans&lng=' . $lng__key;
+                if ($post_id !== null) {
+                    $lng_link .= '&post_id=' . $post_id;
+                } elseif ($url !== null) {
+                    $lng_link .=
+                        '&url=' .
+                        $this->gtbabel->data->getUrlTranslationInLanguage(
+                            $this->gtbabel->data->getLngFromUrl($url),
+                            $lng__key,
+                            $url
+                        );
+                }
+                echo '<a class="gtbabel__transmeta-listitem-link" href="' . admin_url($lng_link) . '">';
             }
             echo $lng__value;
-            if ($lng !== $lng__key) {
+            if ($lng === null || $lng !== $lng__key) {
                 echo '</a>';
             }
             echo '</li>';
@@ -1336,12 +1380,15 @@ class GtbabelWordPress
             echo '<table class="gtbabel__table">';
             echo '<thead class="gtbabel__table-head">';
             echo '<tr class="gtbabel__table-row">';
-            echo '<td class="gtbabel__table-cell">' . $this->gtbabel->settings->getSourceLanguageLabel() . '</td>';
             foreach (
-                $this->gtbabel->settings->getSelectedLanguagesCodesLabelsWithoutSource()
+                $this->gtbabel->settings->getSelectedLanguageCodesLabels()
                 as $languages__key => $languages__value
             ) {
-                if ($lng !== null && $lng !== $languages__key) {
+                if (
+                    $lng !== null &&
+                    $lng !== $languages__key &&
+                    $this->gtbabel->settings->getSourceLanguageCode() !== $languages__key
+                ) {
                     continue;
                 }
                 echo '<td class="gtbabel__table-cell">' . $languages__value . '</td>';
@@ -1354,29 +1401,29 @@ class GtbabelWordPress
             echo '<tbody class="gtbabel__table-body">';
             foreach ($translations as $translations__value) {
                 echo '<tr class="gtbabel__table-row">';
-                echo '<td class="gtbabel__table-cell">';
-                echo '<textarea class="gtbabel__input gtbabel__input--textarea" disabled="disabled">' .
-                    $translations__value['str'] .
-                    '</textarea>';
-                if ($translations__value['context'] === 'file') {
-                    $this->initBackendStringTranslationShowFile($translations__value['str'], false);
-                }
-                echo '</td>';
                 foreach (
-                    $this->gtbabel->settings->getSelectedLanguagesCodesLabelsWithoutSource()
+                    $this->gtbabel->settings->getSelectedLanguageCodesLabels()
                     as $languages__key => $languages__value
                 ) {
-                    if ($lng !== null && $lng !== $languages__key) {
+                    if (
+                        $lng !== null &&
+                        $lng !== $languages__key &&
+                        $this->gtbabel->settings->getSourceLanguageCode() !== $languages__key
+                    ) {
                         continue;
                     }
                     echo '<td class="gtbabel__table-cell">';
-                    if (@$translations__value[$languages__key . '_trans'] != '') {
+                    if (
+                        $languages__key !== $translations__value['lng_source'] &&
+                        @$translations__value[$languages__key] != ''
+                    ) {
                         echo '<input title="' .
                             __('String checked', 'gtbabel-plugin') .
                             '" class="gtbabel__input gtbabel__input--checkbox gtbabel__input--on-change gtbabel__input--submit-unchecked gtbabel__input--check-translation" type="checkbox" data-name="gtbabel[' .
                             __::encode_data([
-                                'str' => $translations__value['str'],
+                                'str' => $translations__value[$translations__value['lng_source']],
                                 'context' => $translations__value['context'],
+                                'lng_source' => $translations__value['lng_source'],
                                 'lng' => $languages__key,
                                 'field' => 'checked'
                             ]) .
@@ -1384,20 +1431,23 @@ class GtbabelWordPress
                             (@$translations__value[$languages__key . '_checked'] == '1' ? ' checked="checked"' : '') .
                             ' />';
                     }
-                    echo '<textarea class="gtbabel__input gtbabel__input--textarea gtbabel__input--on-change" data-name="gtbabel[' .
+                    echo '<textarea' .
+                        ($languages__key === $translations__value['lng_source'] ? ' disabled="disabled"' : '') .
+                        ' class="gtbabel__input gtbabel__input--textarea gtbabel__input--on-change" data-name="gtbabel[' .
                         __::encode_data([
-                            'str' => $translations__value['str'],
+                            'str' => $translations__value[$translations__value['lng_source']],
                             'context' => $translations__value['context'],
+                            'lng_source' => $translations__value['lng_source'],
                             'lng' => $languages__key,
                             'field' => 'trans'
                         ]) .
                         ']">' .
-                        $translations__value[$languages__key . '_trans'] .
+                        $translations__value[$languages__key] .
                         '</textarea>';
                     if ($translations__value['context'] === 'file') {
                         $this->initBackendStringTranslationShowFile(
-                            $translations__value[$languages__key . '_trans'],
-                            true
+                            $translations__value[$languages__key],
+                            $languages__key !== $translations__value['lng_source']
                         );
                     }
                     echo '</td>';
@@ -1415,8 +1465,9 @@ class GtbabelWordPress
                 echo '<td class="gtbabel__table-cell">';
                 echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" name="gtbabel[' .
                     __::encode_data([
-                        'str' => $translations__value['str'],
+                        'str' => $translations__value[$translations__value['lng_source']],
                         'context' => $translations__value['context'],
+                        'lng_source' => $translations__value['lng_source'],
                         'field' => 'delete'
                     ]) .
                     ']" value="1" />';
@@ -1472,7 +1523,11 @@ class GtbabelWordPress
                 $_FILES['gtbabel'] = __::array_map_deep($_FILES['gtbabel'], function ($settings__value) {
                     return sanitize_textarea_field($settings__value);
                 });
-                if (@$_POST['gtbabel']['language'] != '' && @$_FILES['gtbabel']['name']['file'] != '') {
+                if (
+                    @$_POST['gtbabel']['lng_source'] != '' &&
+                    @$_POST['gtbabel']['lng_target'] != '' &&
+                    @$_FILES['gtbabel']['name']['file'] != ''
+                ) {
                     $extension = strtolower(end(explode('.', $_FILES['gtbabel']['name']['file'])));
                     $allowed_extension = [
                         'po' => ['application/octet-stream']
@@ -1485,8 +1540,8 @@ class GtbabelWordPress
                     ) {
                         $this->gtbabel->gettext->import(
                             $_FILES['gtbabel']['tmp_name']['file'],
-                            $this->gtbabel->settings->getSourceLanguageCode(),
-                            $_POST['gtbabel']['language']
+                            $_POST['gtbabel']['lng_source'],
+                            $_POST['gtbabel']['lng_target']
                         );
                         $message =
                             '<div class="gtbabel__notice notice notice-success is-dismissible"><p>' .
@@ -1520,17 +1575,29 @@ class GtbabelWordPress
             '">';
         wp_nonce_field('gtbabel-gettext-import');
         echo '<ul class="gtbabel__fields">';
+
         echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_language" class="gtbabel__label">';
-        echo __('Language', 'gtbabel-plugin');
+        echo '<label for="gtbabel_lng_source" class="gtbabel__label">';
+        echo __('Source language', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        echo '<select required="required" class="gtbabel__input gtbabel__input--select" id="gtbabel_language" name="gtbabel[language]">';
+        echo '<select required="required" class="gtbabel__input gtbabel__input--select" id="gtbabel_lng_source" name="gtbabel[lng_source]">';
         echo '<option value="">&ndash;&ndash;</option>';
-        foreach (
-            $this->gtbabel->settings->getSelectedLanguagesCodesLabelsWithoutSource()
-            as $languages__key => $languages__value
-        ) {
+        foreach ($this->gtbabel->settings->getSelectedLanguageCodesLabels() as $languages__key => $languages__value) {
+            echo '<option value="' . $languages__key . '">' . $languages__value . '</option>';
+        }
+        echo '</select>';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_lng_target" class="gtbabel__label">';
+        echo __('Target language', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<select required="required" class="gtbabel__input gtbabel__input--select" id="gtbabel_lng_target" name="gtbabel[lng_target]">';
+        echo '<option value="">&ndash;&ndash;</option>';
+        foreach ($this->gtbabel->settings->getSelectedLanguageCodesLabels() as $languages__key => $languages__value) {
             echo '<option value="' . $languages__key . '">' . $languages__value . '</option>';
         }
         echo '</select>';
@@ -1564,7 +1631,8 @@ class GtbabelWordPress
         echo '</li>';
         echo '<li class="gtbabel__listitem">';
         echo __(
-            'Create a new Software localization project and pick the same original / target languages as in Gtbabel.'
+            'Create a new Software localization project and pick the same original / target languages as in Gtbabel.',
+            'gtbabel-plugin'
         );
         echo '</li>';
         echo '<li class="gtbabel__listitem">';
@@ -1913,7 +1981,7 @@ EOD;
                     continue;
                 }
                 $url_trans = $this->gtbabel->data->getUrlTranslationInLanguage(
-                    $this->gtbabel->settings->getSourceLanguageCode(),
+                    $this->gtbabel->data->getLngFromUrl($url),
                     $lngs__value,
                     $url
                 );
@@ -1928,18 +1996,17 @@ EOD;
             }, $discovery_strings);
         }
 
-        $translations = $this->gtbabel->data->getGroupedTranslationsFromDatabase(
-            $this->gtbabel->settings->getSourceLanguageCode(),
-            $lng,
-            $url === null
-        );
+        $translations = $this->gtbabel->data->getGroupedTranslationsFromDatabaseNEW(null, $url === null);
 
         // filter
         if ($url !== null) {
             foreach ($translations as $translations__key => $translations__value) {
                 if (
                     !in_array(
-                        __::encode_data([$translations__value['str'], $translations__value['context']]),
+                        __::encode_data([
+                            $translations__value[$translations__value['lng_source']],
+                            $translations__value['context']
+                        ]),
                         $discovery_strings_index
                     )
                 ) {
@@ -1949,7 +2016,17 @@ EOD;
         }
         if (@$_GET['s'] != '') {
             foreach ($translations as $translations__key => $translations__value) {
-                if (mb_stripos($translations__value['str'], wp_kses_post($_GET['s'])) === false) {
+                $found = false;
+                foreach ($this->gtbabel->settings->getSelectedLanguageCodes() as $languages__value) {
+                    if (
+                        @$translations__value[$languages__value] != '' &&
+                        mb_stripos($translations__value[$languages__value], wp_kses_post($_GET['s'])) !== false
+                    ) {
+                        $found = true;
+                        break;
+                    }
+                }
+                if ($found === false) {
                     unset($translations[$translations__key]);
                 }
             }

@@ -15,64 +15,106 @@ class Gettext
         $this->settings = $settings ?: new Settings();
     }
 
-    function export()
+    function export($direct_output = true)
     {
         $export = [];
         $files = [];
         $filename_prefix_tmp = tempnam(sys_get_temp_dir(), 'gtbabel_');
         $filename_zip = $filename_prefix_tmp . '.zip';
-        $translations = $this->data->getGroupedTranslationsFromDatabase($this->settings->getSourceLanguageCode());
+        $translations = $this->data->getGroupedTranslationsFromDatabaseNEW();
 
-        $export['template'] = Translations::create('gtbabel');
-        foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
-            $export[$languages__value] = Translations::create('gtbabel');
-        }
-        foreach ($translations as $translations__value) {
-            $translation = Translation::create($translations__value['context'], $translations__value['str']);
-            if ($translations__value['shared'] == 1) {
-                $translation->getExtractedComments()->add('shared');
-            }
-            $export['template']->add($translation);
-            foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
-                if ($translations__value[$languages__value . '_trans'] === null) {
+        foreach ($this->settings->getSelectedLanguageCodes() as $lng_source__value) {
+            $export[$lng_source__value]['template'] = Translations::create('gtbabel');
+            foreach ($this->settings->getSelectedLanguageCodes() as $lng_target__value) {
+                if ($lng_source__value === $lng_target__value) {
                     continue;
                 }
-                $translation = Translation::create($translations__value['context'], $translations__value['str']);
-                foreach (
-                    [
-                        'added',
-                        'checked',
-                        'shared',
-                        'discovered_last_time',
-                        'discovered_last_url_orig',
-                        'discovered_last_url'
-                    ]
-                    as $cols__value
-                ) {
-                    if ($translations__value[$languages__value . '_' . $cols__value] != '') {
-                        $translation
-                            ->getExtractedComments()
-                            ->add($cols__value . ': ' . $translations__value[$languages__value . '_' . $cols__value]);
-                    }
+                $export[$lng_source__value][$lng_target__value] = Translations::create('gtbabel');
+            }
+            foreach ($translations as $translations__value) {
+                if ($translations__value['lng_source'] !== $lng_source__value) {
+                    continue;
                 }
-                $translation->translate($translations__value[$languages__value . '_trans']);
-                $export[$languages__value]->add($translation);
+                $translation = Translation::create(
+                    $translations__value['context'],
+                    $translations__value[$lng_source__value]
+                );
+                if ($translations__value['shared'] == 1) {
+                    $translation->getExtractedComments()->add('shared');
+                }
+                $export[$lng_source__value]['template']->add($translation);
+                foreach ($this->settings->getSelectedLanguageCodes() as $lng_target__value) {
+                    if ($lng_source__value === $lng_target__value) {
+                        continue;
+                    }
+                    if (@$translations__value[$lng_target__value] == '') {
+                        continue;
+                    }
+                    $translation = Translation::create(
+                        $translations__value['context'],
+                        $translations__value[$lng_source__value]
+                    );
+                    foreach (
+                        [
+                            'added',
+                            'checked',
+                            'shared',
+                            'discovered_last_time',
+                            'discovered_last_url_orig',
+                            'discovered_last_url'
+                        ]
+                        as $cols__value
+                    ) {
+                        if (@$translations__value[$lng_target__value . '_' . $cols__value] != '') {
+                            $translation
+                                ->getExtractedComments()
+                                ->add(
+                                    $cols__value . ': ' . $translations__value[$lng_target__value . '_' . $cols__value]
+                                );
+                        }
+                    }
+                    $translation->translate($translations__value[$lng_target__value]);
+                    $export[$lng_source__value][$lng_target__value]->add($translation);
+                }
             }
         }
 
         foreach ($export as $export__key => $export__value) {
-            $filename_po = $export__key . '.po' . ($export__key === 'template' ? 't' : '');
-            $filename_mo = $export__key . '.mo';
-            $poGenerator = new PoGenerator();
-            $poGenerator->generateFile($export__value, $filename_prefix_tmp . '_' . $filename_po);
-            clearstatcache();
-            $files[] = [$filename_prefix_tmp . '_' . $filename_po, $filename_po];
-            if ($export__key !== 'template') {
-                $moGenerator = new MoGenerator();
-                $moGenerator->generateFile($export__value, $filename_prefix_tmp . '_' . $filename_mo);
+            foreach ($export__value as $export__value__key => $export__value__value) {
+                if (count($export__value__value) === 0) {
+                    continue;
+                }
+                $filename_po = $export__value__key . '.po' . ($export__value__key === 'template' ? 't' : '');
+                $filename_mo = $export__value__key . '.mo';
+                $poGenerator = new PoGenerator();
+                $poGenerator->generateFile(
+                    $export__value__value,
+                    $filename_prefix_tmp . '_' . $export__key . '_' . $filename_po
+                );
                 clearstatcache();
-                $files[] = [$filename_prefix_tmp . '_' . $filename_mo, $filename_mo];
+                $files[] = [
+                    $filename_prefix_tmp . '_' . $export__key . '_' . $filename_po,
+                    $export__key . '/' . $filename_po
+                ];
+                if ($export__key !== 'template') {
+                    $moGenerator = new MoGenerator();
+                    $moGenerator->generateFile(
+                        $export__value__value,
+                        $filename_prefix_tmp . '_' . $export__key . '_' . $filename_mo
+                    );
+                    clearstatcache();
+                    $files[] = [
+                        $filename_prefix_tmp . '_' . $export__key . '_' . $filename_mo,
+                        $export__key . '/' . $filename_mo
+                    ];
+                }
             }
+        }
+
+        if ($direct_output === false) {
+            return array_map(function ($files__value) {
+                return $files__value[0];
+            }, $files);
         }
 
         $zip = new \ZipArchive();

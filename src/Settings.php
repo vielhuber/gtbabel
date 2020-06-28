@@ -56,7 +56,7 @@ class Settings
                 'table' => 'translations'
             ],
             'log_folder' => '/logs',
-            'prefix_source_lng' => true,
+            'prefix_lng_source' => true,
             'redirect_root_domain' => 'browser',
             'translate_default_tag_nodes' => true,
             'html_lang_attribute' => true,
@@ -946,13 +946,13 @@ class Settings
         ];
         // if this already set (this is not the case on init, but we don't need the ordering)
         if ($this->getSourceLanguageCode() !== null) {
-            $source_lng = $this->getSourceLanguageCode();
-            usort($data, function ($a, $b) use ($source_lng) {
-                if ($source_lng != '') {
-                    if ($a['code'] === $source_lng) {
+            $lng_source = $this->getSourceLanguageCode();
+            usort($data, function ($a, $b) use ($lng_source) {
+                if ($lng_source != '') {
+                    if ($a['code'] === $lng_source) {
                         return -1;
                     }
-                    if ($b['code'] === $source_lng) {
+                    if ($b['code'] === $lng_source) {
                         return 1;
                     }
                 }
@@ -1031,7 +1031,7 @@ class Settings
         return $return;
     }
 
-    function getSelectedLanguagesCodesLabelsWithoutSource()
+    function getSelectedLanguageCodesLabelsWithoutSource()
     {
         $lng = [];
         foreach ($this->getSelectedLanguageCodesLabels() as $languages__key => $languages__value) {

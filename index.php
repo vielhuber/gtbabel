@@ -8,7 +8,7 @@ $gtbabel = new Gtbabel();
 
 $gtbabel->start([
     'lng_target' => 'en',
-    'prefix_source_lng' => false,
+    'prefix_lng_source' => false,
     'redirect_root_domain' => 'browser',
     'debug_translations' => true,
     'auto_add_translations' => false,
