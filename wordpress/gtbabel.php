@@ -30,7 +30,7 @@ class GtbabelWordPress
         $this->initBackend();
         $this->triggerPreventPublish();
         $this->addTopBarItem();
-        $this->addGutenbergSidebar();
+        $this->modifyGutenbergSidebar();
         $this->showWizardNotice();
         $this->languagePickerWidget();
         $this->languagePickerShortcode();
@@ -258,7 +258,7 @@ class GtbabelWordPress
         );
     }
 
-    private function addGutenbergSidebar()
+    private function modifyGutenbergSidebar()
     {
         add_action('add_meta_boxes', function () {
             add_meta_box(
@@ -279,6 +279,53 @@ class GtbabelWordPress
                             '</a></li>';
                     }
                     echo '</ul>';
+                },
+                ['post', 'page'],
+                'side',
+                'high'
+            );
+            add_meta_box(
+                'gtbabel-trans-lng-source',
+                __('Source language', 'gtbabel-plugin'),
+                function ($post) {
+                    echo "<script>
+                    document.addEventListener('DOMContentLoaded', () => {
+                        document.querySelector('.gtbabel_set_post_lng').addEventListener('change', (e) =>
+                        {
+                            let data = new URLSearchParams();
+                            data.append('set_post_lng', 1);
+                            data.append('lng', e.currentTarget.value);
+                            data.append('p', e.currentTarget.getAttribute('data-post-id'));
+	                        fetch(e.currentTarget.getAttribute('data-url'), { method: 'POST', body: data }).then(v=>v).catch(v=>v).then(data => {
+                                console.log(data);
+                            }); 
+                            e.preventDefault();
+                        }); 
+                    });
+                    </script>";
+                    echo '<small>';
+                    echo __('Notice: The slug must be always in the general source language.', 'gtbabel-plugin');
+                    echo '</small><br/>';
+                    echo '<select data-post-id="' .
+                        $post->ID .
+                        '" data-url="' .
+                        admin_url('admin.php?page=gtbabel-settings') .
+                        '" class="gtbabel_set_post_lng">';
+                    foreach (
+                        $this->gtbabel->settings->getSelectedLanguageCodesLabels()
+                        as $languages__key => $languages__value
+                    ) {
+                        echo '<option' .
+                            (get_post_meta($post->ID, 'gtbabel_lng', true) === $languages__key
+                                ? ' selected="selected"'
+                                : '') .
+                            ' value="' .
+                            $languages__key .
+                            '">' .
+                            $languages__value .
+                            '</option>';
+                    }
+                    echo '</select>';
                 },
                 ['post', 'page'],
                 'side',
@@ -601,6 +648,14 @@ class GtbabelWordPress
 
             if (isset($_POST['reset_translations'])) {
                 $this->reset();
+            }
+
+            if (isset($_POST['set_post_lng'])) {
+                update_post_meta(
+                    sanitize_textarea_field($_POST['p']),
+                    'gtbabel_lng',
+                    sanitize_textarea_field($_POST['lng'])
+                );
             }
 
             $message =

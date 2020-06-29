@@ -51,7 +51,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test7()
     {
-        $this->runDiff('7.html', 200);
+        $this->runDiff('7.html', 300);
     }
 
     public function test8()
