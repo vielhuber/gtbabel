@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.7.0
+ * Version: 3.7.2
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -14,7 +14,6 @@ if (file_exists(__DIR__ . '/vendor/scoper-autoload.php')) {
     require_once __DIR__ . '/vendor/autoload.php';
 }
 
-use SebastianBergmann\Type\NullType;
 use vielhuber\gtbabel\Gtbabel;
 use vielhuber\stringhelper\__;
 
@@ -29,6 +28,7 @@ class GtbabelWordPress
         $this->localizePlugin();
         $this->initBackend();
         $this->triggerPreventPublish();
+        $this->triggerAltLngUrls();
         $this->addTopBarItem();
         $this->modifyGutenbergSidebar();
         $this->showWizardNotice();
@@ -209,6 +209,23 @@ class GtbabelWordPress
         );
     }
 
+    private function triggerAltLngUrls()
+    {
+        add_action(
+            'post_updated',
+            function ($post_ID, $post_after, $post_before) {
+                $post_before_url = get_permalink($post_before);
+                $post_after_url = get_permalink($post_after);
+                if ($post_before_url != $post_after_url) {
+                    $this->gtbabel->altlng->change($post_before_url, $post_after_url);
+                    $this->saveSetting('alt_lng_urls', $this->gtbabel->settings->get('alt_lng_urls'));
+                }
+            },
+            10,
+            3
+        );
+    }
+
     private function showWizardNotice()
     {
         if ($this->getSetting('wizard_finished') === true) {
@@ -290,15 +307,13 @@ class GtbabelWordPress
                 function ($post) {
                     echo "<script>
                     document.addEventListener('DOMContentLoaded', () => {
-                        document.querySelector('.gtbabel_set_post_lng').addEventListener('change', (e) =>
+                        document.querySelector('.gtbabel_edit_alt_lng_urls').addEventListener('change', (e) =>
                         {
                             let data = new URLSearchParams();
-                            data.append('set_post_lng', 1);
+                            data.append('edit_alt_lng_urls', 1);
                             data.append('lng', e.currentTarget.value);
                             data.append('p', e.currentTarget.getAttribute('data-post-id'));
-	                        fetch(e.currentTarget.getAttribute('data-url'), { method: 'POST', body: data }).then(v=>v).catch(v=>v).then(data => {
-                                console.log(data);
-                            }); 
+	                        fetch(e.currentTarget.getAttribute('data-url'), { method: 'POST', body: data }).then(v=>v).catch(v=>v).then(data => {}); 
                             e.preventDefault();
                         }); 
                     });
@@ -310,13 +325,13 @@ class GtbabelWordPress
                         $post->ID .
                         '" data-url="' .
                         admin_url('admin.php?page=gtbabel-settings') .
-                        '" class="gtbabel_set_post_lng">';
+                        '" class="gtbabel_edit_alt_lng_urls">';
                     foreach (
                         $this->gtbabel->settings->getSelectedLanguageCodesLabels()
                         as $languages__key => $languages__value
                     ) {
                         echo '<option' .
-                            (get_post_meta($post->ID, 'gtbabel_lng', true) === $languages__key
+                            ($this->gtbabel->altlng->get(get_permalink($post->ID)) === $languages__key
                                 ? ' selected="selected"'
                                 : '') .
                             ' value="' .
@@ -483,6 +498,7 @@ class GtbabelWordPress
                             'deepl_translation_api_key',
                             'stats_log',
                             'prevent_publish_urls',
+                            'alt_lng_urls',
                             'exclude_urls',
                             'exclude_dom',
                             'force_tokenize',
@@ -554,6 +570,19 @@ class GtbabelWordPress
                                 $settings['prevent_publish_urls'][$post_data__value_parts[0]] = explode(
                                     ',',
                                     __::trim_whitespace($post_data__value_parts[1])
+                                );
+                            }
+                        }
+                    }
+
+                    $post_data = $settings['alt_lng_urls'];
+                    $settings['alt_lng_urls'] = [];
+                    if ($post_data != '') {
+                        foreach (explode(PHP_EOL, $post_data) as $post_data__value) {
+                            $post_data__value_parts = explode(':', $post_data__value);
+                            if (!empty($post_data__value_parts)) {
+                                $settings['alt_lng_urls'][$post_data__value_parts[0]] = __::trim_whitespace(
+                                    $post_data__value_parts[1]
                                 );
                             }
                         }
@@ -650,12 +679,12 @@ class GtbabelWordPress
                 $this->reset();
             }
 
-            if (isset($_POST['set_post_lng'])) {
-                update_post_meta(
-                    sanitize_textarea_field($_POST['p']),
-                    'gtbabel_lng',
+            if (isset($_POST['edit_alt_lng_urls'])) {
+                $this->gtbabel->altlng->edit(
+                    get_permalink(sanitize_textarea_field($_POST['p'])),
                     sanitize_textarea_field($_POST['lng'])
                 );
+                $this->saveSetting('alt_lng_urls', $this->gtbabel->settings->get('alt_lng_urls'));
             }
 
             $message =
@@ -990,6 +1019,28 @@ class GtbabelWordPress
                     },
                     $settings['prevent_publish_urls'],
                     array_keys($settings['prevent_publish_urls'])
+                )
+            );
+        }
+        echo '</textarea>';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_alt_lng_urls" class="gtbabel__label">';
+        echo __('Alternate language for main content', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<textarea class="gtbabel__input gtbabel__input--textarea" id="gtbabel_alt_lng_urls" name="gtbabel[alt_lng_urls]">';
+        if (!empty($settings['alt_lng_urls'])) {
+            echo implode(
+                PHP_EOL,
+                array_map(
+                    function ($alt_lng_urls__value, $alt_lng_urls__key) {
+                        return $alt_lng_urls__key . ':' . $alt_lng_urls__value;
+                    },
+                    $settings['alt_lng_urls'],
+                    array_keys($settings['alt_lng_urls'])
                 )
             );
         }

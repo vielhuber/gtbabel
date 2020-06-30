@@ -79,6 +79,9 @@ class Settings
                 '/slug1/*' => ['en'],
                 '/slug1/*/slug2' => ['fr']
             ],
+            'alt_lng_urls' => [
+                '/path/in/source/lng/to/specific/page' => 'en'
+            ],
             'exclude_urls' => ['/backend'],
             'exclude_dom' => ['.notranslate', '.lngpicker'],
             'force_tokenize' => ['.force-tokenize'],

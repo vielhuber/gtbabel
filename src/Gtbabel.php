@@ -8,6 +8,7 @@ class Gtbabel
     public $tags;
     public $host;
     public $publish;
+    public $altlng;
     public $log;
     public $dom;
     public $router;
@@ -22,6 +23,7 @@ class Gtbabel
         Tags $tags = null,
         Host $host = null,
         Publish $publish = null,
+        Altlng $altlng = null,
         Log $log = null,
         Data $data = null,
         Dom $dom = null,
@@ -33,10 +35,12 @@ class Gtbabel
         $this->tags = $tags ?: new Tags($this->utils);
         $this->host = $host ?: new Host($this->settings);
         $this->publish = $publish ?: new Publish($this->settings, $this->host);
+        $this->altlng = $altlng ?: new Altlng($this->settings, $this->host);
         $this->log = $log ?: new Log($this->utils, $this->settings, $this->host);
         $this->data =
             $data ?: new Data($this->utils, $this->host, $this->settings, $this->tags, $this->log, $this->publish);
-        $this->dom = $dom ?: new Dom($this->utils, $this->data, $this->host, $this->settings, $this->log);
+        $this->dom =
+            $dom ?: new Dom($this->utils, $this->data, $this->host, $this->settings, $this->log, $this->altlng);
         $this->router = $router ?: new Router($this->data, $this->host, $this->settings, $this->publish);
         $this->gettext = $gettext ?: new Gettext($this->data, $this->settings);
     }

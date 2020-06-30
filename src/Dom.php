@@ -15,19 +15,22 @@ class Dom
     public $host;
     public $settings;
     public $log;
+    public $altlng;
 
     function __construct(
         Utils $utils = null,
         Data $data = null,
         Host $host = null,
         Settings $settings = null,
-        Log $log = null
+        Log $log = null,
+        Altlng $altlng = null
     ) {
         $this->utils = $utils ?: new Utils();
         $this->data = $data ?: new Data();
         $this->host = $host ?: new Host();
         $this->settings = $settings ?: new Settings();
         $this->log = $log ?: new Log();
+        $this->altlng = $altlng ?: new Altlng();
     }
 
     function preloadExcludedNodes()
@@ -80,7 +83,7 @@ class Dom
     function preloadLngAreas()
     {
         $this->lng_areas = [];
-        $nodes = $this->DOMXpath->query('/html/body//*[@lang]');
+        $nodes = $this->DOMXpath->query('/html//*[@lang]');
         foreach ($nodes as $nodes__value) {
             $lng = $nodes__value->getAttribute('lang');
             $this->lng_areas[$this->getIdOfNode($nodes__value)] = $lng;
@@ -350,6 +353,7 @@ class Dom
         $this->setupDomDocument($html);
         $this->setLangTags();
         $this->setRtlAttr();
+        $this->setAltLngUrls();
         $this->preloadExcludedNodes();
         $this->preloadForceTokenize();
         $this->preloadLngAreas();
@@ -441,6 +445,22 @@ class Dom
                     $head_node->appendChild($tag);
                 }
             }
+        }
+    }
+
+    function setAltLngUrls()
+    {
+        $lng = $this->altlng->get();
+        if ($this->altlng->get() === $this->settings->getSourceLanguageCode()) {
+            return;
+        }
+        $html_node = $this->DOMXpath->query('/html/head//title')[0];
+        if ($html_node !== null) {
+            $html_node->setAttribute('lang', $lng);
+        }
+        $html_node = $this->DOMXpath->query('/html/head//meta[@name="description"][@content]')[0];
+        if ($html_node !== null) {
+            $html_node->setAttribute('lang', $lng);
         }
     }
 

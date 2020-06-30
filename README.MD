@@ -936,6 +936,9 @@ The default configuration is:
         '/slug1/*/slug2' => ['fr']
         //'/*' => ['en', 'fr'] // disable whole languages
     ],
+    'alt_lng_urls' => [
+        '/path/in/source/lng/to/specific/page' => 'en'
+    ],
     'exclude_urls' => ['/backend'],
     'exclude_dom' => ['.notranslate', '.lngpicker'],
     'force_tokenize' => ['.force-tokenize'],
