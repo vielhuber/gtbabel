@@ -665,18 +665,24 @@ class Dom
                 if (!is_array($translated_strings__value)) {
                     $context = '';
                     $orig = $translated_strings__value;
-                    $trans = $this->data->getTranslationInForeignLngAndAddDynamicallyIfNeeded(
-                        $translated_strings__value
+                    $trans = $this->data->getTranslationAndAddDynamicallyIfNeeded(
+                        $translated_strings__value,
+                        $this->settings->getSourceLanguageCode(),
+                        $this->data->getCurrentLanguageCode(),
+                        null
                     );
                 } else {
                     $context = $translated_strings__value[1];
                     $orig = $translated_strings__value[0];
-                    $trans = $this->data->getTranslationInForeignLngAndAddDynamicallyIfNeeded(
+                    $trans = $this->data->getTranslationAndAddDynamicallyIfNeeded(
                         $translated_strings__value[0],
-                        null,
-                        null,
+                        $this->settings->getSourceLanguageCode(),
+                        $this->data->getCurrentLanguageCode(),
                         $translated_strings__value[1]
                     );
+                }
+                if ($trans === null) {
+                    continue;
                 }
                 $orig = str_replace("\r", '', $orig);
                 $trans = str_replace("\r", '', $trans);
@@ -692,7 +698,7 @@ class Dom
             echo 'var translated_strings = JSON.parse(\'' .
                 json_encode($translated_strings_json, JSON_HEX_APOS) .
                 '\');';
-            echo 'function gtbabel__(string, context = \'\') { if( translated_strings[context][string] !== undefined ) { return translated_strings[context][string]; } return string; }';
+            echo 'function gtbabel__(string, context = \'\') { if( translated_strings[context][string] !== undefined && translated_strings[context][string] !== undefined ) { return translated_strings[context][string]; } return string; }';
             echo '</script>';
         }
     }
