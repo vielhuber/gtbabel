@@ -44,4 +44,9 @@ class Utils
         $date = new \DateTime('now');
         return $date->format('Y-m-d H:i:s.u');
     }
+
+    function isWordPress()
+    {
+        return function_exists('get_bloginfo');
+    }
 }

@@ -159,6 +159,7 @@ class Data
             return;
         }
 
+        // prepare args
         $date = $this->utils->getCurrentTime();
         $discovered_last_url_orig = $this->host->getCurrentUrlWithArgsConverted();
         $discovered_last_url = $this->host->getCurrentUrlWithArgs();
@@ -1520,12 +1521,17 @@ class Data
         return $path;
     }
 
-    function addCurrentUrlToTranslations()
+    function addCurrentUrlToTranslations($force = false)
     {
         if (!$this->sourceLngIsCurrentLng()) {
             return;
         }
         if ($this->host->isAjaxRequest()) {
+            return;
+        }
+        /* on wp environments, this triggers also on 404s because it is too early called */
+        /* we therefore stop here and trigger it later manually */
+        if ($force === false && $this->utils->isWordPress()) {
             return;
         }
         if (!$this->host->responseCodeIsSuccessful()) {

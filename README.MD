@@ -1191,6 +1191,15 @@ This all gets translated correctly to the target language (in our case `de`):
 </html>
 ```
 
+If a page consists mainly of a block in another language, you can easily set the `lang`-tags using the `gtbabel_alt_lng` function:
+
+```php
+gtbabel_alt_lng() // current url
+gtbabel_alt_lng('https://tld.com/some-page') // specific url (in source language)
+```
+
+You can provide those settings beforehand via the `alt_lng_urls` option.
+
 ## Router
 
 The router automatically modifies the `$_SERVER['REQUEST_URI']` variable to catch translated urls.\
