@@ -61,7 +61,8 @@ class Gettext
                             'shared',
                             'discovered_last_time',
                             'discovered_last_url_orig',
-                            'discovered_last_url'
+                            'discovered_last_url',
+                            'translated_by'
                         ]
                         as $cols__value
                     ) {
@@ -155,7 +156,8 @@ class Gettext
                     'shared',
                     'discovered_last_time',
                     'discovered_last_url_orig',
-                    'discovered_last_url'
+                    'discovered_last_url',
+                    'translated_by'
                 ]
                 as $cols__value
             ) {
@@ -178,7 +180,8 @@ class Gettext
                 $added,
                 $discovered_last_time,
                 $discovered_last_url_orig,
-                $discovered_last_url
+                $discovered_last_url,
+                $translated_by
             );
         }
     }

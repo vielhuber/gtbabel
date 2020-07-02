@@ -560,6 +560,89 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->gtbabel->reset();
     }
 
+    public function test_get_translated_chars_by_service()
+    {
+        $this->gtbabel = new Gtbabel();
+        $settings = $this->getDefaultSettings();
+        $settings['languages'] = [
+            ['code' => 'de', 'label' => 'Deutsch'],
+            ['code' => 'en', 'label' => 'English'],
+            ['code' => 'fr', 'label' => 'Français']
+        ];
+        $settings['lng_source'] = 'de';
+        $settings['lng_target'] = 'en';
+        $settings['debug_translations'] = false;
+        $settings['auto_translation'] = true;
+        $settings['auto_add_translations'] = true;
+        $settings['only_show_checked_strings'] = false;
+
+        $settings['auto_translation_service'] = 'google';
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo '<!DOCTYPE html><html lang="de"><body><p>Some content in english.</p></body></html>';
+        $this->gtbabel->stop();
+        ob_end_clean();
+        $this->assertSame($this->gtbabel->data->getTranslatedCharsByService(), [
+            'google' => 24
+        ]);
+
+        $this->gtbabel->reset();
+
+        $settings['auto_translation_service'] = 'google';
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo '<!DOCTYPE html><html lang="de"><body><p>Some content in english.</p><p>Some content in english.</p></body></html>';
+        $this->gtbabel->stop();
+        ob_end_clean();
+        $this->assertSame($this->gtbabel->data->getTranslatedCharsByService(), [
+            'google' => 24
+        ]);
+        $this->gtbabel->reset();
+
+        $settings['auto_translation_service'] = 'microsoft';
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo '<!DOCTYPE html><html lang="de"><body><p>Some content in english.</p><p>Some content in english.</p></body></html>';
+        $this->gtbabel->stop();
+        ob_end_clean();
+        $this->assertSame($this->gtbabel->data->getTranslatedCharsByService(), [
+            'microsoft' => 24
+        ]);
+        $this->gtbabel->reset();
+
+        $settings['auto_translation_service'] = 'microsoft';
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo '<!DOCTYPE html><html lang="de"><body><p>Some content in english.</p><p>Other content in english.</p></body></html>';
+        $this->gtbabel->stop();
+        ob_end_clean();
+        $this->assertSame($this->gtbabel->data->getTranslatedCharsByService(), [
+            'microsoft' => 49
+        ]);
+        $this->gtbabel->reset();
+
+        $settings['auto_translation_service'] = 'deepl';
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo '<!DOCTYPE html><html lang="de"><body><p>Some content in english.</p></body></html>';
+        $this->gtbabel->stop();
+        ob_end_clean();
+        $this->assertSame($this->gtbabel->data->getTranslatedCharsByService(), [
+            'deepl' => 24
+        ]);
+        $settings['auto_translation_service'] = 'google';
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo '<!DOCTYPE html><html lang="de"><body><p>Other content in english.</p></body></html>';
+        $this->gtbabel->stop();
+        ob_end_clean();
+        $this->assertSame($this->gtbabel->data->getTranslatedCharsByService(), [
+            'deepl' => 24,
+            'google' => 25
+        ]);
+        $this->gtbabel->reset();
+    }
+
     public function test_file()
     {
         $this->gtbabel = new Gtbabel();
@@ -1027,7 +1110,8 @@ EOD;
             'auto_translation' => false,
             'auto_translation_service' => 'google',
             'google_translation_api_key' => @$_SERVER['GOOGLE_TRANSLATION_API_KEY'],
-            'stats_log' => true,
+            'microsoft_translation_api_key' => @$_SERVER['MICROSOFT_TRANSLATION_API_KEY'],
+            'deepl_translation_api_key' => @$_SERVER['DEEPL_TRANSLATION_API_KEY'],
             'discovery_log' => false
         ];
     }

@@ -64,7 +64,8 @@ class Data
                             shared INTEGER NOT NULL,
                             discovered_last_time TEXT,
                             discovered_last_url_orig TEXT,
-                            discovered_last_url TEXT
+                            discovered_last_url TEXT,
+                            translated_by TEXT
                         )'
                 );
                 $this->db->query(
@@ -109,7 +110,8 @@ class Data
                         shared TINYINT NOT NULL,
                         discovered_last_time TEXT,
                         discovered_last_url_orig TEXT,
-                        discovered_last_url TEXT
+                        discovered_last_url TEXT,
+                        translated_by TEXT
                     ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'
             );
             try {
@@ -198,14 +200,14 @@ class Data
                 $query .=
                     ' INTO ' .
                     $this->table .
-                    ' (str, context, lng_source, lng_target, trans, added, checked, shared, discovered_last_time, discovered_last_url_orig, discovered_last_url) VALUES ';
+                    ' (str, context, lng_source, lng_target, trans, added, checked, shared, discovered_last_time, discovered_last_url_orig, discovered_last_url, translated_by) VALUES ';
                 $query_q = [];
                 $query_a = [];
                 foreach ($this->data['save']['insert'] as $save__key => $save__value) {
                     if ($save__key < $batch_size * $batch_cur || $save__key >= $batch_size * ($batch_cur + 1)) {
                         continue;
                     }
-                    $query_q[] = '(?,?,?,?,?,?,?,?,?,?,?)';
+                    $query_q[] = '(?,?,?,?,?,?,?,?,?,?,?,?)';
                     $query_a = array_merge($query_a, [
                         $save__value['str'],
                         $save__value['context'],
@@ -217,7 +219,8 @@ class Data
                         $save__value['shared'],
                         $date,
                         $discovered_last_url_orig,
-                        $discovered_last_url
+                        $discovered_last_url,
+                        $save__value['translated_by']
                     ]);
                 }
                 $query .= implode(',', $query_q);
@@ -274,6 +277,24 @@ class Data
             return $col;
         }
         return 'BINARY ' . $col;
+    }
+
+    function getTranslatedCharsByService()
+    {
+        $data = [];
+        // sometimes the db does not yet exist
+        try {
+            $data_raw = $this->db->fetch_all(
+                'SELECT translated_by, SUM(LENGTH(str)) as length FROM ' . $this->table . ' GROUP BY translated_by'
+            );
+            if (!empty($data_raw)) {
+                foreach ($data_raw as $data_raw__value) {
+                    $data[$data_raw__value['translated_by']] = intval($data_raw__value['length']);
+                }
+            }
+        } catch (\Exception $e) {
+        }
+        return $data;
     }
 
     function trackDiscovered($str, $lng_source, $lng_target, $context = null)
@@ -395,6 +416,9 @@ class Data
                 $data_grouped[$result__value['str']][$result__value['context']][
                     $result__value['lng_target'] . '_discovered_last_url'
                 ] = $result__value['discovered_last_url'];
+                $data_grouped[$result__value['str']][$result__value['context']][
+                    $result__value['lng_target'] . '_translated_by'
+                ] = $result__value['translated_by'];
             }
         }
         foreach ($data_grouped as $data_grouped__value) {
@@ -469,7 +493,8 @@ class Data
         $added = null,
         $discovered_last_time = null,
         $discovered_last_url_orig = null,
-        $discovered_last_url = null
+        $discovered_last_url = null,
+        $translated_by = null
     ) {
         $success = false;
 
@@ -529,7 +554,13 @@ class Data
                     }
                 }
                 foreach (
-                    ['added', 'discovered_last_time', 'discovered_last_url_orig', 'discovered_last_url']
+                    [
+                        'added',
+                        'discovered_last_time',
+                        'discovered_last_url_orig',
+                        'discovered_last_url',
+                        'translated_by'
+                    ]
                     as $cols__value
                 ) {
                     if (${$cols__value} !== null) {
@@ -553,7 +584,8 @@ class Data
                 'shared' => $shared === true || $shared == 1 ? 1 : 0,
                 'discovered_last_time' => $discovered_last_time,
                 'discovered_last_url_orig' => $discovered_last_url_orig,
-                'discovered_last_url' => $discovered_last_url
+                'discovered_last_url' => $discovered_last_url,
+                'translated_by' => $translated_by
             ]);
             $success = true;
         }
@@ -614,7 +646,11 @@ class Data
             'lng_target' => $lng_target,
             'trans' => $trans,
             'checked' => $this->settings->get('auto_set_new_strings_checked') === true ? 1 : 0,
-            'shared' => 0
+            'shared' => 0,
+            'translated_by' =>
+                $this->settings->get('auto_translation') === true
+                    ? $this->settings->get('auto_translation_service')
+                    : null
         ];
         $this->data['cache'][$lng_source][$lng_target][$context ?? ''][$str] = $trans;
         $this->data['cache_reverse'][$lng_source][$lng_target][$context ?? ''][$trans] = $str;
@@ -1132,7 +1168,6 @@ class Data
                 if ($trans === null || $trans === '') {
                     return null;
                 }
-                $this->log->statsLogIncrease('google', mb_strlen($orig));
             } elseif ($this->settings->get('auto_translation_service') === 'microsoft') {
                 $api_key = $this->settings->get('microsoft_translation_api_key');
                 if (is_array($api_key)) {
@@ -1146,7 +1181,6 @@ class Data
                 if ($trans === null || $trans === '') {
                     return null;
                 }
-                $this->log->statsLogIncrease('microsoft', mb_strlen($orig));
             } elseif ($this->settings->get('auto_translation_service') === 'deepl') {
                 $api_key = $this->settings->get('deepl_translation_api_key');
                 if (is_array($api_key)) {
@@ -1160,7 +1194,6 @@ class Data
                 if ($trans === null || $trans === '') {
                     return null;
                 }
-                $this->log->statsLogIncrease('deepl', mb_strlen($orig));
             }
             if ($context === 'slug') {
                 $trans = $this->utils->slugify($trans, $orig, $lng_target);

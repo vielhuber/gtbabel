@@ -927,7 +927,6 @@ The default configuration is:
     'google_translation_api_key' => [], // use a string or array of strings to provide multiple keys at once
     'microsoft_translation_api_key' => [], // use a string or array of strings to provide multiple keys at once
     'deepl_translation_api_key' => [], // use a string or array of strings to provide multiple keys at once
-    'stats_log' => true,
     'discovery_log' => false,
     'prevent_publish' => true,
     'prevent_publish_urls' => [
@@ -1264,7 +1263,7 @@ Country codes (like "BR" in "pt_BR") should be used in the (unique) `code`-attri
 
 ## API usage costs
 
-The translation apis of Google, Microsoft or DeepL can be costly. Try to keep track of your current usage stats. Gtbabel helps you by tracking the total amount of translated chars (see the `stats_log` option). You can also provide multiple api keys, Gtbabel then distributes the calls uniformly.
+The translation apis of Google, Microsoft or DeepL can be costly. Try to keep track of your current usage stats. Gtbabel helps you by tracking the total amount of translated chars. You can also provide multiple api keys, Gtbabel then distributes the calls uniformly.
 
 ## Caveats
 

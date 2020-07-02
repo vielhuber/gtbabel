@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.7.5
+ * Version: 3.7.6
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -499,7 +499,6 @@ class GtbabelWordPress
                             'google_translation_api_key',
                             'microsoft_translation_api_key',
                             'deepl_translation_api_key',
-                            'stats_log',
                             'prevent_publish_urls',
                             'alt_lng_urls',
                             'exclude_urls',
@@ -533,7 +532,6 @@ class GtbabelWordPress
                             'only_show_checked_strings',
                             'auto_set_new_strings_checked',
                             'auto_translation',
-                            'stats_log',
                             'wizard_finished'
                         ]
                         as $checkbox__value
@@ -997,17 +995,6 @@ class GtbabelWordPress
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_stats_log" class="gtbabel__label">';
-        echo __('Enable translation api usage stats', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_stats_log" name="gtbabel[stats_log]" value="1"' .
-            ($settings['stats_log'] == '1' ? ' checked="checked"' : '') .
-            ' />';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
         echo '<label for="gtbabel_prevent_publish_urls" class="gtbabel__label">';
         echo __('Prevent publish of pages', 'gtbabel-plugin');
         echo '</label>';
@@ -1178,12 +1165,10 @@ class GtbabelWordPress
 
         $this->initBackendAutoTranslate('page=gtbabel-settings');
 
-        if ($settings['stats_log'] == '1') {
-            echo '<div class="gtbabel__stats-log">';
-            echo '<h2 class="gtbabel__subtitle">' . __('Translation api usage stats', 'gtbabel-plugin') . '</h2>';
-            echo $this->showStatsLog();
-            echo '</div>';
-        }
+        echo '<div class="gtbabel__stats-log">';
+        echo '<h2 class="gtbabel__subtitle">' . __('Translation api usage stats', 'gtbabel-plugin') . '</h2>';
+        echo $this->showStatsLog();
+        echo '</div>';
 
         echo '<h2 class="gtbabel__subtitle">' . __('Set all strings to checked', 'gtbabel-plugin') . '</h2>';
         echo '<input class="gtbabel__submit button button-secondary" name="check_all_strings" value="' .
@@ -2008,11 +1993,10 @@ EOD;
 
             $this->initBackendAutoTranslate('page=gtbabel-wizard&step=3');
 
-            if ($settings['stats_log'] == '1') {
-                echo '<div class="gtbabel__stats-log">';
-                echo $this->showStatsLog('google');
-                echo '</div>';
-            }
+            echo '<div class="gtbabel__stats-log">';
+            echo $this->showStatsLog('google');
+            echo '</div>';
+
             echo '<div class="gtbabel__wizard-buttons">';
             echo '<a class="button button-secondary" href="' .
                 admin_url('admin.php?page=gtbabel-wizard&step=2') .
@@ -2319,9 +2303,8 @@ EOD;
             return strpos($urls__value, $this->gtbabel->host->getCurrentHost()) !== false;
         });
 
-
         // intentionally throw in a 404 page (so that content there [except the slug] is translated as well)
-        $urls[] = get_bloginfo('url').'/gtbabel-force-404/';
+        $urls[] = get_bloginfo('url') . '/gtbabel-force-404/';
 
         $urls = array_unique($urls);
 
@@ -2349,6 +2332,11 @@ EOD;
 
     private function showStatsLog($service = null)
     {
+        $data = $this->gtbabel->data->getTranslatedCharsByService();
+        if (empty($data)) {
+            echo '<p>' . __('No translations available.', 'gtbabel-plugin') . '</p>';
+            return;
+        }
         echo '<ul>';
         foreach (
             [
@@ -2361,21 +2349,24 @@ EOD;
             if ($service !== null && $service__key !== $service) {
                 continue;
             }
+            if (!array_key_exists($service__key, $data)) {
+                continue;
+            }
+            $length = $data[$service__key];
             echo '<li>';
             echo $service__value . ': ';
-            $cur = $this->gtbabel->log->statsLogGet($service__key);
-            echo $cur;
+            echo $length;
             echo ' ';
             echo __('Characters', 'gtbabel-plugin');
             $costs = 0;
             if ($service__key === 'google') {
-                $costs = $cur * (20 / 1000000) * 0.92;
+                $costs = $length * (20 / 1000000) * 0.92;
             }
             if ($service__value === 'microsoft') {
-                $costs = $cur * (8.433 / 1000000);
+                $costs = $length * (8.433 / 1000000);
             }
             if ($service__value === 'deepl') {
-                $costs = $cur * (20 / 1000000);
+                $costs = $length * (20 / 1000000);
             }
             echo ' (~' . number_format(round($costs, 2), 2, ',', '.') . ' €)';
             echo '</li>';

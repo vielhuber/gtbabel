@@ -71,7 +71,6 @@ class Settings
             'google_translation_api_key' => [],
             'microsoft_translation_api_key' => [],
             'deepl_translation_api_key' => [],
-            'stats_log' => true,
             'discovery_log' => false,
             'prevent_publish' => true,
             'prevent_publish_urls' => [

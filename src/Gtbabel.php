@@ -78,13 +78,11 @@ class Gtbabel
         ob_end_clean();
         echo $content;
         $this->data->saveCacheToDatabase();
-        $this->log->statsLogSave();
     }
 
     function reset()
     {
         $this->data->resetTranslations();
-        $this->log->statsLogReset();
         $this->log->generalLogReset();
     }
 
