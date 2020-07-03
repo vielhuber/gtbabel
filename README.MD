@@ -1036,6 +1036,7 @@ By default Gtbabel translates all text and tag nodes with the following rules:
 | `body input`                    | ✗    | `placeholder`    | `auto`           |
 | `head title`                    | ✓    | ✗                | `'title'`        |
 | `head meta[name="description"]` | ✗    | `content`        | `'description'`  |
+| `head link[rel="canonical"]`    | ✗    | `href`           | `'slug'`         |
 | `body img`                      | ✗    | `src`            | `'file'`         |
 | `body *`                        | ✗    | `style`          | `'file'`         |
 | `body *`                        | ✗    | `data-*`         | `auto`           |

@@ -192,6 +192,11 @@ class Dom
                     'context' => 'description'
                 ],
                 [
+                    'selector' => '/html/head//link[@rel="canonical"][@href]',
+                    'attribute' => 'href',
+                    'context' => 'slug'
+                ],
+                [
                     'selector' => '/html/body//img[@src]',
                     'attribute' => 'src',
                     'context' => 'file'
