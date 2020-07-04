@@ -177,8 +177,18 @@ class Dom
                     'context' => null
                 ],
                 [
-                    'selector' => '/html/body//input[@placeholder]',
+                    'selector' => '/html/body//*[@placeholder]',
                     'attribute' => 'placeholder',
+                    'context' => null
+                ],
+                [
+                    'selector' => '/html/body//input[@type="submit"][@value]',
+                    'attribute' => 'value',
+                    'context' => null
+                ],
+                [
+                    'selector' => '/html/body//input[@type="reset"][@value]',
+                    'attribute' => 'value',
                     'context' => null
                 ],
                 [
@@ -325,7 +335,11 @@ class Dom
                                     $this->addToExcludedNodes($nodes__value, 'text()');
                                 } else {
                                     if ($content__value['type'] === 'attribute') {
-                                        $nodes__value->setAttribute($content__value['key'], $trans);
+                                        // sometimes there are malformed chars; catch errors
+                                        try {
+                                            $nodes__value->setAttribute($content__value['key'], $trans);
+                                        } catch (\Exception $e) {
+                                        }
                                         $this->addToExcludedNodes($nodes__value, $content__value['key']);
                                     } else {
                                         $this->setInnerHtml($nodes__value, $trans);
@@ -726,6 +740,9 @@ class Dom
                 if (is_array($json__value) || is_object($json__value) || $json__value instanceof \Traversable) {
                     $this->traverseJson($json__value);
                 } elseif (is_string($json__value)) {
+                    if (!is_numeric($json__key) && !in_array($json__key, ['message'], true)) {
+                        continue;
+                    }
                     $trans = $this->data->prepareTranslationAndAddDynamicallyIfNeeded(
                         $json__value,
                         $this->settings->getSourceLanguageCode(),

@@ -921,7 +921,7 @@ The default configuration is:
     'auto_add_translations' => true,
     'auto_set_new_strings_checked' => false,
     'auto_set_discovered_strings_checked' => false,
-    'only_show_checked_strings' => true,
+    'only_show_checked_strings' => false,
     'auto_translation' => true,
     'auto_translation_service' => 'google', // google|microsoft|deepl
     'google_translation_api_key' => [], // use a string or array of strings to provide multiple keys at once
@@ -938,7 +938,7 @@ The default configuration is:
     'alt_lng_urls' => [
         '/path/in/source/lng/to/specific/page' => 'en'
     ],
-    'exclude_urls' => ['/backend'],
+    'exclude_urls' => ['backend'],
     'exclude_dom' => ['.notranslate', '.lngpicker'],
     'force_tokenize' => ['.force-tokenize'],
     'include_dom' => [
@@ -1019,7 +1019,8 @@ gtbabel__('string', 'context');
 Also first check, if Gtbabel is available in JavaScript with `if (typeof gtbabel__ === 'function') { }`.
 
 In WordPress environments Gtbabel gives you a backend interface to handle the strings more conveniently.\
-Instead you can also can use [wp_localize_script](https://codex.wordpress.org/Function_Reference/wp_localize_script) (in conjunction with `gtbabel__`).
+You there don't even have to manually call `gtbabel_localize_js` (this is done for you).\
+As an alternative you can also can use [wp_localize_script](https://codex.wordpress.org/Function_Reference/wp_localize_script) (in conjunction with `gtbabel__`).
 
 ## Modified nodes
 
@@ -1033,7 +1034,9 @@ By default Gtbabel translates all text and tag nodes with the following rules:
 | `body form`                     | ✗    | `action`         | `'slug'`         |
 | `body img`                      | ✗    | `alt`            | `auto`           |
 | `body *`                        | ✗    | `title`          | `auto`           |
-| `body input`                    | ✗    | `placeholder`    | `auto`           |
+| `body *`                        | ✗    | `placeholder`    | `auto`           |
+| `body input[type="submit"]`     | ✗    | `value`          | `auto`           |
+| `body input[type="reset"]`      | ✗    | `value`          | `auto`           |
 | `head title`                    | ✓    | ✗                | `'title'`        |
 | `head meta[name="description"]` | ✗    | `content`        | `'description'`  |
 | `head link[rel="canonical"]`    | ✗    | `href`           | `'slug'`         |

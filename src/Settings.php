@@ -65,7 +65,7 @@ class Settings
             'auto_add_translations' => true,
             'auto_set_new_strings_checked' => false,
             'auto_set_discovered_strings_checked' => false,
-            'only_show_checked_strings' => true,
+            'only_show_checked_strings' => false,
             'auto_translation' => false,
             'auto_translation_service' => 'google',
             'google_translation_api_key' => [],
@@ -81,7 +81,7 @@ class Settings
             'alt_lng_urls' => [
                 '/path/in/source/lng/to/specific/page' => 'en'
             ],
-            'exclude_urls' => ['/backend'],
+            'exclude_urls' => ['backend'],
             'exclude_dom' => ['.notranslate', '.lngpicker'],
             'force_tokenize' => ['.force-tokenize'],
             'include_dom' => [

@@ -14,7 +14,7 @@ $gtbabel->start([
     'auto_add_translations' => false,
     'auto_set_new_strings_checked' => false,
     'auto_set_discovered_strings_checked' => false,
-    'only_show_checked_strings' => true,
+    'only_show_checked_strings' => false,
     'auto_translation' => true,
     'auto_translation_service' => 'google',
     'google_translation_api_key' => @$_SERVER['GOOGLE_TRANSLATION_API_KEY'],
