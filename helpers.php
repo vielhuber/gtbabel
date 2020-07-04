@@ -10,6 +10,17 @@ if (!function_exists('gtbabel_current_lng')) {
     }
 }
 
+if (!function_exists('gtbabel_source_lng')) {
+    function gtbabel_source_lng()
+    {
+        global $gtbabel;
+        if ($gtbabel === null) {
+            $gtbabel = new \vielhuber\gtbabel\Gtbabel();
+        }
+        return $gtbabel->settings->getSourceLanguageCode();
+    }
+}
+
 if (!function_exists('gtbabel_language_label')) {
     function gtbabel_language_label($lng)
     {

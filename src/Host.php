@@ -132,6 +132,16 @@ class Host
         return false;
     }
 
+    function currentUrlIsStaticFile()
+    {
+        return $this->urlIsStaticFile($this->getCurrentPath());
+    }
+
+    function urlIsStaticFile($url)
+    {
+        return preg_match('/\.(php|html)$/', rtrim($url, '/'));
+    }
+
     function responseCodeIsSuccessful()
     {
         return in_array(http_response_code(), [200, 304]);

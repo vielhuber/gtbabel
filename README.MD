@@ -1232,6 +1232,7 @@ Always surround these helper functions with `if( function_exists('...') ) { }`.
 
 ```php
 gtbabel_current_lng() // 'en'
+gtbabel_source_lng() // 'de'
 gtbabel_languages() // ['de','en']
 gtbabel_default_language_codes() // ['de','en','fr','af','am','ar','az','be','bg','bn','bs','ca','ceb','co','cs','cy','da','el','eo','es','et','eu','fa','fi','ga','gd','gl','gu','ha','haw','he','hi','hmn','hr','ht','hu','hy','id','ig','is','it','ja','jv','ka','kk','km','kn','ko','ku','ky','la','lb','lo','lt','lv','mg','mi','mk','ml','mn','mr','ms','mt','my','ne','nl','no','ny','pa','pl','ps','pt','ro','ru','sd','si','sk','sl','sm','sn','so','sq','sr','su','sv','ta','te','tg','th','tr','uk','ur','uz','vi','xh','yi','yo','zh-cn','zh-tw','zu']
 gtbabel_default_languages() // [['code' => 'de', 'label' => 'Deutsch'], ['code' => 'en', 'label' => 'English'], ...]
@@ -1245,12 +1246,31 @@ gtbabel_localize_js(['string', ['string', 'context']]) // hotload translations i
 
 gtbabel__('Hallo') // 'Hi there'
 gtbabel__('blog', 'slug') // 'blog-en'
-gtbabel__('Hi there', null, 'de', 'en') // 'Hello'
+gtbabel__('Hi there', null, 'de', 'en') // 'Hallo'
 ```
 
 ## Note on gtbabel\_\_()
 
 Don't use `gtbabel__()` for echoing strings, just output them in the source language. Gtbabel will take care of the rest.
+
+## Search
+
+If you need to translate queries into your source languages (for example in searches), just do this:
+
+```php
+$s = gtbabel__($s, null, gtbabel_source_lng(), gtbabel_current_lng());
+```
+
+In WordPress for example, you can modify the search query like this:
+
+```php
+add_action('pre_get_posts', function ($query) {
+    if (!$query->is_main_query() || is_admin() || !is_search()) {
+        return;
+    }
+    $query->set('s', gtbabel__($query->get('s'), null, gtbabel_source_lng(), gtbabel_current_lng()));
+});
+```
 
 ## Language codes
 

@@ -711,7 +711,7 @@ EOD;
 <a href="/beispiel-bilddatei13_EN.jpg"></a>
 <a href="beispiel-bilddatei14_EN.jpg"></a>
 <a href="en/beispiel-script.php?foo=bar"></a>
-<a href="en/beispiel.html"></a>
+<a href="beispiel.html"></a>
 <a href="en/example/path/1-buch-moses"></a>
 EOD;
 

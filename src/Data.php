@@ -949,6 +949,9 @@ class Data
         if (mb_strpos(trim($link, '/'), '&') === 0) {
             return $link;
         }
+        if ($this->host->urlIsStaticFile($link)) {
+            return $link;
+        }
         $is_absolute_link = mb_strpos($link, $this->host->getCurrentHost()) === 0;
         if (mb_strpos($link, 'http') !== false && $is_absolute_link === false) {
             return $link;
@@ -1556,6 +1559,9 @@ class Data
 
     function addCurrentUrlToTranslations($force = false)
     {
+        if ($this->host->currentUrlIsStaticFile()) {
+            return;
+        }
         if (!$this->sourceLngIsCurrentLng()) {
             return;
         }

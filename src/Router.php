@@ -18,6 +18,9 @@ class Router
 
     function redirectPrefixedSourceLng()
     {
+        if ($this->host->currentUrlIsStaticFile()) {
+            return;
+        }
         if (!$this->data->sourceLngIsCurrentLng()) {
             return;
         }
@@ -70,6 +73,9 @@ class Router
 
     function addTrailingSlash()
     {
+        if ($this->host->currentUrlIsStaticFile()) {
+            return;
+        }
         $args = $this->host->getCurrentArgs();
         if ($args != '') {
             return;
@@ -92,6 +98,9 @@ class Router
 
     function initMagicRouter()
     {
+        if ($this->host->currentUrlIsStaticFile()) {
+            return;
+        }
         if ($this->data->sourceLngIsCurrentLng()) {
             if ($this->settings->get('prefix_lng_source') === false) {
                 return;
@@ -122,6 +131,9 @@ class Router
 
     function redirectUnpublished()
     {
+        if ($this->host->currentUrlIsStaticFile()) {
+            return;
+        }
         if ($this->data->sourceLngIsCurrentLng()) {
             return;
         }
