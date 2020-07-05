@@ -107,7 +107,7 @@ class Host
     {
         if ($this->settings->get('exclude_urls') !== null && is_array($this->settings->get('exclude_urls'))) {
             foreach ($this->settings->get('exclude_urls') as $exclude__value) {
-                $regex = '/^(.+\/)?' . preg_quote(trim($exclude__value, '/')) . '(\/.+)?$/';
+                $regex = '/^(.+\/)?' . str_replace('/', '\/', preg_quote(trim($exclude__value, '/'))) . '(\/.+)?$/';
                 if (preg_match($regex, trim($url, '/'))) {
                     return true;
                 }

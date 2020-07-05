@@ -489,6 +489,9 @@ class GtbabelWordPress
                             'prefix_lng_source',
                             'redirect_root_domain',
                             'translate_default_tag_nodes',
+                            'translate_html',
+                            'translate_json',
+                            'translate_dom_changes',
                             'html_lang_attribute',
                             'html_hreflang_tags',
                             'auto_add_translations',
@@ -525,6 +528,9 @@ class GtbabelWordPress
                         [
                             'prefix_lng_source',
                             'translate_default_tag_nodes',
+                            'translate_html',
+                            'translate_json',
+                            'translate_dom_changes',
                             'html_lang_attribute',
                             'html_hreflang_tags',
                             'debug_translations',
@@ -856,6 +862,39 @@ class GtbabelWordPress
         echo '<div class="gtbabel__inputbox">';
         echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_translate_default_tag_nodes" name="gtbabel[translate_default_tag_nodes]" value="1"' .
             ($settings['translate_default_tag_nodes'] == '1' ? ' checked="checked"' : '') .
+            ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_translate_html" class="gtbabel__label">';
+        echo __('Translate additional nodes', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_translate_html" name="gtbabel[translate_html]" value="1"' .
+            ($settings['translate_html'] == '1' ? ' checked="checked"' : '') .
+            ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_translate_json" class="gtbabel__label">';
+        echo __('Translate additional nodes', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_translate_json" name="gtbabel[translate_json]" value="1"' .
+            ($settings['translate_json'] == '1' ? ' checked="checked"' : '') .
+            ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_translate_dom_changes" class="gtbabel__label">';
+        echo __('Translate additional nodes', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_translate_dom_changes" name="gtbabel[translate_dom_changes]" value="1"' .
+            ($settings['translate_dom_changes'] == '1' ? ' checked="checked"' : '') .
             ' />';
         echo '</div>';
         echo '</li>';

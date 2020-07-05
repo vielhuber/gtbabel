@@ -915,6 +915,9 @@ The default configuration is:
     'prefix_lng_source' => true,
     'redirect_root_domain' => 'browser', // 'browser'|'source' (only relevant if prefix_lng_source=true)
     'translate_default_tag_nodes' => true,
+    'translate_html' => true,
+    'translate_json' => true,
+    'translate_dom_changes' => true,
     'html_lang_attribute' => true,
     'html_hreflang_tags' => true,
     'debug_translations' => false, // surround outputted translations with "%|%" to see borders
