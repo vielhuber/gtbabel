@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.8.0
+ * Version: 3.8.1
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -125,7 +125,18 @@ class GtbabelWordPress
             }
         }
 
-        $this->gtbabel->start($settings);
+        if (isset($_GET['gtbabel_translate_part']) && $_GET['gtbabel_translate_part'] == '1' && isset($_POST['html'])) {
+            $_POST = stripslashes_deep($_POST);
+            $html = $this->gtbabel->translate($_POST['html'], $settings);
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'data' => $html
+            ]);
+            die();
+        } else {
+            $this->gtbabel->start($settings);
+        }
 
         // define wpml fallback constant
         if (!defined('ICL_LANGUAGE_CODE')) {
@@ -491,7 +502,7 @@ class GtbabelWordPress
                             'translate_default_tag_nodes',
                             'translate_html',
                             'translate_json',
-                            'translate_dom_changes',
+                            'detect_dom_changes',
                             'html_lang_attribute',
                             'html_hreflang_tags',
                             'auto_add_translations',
@@ -530,7 +541,7 @@ class GtbabelWordPress
                             'translate_default_tag_nodes',
                             'translate_html',
                             'translate_json',
-                            'translate_dom_changes',
+                            'detect_dom_changes',
                             'html_lang_attribute',
                             'html_hreflang_tags',
                             'debug_translations',
@@ -868,7 +879,7 @@ class GtbabelWordPress
 
         echo '<li class="gtbabel__field">';
         echo '<label for="gtbabel_translate_html" class="gtbabel__label">';
-        echo __('Translate additional nodes', 'gtbabel-plugin');
+        echo __('Translate html', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
         echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_translate_html" name="gtbabel[translate_html]" value="1"' .
@@ -879,7 +890,7 @@ class GtbabelWordPress
 
         echo '<li class="gtbabel__field">';
         echo '<label for="gtbabel_translate_json" class="gtbabel__label">';
-        echo __('Translate additional nodes', 'gtbabel-plugin');
+        echo __('Translate json', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
         echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_translate_json" name="gtbabel[translate_json]" value="1"' .
@@ -889,12 +900,12 @@ class GtbabelWordPress
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_translate_dom_changes" class="gtbabel__label">';
-        echo __('Translate additional nodes', 'gtbabel-plugin');
+        echo '<label for="gtbabel_detect_dom_changes" class="gtbabel__label">';
+        echo __('Detect dom changes', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_translate_dom_changes" name="gtbabel[translate_dom_changes]" value="1"' .
-            ($settings['translate_dom_changes'] == '1' ? ' checked="checked"' : '') .
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_detect_dom_changes" name="gtbabel[detect_dom_changes]" value="1"' .
+            ($settings['detect_dom_changes'] == '1' ? ' checked="checked"' : '') .
             ' />';
         echo '</div>';
         echo '</li>';

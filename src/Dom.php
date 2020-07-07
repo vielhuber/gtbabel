@@ -359,20 +359,24 @@ class Dom
         if ($content == '') {
             return $content;
         }
-        if ($this->utils->getContentType($content) === 'html') {
-            $content = $this->modifyHtml($content);
-        } elseif ($this->utils->getContentType($content) === 'json') {
-            $content = $this->modifyJson($content);
-        }
+        $content = $this->modifyHtml($content);
+        $content = $this->modifyJson($content);
         return $content;
     }
 
     function modifyHtml($html)
     {
+        if ($this->utils->getContentType($html) !== 'html') {
+            return $html;
+        }
+        if ($this->settings->get('translate_html') !== true) {
+            return $html;
+        }
         $this->setupDomDocument($html);
         $this->setLangTags();
         $this->setRtlAttr();
         $this->setAltLngUrls();
+        $this->detectDomChanges();
         $this->preloadExcludedNodes();
         $this->preloadForceTokenize();
         $this->preloadLngAreas();
@@ -724,6 +728,12 @@ class Dom
 
     function modifyJson($json)
     {
+        if ($this->utils->getContentType($json) !== 'json') {
+            return $json;
+        }
+        if ($this->settings->get('translate_json') !== true) {
+            return $json;
+        }
         if ($this->data->sourceLngIsCurrentLng() && $this->settings->get('prefix_lng_source') === false) {
             return $json;
         }
@@ -756,5 +766,22 @@ class Dom
                 }
             }
         }
+    }
+
+    function detectDomChanges()
+    {
+        if ($this->settings->get('detect_dom_changes') !== true) {
+            return;
+        }
+        if (!$this->host->responseCodeIsSuccessful()) {
+            return;
+        }
+        $head = $this->DOMXpath->query('/html/head')[0];
+        if ($head === null) {
+            return;
+        }
+        $tag = $this->DOMDocument->createElement('script', '');
+        $tag->textContent = file_get_contents(dirname(__DIR__) . '/js/frontend/build/bundle.js');
+        $head->appendChild($tag);
     }
 }

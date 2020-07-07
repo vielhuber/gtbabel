@@ -11,10 +11,12 @@ class Host
     public $original_host;
 
     public $settings;
+    public $log;
 
-    function __construct(Settings $settings = null)
+    function __construct(Settings $settings = null, Log $log = null)
     {
         $this->settings = $settings ?: new Settings();
+        $this->log = $log ?: new Log();
     }
 
     function setup()
@@ -107,7 +109,7 @@ class Host
     {
         if ($this->settings->get('exclude_urls') !== null && is_array($this->settings->get('exclude_urls'))) {
             foreach ($this->settings->get('exclude_urls') as $exclude__value) {
-                $regex = '/^(.+\/)?' . str_replace('/', '\/', preg_quote(trim($exclude__value, '/'))) . '(\/.+)?$/';
+                $regex = '/^(.+\/)?' . preg_quote(trim($exclude__value, '/'), '/') . '(\/.+)?$/';
                 if (preg_match($regex, trim($url, '/'))) {
                     return true;
                 }

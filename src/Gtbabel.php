@@ -32,11 +32,11 @@ class Gtbabel
     ) {
         $this->settings = $settings ?: new Settings();
         $this->utils = $utils ?: new Utils();
+        $this->log = $log ?: new Log($this->utils, $this->settings);
         $this->tags = $tags ?: new Tags($this->utils);
-        $this->host = $host ?: new Host($this->settings);
-        $this->publish = $publish ?: new Publish($this->settings, $this->host);
+        $this->host = $host ?: new Host($this->settings, $this->log);
+        $this->publish = $publish ?: new Publish($this->settings, $this->host, $this->log);
         $this->altlng = $altlng ?: new Altlng($this->settings, $this->host);
-        $this->log = $log ?: new Log($this->utils, $this->settings, $this->host);
         $this->data =
             $data ?: new Data($this->utils, $this->host, $this->settings, $this->tags, $this->log, $this->publish);
         $this->dom =
@@ -86,15 +86,15 @@ class Gtbabel
         $this->log->generalLogReset();
     }
 
-    function translate($content, $args = [])
+    function translate($html, $args = [])
     {
-        $args['only_show_checked_strings'] = 'false';
-        $this->settings->setup($args);
-        $this->host->setup();
-        $this->log->setup();
-        $this->data->preloadDataInCache();
-        $content = $this->dom->modifyContent($content);
-        return $content;
+        ob_start();
+        $this->start($args);
+        echo $html;
+        $this->stop();
+        $trans = ob_get_contents();
+        ob_end_clean();
+        return $trans;
     }
 
     function tokenize($content, $args = [])

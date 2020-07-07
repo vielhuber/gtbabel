@@ -7,13 +7,11 @@ class Log
 {
     public $utils;
     public $settings;
-    public $host;
 
-    function __construct(Utils $utils = null, Settings $settings = null, Host $host = null)
+    function __construct(Utils $utils = null, Settings $settings = null)
     {
         $this->utils = $utils ?: new Utils();
         $this->settings = $settings ?: new Settings();
-        $this->host = $host ?: new Host();
     }
 
     function setup()

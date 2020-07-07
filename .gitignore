@@ -12,3 +12,5 @@ log.txt
 gtbabel-*-log.txt
 /node_modules/
 /package-lock.json
+*.js.map
+*.tmp-browserify*

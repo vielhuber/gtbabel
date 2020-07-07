@@ -5,11 +5,13 @@ class Publish
 {
     public $settings;
     public $host;
+    public $log;
 
-    function __construct(Settings $settings = null, Host $host = null)
+    function __construct(Settings $settings = null, Host $host = null, Log $log = null)
     {
         $this->settings = $settings ?: new Settings();
         $this->host = $host ?: new Host();
+        $this->log = $log ?: new Log();
     }
 
     function edit($url, $lngs = null)
@@ -81,11 +83,7 @@ class Publish
         $prevent_publish_urls = $this->settings->get('prevent_publish_urls');
         foreach ($prevent_publish_urls as $prevent_publish_urls__key => $prevent_publish_urls__value) {
             if ($allow_regex === true) {
-                $regex = str_replace(
-                    '/',
-                    '\/',
-                    str_replace('\*', '.*', preg_quote(trim($prevent_publish_urls__key, '/'), '/'))
-                );
+                $regex = str_replace('\*', '.*', preg_quote(trim($prevent_publish_urls__key, '/'), '/'));
                 if (preg_match('/' . $regex . '/', trim($url, '/')) == 0) {
                     continue;
                 }

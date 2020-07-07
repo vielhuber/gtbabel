@@ -917,7 +917,7 @@ The default configuration is:
     'translate_default_tag_nodes' => true,
     'translate_html' => true,
     'translate_json' => true,
-    'translate_dom_changes' => true,
+    'detect_dom_changes' => true,
     'html_lang_attribute' => true,
     'html_hreflang_tags' => true,
     'debug_translations' => false, // surround outputted translations with "%|%" to see borders
