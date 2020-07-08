@@ -1598,7 +1598,9 @@ class Data
                 $args[] = $since;
             }
             $data_raw = $this->db->fetch_all(
-                'SELECT translated_by, SUM(LENGTH(str)) as length FROM ' .
+                'SELECT translated_by, SUM(' .
+                    ($this->db->sql->engine === 'sqlite' ? 'LENGTH' : 'CHAR_LENGTH') .
+                    '(str)) as length FROM ' .
                     $this->table .
                     ($since !== null ? ' WHERE added > ?' : '') .
                     ' GROUP BY translated_by',
