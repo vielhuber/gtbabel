@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.8.8
+ * Version: 3.8.9
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -2390,7 +2390,12 @@ EOD;
         });
 
         // intentionally throw in a 404 page (so that content there [except the slug] is translated as well)
-        $urls[] = get_bloginfo('url') . '/gtbabel-force-404/';
+        $urls[] =
+            get_bloginfo('url') .
+            ($this->gtbabel->settings->get('prefix_lng_source') === true
+                ? '/' . $this->gtbabel->settings->getSourceLanguageCode()
+                : '') .
+            '/gtbabel-force-404/';
 
         $urls = array_unique($urls);
 
