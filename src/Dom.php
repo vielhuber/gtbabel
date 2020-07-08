@@ -688,7 +688,7 @@ class Dom
                 if (!is_array($translated_strings__value)) {
                     $context = '';
                     $orig = $translated_strings__value;
-                    $trans = $this->data->getTranslationAndAddDynamicallyIfNeeded(
+                    $trans = $this->data->prepareTranslationAndAddDynamicallyIfNeeded(
                         $translated_strings__value,
                         $this->settings->getSourceLanguageCode(),
                         $this->data->getCurrentLanguageCode(),
@@ -697,7 +697,7 @@ class Dom
                 } else {
                     $context = $translated_strings__value[1];
                     $orig = $translated_strings__value[0];
-                    $trans = $this->data->getTranslationAndAddDynamicallyIfNeeded(
+                    $trans = $this->data->prepareTranslationAndAddDynamicallyIfNeeded(
                         $translated_strings__value[0],
                         $this->settings->getSourceLanguageCode(),
                         $this->data->getCurrentLanguageCode(),
@@ -705,7 +705,9 @@ class Dom
                     );
                 }
                 if ($trans === null) {
-                    continue;
+                    $trans = !is_array($translated_strings__value)
+                        ? $translated_strings__value
+                        : $translated_strings__value[0];
                 }
                 $orig = str_replace("\r", '', $orig);
                 $trans = str_replace("\r", '', $trans);

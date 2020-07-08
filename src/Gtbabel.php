@@ -10,10 +10,10 @@ class Gtbabel
     public $publish;
     public $altlng;
     public $log;
+    public $data;
     public $dom;
     public $router;
     public $gettext;
-    public $data;
 
     public $started;
 
@@ -83,6 +83,7 @@ class Gtbabel
     function reset()
     {
         $this->data->resetTranslations();
+        $this->data->statsReset();
         $this->log->generalLogReset();
     }
 

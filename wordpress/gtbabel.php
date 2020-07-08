@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.8.1
+ * Version: 3.8.2
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -513,6 +513,9 @@ class GtbabelWordPress
                             'google_translation_api_key',
                             'microsoft_translation_api_key',
                             'deepl_translation_api_key',
+                            'google_throttle_chars_per_month',
+                            'microsoft_throttle_chars_per_month',
+                            'deepl_throttle_chars_per_month',
                             'prevent_publish_urls',
                             'alt_lng_urls',
                             'exclude_urls',
@@ -1041,6 +1044,39 @@ class GtbabelWordPress
                 ? implode(PHP_EOL, $settings['deepl_translation_api_key'])
                 : $settings['deepl_translation_api_key']) .
             '</textarea>';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_google_throttle_chars_per_month" class="gtbabel__label">';
+        echo __('Google API throttling after chars per month', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input" type="text" id="gtbabel_google_throttle_chars_per_month" name="gtbabel[google_throttle_chars_per_month]" value="' .
+            $settings['google_throttle_chars_per_month'] .
+            '" />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_microsoft_throttle_chars_per_month" class="gtbabel__label">';
+        echo __('Microsoft API throttling after chars per month', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input" type="text" id="gtbabel_microsoft_throttle_chars_per_month" name="gtbabel[microsoft_throttle_chars_per_month]" value="' .
+            $settings['microsoft_throttle_chars_per_month'] .
+            '" />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_deepl_throttle_chars_per_month" class="gtbabel__label">';
+        echo __('DeepL API throttling after chars per month', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input" type="text" id="gtbabel_deepl_throttle_chars_per_month" name="gtbabel[deepl_throttle_chars_per_month]" value="' .
+            $settings['deepl_throttle_chars_per_month'] .
+            '" />';
         echo '</div>';
         echo '</li>';
 
@@ -2382,43 +2418,22 @@ EOD;
 
     private function showStatsLog($service = null)
     {
-        $data = $this->gtbabel->data->getTranslatedCharsByService();
+        $data = $this->gtbabel->data->statsGetTranslatedCharsByService();
         if (empty($data)) {
             echo '<p>' . __('No translations available.', 'gtbabel-plugin') . '</p>';
             return;
         }
         echo '<ul>';
-        foreach (
-            [
-                'google' => 'Google Translation API',
-                'microsoft' => 'Microsoft Translation API',
-                'deepl' => 'DeepL Translation API'
-            ]
-            as $service__key => $service__value
-        ) {
-            if ($service !== null && $service__key !== $service) {
+        foreach ($data as $data__value) {
+            if ($service !== null && $data__value['service'] !== $service) {
                 continue;
             }
-            if (!array_key_exists($service__key, $data)) {
-                continue;
-            }
-            $length = $data[$service__key];
             echo '<li>';
-            echo $service__value . ': ';
-            echo $length;
+            echo $data__value['label'] . ': ';
+            echo $data__value['length'];
             echo ' ';
             echo __('Characters', 'gtbabel-plugin');
-            $costs = 0;
-            if ($service__key === 'google') {
-                $costs = $length * (20 / 1000000) * 0.92;
-            }
-            if ($service__value === 'microsoft') {
-                $costs = $length * (8.433 / 1000000);
-            }
-            if ($service__value === 'deepl') {
-                $costs = $length * (20 / 1000000);
-            }
-            echo ' (~' . number_format(round($costs, 2), 2, ',', '.') . ' €)';
+            echo ' (~' . number_format($data__value['costs'], 2, ',', '.') . ' €)';
             echo '</li>';
         }
         echo '</ul>';

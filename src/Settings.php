@@ -74,6 +74,9 @@ class Settings
             'google_translation_api_key' => [],
             'microsoft_translation_api_key' => [],
             'deepl_translation_api_key' => [],
+            'google_throttle_chars_per_month' => 1000000,
+            'microsoft_throttle_chars_per_month' => 1000000,
+            'deepl_throttle_chars_per_month' => 1000000,
             'discovery_log' => false,
             'prevent_publish' => true,
             'prevent_publish_urls' => [

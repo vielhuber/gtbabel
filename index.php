@@ -20,6 +20,9 @@ $gtbabel->start([
     'google_translation_api_key' => @$_SERVER['GOOGLE_TRANSLATION_API_KEY'],
     'microsoft_translation_api_key' => @$_SERVER['MICROSOFT_TRANSLATION_API_KEY'],
     'deepl_translation_api_key' => @$_SERVER['DEEPL_TRANSLATION_API_KEY'],
+    'google_throttle_chars_per_month' => 1000000,
+    'microsoft_throttle_chars_per_month' => 1000000,
+    'deepl_throttle_chars_per_month' => 1000000,
     'exclude_urls' => null,
     'languages' => [
         [

@@ -28,6 +28,8 @@ Gtbabel automatically translates your HTML/PHP pages – server sided!
 -   PHPUnit e2e tests available.
 -   Exports and imports directly to [gettext](https://www.gnu.org/software/gettext/) (using extracted comments and template files).
 -   Multiple source languages supported concurrently.
+-   DOM change detection: Works out of the box with dynamic content.
+-   Auto throttling api translation for cost control.
 
 ## Requirements
 
@@ -930,6 +932,9 @@ The default configuration is:
     'google_translation_api_key' => [], // use a string or array of strings to provide multiple keys at once
     'microsoft_translation_api_key' => [], // use a string or array of strings to provide multiple keys at once
     'deepl_translation_api_key' => [], // use a string or array of strings to provide multiple keys at once
+    'google_throttle_chars_per_month' => 1000000,
+    'microsoft_throttle_chars_per_month' => 1000000,
+    'deepl_throttle_chars_per_month' => 1000000,
     'discovery_log' => false,
     'prevent_publish' => true,
     'prevent_publish_urls' => [
@@ -1004,9 +1009,10 @@ The following features are included:
 
 ## JavaScript
 
-Gtbabel itself is based on PHP and only works for static pages or pages rendered via PHP.\
-The whole idea can be relatively easy implemented in js frameworks like Vue or React.\
-To get translations in JavaScript from your PHP application, Gtbabel provides a neat helper function to hotload your translations in the header that works in every environment. Execute the following function before you include your js files:
+Gtbabel itself is based on PHP and works for static pages or pages rendered via PHP.\
+However, if you enable `detect_dom_changes`, Gtbabel monitors all dom changes and translates suitable parts automatically.\
+
+To get translations directly in JavaScript, Gtbabel provides a small helper function to hotload your translations in the header that works in every environment. Execute the following function before you include your js files:
 
 ```php
 gtbabel_localize_js(['string', ['string', 'context']]);
