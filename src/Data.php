@@ -1198,7 +1198,7 @@ class Data
             }
 
             // increase stats
-            $this->statsIncreaseCharLengthForService($service, mb_strlen($trans));
+            $this->statsIncreaseCharLengthForService($service, mb_strlen($orig));
 
             if ($context === 'slug') {
                 $trans = $this->utils->slugify($trans, $orig, $lng_target);
