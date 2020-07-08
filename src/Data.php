@@ -785,25 +785,26 @@ class Data
         return $this->getPrefixFromUrl($url) ?? $this->settings->getSourceLanguageCode();
     }
 
-    function getLanguagePickerData()
+    function getLanguagePickerData($with_args = true)
     {
         $data = [];
+        if (!$this->host->responseCodeIsSuccessful()) {
+            return $data;
+        }
+        $cur_url = $with_args === true ? $this->host->getCurrentUrlWithArgs() : $this->host->getCurrentUrl();
         foreach ($this->settings->getSelectedLanguageCodesLabels() as $languages__key => $languages__value) {
-            if (!$this->host->responseCodeIsSuccessful()) {
-                continue;
-            }
-            $url = $this->getUrlTranslationInLanguage($this->getCurrentLanguageCode(), $languages__key);
             if (
                 $this->publish->isActive() &&
                 $this->publish->isPrevented($this->host->getCurrentUrl(), $languages__key)
             ) {
                 continue;
             }
+            $trans_url = $this->getUrlTranslationInLanguage($this->getCurrentLanguageCode(), $languages__key, $cur_url);
             $data[] = [
                 'code' => $languages__key,
                 'label' => $languages__value,
-                'url' => $url,
-                'active' => rtrim($url, '/') === rtrim($this->host->getCurrentUrlWithArgs(), '/')
+                'url' => $trans_url,
+                'active' => rtrim($trans_url, '/') === rtrim($cur_url, '/')
             ];
         }
         return $data;

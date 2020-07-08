@@ -459,7 +459,7 @@ class Dom
         if ($this->settings->get('html_hreflang_tags') === true) {
             $head_node = $this->DOMXpath->query('/html/head')[0];
             if ($head_node !== null) {
-                $data = $this->data->getLanguagePickerData();
+                $data = $this->data->getLanguagePickerData(false);
                 foreach ($data as $data__value) {
                     $tag = $this->DOMDocument->createElement('link', '');
                     $tag->setAttribute('rel', 'alternate');
