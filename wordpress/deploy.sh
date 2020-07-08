@@ -23,6 +23,7 @@ unlink vendor
 # copy composer files to current folder (one level up) and run composer install
 cp ../composer.json ./composer.json
 cp -r ../src ./src
+cp -r ../js ./js
 cp ../helpers.php ./helpers.php
 composer install --no-dev
 composer update --no-dev
@@ -75,6 +76,7 @@ rm -rf ./gtbabel/
 rm -f ./php-scoper.phar
 rm -rf ./vendor/
 rm -rf ./src
+rm -rf ./js
 rm -f ./helpers.php
 rm -f ./composer.json
 rm -f ./composer.lock
