@@ -617,8 +617,14 @@ class Data
         return true;
     }
 
-    function addTranslationToDatabaseAndToCache($str, $trans, $lng_source, $lng_target, $context = null)
-    {
+    function addTranslationToDatabaseAndToCache(
+        $str,
+        $trans,
+        $lng_source,
+        $lng_target,
+        $context = null,
+        $translated_by_current_service = true
+    ) {
         if ($lng_target === $lng_source) {
             return;
         }
@@ -631,7 +637,7 @@ class Data
             'checked' => $this->settings->get('auto_set_new_strings_checked') === true ? 1 : 0,
             'shared' => 0,
             'translated_by' =>
-                $this->settings->get('auto_translation') === true
+                $translated_by_current_service === true && $this->settings->get('auto_translation') === true
                     ? $this->settings->get('auto_translation_service')
                     : null
         ];
@@ -1018,7 +1024,14 @@ class Data
             }
             $trans = $this->getExistingTranslationFromCache($urls__value, $lng_source, $lng_target, 'file');
             if ($trans === false) {
-                $this->addTranslationToDatabaseAndToCache($urls__value, $urls__value, $lng_source, $lng_target, 'file');
+                $this->addTranslationToDatabaseAndToCache(
+                    $urls__value,
+                    $urls__value,
+                    $lng_source,
+                    $lng_target,
+                    'file',
+                    false
+                );
             } elseif ($this->stringIsChecked($urls__value, $lng_source, $lng_target, 'file')) {
                 $orig = str_replace($urls__value, $trans, $orig);
             }
@@ -1034,7 +1047,7 @@ class Data
         }
         $trans = $this->getExistingTranslationFromCache($orig, $lng_source, $lng_target, 'email');
         if ($trans === false) {
-            $this->addTranslationToDatabaseAndToCache($orig, $orig, $lng_source, $lng_target, 'email');
+            $this->addTranslationToDatabaseAndToCache($orig, $orig, $lng_source, $lng_target, 'email', false);
         } elseif ($this->stringIsChecked($orig, $lng_source, $lng_target, 'email')) {
             return ($is_link ? 'mailto:' : '') . $trans;
         }
@@ -1094,7 +1107,8 @@ class Data
                     $transWithoutAttributes,
                     $lng_source,
                     $lng_target,
-                    $context
+                    $context,
+                    true
                 );
             } else {
                 $transWithoutAttributes = $this->tags->removeAttributesExceptIrregularIds($origWithIds);
@@ -1482,8 +1496,22 @@ class Data
             }
             $trans = $this->autoTranslateString($str_in_source, $lng_source, $lng_target, $context);
             if ($trans !== null) {
-                $this->addTranslationToDatabaseAndToCache($str_in_source, $str, $lng_target, $lng_source, $context);
-                $this->addTranslationToDatabaseAndToCache($str_in_source, $trans, $lng_source, $lng_target, $context);
+                $this->addTranslationToDatabaseAndToCache(
+                    $str_in_source,
+                    $str,
+                    $lng_target,
+                    $lng_source,
+                    $context,
+                    true
+                );
+                $this->addTranslationToDatabaseAndToCache(
+                    $str_in_source,
+                    $trans,
+                    $lng_source,
+                    $lng_target,
+                    $context,
+                    true
+                );
             } else {
                 $trans = $str;
             }
@@ -1602,7 +1630,8 @@ class Data
                     ($this->db->sql->engine === 'sqlite' ? 'LENGTH' : 'CHAR_LENGTH') .
                     '(str)) as length FROM ' .
                     $this->table .
-                    ($since !== null ? ' WHERE added > ?' : '') .
+                    ' WHERE translated_by IS NOT NULL' .
+                    ($since !== null ? ' AND added > ?' : '') .
                     ' GROUP BY translated_by',
                 $args
             );
