@@ -25,10 +25,10 @@ export default class DetectChanges {
     }
 
     async onDomChange(mutation) {
-        let nodes;
+        let nodes = [];
         if (mutation.addedNodes.length > 0) {
             nodes = mutation.addedNodes;
-        } else if (mutation.target !== null) {
+        } else if (mutation.removedNodes.length === 0 && mutation.target !== null) {
             nodes = [mutation.target];
         }
         if (nodes.length === 0) {
@@ -48,8 +48,10 @@ export default class DetectChanges {
                 continue;
             }
             let html = '';
+            // this is important: previously set attributes must be removed (because they could have changed in the meantime again)
+            nodes__value.removeAttribute('data-gtbabel-hide');
             html = nodes__value.outerHTML;
-            nodes__value.style = 'display:none !important';
+            nodes__value.setAttribute('data-gtbabel-hide', '');
             let resp = await this.getTranslation(html);
             console.log(resp);
             let trans = resp.success === true ? resp.data : html;
@@ -67,7 +69,7 @@ export default class DetectChanges {
     }
 
     getTranslation(html) {
-        return new Promise((resolve, reject) => {
+        return new Promise(resolve => {
             let data = new URLSearchParams();
             data.append('html', html);
             let url = window.location.protocol + '//' + window.location.host + window.location.pathname;

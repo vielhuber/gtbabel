@@ -785,5 +785,8 @@ class Dom
         $tag = $this->DOMDocument->createElement('script', '');
         $tag->textContent = file_get_contents(dirname(__DIR__) . '/js/frontend/build/bundle.js');
         $head->appendChild($tag);
+        $tag = $this->DOMDocument->createElement('style', '');
+        $tag->textContent = '[data-gtbabel-hide] { display:none !important; }';
+        $head->appendChild($tag);
     }
 }
