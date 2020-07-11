@@ -45,8 +45,11 @@ class Gtbabel
         $this->gettext = $gettext ?: new Gettext($this->data, $this->settings);
     }
 
-    function start($args = [])
+    function start($args = [], $detectDomChanges = true)
     {
+        if ($detectDomChanges === true) {
+            $this->detectDomChanges($args);
+        }
         $this->started = true;
         $this->settings->setup($args);
         $this->host->setup();
@@ -90,12 +93,27 @@ class Gtbabel
     function translate($html, $args = [])
     {
         ob_start();
-        $this->start($args);
+        $this->start($args, false);
         echo $html;
         $this->stop();
         $trans = ob_get_contents();
         ob_end_clean();
         return $trans;
+    }
+
+    function detectDomChanges($args)
+    {
+        if (isset($_GET['gtbabel_translate_part']) && $_GET['gtbabel_translate_part'] == '1' && isset($_POST['html'])) {
+            $input = $_POST['html'];
+            $input = stripslashes($input);
+            $output = $this->translate($input, $args);
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'data' => ['input' => $input, 'output' => $output]
+            ]);
+            die();
+        }
     }
 
     function tokenize($content, $args = [])

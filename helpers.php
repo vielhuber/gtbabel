@@ -21,6 +21,17 @@ if (!function_exists('gtbabel_source_lng')) {
     }
 }
 
+if (!function_exists('gtbabel_referer_lng')) {
+    function gtbabel_referer_lng()
+    {
+        global $gtbabel;
+        if ($gtbabel === null) {
+            $gtbabel = new \vielhuber\gtbabel\Gtbabel();
+        }
+        return $gtbabel->data->getRefererLng();
+    }
+}
+
 if (!function_exists('gtbabel_language_label')) {
     function gtbabel_language_label($lng)
     {
@@ -100,17 +111,6 @@ if (!function_exists('gtbabel__')) {
             $lng_source,
             $context
         );
-    }
-}
-
-if (!function_exists('gtbabel_localize_js')) {
-    function gtbabel_localize_js($data)
-    {
-        global $gtbabel;
-        if ($gtbabel === null) {
-            $gtbabel = new \vielhuber\gtbabel\Gtbabel();
-        }
-        return $gtbabel->dom->outputJsLocalizationHelper($data);
     }
 }
 

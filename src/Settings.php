@@ -100,7 +100,9 @@ class Settings
                     'attribute' => 'alt-href',
                     'context' => 'slug'
                 ]
-            ]
+            ],
+            'localize_js' => true,
+            'localize_js_strings' => [['string' => 'Schließen'], ['string' => 'blog', 'context' => 'slug']]
         ];
         if (!empty($args)) {
             foreach ($args as $args__key => $args__value) {

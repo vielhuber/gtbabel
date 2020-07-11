@@ -468,6 +468,26 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->gtbabel->reset();
     }
 
+    public function test_referer_lng()
+    {
+        $this->gtbabel = new Gtbabel();
+        $settings = $this->getDefaultSettings();
+        $settings['languages'] = [['code' => 'de', 'label' => 'Deutsch'], ['code' => 'en', 'label' => 'English']];
+        $settings['debug_translations'] = false;
+
+        $_SERVER['HTTP_REFERER'] = 'http://gtbabel.local.vielhuber.de/de/';
+        $this->gtbabel->start($settings);
+        $this->gtbabel->stop();
+        $this->assertEquals($this->gtbabel->data->getRefererLng(), 'de');
+        $this->gtbabel->reset();
+
+        $_SERVER['HTTP_REFERER'] = 'http://gtbabel.local.vielhuber.de/en/';
+        $this->gtbabel->start($settings);
+        $this->gtbabel->stop();
+        $this->assertEquals($this->gtbabel->data->getRefererLng(), 'en');
+        $this->gtbabel->reset();
+    }
+
     public function test_multiple_sources()
     {
         $this->gtbabel = new Gtbabel();
@@ -1172,7 +1192,8 @@ EOD;
             'google_throttle_chars_per_month' => 1000000,
             'microsoft_throttle_chars_per_month' => 1000000,
             'deepl_throttle_chars_per_month' => 1000000,
-            'discovery_log' => false
+            'discovery_log' => false,
+            'localize_js' => false
         ];
     }
 

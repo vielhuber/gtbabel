@@ -28,7 +28,7 @@ Gtbabel automatically translates your HTML/PHP pages – server sided!
 -   PHPUnit e2e tests available.
 -   Exports and imports directly to [gettext](https://www.gnu.org/software/gettext/) (using extracted comments and template files).
 -   Multiple source languages supported concurrently.
--   DOM change detection: Works out of the box with dynamic content.
+-   DOM change detection: Observe specific page parts and translate dynamic content.
 -   Auto throttling api translation for cost control.
 
 ## Requirements
@@ -919,7 +919,6 @@ The default configuration is:
     'translate_default_tag_nodes' => true,
     'translate_html' => true,
     'translate_json' => true,
-    'detect_dom_changes' => true,
     'html_lang_attribute' => true,
     'html_hreflang_tags' => true,
     'debug_translations' => false, // surround outputted translations with "%|%" to see borders
@@ -959,7 +958,11 @@ The default configuration is:
             'attribute' => 'alt-href',
             'context' => 'slug'
         ]
-    ]
+    ],
+    'localize_js' => true,
+    'localize_js_strings' => [['string' => 'Schließen'], ['string' => 'blog', 'context' => 'slug']],
+    'detect_dom_changes' => true,
+    'detect_dom_changes_include' => ['.top-button', '.swal-overlay', '.wpcf7-response-output']
 ];
 ```
 
@@ -1009,16 +1012,11 @@ The following features are included:
 
 ## JavaScript
 
-Gtbabel itself is based on PHP and works for static pages or pages rendered via PHP.\
-However, if you enable `detect_dom_changes`, Gtbabel monitors all dom changes and translates suitable parts automatically.\
+Gtbabel itself is based on PHP and works for static pages or pages rendered via PHP.
 
-To get translations directly in JavaScript, Gtbabel provides a small helper function to hotload your translations in the header that works in every environment. Execute the following function before you include your js files:
+However, if you enable `detect_dom_changes`, Gtbabel monitors dom changes and translates suitable parts.\
 
-```php
-gtbabel_localize_js(['string', ['string', 'context']]);
-```
-
-Now you can access those strings easily inside JavaScript with:
+To get translations directly in JavaScript, Gtbabel also provides a small helper function to hotload your translations in the header that works in every environment. For this purpose the option `localize_js_strings` must be filled with content. You then can access those strings easily inside JavaScript with:
 
 ```js
 gtbabel__('string');
@@ -1026,10 +1024,6 @@ gtbabel__('string', 'context');
 ```
 
 Also first check, if Gtbabel is available in JavaScript with `if (typeof gtbabel__ === 'function') { }`.
-
-In WordPress environments Gtbabel gives you a backend interface to handle the strings more conveniently.\
-You there don't even have to manually call `gtbabel_localize_js` (this is done for you).\
-As an alternative you can also can use [wp_localize_script](https://codex.wordpress.org/Function_Reference/wp_localize_script) (in conjunction with `gtbabel__`).
 
 ## Modified nodes
 
@@ -1224,8 +1218,8 @@ Although Gtbabel leaves static files untouched, it adds them to the template fil
 
 ## JSON Responses
 
-JSON responses are also automatically parsed by Gtbabel.\
-Currently only string values are automatically translated.
+JSON responses can also be translated by Gtbabel when setting `translate_json` to true.\
+If your json endpoint is not targeted via a language specific url, you can get the language via `gtbabel_referer_lng()`.
 
 ## Translation management
 
@@ -1248,10 +1242,9 @@ gtbabel_default_languages() // [['code' => 'de', 'label' => 'Deutsch'], ['code' 
 gtbabel_language_label('en') // 'English'
 gtbabel_default_settings() // ['languages' => [['code' => 'de', 'label' => 'Deutsch'], ['code' => 'en', 'label' => 'English'], ...], 'log_folder' => '/logs', ...]
 gtbabel_default_settings(['log_folder' => '/foo']) // ['languages' => [['code' => 'de', 'label' => 'Deutsch'], ['code' => 'en', 'label' => 'English'], ...], 'log_folder' => '/foo', ...]
+gtbabel_referer_lng() // 'de'
 
 gtbabel_languagepicker() // [['code' => 'de', 'label' => 'Deutsch', 'url' => 'https://tld.com/de/nudel', 'active' => true], ['code' => 'en', 'label' => 'English', 'url' => 'https://tld.com/en/noodle', 'active' => false], ...]
-
-gtbabel_localize_js(['string', ['string', 'context']]) // hotload translations inside your javascript files
 
 gtbabel__('Hallo') // 'Hi there'
 gtbabel__('blog', 'slug') // 'blog-en'

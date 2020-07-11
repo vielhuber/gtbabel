@@ -377,6 +377,7 @@ class Dom
         $this->setRtlAttr();
         $this->setAltLngUrls();
         $this->detectDomChanges();
+        $this->localizeJs();
         $this->preloadExcludedNodes();
         $this->preloadForceTokenize();
         $this->preloadLngAreas();
@@ -680,54 +681,6 @@ class Dom
         return $parent;
     }
 
-    function outputJsLocalizationHelper($translated_strings)
-    {
-        if (!empty($translated_strings)) {
-            $translated_strings_json = [];
-            foreach ($translated_strings as $translated_strings__value) {
-                if (!is_array($translated_strings__value)) {
-                    $context = '';
-                    $orig = $translated_strings__value;
-                    $trans = $this->data->prepareTranslationAndAddDynamicallyIfNeeded(
-                        $translated_strings__value,
-                        $this->settings->getSourceLanguageCode(),
-                        $this->data->getCurrentLanguageCode(),
-                        null
-                    );
-                } else {
-                    $context = $translated_strings__value[1];
-                    $orig = $translated_strings__value[0];
-                    $trans = $this->data->prepareTranslationAndAddDynamicallyIfNeeded(
-                        $translated_strings__value[0],
-                        $this->settings->getSourceLanguageCode(),
-                        $this->data->getCurrentLanguageCode(),
-                        $translated_strings__value[1]
-                    );
-                }
-                if ($trans === null) {
-                    $trans = !is_array($translated_strings__value)
-                        ? $translated_strings__value
-                        : $translated_strings__value[0];
-                }
-                $orig = str_replace("\r", '', $orig);
-                $trans = str_replace("\r", '', $trans);
-                // those chars must be escaped in a json encoded string
-                $to_escape = ['\\', "\f", "\n", "\r", "\t", "\v", "\""];
-                foreach ($to_escape as $to_escape__value) {
-                    $orig = addcslashes($orig, $to_escape__value);
-                    $trans = addcslashes($trans, $to_escape__value);
-                }
-                $translated_strings_json[$context][$orig] = $trans;
-            }
-            echo '<script data-type="translated-strings">';
-            echo 'var translated_strings = JSON.parse(\'' .
-                json_encode($translated_strings_json, JSON_HEX_APOS) .
-                '\');';
-            echo 'function gtbabel__(string, context = \'\') { if( translated_strings[context][string] !== undefined && translated_strings[context][string] !== undefined ) { return translated_strings[context][string]; } return string; }';
-            echo '</script>';
-        }
-    }
-
     function modifyJson($json)
     {
         if ($this->utils->getContentType($json) !== 'json') {
@@ -778,6 +731,9 @@ class Dom
         if (!$this->host->responseCodeIsSuccessful()) {
             return;
         }
+        if ($this->data->sourceLngIsCurrentLng()) {
+            return;
+        }
         $head = $this->DOMXpath->query('/html/head')[0];
         if ($head === null) {
             return;
@@ -786,7 +742,61 @@ class Dom
         $tag->textContent = file_get_contents(dirname(__DIR__) . '/js/frontend/build/bundle.js');
         $head->appendChild($tag);
         $tag = $this->DOMDocument->createElement('style', '');
-        $tag->textContent = '[data-gtbabel-hide] { display:none !important; }';
+        $tag->textContent = '[data-gtbabel-hide] { opacity:0 !important; }';
         $head->appendChild($tag);
+    }
+
+    function localizeJs()
+    {
+        if ($this->settings->get('localize_js') !== true) {
+            return;
+        }
+        if (
+            $this->settings->get('localize_js_strings') === null ||
+            empty($this->settings->get('localize_js_strings'))
+        ) {
+            return;
+        }
+        if (!$this->host->responseCodeIsSuccessful()) {
+            return;
+        }
+        $translated_strings_json = [];
+        if (!$this->data->sourceLngIsCurrentLng()) {
+            foreach ($this->settings->get('localize_js_strings') as $localize_js_strings__value) {
+                $string = $localize_js_strings__value['string'];
+                $context = $localize_js_strings__value['context'];
+                $trans = $this->data->prepareTranslationAndAddDynamicallyIfNeeded(
+                    $string,
+                    $this->settings->getSourceLanguageCode(),
+                    $this->data->getCurrentLanguageCode(),
+                    $context
+                );
+                if ($trans === null) {
+                    continue;
+                }
+                $string = str_replace("\r", '', $string);
+                $trans = str_replace("\r", '', $trans);
+                // those chars must be escaped in a json encoded string
+                $to_escape = ['\\', "\f", "\n", "\r", "\t", "\v", "\""];
+                foreach ($to_escape as $to_escape__value) {
+                    $string = addcslashes($string, $to_escape__value);
+                    $trans = addcslashes($trans, $to_escape__value);
+                }
+                $translated_strings_json[$context][$string] = $trans;
+            }
+        }
+        $script = '';
+        $script .=
+            'var translated_strings = JSON.parse(\'' . json_encode($translated_strings_json, JSON_HEX_APOS) . '\');';
+        $script .=
+            'function gtbabel__(string, context = \'\') { if( translated_strings[context][string] !== undefined && translated_strings[context][string] !== undefined ) { return translated_strings[context][string]; } return string; }';
+
+        $head = $this->DOMXpath->query('/html/head')[0];
+        if ($head === null) {
+            return;
+        }
+        $tag = $this->DOMDocument->createElement('script', '');
+        $tag->textContent = $script;
+        $head->insertBefore($tag, $head->firstChild);
     }
 }

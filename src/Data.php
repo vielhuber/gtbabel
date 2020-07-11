@@ -791,6 +791,15 @@ class Data
         return $this->getPrefixFromUrl($url) ?? $this->settings->getSourceLanguageCode();
     }
 
+    function getRefererLng()
+    {
+        $referer = @$_SERVER['HTTP_REFERER'];
+        if ($referer == '') {
+            return $this->settings->getSourceLanguageCode();
+        }
+        return $this->getLngFromUrl($referer);
+    }
+
     function getLanguagePickerData($with_args = true)
     {
         $data = [];

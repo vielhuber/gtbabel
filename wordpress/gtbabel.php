@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.9.0
+ * Version: 3.9.1
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -35,7 +35,6 @@ class GtbabelWordPress
         $this->languagePickerWidget();
         $this->languagePickerShortcode();
         $this->disableAutoRedirect();
-        $this->localizeJs();
         $this->startHook();
         $this->stopHook();
     }
@@ -57,20 +56,6 @@ class GtbabelWordPress
             }
             return false;
         });
-    }
-
-    private function localizeJs()
-    {
-        $settings = $this->getSettings();
-        if (!empty($settings['localize_js'])) {
-            add_action(
-                'wp_head',
-                function () use ($settings) {
-                    $this->gtbabel->dom->outputJsLocalizationHelper($settings['localize_js']);
-                },
-                -1
-            );
-        }
     }
 
     private function startHook()
@@ -125,18 +110,7 @@ class GtbabelWordPress
             }
         }
 
-        if (isset($_GET['gtbabel_translate_part']) && $_GET['gtbabel_translate_part'] == '1' && isset($_POST['html'])) {
-            $_POST = stripslashes_deep($_POST);
-            $html = $this->gtbabel->translate($_POST['html'], $settings);
-            header('Content-Type: application/json');
-            echo json_encode([
-                'success' => true,
-                'data' => $html
-            ]);
-            die();
-        } else {
-            $this->gtbabel->start($settings);
-        }
+        $this->gtbabel->start($settings);
 
         // define wpml fallback constant
         if (!defined('ICL_LANGUAGE_CODE')) {
@@ -523,6 +497,7 @@ class GtbabelWordPress
                             'force_tokenize',
                             'include_dom',
                             'localize_js',
+                            'localize_js_strings',
                             'wizard_finished'
                         ]
                         as $fields__value
@@ -552,6 +527,7 @@ class GtbabelWordPress
                             'only_show_checked_strings',
                             'auto_set_new_strings_checked',
                             'auto_translation',
+                            'localize_js',
                             'wizard_finished'
                         ]
                         as $checkbox__value
@@ -650,8 +626,8 @@ class GtbabelWordPress
                         }
                     }
 
-                    $post_data = $settings['localize_js'];
-                    $settings['localize_js'] = [];
+                    $post_data = $settings['localize_js_strings'];
+                    $settings['localize_js_strings'] = [];
                     if (!empty(@$post_data['string'])) {
                         foreach ($post_data['string'] as $post_data__key => $post_data__value) {
                             if (
@@ -660,11 +636,12 @@ class GtbabelWordPress
                             ) {
                                 continue;
                             }
-                            $settings['localize_js'][] = [
-                                $post_data['string'][$post_data__key],
-                                $post_data['context'][$post_data__key] != ''
-                                    ? $post_data['context'][$post_data__key]
-                                    : null
+                            $settings['localize_js_strings'][] = [
+                                'string' => $post_data['string'][$post_data__key],
+                                'context' =>
+                                    $post_data['context'][$post_data__key] != ''
+                                        ? $post_data['context'][$post_data__key]
+                                        : null
                             ];
                         }
                     }
@@ -909,6 +886,17 @@ class GtbabelWordPress
         echo '<div class="gtbabel__inputbox">';
         echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_detect_dom_changes" name="gtbabel[detect_dom_changes]" value="1"' .
             ($settings['detect_dom_changes'] == '1' ? ' checked="checked"' : '') .
+            ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_localize_js" class="gtbabel__label">';
+        echo __('Detect dom changes', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_localize_js" name="gtbabel[localize_js]" value="1"' .
+            ($settings['localize_js'] == '1' ? ' checked="checked"' : '') .
             ' />';
         echo '</div>';
         echo '</li>';
@@ -1198,16 +1186,16 @@ class GtbabelWordPress
         echo '<div class="gtbabel__inputbox">';
         echo '<div class="gtbabel__repeater">';
         echo '<ul class="gtbabel__repeater-list">';
-        if (empty(@$settings['localize_js'])) {
-            $settings['localize_js'] = [['', '']];
+        if (empty(@$settings['localize_js_strings'])) {
+            $settings['localize_js_strings'] = [['string' => '', 'context' => '']];
         }
-        foreach ($settings['localize_js'] as $localize_js__value) {
+        foreach ($settings['localize_js_strings'] as $localize_js_strings__value) {
             echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-2">';
-            echo '<input class="gtbabel__input" type="text" name="gtbabel[localize_js][string][]" value="' .
-                $localize_js__value[0] .
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[localize_js_strings][string][]" value="' .
+                $localize_js_strings__value['string'] .
                 '" placeholder="string" />';
-            echo '<input class="gtbabel__input" type="text" name="gtbabel[localize_js][context][]" value="' .
-                $localize_js__value[1] .
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[localize_js_strings][context][]" value="' .
+                $localize_js_strings__value['context'] .
                 '" placeholder="context" />';
             echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
                 __('Remove', 'gtbabel-plugin') .
