@@ -764,7 +764,7 @@ class Dom
         if (!$this->data->sourceLngIsCurrentLng()) {
             foreach ($this->settings->get('localize_js_strings') as $localize_js_strings__value) {
                 $string = $localize_js_strings__value['string'];
-                $context = $localize_js_strings__value['context'];
+                $context = @$localize_js_strings__value['context'] ?? null;
                 $trans = $this->data->prepareTranslationAndAddDynamicallyIfNeeded(
                     $string,
                     $this->settings->getSourceLanguageCode(),
@@ -785,11 +785,12 @@ class Dom
                 $translated_strings_json[$context][$string] = $trans;
             }
         }
+
         $script = '';
         $script .=
             'var translated_strings = JSON.parse(\'' . json_encode($translated_strings_json, JSON_HEX_APOS) . '\');';
         $script .=
-            'function gtbabel__(string, context = \'\') { if( translated_strings[context][string] !== undefined && translated_strings[context][string] !== undefined ) { return translated_strings[context][string]; } return string; }';
+            'function gtbabel__(string, context = \'\') { if( context in translated_strings && translated_strings[context] !== undefined && translated_strings[context][string] !== undefined ) { return translated_strings[context][string]; } return string; }';
 
         $head = $this->DOMXpath->query('/html/head')[0];
         if ($head === null) {

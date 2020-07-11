@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.9.1
+ * Version: 3.9.2
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -891,17 +891,6 @@ class GtbabelWordPress
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_localize_js" class="gtbabel__label">';
-        echo __('Detect dom changes', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_localize_js" name="gtbabel[localize_js]" value="1"' .
-            ($settings['localize_js'] == '1' ? ' checked="checked"' : '') .
-            ' />';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
         echo '<label for="gtbabel_html_lang_attribute" class="gtbabel__label">';
         echo __('Set html lang attribute', 'gtbabel-plugin');
         echo '</label>';
@@ -1180,8 +1169,19 @@ class GtbabelWordPress
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label class="gtbabel__label">';
+        echo '<label for="gtbabel_localize_js" class="gtbabel__label">';
         echo __('Provide strings in JavaScript', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_localize_js" name="gtbabel[localize_js]" value="1"' .
+            ($settings['localize_js'] == '1' ? ' checked="checked"' : '') .
+            ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label class="gtbabel__label">';
+        echo __('Strings in JavaScript', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
         echo '<div class="gtbabel__repeater">';

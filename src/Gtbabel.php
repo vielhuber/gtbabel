@@ -121,6 +121,7 @@ class Gtbabel
         // set fixed source and target (important: they just need to be different)
         $args['lng_source'] = 'de';
         $args['lng_target'] = 'en';
+        $args['localize_js'] = false;
         $args['discovery_log'] = true;
         $this->settings->setup($args);
         $this->host->setup();
