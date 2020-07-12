@@ -4,7 +4,7 @@ namespace vielhuber\gtbabel;
 class Dom
 {
     public $DOMDocument;
-    public $DOMXpath;
+    public $DOMXPath;
 
     public $excluded_nodes;
     public $force_tokenize;
@@ -39,7 +39,7 @@ class Dom
         $this->excluded_nodes = [];
         if ($this->settings->get('exclude_dom') !== null) {
             foreach ($this->settings->get('exclude_dom') as $exclude__value) {
-                $nodes = $this->DOMXpath->query($this->transformSelectorToXpath($exclude__value));
+                $nodes = $this->DOMXPath->query($this->transformSelectorToXpath($exclude__value));
                 foreach ($nodes as $nodes__value) {
                     $this->addToExcludedNodes($nodes__value, '*');
                     foreach ($this->getChildrenOfNodeIncludingWhitespace($nodes__value) as $nodes__value__value) {
@@ -72,7 +72,7 @@ class Dom
         $this->force_tokenize = [];
         if ($this->settings->get('force_tokenize') !== null) {
             foreach ($this->settings->get('force_tokenize') as $tokenize__value) {
-                $nodes = $this->DOMXpath->query($this->transformSelectorToXpath($tokenize__value));
+                $nodes = $this->DOMXPath->query($this->transformSelectorToXpath($tokenize__value));
                 foreach ($nodes as $nodes__value) {
                     $this->force_tokenize[] = $this->getIdOfNode($nodes__value);
                 }
@@ -83,7 +83,7 @@ class Dom
     function preloadLngAreas()
     {
         $this->lng_areas = [];
-        $nodes = $this->DOMXpath->query('/html//*[@lang]');
+        $nodes = $this->DOMXPath->query('/html//*[@lang]');
         foreach ($nodes as $nodes__value) {
             $lng = $nodes__value->getAttribute('lang');
             $this->lng_areas[$this->getIdOfNode($nodes__value)] = $lng;
@@ -236,7 +236,7 @@ class Dom
 
         foreach ($include as $include__value) {
             $xpath = $this->transformSelectorToXpath($include__value['selector']);
-            $nodes = $this->DOMXpath->query($xpath);
+            $nodes = $this->DOMXPath->query($xpath);
             if (strpos($include__value['selector'], 'text()') !== false) {
                 $nodes = $this->getGroupsForTextNodes($nodes);
             }
@@ -411,7 +411,7 @@ class Dom
                 $html;
         }
         @$this->DOMDocument->loadHTML($html);
-        $this->DOMXpath = new \DOMXpath($this->DOMDocument);
+        $this->DOMXPath = new \DOMXPath($this->DOMDocument);
     }
 
     function finishDomDocument($htmlOriginal)
@@ -451,14 +451,14 @@ class Dom
         }
 
         if ($this->settings->get('html_lang_attribute') === true) {
-            $html_node = $this->DOMXpath->query('/html')[0];
+            $html_node = $this->DOMXPath->query('/html')[0];
             if ($html_node !== null) {
                 $html_node->setAttribute('lang', $this->data->getCurrentLanguageCode());
             }
         }
 
         if ($this->settings->get('html_hreflang_tags') === true) {
-            $head_node = $this->DOMXpath->query('/html/head')[0];
+            $head_node = $this->DOMXPath->query('/html/head')[0];
             if ($head_node !== null) {
                 $data = $this->data->getLanguagePickerData(false);
                 foreach ($data as $data__value) {
@@ -478,11 +478,11 @@ class Dom
         if ($this->altlng->get() === $this->settings->getSourceLanguageCode()) {
             return;
         }
-        $html_node = $this->DOMXpath->query('/html/head//title')[0];
+        $html_node = $this->DOMXPath->query('/html/head//title')[0];
         if ($html_node !== null) {
             $html_node->setAttribute('lang', $lng);
         }
-        $html_node = $this->DOMXpath->query('/html/head//meta[@name="description"][@content]')[0];
+        $html_node = $this->DOMXPath->query('/html/head//meta[@name="description"][@content]')[0];
         if ($html_node !== null) {
             $html_node->setAttribute('lang', $lng);
         }
@@ -491,7 +491,7 @@ class Dom
     function setRtlAttr()
     {
         if ($this->settings->isLanguageDirectionRtl($this->data->getCurrentLanguageCode())) {
-            $html_node = $this->DOMXpath->query('/html')[0];
+            $html_node = $this->DOMXPath->query('/html')[0];
             if ($html_node !== null) {
                 $html_node->setAttribute('dir', 'rtl');
             }
@@ -607,22 +607,22 @@ class Dom
 
     function getChildrenCountRecursivelyOfNodeTagsOnly($node)
     {
-        return $this->DOMXpath->evaluate('count(.//*)', $node);
+        return $this->DOMXPath->evaluate('count(.//*)', $node);
     }
 
     function getChildrenCountOfNode($node)
     {
-        return $this->DOMXpath->evaluate('count(./node()[normalize-space()])', $node);
+        return $this->DOMXPath->evaluate('count(./node()[normalize-space()])', $node);
     }
 
     function getChildrenOfNode($node)
     {
-        return $this->DOMXpath->query('.//node()[normalize-space()]', $node);
+        return $this->DOMXPath->query('.//node()[normalize-space()]', $node);
     }
 
     function getChildrenOfNodeIncludingWhitespace($node)
     {
-        return $this->DOMXpath->query('.//node()', $node);
+        return $this->DOMXPath->query('.//node()', $node);
     }
 
     function getParentNodeWithMoreThanOneChildren($node)
@@ -740,7 +740,7 @@ class Dom
         if ($this->data->sourceLngIsCurrentLng()) {
             return;
         }
-        $head = $this->DOMXpath->query('/html/head')[0];
+        $head = $this->DOMXPath->query('/html/head')[0];
         if ($head === null) {
             return;
         }
@@ -813,7 +813,7 @@ class Dom
         $script .=
             'function gtbabel__(string, context = \'\') { if( context in translated_strings && translated_strings[context] !== undefined && translated_strings[context][string] !== undefined ) { return translated_strings[context][string]; } return string; }';
 
-        $head = $this->DOMXpath->query('/html/head')[0];
+        $head = $this->DOMXPath->query('/html/head')[0];
         if ($head === null) {
             return;
         }

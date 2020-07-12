@@ -19,10 +19,6 @@ return [
     'whitelist-global-classes' => false,
     'patchers' => [
         function (string $filePath, string $prefix, string $content) use ($functions): string {
-            // domxpath is wrongly prefixed (see: https://github.com/humbug/php-scoper/issues/367)
-            if (strpos($filePath,'src/Dom.php') !== false) {
-                $content = str_replace('\\'.$prefix.'\\DOMXpath', '\\DOMXpath', $content);
-            }
             // remove prefix
             foreach($functions as $functions__value) {
                 foreach($functions__value as $functions__value__value) {
