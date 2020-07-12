@@ -343,9 +343,11 @@ class Test extends \PHPUnit\Framework\TestCase
             'lng_target' => 'en',
             'auto_translation' => true,
             'auto_translation_service' => 'google',
-            'google_translation_api_key' => @$_SERVER['GOOGLE_TRANSLATION_API_KEY']
+            'google_translation_api_key' => @$_SERVER['GOOGLE_TRANSLATION_API_KEY'],
+            'log_folder' => './tests/logs'
         ]);
         $this->assertEquals($output, '<p>This is a test!</p>');
+        $this->gtbabel->reset();
     }
 
     public function test_tokenize()
@@ -1193,7 +1195,7 @@ EOD;
             'deepl_throttle_chars_per_month' => 1000000,
             'discovery_log' => false,
             'localize_js' => false,
-            'detect_dom_changes' => false,
+            'detect_dom_changes' => false
         ];
     }
 
