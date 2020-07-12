@@ -8,11 +8,14 @@ export default class DetectChanges {
         this.batch = [];
         this.debounceFn = null;
         this.removed = [];
-        this.excluded = ['#wholesaler-map', '[class*="slider"]', '.gm-style'];
-        this.included = ['.swal-overlay', '.top-button', '.wpcf7-response-output'];
+        this.included = [];
     }
 
-    async init() {
+    init() {
+        if (window.gtbabel_detect_dom_changes_include === undefined) {
+            return;
+        }
+        this.included = window.gtbabel_detect_dom_changes_include;
         this.setupMutationObserver();
         this.setupDebounce();
     }
@@ -31,27 +34,6 @@ export default class DetectChanges {
     }
 
     async onDomChange(mutation) {
-        /*
-        if (this.isInsideGroup(mutation.target, this.excluded)) {
-            return;
-        }
-        if (this.isInsideGroup(mutation.target, this.blocked)) {
-            return;
-        }
-        if (!document.body.contains(mutation.target)) {
-            return;
-        }
-        if (mutation.target.tagName === 'BODY') {
-            return;
-        }
-        console.log([mutation, mutation.target.outerHTML]);
-            console.log({
-                0: mutation.addedNodes.length > 0 ? mutation.addedNodes[0].outerHTML : null,
-                1: mutation.removedNodes.length > 0 ? mutation.removedNodes[0].outerHTML : null,
-                2: mutation
-            });
-        return;
-        */
         if (mutation.removedNodes.length > 0) {
             // keep track of removed nodes (if they are added later again they are ignored)
             this.removed.concat(mutation.removedNodes);
@@ -83,9 +65,6 @@ export default class DetectChanges {
             if (!this.isInsideGroup(nodes__value, this.included)) {
                 return;
             }
-            if (this.isInsideGroup(nodes__value, this.excluded)) {
-                return;
-            }
             if (this.isInsideGroup(nodes__value, this.blocked)) {
                 return;
             }
@@ -102,14 +81,12 @@ export default class DetectChanges {
                 continue;
             }
             this.hideNode(nodes__value);
-            //console.log(nodes__value);
             this.batch.push(nodes__value);
         }
         this.runDebounce();
     }
 
     translateBatch() {
-        console.log('translating batch');
         if (this.batch.length === 0) {
             return;
         }

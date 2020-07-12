@@ -728,6 +728,12 @@ class Dom
         if ($this->settings->get('detect_dom_changes') !== true) {
             return;
         }
+        if (
+            $this->settings->get('detect_dom_changes_include') === null ||
+            empty($this->settings->get('detect_dom_changes_include'))
+        ) {
+            return;
+        }
         if (!$this->host->responseCodeIsSuccessful()) {
             return;
         }
@@ -739,7 +745,22 @@ class Dom
             return;
         }
         $tag = $this->DOMDocument->createElement('script', '');
-        $tag->textContent = file_get_contents(dirname(__DIR__) . '/js/frontend/build/bundle.js');
+        $script = '';
+        $detect_dom_changes_include = [];
+        foreach ($this->settings->get('detect_dom_changes_include') as $detect_dom_changes_include__value) {
+            $detect_dom_changes_include__value = str_replace("\r", '', $detect_dom_changes_include__value);
+            $to_escape = ['\\', "\f", "\n", "\r", "\t", "\v", "\""];
+            foreach ($to_escape as $to_escape__value) {
+                $detect_dom_changes_include__value = addcslashes($detect_dom_changes_include__value, $to_escape__value);
+            }
+            $detect_dom_changes_include[] = $detect_dom_changes_include__value;
+        }
+        $script .=
+            'var gtbabel_detect_dom_changes_include = JSON.parse(\'' .
+            json_encode($detect_dom_changes_include, JSON_HEX_APOS) .
+            '\');';
+        $script .= file_get_contents(dirname(__DIR__) . '/js/frontend/build/bundle.js');
+        $tag->textContent = $script;
         $head->appendChild($tag);
         $tag = $this->DOMDocument->createElement('style', '');
         $tag->textContent = '[data-gtbabel-hide] { opacity:0 !important; }';

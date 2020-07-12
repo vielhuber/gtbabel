@@ -1175,7 +1175,6 @@ EOD;
             'redirect_root_domain' => 'browser',
             'translate_html' => true,
             'translate_json' => true,
-            'detect_dom_changes' => false,
             'debug_translations' => true,
             'auto_add_translations' => false,
             'auto_set_new_strings_checked' => false,
@@ -1193,7 +1192,8 @@ EOD;
             'microsoft_throttle_chars_per_month' => 1000000,
             'deepl_throttle_chars_per_month' => 1000000,
             'discovery_log' => false,
-            'localize_js' => false
+            'localize_js' => false,
+            'detect_dom_changes' => false,
         ];
     }
 

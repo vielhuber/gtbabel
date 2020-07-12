@@ -61,7 +61,6 @@ class Settings
             'translate_default_tag_nodes' => true,
             'translate_html' => true,
             'translate_json' => true,
-            'detect_dom_changes' => true,
             'html_lang_attribute' => true,
             'html_hreflang_tags' => true,
             'debug_translations' => false,
@@ -102,7 +101,9 @@ class Settings
                 ]
             ],
             'localize_js' => true,
-            'localize_js_strings' => [['string' => 'Schließen'], ['string' => 'blog', 'context' => 'slug']]
+            'localize_js_strings' => [['string' => 'Schließen'], ['string' => 'blog', 'context' => 'slug']],
+            'detect_dom_changes' => true,
+            'detect_dom_changes_include' => ['.top-button', '.swal-overlay', '.wpcf7-response-output']
         ];
         if (!empty($args)) {
             foreach ($args as $args__key => $args__value) {

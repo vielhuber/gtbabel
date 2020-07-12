@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 3.9.3
+ * Version: 3.9.4
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -476,7 +476,6 @@ class GtbabelWordPress
                             'translate_default_tag_nodes',
                             'translate_html',
                             'translate_json',
-                            'detect_dom_changes',
                             'html_lang_attribute',
                             'html_hreflang_tags',
                             'auto_add_translations',
@@ -498,6 +497,8 @@ class GtbabelWordPress
                             'include_dom',
                             'localize_js',
                             'localize_js_strings',
+                            'detect_dom_changes',
+                            'detect_dom_changes_include',
                             'wizard_finished'
                         ]
                         as $fields__value
@@ -519,7 +520,6 @@ class GtbabelWordPress
                             'translate_default_tag_nodes',
                             'translate_html',
                             'translate_json',
-                            'detect_dom_changes',
                             'html_lang_attribute',
                             'html_hreflang_tags',
                             'debug_translations',
@@ -528,6 +528,7 @@ class GtbabelWordPress
                             'auto_set_new_strings_checked',
                             'auto_translation',
                             'localize_js',
+                            'detect_dom_changes',
                             'wizard_finished'
                         ]
                         as $checkbox__value
@@ -545,7 +546,8 @@ class GtbabelWordPress
                             'force_tokenize',
                             'google_translation_api_key',
                             'microsoft_translation_api_key',
-                            'deepl_translation_api_key'
+                            'deepl_translation_api_key',
+                            'detect_dom_changes_include'
                         ]
                         as $exclude__value
                     ) {
@@ -880,17 +882,6 @@ class GtbabelWordPress
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_detect_dom_changes" class="gtbabel__label">';
-        echo __('Detect dom changes', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_detect_dom_changes" name="gtbabel[detect_dom_changes]" value="1"' .
-            ($settings['detect_dom_changes'] == '1' ? ' checked="checked"' : '') .
-            ' />';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
         echo '<label for="gtbabel_html_lang_attribute" class="gtbabel__label">';
         echo __('Set html lang attribute', 'gtbabel-plugin');
         echo '</label>';
@@ -1207,6 +1198,28 @@ class GtbabelWordPress
             __('Add', 'gtbabel-plugin') .
             '</a>';
         echo '</div>';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_detect_dom_changes" class="gtbabel__label">';
+        echo __('Detect dom changes', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_detect_dom_changes" name="gtbabel[detect_dom_changes]" value="1"' .
+            ($settings['detect_dom_changes'] == '1' ? ' checked="checked"' : '') .
+            ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_detect_dom_changes_include" class="gtbabel__label">';
+        echo __('Exclude urls', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<textarea class="gtbabel__input gtbabel__input--textarea" id="gtbabel_detect_dom_changes_include" name="gtbabel[detect_dom_changes_include]">' .
+            implode(PHP_EOL, $settings['detect_dom_changes_include']) .
+            '</textarea>';
         echo '</div>';
         echo '</li>';
 
