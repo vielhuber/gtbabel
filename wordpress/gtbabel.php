@@ -539,51 +539,60 @@ class GtbabelWordPress
                             $settings[$checkbox__value] = false;
                         }
                     }
+
                     foreach (
                         [
-                            'exclude_urls',
-                            'exclude_dom',
-                            'force_tokenize',
                             'google_translation_api_key',
                             'microsoft_translation_api_key',
                             'deepl_translation_api_key',
+                            'exclude_urls',
+                            'exclude_dom',
+                            'force_tokenize',
                             'detect_dom_changes_include'
                         ]
-                        as $exclude__value
+                        as $repeater__value
                     ) {
-                        $post_data = $settings[$exclude__value];
-                        $settings[$exclude__value] = [];
-                        if ($post_data != '') {
-                            foreach (explode(PHP_EOL, $post_data) as $post_data__value) {
-                                $settings[$exclude__value][] = trim($post_data__value);
+                        $post_data = $settings[$repeater__value];
+                        $settings[$repeater__value] = [];
+                        if (!empty(@$post_data)) {
+                            foreach ($post_data as $post_data__key => $post_data__value) {
+                                if (@$post_data__value == '') {
+                                    continue;
+                                }
+                                $settings[$repeater__value][] = $post_data__value;
                             }
                         }
                     }
 
                     $post_data = $settings['prevent_publish_urls'];
                     $settings['prevent_publish_urls'] = [];
-                    if ($post_data != '') {
-                        foreach (explode(PHP_EOL, $post_data) as $post_data__value) {
-                            $post_data__value_parts = explode(':', $post_data__value);
-                            if (!empty($post_data__value_parts)) {
-                                $settings['prevent_publish_urls'][$post_data__value_parts[0]] = explode(
-                                    ',',
-                                    __::trim_whitespace($post_data__value_parts[1])
-                                );
+                    if (!empty(@$post_data['url'])) {
+                        foreach ($post_data['url'] as $post_data__key => $post_data__value) {
+                            if (
+                                @$post_data['url'][$post_data__key] == '' &&
+                                @$post_data['lngs'][$post_data__key] == ''
+                            ) {
+                                continue;
                             }
+                            $settings['prevent_publish_urls'][$post_data['url'][$post_data__key]] = explode(
+                                ',',
+                                $post_data['lngs'][$post_data__key]
+                            );
                         }
                     }
 
                     $post_data = $settings['alt_lng_urls'];
                     $settings['alt_lng_urls'] = [];
-                    if ($post_data != '') {
-                        foreach (explode(PHP_EOL, $post_data) as $post_data__value) {
-                            $post_data__value_parts = explode(':', $post_data__value);
-                            if (!empty($post_data__value_parts)) {
-                                $settings['alt_lng_urls'][$post_data__value_parts[0]] = __::trim_whitespace(
-                                    $post_data__value_parts[1]
-                                );
+                    if (!empty(@$post_data['url'])) {
+                        foreach ($post_data['url'] as $post_data__key => $post_data__value) {
+                            if (
+                                @$post_data['url'][$post_data__key] == '' &&
+                                @$post_data['lng'][$post_data__key] == ''
+                            ) {
+                                continue;
                             }
+                            $settings['alt_lng_urls'][$post_data['url'][$post_data__key]] =
+                                $post_data['lng'][$post_data__key];
                         }
                     }
 
@@ -968,50 +977,95 @@ class GtbabelWordPress
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_google_translation_api_key" class="gtbabel__label">';
+        echo '<label class="gtbabel__label">';
         echo __('Google Translation API Key', 'gtbabel-plugin') .
             ' (<a href="https://console.cloud.google.com/apis/library/translate.googleapis.com" target="_blank">' .
             __('Link', 'gtbabel-plugin') .
             '</a>)';
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        echo '<textarea class="gtbabel__input gtbabel__input--textarea" id="gtbabel_google_translation_api_key" name="gtbabel[google_translation_api_key]">' .
-            (is_array($settings['google_translation_api_key'])
-                ? implode(PHP_EOL, $settings['google_translation_api_key'])
-                : $settings['google_translation_api_key']) .
-            '</textarea>';
+        echo '<div class="gtbabel__repeater">';
+        echo '<ul class="gtbabel__repeater-list">';
+        if (empty(@$settings['google_translation_api_key'])) {
+            $settings['google_translation_api_key'] = [''];
+        }
+        foreach ($settings['google_translation_api_key'] as $google_translation_api_key__value) {
+            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-1">';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[google_translation_api_key][]" value="' .
+                $google_translation_api_key__value .
+                '" />';
+            echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
+                __('Remove', 'gtbabel-plugin') .
+                '</a>';
+            echo '</li>';
+        }
+        echo '</ul>';
+        echo '<a href="#" class="gtbabel__repeater-add button button-secondary">' .
+            __('Add', 'gtbabel-plugin') .
+            '</a>';
+        echo '</div>';
         echo '</div>';
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_microsoft_translation_api_key" class="gtbabel__label">';
+        echo '<label class="gtbabel__label">';
         echo __('Microsoft Translation API Key', 'gtbabel-plugin') .
             ' (<a href="https://azure.microsoft.com/de-de/services/cognitive-services/translator-text-api" target="_blank">' .
             __('Link', 'gtbabel-plugin') .
             '</a>)';
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        echo '<textarea class="gtbabel__input gtbabel__input--textarea" id="gtbabel_microsoft_translation_api_key" name="gtbabel[microsoft_translation_api_key]">' .
-            (is_array($settings['microsoft_translation_api_key'])
-                ? implode(PHP_EOL, $settings['microsoft_translation_api_key'])
-                : $settings['microsoft_translation_api_key']) .
-            '</textarea>';
+        echo '<div class="gtbabel__repeater">';
+        echo '<ul class="gtbabel__repeater-list">';
+        if (empty(@$settings['microsoft_translation_api_key'])) {
+            $settings['microsoft_translation_api_key'] = [''];
+        }
+        foreach ($settings['microsoft_translation_api_key'] as $microsoft_translation_api_key__value) {
+            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-1">';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[microsoft_translation_api_key][]" value="' .
+                $microsoft_translation_api_key__value .
+                '" />';
+            echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
+                __('Remove', 'gtbabel-plugin') .
+                '</a>';
+            echo '</li>';
+        }
+        echo '</ul>';
+        echo '<a href="#" class="gtbabel__repeater-add button button-secondary">' .
+            __('Add', 'gtbabel-plugin') .
+            '</a>';
+        echo '</div>';
         echo '</div>';
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_deepl_translation_api_key" class="gtbabel__label">';
+        echo '<label class="gtbabel__label">';
         echo __('DeepL Translation API Key', 'gtbabel-plugin') .
             ' (<a href="https://www.deepl.com/pro#developer" target="_blank">' .
             __('Link', 'gtbabel-plugin') .
             '</a>)';
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        echo '<textarea class="gtbabel__input gtbabel__input--textarea" id="gtbabel_deepl_translation_api_key" name="gtbabel[deepl_translation_api_key]">' .
-            (is_array($settings['deepl_translation_api_key'])
-                ? implode(PHP_EOL, $settings['deepl_translation_api_key'])
-                : $settings['deepl_translation_api_key']) .
-            '</textarea>';
+        echo '<div class="gtbabel__repeater">';
+        echo '<ul class="gtbabel__repeater-list">';
+        if (empty(@$settings['deepl_translation_api_key'])) {
+            $settings['deepl_translation_api_key'] = [''];
+        }
+        foreach ($settings['deepl_translation_api_key'] as $deepl_translation_api_key__value) {
+            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-1">';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[deepl_translation_api_key][]" value="' .
+                $deepl_translation_api_key__value .
+                '" />';
+            echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
+                __('Remove', 'gtbabel-plugin') .
+                '</a>';
+            echo '</li>';
+        }
+        echo '</ul>';
+        echo '<a href="#" class="gtbabel__repeater-add button button-secondary">' .
+            __('Add', 'gtbabel-plugin') .
+            '</a>';
+        echo '</div>';
         echo '</div>';
         echo '</li>';
 
@@ -1049,79 +1103,148 @@ class GtbabelWordPress
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_prevent_publish_urls" class="gtbabel__label">';
+        echo '<label class="gtbabel__label">';
         echo __('Prevent publish of pages', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        echo '<textarea class="gtbabel__input gtbabel__input--textarea" id="gtbabel_prevent_publish_urls" name="gtbabel[prevent_publish_urls]">';
-        if (!empty($settings['prevent_publish_urls'])) {
-            echo implode(
-                PHP_EOL,
-                array_map(
-                    function ($prevent_publish_urls__value, $prevent_publish_urls__key) {
-                        return $prevent_publish_urls__key . ':' . implode(',', $prevent_publish_urls__value);
-                    },
-                    $settings['prevent_publish_urls'],
-                    array_keys($settings['prevent_publish_urls'])
-                )
-            );
+        echo '<div class="gtbabel__repeater">';
+        echo '<ul class="gtbabel__repeater-list">';
+        if (empty(@$settings['prevent_publish_urls'])) {
+            $settings['prevent_publish_urls'] = ['' => ['']];
         }
-        echo '</textarea>';
+        foreach ($settings['prevent_publish_urls'] as $prevent_publish_urls__key => $prevent_publish_urls__value) {
+            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-2">';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[prevent_publish_urls][url][]" value="' .
+                $prevent_publish_urls__key .
+                '" />';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[prevent_publish_urls][lngs][]" value="' .
+                implode(',', $prevent_publish_urls__value) .
+                '" />';
+            echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
+                __('Remove', 'gtbabel-plugin') .
+                '</a>';
+            echo '</li>';
+        }
+        echo '</ul>';
+        echo '<a href="#" class="gtbabel__repeater-add button button-secondary">' .
+            __('Add', 'gtbabel-plugin') .
+            '</a>';
+        echo '</div>';
         echo '</div>';
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_alt_lng_urls" class="gtbabel__label">';
+        echo '<label class="gtbabel__label">';
         echo __('Alternate language for main content', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        echo '<textarea class="gtbabel__input gtbabel__input--textarea" id="gtbabel_alt_lng_urls" name="gtbabel[alt_lng_urls]">';
-        if (!empty($settings['alt_lng_urls'])) {
-            echo implode(
-                PHP_EOL,
-                array_map(
-                    function ($alt_lng_urls__value, $alt_lng_urls__key) {
-                        return $alt_lng_urls__key . ':' . $alt_lng_urls__value;
-                    },
-                    $settings['alt_lng_urls'],
-                    array_keys($settings['alt_lng_urls'])
-                )
-            );
+        echo '<div class="gtbabel__repeater">';
+        echo '<ul class="gtbabel__repeater-list">';
+        if (empty(@$settings['alt_lng_urls'])) {
+            $settings['alt_lng_urls'] = ['' => ''];
         }
-        echo '</textarea>';
+        foreach ($settings['alt_lng_urls'] as $alt_lng_urls__key => $alt_lng_urls__value) {
+            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-2">';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[alt_lng_urls][url][]" value="' .
+                $alt_lng_urls__key .
+                '" />';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[alt_lng_urls][lng][]" value="' .
+                $alt_lng_urls__value .
+                '" />';
+            echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
+                __('Remove', 'gtbabel-plugin') .
+                '</a>';
+            echo '</li>';
+        }
+        echo '</ul>';
+        echo '<a href="#" class="gtbabel__repeater-add button button-secondary">' .
+            __('Add', 'gtbabel-plugin') .
+            '</a>';
+        echo '</div>';
         echo '</div>';
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_exclude_urls" class="gtbabel__label">';
+        echo '<label class="gtbabel__label">';
         echo __('Exclude urls', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        echo '<textarea class="gtbabel__input gtbabel__input--textarea" id="gtbabel_exclude_urls" name="gtbabel[exclude_urls]">' .
-            implode(PHP_EOL, $settings['exclude_urls']) .
-            '</textarea>';
+        echo '<div class="gtbabel__repeater">';
+        echo '<ul class="gtbabel__repeater-list">';
+        if (empty(@$settings['exclude_urls'])) {
+            $settings['exclude_urls'] = [''];
+        }
+        foreach ($settings['exclude_urls'] as $exclude_urls__value) {
+            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-1">';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[exclude_urls][]" value="' .
+                $exclude_urls__value .
+                '" />';
+            echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
+                __('Remove', 'gtbabel-plugin') .
+                '</a>';
+            echo '</li>';
+        }
+        echo '</ul>';
+        echo '<a href="#" class="gtbabel__repeater-add button button-secondary">' .
+            __('Add', 'gtbabel-plugin') .
+            '</a>';
+        echo '</div>';
         echo '</div>';
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_exclude_dom" class="gtbabel__label">';
+        echo '<label class="gtbabel__label">';
         echo __('Exclude dom nodes', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        echo '<textarea class="gtbabel__input gtbabel__input--textarea" id="gtbabel_exclude_dom" name="gtbabel[exclude_dom]">' .
-            implode(PHP_EOL, $settings['exclude_dom']) .
-            '</textarea>';
+        echo '<div class="gtbabel__repeater">';
+        echo '<ul class="gtbabel__repeater-list">';
+        if (empty(@$settings['exclude_dom'])) {
+            $settings['exclude_dom'] = [''];
+        }
+        foreach ($settings['exclude_dom'] as $exclude_dom__value) {
+            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-1">';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[exclude_dom][]" value="' .
+                $exclude_dom__value .
+                '" placeholder="selector" />';
+            echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
+                __('Remove', 'gtbabel-plugin') .
+                '</a>';
+            echo '</li>';
+        }
+        echo '</ul>';
+        echo '<a href="#" class="gtbabel__repeater-add button button-secondary">' .
+            __('Add', 'gtbabel-plugin') .
+            '</a>';
+        echo '</div>';
         echo '</div>';
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_force_tokenize" class="gtbabel__label">';
+        echo '<label class="gtbabel__label">';
         echo __('Force tokenize', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        echo '<textarea class="gtbabel__input gtbabel__input--textarea" id="gtbabel_force_tokenize" name="gtbabel[force_tokenize]">' .
-            implode(PHP_EOL, $settings['force_tokenize']) .
-            '</textarea>';
+        echo '<div class="gtbabel__repeater">';
+        echo '<ul class="gtbabel__repeater-list">';
+        if (empty(@$settings['force_tokenize'])) {
+            $settings['force_tokenize'] = [''];
+        }
+        foreach ($settings['force_tokenize'] as $force_tokenize__value) {
+            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-1">';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[force_tokenize][]" value="' .
+                $force_tokenize__value .
+                '" placeholder="selector" />';
+            echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
+                __('Remove', 'gtbabel-plugin') .
+                '</a>';
+            echo '</li>';
+        }
+        echo '</ul>';
+        echo '<a href="#" class="gtbabel__repeater-add button button-secondary">' .
+            __('Add', 'gtbabel-plugin') .
+            '</a>';
+        echo '</div>';
         echo '</div>';
         echo '</li>';
 
@@ -1213,13 +1336,30 @@ class GtbabelWordPress
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_detect_dom_changes_include" class="gtbabel__label">';
+        echo '<label class="gtbabel__label">';
         echo __('Detect dom changes in areas', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        echo '<textarea class="gtbabel__input gtbabel__input--textarea" id="gtbabel_detect_dom_changes_include" name="gtbabel[detect_dom_changes_include]">' .
-            implode(PHP_EOL, $settings['detect_dom_changes_include']) .
-            '</textarea>';
+        echo '<div class="gtbabel__repeater">';
+        echo '<ul class="gtbabel__repeater-list">';
+        if (empty(@$settings['detect_dom_changes_include'])) {
+            $settings['detect_dom_changes_include'] = [''];
+        }
+        foreach ($settings['detect_dom_changes_include'] as $detect_dom_changes_include__value) {
+            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-1">';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[detect_dom_changes_include][]" value="' .
+                $detect_dom_changes_include__value .
+                '" placeholder="selector" />';
+            echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
+                __('Remove', 'gtbabel-plugin') .
+                '</a>';
+            echo '</li>';
+        }
+        echo '</ul>';
+        echo '<a href="#" class="gtbabel__repeater-add button button-secondary">' .
+            __('Add', 'gtbabel-plugin') .
+            '</a>';
+        echo '</div>';
         echo '</div>';
         echo '</li>';
 
