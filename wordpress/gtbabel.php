@@ -1214,7 +1214,7 @@ class GtbabelWordPress
 
         echo '<li class="gtbabel__field">';
         echo '<label for="gtbabel_detect_dom_changes_include" class="gtbabel__label">';
-        echo __('Exclude urls', 'gtbabel-plugin');
+        echo __('Detect dom changes in areas', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
         echo '<textarea class="gtbabel__input gtbabel__input--textarea" id="gtbabel_detect_dom_changes_include" name="gtbabel[detect_dom_changes_include]">' .
