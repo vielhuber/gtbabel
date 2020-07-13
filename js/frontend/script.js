@@ -1,6 +1,17 @@
 import DetectChanges from './DetectChanges';
 
 const d = new DetectChanges();
-document.addEventListener('DOMContentLoaded', () => {
+
+const ready = new Promise(resolve => {
+    if (document.readyState !== 'loading') {
+        return resolve();
+    } else {
+        document.addEventListener('DOMContentLoaded', () => {
+            return resolve();
+        });
+    }
+});
+
+ready.then(() => {
     d.init();
 });
