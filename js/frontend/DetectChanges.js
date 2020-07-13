@@ -7,7 +7,6 @@ export default class DetectChanges {
         this.blocked = [];
         this.batch = [];
         this.debounceFn = null;
-        this.removed = [];
         this.included = [];
     }
 
@@ -34,16 +33,6 @@ export default class DetectChanges {
     }
 
     async onDomChange(mutation) {
-        if (mutation.removedNodes.length > 0) {
-            // keep track of removed nodes (if they are added later again they are ignored)
-            this.removed.concat(mutation.removedNodes);
-            // also remove removed nodes from already batched nodes
-            mutation.removedNodes.forEach(removedNodes__value => {
-                this.batch = this.batch.filter(x => x !== removedNodes__value);
-            });
-            return;
-        }
-
         // collect nodes
         let nodes = [];
         if (mutation.addedNodes.length > 0) {
@@ -75,9 +64,6 @@ export default class DetectChanges {
                 continue;
             }
             if (nodes__value.closest('iframe') !== null) {
-                continue;
-            }
-            if (this.removed.indexOf(nodes__value) > -1) {
                 continue;
             }
             this.hideNode(nodes__value);
@@ -115,7 +101,7 @@ export default class DetectChanges {
             this.showNode(clone);
             let html = clone.outerHTML;
             this.getTranslation(html).then(resp => {
-                console.log(resp.data);
+                //console.log(resp.data);
                 this.showNode(batch__value);
                 if (
                     resp.success === false ||

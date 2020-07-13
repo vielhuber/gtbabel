@@ -745,6 +745,7 @@ class Dom
             return;
         }
         $tag = $this->DOMDocument->createElement('script', '');
+        $tag->setAttribute('data-type', 'gtbabel-detect-dom-changes');
         $script = '';
         $detect_dom_changes_include = [];
         foreach ($this->settings->get('detect_dom_changes_include') as $detect_dom_changes_include__value) {
@@ -763,6 +764,7 @@ class Dom
         $tag->textContent = $script;
         $head->appendChild($tag);
         $tag = $this->DOMDocument->createElement('style', '');
+        $tag->setAttribute('data-type', 'gtbabel-detect-dom-changes');
         $tag->textContent = '[data-gtbabel-hide] { opacity:0 !important; }';
         $head->appendChild($tag);
     }
@@ -809,16 +811,18 @@ class Dom
 
         $script = '';
         $script .=
-            'var translated_strings = JSON.parse(\'' . json_encode($translated_strings_json, JSON_HEX_APOS) . '\');';
+            'var gtbabel_translated_strings = JSON.parse(\'' .
+            json_encode($translated_strings_json, JSON_HEX_APOS) .
+            '\');';
         $script .=
-            'function gtbabel__(string, context = \'\') { if( context in translated_strings && translated_strings[context] !== undefined && translated_strings[context][string] !== undefined ) { return translated_strings[context][string]; } return string; }';
+            'function gtbabel__(string, context = \'\') { if( context in gtbabel_translated_strings && gtbabel_translated_strings[context] !== undefined && gtbabel_translated_strings[context][string] !== undefined ) { return gtbabel_translated_strings[context][string]; } return string; }';
 
         $head = $this->DOMXPath->query('/html/head')[0];
         if ($head === null) {
             return;
         }
         $tag = $this->DOMDocument->createElement('script', '');
-        $tag->setAttribute('data-type', 'translated-strings');
+        $tag->setAttribute('data-type', 'gtbabel-translated-strings');
         $tag->textContent = $script;
         $head->insertBefore($tag, $head->firstChild);
     }
