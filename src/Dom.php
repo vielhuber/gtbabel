@@ -818,6 +818,7 @@ class Dom
             return;
         }
         $tag = $this->DOMDocument->createElement('script', '');
+        $tag->setAttribute('data-type', 'translated-strings');
         $tag->textContent = $script;
         $head->insertBefore($tag, $head->firstChild);
     }
