@@ -335,6 +335,11 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->runDiff('51.html', 200);
     }
 
+    public function test52()
+    {
+        $this->runDiff('52.html', 200);
+    }
+
     public function test_translate()
     {
         $this->gtbabel = new Gtbabel();

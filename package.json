@@ -20,7 +20,7 @@
         "@babel/preset-env": "^7.10.4",
         "@babel/runtime": "^7.10.4",
         "@prettier/plugin-php": "^0.14.2",
-        "autoprefixer": "^9.8.4",
+        "autoprefixer": "^9.8.5",
         "babel-core": "^7.0.0-bridge.0",
         "babel-jest": "^26.1.0",
         "babel-plugin-array-includes": "^2.0.3",
@@ -75,7 +75,7 @@
         "postcss-tailwind-data-attr": "^1.0.4",
         "postcss-url": "^8.0.0",
         "prettier": "^2.0.5",
-        "puppeteer": "^5.0.0",
+        "puppeteer": "^5.1.0",
         "regenerator-runtime": "^0.13.5",
         "replace-in-file": "^6.1.0",
         "run-sequence": "^2.2.1",
@@ -90,7 +90,7 @@
         "vue-template-compiler": "^2.6.11",
         "vueify": "^9.4.1",
         "vueify-insert-css": "^1.0.0",
-        "whatwg-fetch": "^3.1.0"
+        "whatwg-fetch": "^3.2.0"
     },
     "browserslist": [
         "last 2 versions",

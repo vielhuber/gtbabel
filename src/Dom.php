@@ -416,6 +416,13 @@ class Dom
 
     function finishDomDocument($htmlOriginal)
     {
+        // domdocument does not close empty li tags (because they're valid html)
+        // to circumvent that, use:
+        $nodes = $this->DOMXPath->query('/html/body//*[not(node())]');
+        foreach ($nodes as $nodes__value) {
+            $nodes__value->nodeValue = '';
+        }
+
         $htmlModified = $this->DOMDocument->saveHTML();
         if (
             mb_strpos($htmlModified, '<!--remove-->') !== false &&
