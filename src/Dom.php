@@ -776,11 +776,11 @@ class Dom
             '\');';
         $script .= file_get_contents(dirname(__DIR__) . '/js/frontend/build/bundle.js');
         $tag->textContent = $script;
-        $head->appendChild($tag);
+        $head->insertBefore($tag, $head->firstChild);
         $tag = $this->DOMDocument->createElement('style', '');
         $tag->setAttribute('data-type', 'gtbabel-detect-dom-changes');
-        $tag->textContent = '[data-gtbabel-hide] { opacity:0.5 !important; }';
-        $head->appendChild($tag);
+        $tag->textContent = '[data-gtbabel-hide] { opacity:0.001 !important; }';
+        $head->insertBefore($tag, $head->firstChild);
     }
 
     function localizeJs()

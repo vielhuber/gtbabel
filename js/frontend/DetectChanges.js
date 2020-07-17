@@ -52,13 +52,13 @@ export default class DetectChanges {
                 nodes__value = nodes__value.parentNode;
             }
             if (!this.isInsideGroup(nodes__value, this.included)) {
-                return;
+                continue;
             }
             if (this.isInsideGroup(nodes__value, this.blocked)) {
-                return;
+                continue;
             }
             if (!document.body.contains(mutation.target)) {
-                return;
+                continue;
             }
             if (nodes__value.tagName === 'BODY') {
                 continue;
