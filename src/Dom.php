@@ -331,7 +331,14 @@ class Dom
                                 $trans = $this->data->reintroduceLineBreaks($trans, $str_without_lb, $str_with_lb);
 
                                 if ($this->isTextNode($nodes__value)) {
-                                    $nodes__value->nodeValue = $trans;
+                                    // this is important: domdocument set strings with encoded html chars
+                                    // for text nodes as plain text (and not html)
+                                    // we therefore use the parent node and set the node value accordingly
+                                    $nodes__value->nodeValue = html_entity_decode(
+                                        $trans,
+                                        ENT_QUOTES | ENT_XML1,
+                                        'UTF-8'
+                                    );
                                     $this->addToExcludedNodes($nodes__value, 'text()');
                                 } else {
                                     if ($content__value['type'] === 'attribute') {
@@ -772,7 +779,7 @@ class Dom
         $head->appendChild($tag);
         $tag = $this->DOMDocument->createElement('style', '');
         $tag->setAttribute('data-type', 'gtbabel-detect-dom-changes');
-        $tag->textContent = '[data-gtbabel-hide] { opacity:0 !important; }';
+        $tag->textContent = '[data-gtbabel-hide] { opacity:0.5 !important; }';
         $head->appendChild($tag);
     }
 

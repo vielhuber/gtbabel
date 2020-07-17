@@ -112,7 +112,7 @@ export default class DetectChanges {
                 ) {
                     return;
                 }
-                this.setHtmlAndKeepEventListeners(batch__value, resp.data.output);
+                this.setHtmlAndKeepEventListeners(batch__value, resp.data);
             });
         }
     }
@@ -130,9 +130,12 @@ export default class DetectChanges {
         }
     }
 
-    setHtmlAndKeepEventListeners(node, html) {
+    setHtmlAndKeepEventListeners(node, data) {
+        // stop mutationobserver
         this.blocked.push(node);
-        let diff = this.dd.diff(node, html);
+        // now this is interesting: we make a diff of input and output (not output and current node),
+        // because we don't want to loose any attribute changes that have been applied in the meantime
+        let diff = this.dd.diff(data.input, data.output);
         this.dd.apply(node, diff);
         requestAnimationFrame(() => {
             this.blocked = this.blocked.filter(blocked__value => blocked__value !== node);

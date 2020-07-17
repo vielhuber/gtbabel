@@ -19,102 +19,102 @@ class Test extends \PHPUnit\Framework\TestCase
         http_response_code(200);
     }
 
-    public function test1()
+    public function test001()
     {
         $this->runDiff('1.html', 200);
     }
 
-    public function test2()
+    public function test002()
     {
         $this->runDiff('2.html', 200);
     }
 
-    public function test3()
+    public function test003()
     {
         $this->runDiff('3.html', 200);
     }
 
-    public function test4()
+    public function test004()
     {
         $this->runDiff('4.html', 200);
     }
 
-    public function test5()
+    public function test005()
     {
         $this->runDiff('5.html', 200);
     }
 
-    public function test6()
+    public function test006()
     {
         $this->runDiff('6.html', 200);
     }
 
-    public function test7()
+    public function test007()
     {
         $this->runDiff('7.html', 300);
     }
 
-    public function test8()
+    public function test008()
     {
         $this->runDiff('8.html', 200);
     }
 
-    public function test9()
+    public function test009()
     {
         $this->runDiff('9.html', 200);
     }
 
-    public function test10()
+    public function test010()
     {
         $this->runDiff('10.html', 200);
     }
 
-    public function test11()
+    public function test011()
     {
         $this->runDiff('11.html', 200);
     }
 
-    public function test12()
+    public function test012()
     {
         $this->runDiff('12.html', 200);
     }
 
-    public function test13()
+    public function test013()
     {
         $this->runDiff('13.html', 200);
     }
 
-    public function test14()
+    public function test014()
     {
         $this->runDiff('14.html', 200);
     }
 
-    public function test15()
+    public function test015()
     {
         $this->runDiff('15.html', 200);
     }
 
-    public function test16()
+    public function test016()
     {
         $this->runDiff('16.html', 200);
     }
 
-    public function test17()
+    public function test017()
     {
         $this->runDiff('17.html', 200);
     }
 
-    public function test18()
+    public function test018()
     {
         $this->runDiff('18.html', 3000);
     }
 
-    public function test19()
+    public function test019()
     {
         $this->runDiff('19.html', 1500);
     }
 
-    public function test20()
+    public function test020()
     {
         $this->runDiff('20.html', 200, [
             'languages' => [
@@ -127,27 +127,27 @@ class Test extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function test21()
+    public function test021()
     {
         $this->runDiff('21.php', 7500);
     }
 
-    public function test22()
+    public function test022()
     {
         $this->runDiff('22.php', 3000);
     }
 
-    public function test23()
+    public function test023()
     {
         $this->runDiff('23.php', 4500);
     }
 
-    public function test24()
+    public function test024()
     {
         $this->runDiff('24.php', 3500);
     }
 
-    public function test25()
+    public function test025()
     {
         $this->runDiff('25.html', 3500, [
             'debug_translations' => false,
@@ -155,7 +155,7 @@ class Test extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function test26()
+    public function test026()
     {
         $this->runDiff('26.html', 3500, [
             'debug_translations' => false,
@@ -163,27 +163,27 @@ class Test extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function test27()
+    public function test027()
     {
         $this->runDiff('27.html', 3500);
     }
 
-    public function test28()
+    public function test028()
     {
         $this->runDiff('28.html', 200);
     }
 
-    public function test29()
+    public function test029()
     {
         $this->runDiff('29.json', 200);
     }
 
-    public function test30()
+    public function test030()
     {
         $this->runDiff('30.json', 200);
     }
 
-    public function test31()
+    public function test031()
     {
         $this->runDiff('31.html', 750, [
             'debug_translations' => false,
@@ -191,7 +191,7 @@ class Test extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function test32()
+    public function test032()
     {
         $this->runDiff('32.html', 750, [
             'debug_translations' => false,
@@ -199,22 +199,22 @@ class Test extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function test33()
+    public function test033()
     {
         $this->runDiff('33.html', 200);
     }
 
-    public function test34()
+    public function test034()
     {
         $this->runDiff('34.html', 200);
     }
 
-    public function test35()
+    public function test035()
     {
         $this->runDiff('35.html', 200);
     }
 
-    public function test36()
+    public function test036()
     {
         $this->runDiff('36.html', 750, [
             'debug_translations' => false,
@@ -222,14 +222,14 @@ class Test extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function test37()
+    public function test037()
     {
         $this->runDiff('37.html', 200, [
             'exclude_dom' => ['.foo', '#bar']
         ]);
     }
 
-    public function test38()
+    public function test038()
     {
         $this->runDiff('38.html', 500, [
             'lng_target' => 'ar',
@@ -238,7 +238,7 @@ class Test extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function test39()
+    public function test039()
     {
         $this->runDiff('39.html', 500, [
             'debug_translations' => false,
@@ -247,7 +247,7 @@ class Test extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function test40()
+    public function test040()
     {
         $this->runDiff('40.html', 500, [
             'debug_translations' => false,
@@ -256,7 +256,7 @@ class Test extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function test41()
+    public function test041()
     {
         $this->runDiff('41.html', 2000, [
             'lng_source' => 'en',
@@ -267,7 +267,7 @@ class Test extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function test42()
+    public function test042()
     {
         $this->runDiff('42.html', 1500, [
             'lng_source' => 'en',
@@ -278,32 +278,32 @@ class Test extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function test43()
+    public function test043()
     {
         $this->runDiff('43.html', 200);
     }
 
-    public function test44()
+    public function test044()
     {
         $this->runDiff('44.html', 200);
     }
 
-    public function test45()
+    public function test045()
     {
         $this->runDiff('45.html', 200);
     }
 
-    public function test46()
+    public function test046()
     {
         $this->runDiff('46.html', 200);
     }
 
-    public function test47()
+    public function test047()
     {
         $this->runDiff('47.html', 200);
     }
 
-    public function test48()
+    public function test048()
     {
         $this->runDiff('48.html', 1500, [
             'lng_source' => 'en',
@@ -314,7 +314,7 @@ class Test extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function test49()
+    public function test049()
     {
         $this->runDiff('49.html', 1500, [
             'lng_source' => 'de',
@@ -325,19 +325,30 @@ class Test extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function test50()
+    public function test050()
     {
         $this->runDiff('50.html', 200);
     }
 
-    public function test51()
+    public function test051()
     {
         $this->runDiff('51.html', 200);
     }
 
-    public function test52()
+    public function test052()
     {
         $this->runDiff('52.html', 200);
+    }
+
+    public function test053()
+    {
+        $this->runDiff('53.html', 1500, [
+            'lng_source' => 'de',
+            'lng_target' => 'en',
+            'debug_translations' => false,
+            'auto_translation' => true,
+            'prefix_lng_source' => true
+        ]);
     }
 
     public function test_translate()
