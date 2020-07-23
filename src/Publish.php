@@ -17,7 +17,7 @@ class Publish
     function edit($url, $lngs = null)
     {
         $prevent_publish_urls = $this->settings->get('prevent_publish_urls');
-        $url = '/' . trim(str_replace($this->host->getCurrentHost(), '', $url), '/');
+        $url = '/' . trim($this->host->getPathWithoutPrefixFromUrl($url), '/');
         if ($lngs === null || empty($lngs)) {
             if (array_key_exists($url, $prevent_publish_urls)) {
                 unset($prevent_publish_urls[$url]);
@@ -31,7 +31,7 @@ class Publish
     function unpublish($url, $lng)
     {
         $prevent_publish_urls = $this->settings->get('prevent_publish_urls');
-        $url = '/' . trim(str_replace($this->host->getCurrentHost(), '', $url), '/');
+        $url = '/' . trim($this->host->getPathWithoutPrefixFromUrl($url), '/');
         if (!array_key_exists($url, $prevent_publish_urls)) {
             $prevent_publish_urls[$url] = [];
         }
@@ -44,7 +44,7 @@ class Publish
     function publish($url, $lng)
     {
         $prevent_publish_urls = $this->settings->get('prevent_publish_urls');
-        $url = '/' . trim(str_replace($this->host->getCurrentHost(), '', $url), '/');
+        $url = '/' . trim($this->host->getPathWithoutPrefixFromUrl($url), '/');
         if (!array_key_exists($url, $prevent_publish_urls)) {
             return;
         }
@@ -60,8 +60,8 @@ class Publish
     function change($old_url, $new_url)
     {
         $prevent_publish_urls = $this->settings->get('prevent_publish_urls');
-        $old_url = '/' . trim(str_replace($this->host->getCurrentHost(), '', $old_url), '/');
-        $new_url = '/' . trim(str_replace($this->host->getCurrentHost(), '', $new_url), '/');
+        $old_url = '/' . trim($this->host->getPathWithoutPrefixFromUrl($old_url), '/');
+        $new_url = '/' . trim($this->host->getPathWithoutPrefixFromUrl($new_url), '/');
         if (!array_key_exists($old_url, $prevent_publish_urls)) {
             return;
         } else {
@@ -79,7 +79,7 @@ class Publish
 
     function isPrevented($url, $lng, $allow_regex = true)
     {
-        $url = str_replace($this->host->getCurrentHost(), '', $url);
+        $url = '/' . trim($this->host->getPathWithoutPrefixFromUrl($url), '/');
         $prevent_publish_urls = $this->settings->get('prevent_publish_urls');
         foreach ($prevent_publish_urls as $prevent_publish_urls__key => $prevent_publish_urls__value) {
             if ($allow_regex === true) {

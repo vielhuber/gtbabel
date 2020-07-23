@@ -15,7 +15,7 @@ class Altlng
     function edit($url, $lng = null)
     {
         $alt_lng_urls = $this->settings->get('alt_lng_urls');
-        $url = '/' . trim(str_replace($this->host->getCurrentHost(), '', $url), '/');
+        $url = '/' . trim($this->host->getPathWithoutPrefixFromUrl($url), '/');
         $alt_lng_urls[$url] = $lng;
         if ($lng === null || $lng === $this->settings->getSourceLanguageCode()) {
             unset($alt_lng_urls[$url]);
@@ -26,8 +26,8 @@ class Altlng
     function change($old_url, $new_url)
     {
         $alt_lng_urls = $this->settings->get('alt_lng_urls');
-        $old_url = '/' . trim(str_replace($this->host->getCurrentHost(), '', $old_url), '/');
-        $new_url = '/' . trim(str_replace($this->host->getCurrentHost(), '', $new_url), '/');
+        $old_url = '/' . trim($this->host->getPathWithoutPrefixFromUrl($old_url), '/');
+        $new_url = '/' . trim($this->host->getPathWithoutPrefixFromUrl($new_url), '/');
         if (!array_key_exists($old_url, $alt_lng_urls)) {
             return;
         } else {
@@ -43,7 +43,7 @@ class Altlng
         if ($url === null) {
             $url = $this->host->getCurrentUrl();
         }
-        $url = '/' . trim(str_replace($this->host->getCurrentHost(), '', $url), '/');
+        $url = '/' . trim($this->host->getPathWithoutPrefixFromUrl($url), '/');
         $alt_lng_urls = $this->settings->get('alt_lng_urls');
         if ($alt_lng_urls === null) {
             return null;

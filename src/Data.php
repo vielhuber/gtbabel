@@ -168,7 +168,7 @@ class Data
         $discovered_last_url = $this->host->getCurrentUrlWithArgs();
         foreach (['discovered_last_url_orig', 'discovered_last_url'] as $url__value) {
             // extract path
-            ${$url__value} = str_replace($this->host->getCurrentHost(), '', ${$url__value});
+            ${$url__value} = $this->host->getPathWithPrefixFromUrl(${$url__value});
             // strip server sided requests initiated by auto translation
             $pos = strpos(${$url__value}, '?');
             if ($pos !== false) {
@@ -349,7 +349,7 @@ class Data
         return $this->db->fetch_all('SELECT * FROM ' . $this->table . ' ORDER BY id ASC');
     }
 
-    function getGroupedTranslationsFromDatabaseNEW($lng_target = null, $order_by_string = true)
+    function getGroupedTranslationsFromDatabase($lng_target = null, $order_by_string = true)
     {
         $data = [];
 
@@ -685,9 +685,8 @@ class Data
             }
         }
         if ($urls !== null) {
-            $current_host = $this->host->getCurrentHost();
-            $urls = array_map(function ($urls__value) use ($current_host) {
-                return '/' . trim(str_replace($current_host, '', $urls__value), '/');
+            $urls = array_map(function ($urls__value) {
+                return trim($this->host->getPathWithPrefixFromUrl($urls__value), '/');
             }, $urls);
         }
         $query = '';
@@ -704,7 +703,14 @@ class Data
         $query .= ' FROM ' . $this->table . ' WHERE 1=1';
         $args = [];
         if ($urls !== null) {
-            $query .= ' AND discovered_last_url IN (' . str_repeat('?,', count($urls) - 1) . '?)';
+            $query .=
+                ' AND ' .
+                ($this->db->sql->engine === 'sqlite'
+                    ? 'TRIM(discovered_last_url,\'/\')'
+                    : 'TRIM(\'/\' FROM discovered_last_url)') .
+                ' IN (' .
+                str_repeat('?,', count($urls) - 1) .
+                '?)';
             $args = array_merge($args, $urls);
         }
         if ($time !== null) {
@@ -742,62 +748,13 @@ class Data
         return $this->discoveryLogGet($time, false, $url, false, true);
     }
 
-    function getCurrentPrefix()
-    {
-        foreach ($this->settings->getSelectedLanguageCodes() as $languages__value) {
-            if (
-                $this->host->getCurrentPath() === $languages__value ||
-                mb_strpos($this->host->getCurrentPath(), '/' . $languages__value . '/') === 0
-            ) {
-                return $languages__value;
-            }
-        }
-        return null;
-    }
-
     function getCurrentLanguageCode()
     {
         if ($this->settings->get('lng_target') !== null) {
             return $this->settings->get('lng_target');
         }
-        return $this->getCurrentPrefix() ?? $this->settings->getSourceLanguageCode();
-    }
 
-    function getBrowserLng()
-    {
-        if (@$_SERVER['HTTP_ACCEPT_LANGUAGE'] != '') {
-            foreach ($this->settings->getSelectedLanguageCodes() as $languages__value) {
-                if (mb_strpos($_SERVER['HTTP_ACCEPT_LANGUAGE'], $languages__value) === 0) {
-                    return $languages__value;
-                }
-            }
-        }
-        return $this->settings->getSourceLanguageCode();
-    }
-
-    function getPrefixFromUrl($url)
-    {
-        $path = str_replace($this->host->getCurrentHost(), '', $url);
-        foreach ($this->settings->getSelectedLanguageCodes() as $languages__value) {
-            if ($path === $languages__value || mb_strpos($path, '/' . $languages__value . '/') === 0) {
-                return $languages__value;
-            }
-        }
-        return null;
-    }
-
-    function getLngFromUrl($url)
-    {
-        return $this->getPrefixFromUrl($url) ?? $this->settings->getSourceLanguageCode();
-    }
-
-    function getRefererLng()
-    {
-        $referer = @$_SERVER['HTTP_REFERER'];
-        if ($referer == '') {
-            return $this->settings->getSourceLanguageCode();
-        }
-        return $this->getLngFromUrl($referer);
+        return $this->host->getLngFromUrl($this->host->getCurrentUrl());
     }
 
     function getLanguagePickerData($with_args = true)
@@ -845,9 +802,10 @@ class Data
             if (
                 $context === 'slug' &&
                 $this->settings->getSourceLanguageCode() === $lng_source &&
-                $this->settings->get('prefix_lng_source') === true
+                $this->host->getPrefixForLanguageCode($lng_source) != '' &&
+                $this->host->getPrefixFromUrl($orig) != $this->host->getPrefixForLanguageCode($lng_source)
             ) {
-                return $this->addPrefixToLink($orig, $lng_source, $lng_target);
+                return $this->modifyLink($orig, $lng_source, $lng_target);
             }
             return null;
         }
@@ -910,9 +868,9 @@ class Data
         return $this->getTranslationAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, 'title');
     }
 
-    function addPrefixToLink($link, $lng_source, $lng_target)
+    function modifyLink($link, $lng_source, $lng_target)
     {
-        return $this->addPrefixToLinkAndGetTranslationOfLinkHrefAndAddDynamicallyIfNeeded(
+        return $this->modifyLinkAndGetTranslationOfLinkHrefAndAddDynamicallyIfNeeded(
             $link,
             $lng_source,
             $lng_target,
@@ -922,7 +880,7 @@ class Data
 
     function getTranslationOfLinkHrefAndAddDynamicallyIfNeeded($link, $lng_source, $lng_target)
     {
-        return $this->addPrefixToLinkAndGetTranslationOfLinkHrefAndAddDynamicallyIfNeeded(
+        return $this->modifyLinkAndGetTranslationOfLinkHrefAndAddDynamicallyIfNeeded(
             $link,
             $lng_source,
             $lng_target,
@@ -930,12 +888,8 @@ class Data
         );
     }
 
-    function addPrefixToLinkAndGetTranslationOfLinkHrefAndAddDynamicallyIfNeeded(
-        $link,
-        $lng_source,
-        $lng_target,
-        $translate
-    ) {
+    function modifyLinkAndGetTranslationOfLinkHrefAndAddDynamicallyIfNeeded($link, $lng_source, $lng_target, $translate)
+    {
         if ($link === null || trim($link) === '') {
             return $link;
         }
@@ -951,7 +905,9 @@ class Data
         if ($this->host->urlIsStaticFile($link)) {
             return $link;
         }
-        $is_absolute_link = mb_strpos($link, $this->host->getCurrentHost()) === 0;
+
+        $is_absolute_link =
+            mb_strpos($link, $this->host->getBaseUrlForLanguageCode($this->settings->getSourceLanguageCode())) === 0;
         if (mb_strpos($link, 'http') !== false && $is_absolute_link === false) {
             return $link;
         }
@@ -959,20 +915,8 @@ class Data
             return $link;
         }
 
-        // replace host/lng
-        foreach (
-            [
-                $this->host->getCurrentHost() . '/' . $this->settings->getSourceLanguageCode(),
-                $this->host->getCurrentHost(),
-                '/' . $this->settings->getSourceLanguageCode(),
-                $this->settings->getSourceLanguageCode()
-            ]
-            as $begin__value
-        ) {
-            if (mb_strpos($link, $begin__value) === 0) {
-                $link = str_replace($begin__value, '', $link);
-            }
-        }
+        // strip out host/lng
+        $link = $this->host->getPathWithoutPrefixFromUrl($link);
 
         if ($translate === true) {
             $url_parts = explode('/', $link);
@@ -989,10 +933,18 @@ class Data
             }
             $link = implode('/', $url_parts);
         }
-        $link = (mb_strpos($link, '/') === 0 ? '/' : '') . $lng_target . '/' . ltrim($link, '/');
         if ($is_absolute_link === true) {
-            $link = rtrim($this->host->getCurrentHost(), '/') . '/' . ltrim($link, '/');
+            $link = rtrim($this->host->getBaseUrlWithPrefixForLanguageCode($lng_target), '/') . '/' . ltrim($link, '/');
+        } else {
+            if ($this->host->getPrefixForLanguageCode($lng_target) != '') {
+                $link =
+                    (mb_strpos($link, '/') === 0 ? '/' : '') .
+                    $this->host->getPrefixForLanguageCode($lng_target) .
+                    '/' .
+                    ltrim($link, '/');
+            }
         }
+
         return $link;
     }
 
@@ -1010,22 +962,13 @@ class Data
         }
         foreach ($urls as $urls__value) {
             // always submit relative urls
-            foreach (
-                [
-                    $this->host->getCurrentHost() . '/' . $this->settings->getSourceLanguageCode(),
-                    $this->host->getCurrentHost(),
-                    '/' . $this->settings->getSourceLanguageCode(),
-                    $this->settings->getSourceLanguageCode()
-                ]
-                as $begin__value
-            ) {
-                if (strpos($urls__value, $begin__value) === 0) {
-                    $urls__value = str_replace($begin__value, '', $urls__value);
-                }
-            }
+            $urls__value = $this->host->getPathWithoutPrefixFromUrl($urls__value);
             $urls__value = trim($urls__value, '/');
             // skip external files
-            if (strpos($urls__value, 'http') === 0 && strpos($urls__value, $this->host->getCurrentHost()) === false) {
+            if (
+                strpos($urls__value, 'http') === 0 &&
+                strpos($urls__value, $this->host->getBaseUrlForSourceLanguage()) === false
+            ) {
                 continue;
             }
             if ($this->stringShouldNotBeTranslated($urls__value, 'file')) {
@@ -1370,7 +1313,7 @@ class Data
         if ($context === null || $context == '') {
             if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
                 $context = 'email';
-            } elseif (mb_strpos($value, $this->host->getCurrentHost()) === 0) {
+            } elseif (mb_strpos($value, $this->host->getBaseUrlForSourceLanguage()) === 0) {
                 $context = 'slug|file';
             } elseif (mb_strpos($value, 'http') === 0 && mb_strpos($value, ' ') === false) {
                 $context = 'slug';
@@ -1379,7 +1322,7 @@ class Data
         if ($context === 'slug|file') {
             $value_modified = $value;
             if (!preg_match('/^[a-zA-Z]+?:.+$/', $value_modified)) {
-                $value_modified = $this->host->getCurrentHost() . '/' . $value_modified;
+                $value_modified = $this->host->getBaseUrlForSourceLanguage() . '/' . $value_modified;
             }
             $value_modified = str_replace(['.php', '.html'], '', $value_modified);
             if (preg_match('/\/.+\.[a-zA-Z\d]+$/', str_replace('://', '', $value_modified))) {
@@ -1415,16 +1358,14 @@ class Data
 
     function getUrlTranslationInLanguage($from_lng, $to_lng, $url = null)
     {
-        $path = null;
-        if ($url !== null) {
-            $path = str_replace($this->host->getCurrentHost(), '', $url);
-        } else {
-            $path = $this->host->getCurrentPathWithArgs();
+        if ($url === null) {
+            $url = $this->host->getCurrentUrlWithArgs();
         }
+        $path = $this->host->getPathWithoutPrefixFromUrl($url);
         return trim(
-            trim($this->host->getCurrentHost(), '/') .
+            trim($this->host->getBaseUrlWithPrefixForLanguageCode($to_lng), '/') .
                 '/' .
-                trim($this->getPathTranslationInLanguage($from_lng, $to_lng, false, $path), '/'),
+                trim($this->getPathTranslationInLanguage($from_lng, $to_lng, $path), '/'),
             '/'
         ) . (mb_strpos($path, '?') === false ? '/' : '');
     }
@@ -1531,10 +1472,10 @@ class Data
         return $trans;
     }
 
-    function getPathTranslationInLanguage($from_lng, $to_lng, $always_remove_prefix = false, $path = null)
+    function getPathTranslationInLanguage($from_lng, $to_lng, $path = null)
     {
-        if ($path === null) {
-            $path = $this->host->getCurrentPathWithArgs();
+        if ($path == '') {
+            return $path;
         }
         if ($from_lng === $to_lng) {
             return $path;
@@ -1547,27 +1488,7 @@ class Data
         }
         $path_parts = array_values($path_parts);
 
-        // prefix
-        if (
-            $always_remove_prefix === true ||
-            ($this->settings->getSourceLanguageCode() === $to_lng &&
-                $this->settings->get('prefix_lng_source') === false)
-        ) {
-            if (@$path_parts[0] === $from_lng) {
-                unset($path_parts[0]);
-            }
-        } else {
-            if (@$path_parts[0] === $from_lng) {
-                $path_parts[0] = $to_lng;
-            } else {
-                array_unshift($path_parts, $to_lng);
-            }
-        }
-
         foreach ($path_parts as $path_parts__key => $path_parts__value) {
-            if (in_array($path_parts__value, $this->settings->getSelectedLanguageCodes())) {
-                continue;
-            }
             $data = $this->getTranslationInForeignLng($path_parts__value, $to_lng, $from_lng, 'slug');
             if ($this->settings->get('only_show_checked_strings') === true) {
                 // no string has been found in general (unchecked or checked)

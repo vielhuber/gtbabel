@@ -7,8 +7,8 @@ log.txt
 /wordpress/vendor
 /wordpress/vendor/
 /.phpunit.result.cache
-/tests/files/**/*_expected
-/tests/data.db
+/tests/phpunit/files/**/*_expected
+/tests/phpunit/data.db
 gtbabel-*-log.txt
 /node_modules/
 /package-lock.json

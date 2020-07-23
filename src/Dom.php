@@ -703,7 +703,7 @@ class Dom
         if ($this->settings->get('translate_json') !== true) {
             return $json;
         }
-        if ($this->data->sourceLngIsCurrentLng() && $this->settings->get('prefix_lng_source') === false) {
+        if ($this->data->sourceLngIsCurrentLng()) {
             return $json;
         }
         $json = json_decode($json);

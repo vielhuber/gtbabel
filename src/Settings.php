@@ -56,7 +56,6 @@ class Settings
                 'table' => 'translations'
             ],
             'log_folder' => '/logs',
-            'prefix_lng_source' => true,
             'redirect_root_domain' => 'browser',
             'translate_default_tag_nodes' => true,
             'translate_html' => true,

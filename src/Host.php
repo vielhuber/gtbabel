@@ -148,4 +148,129 @@ class Host
     {
         return in_array(http_response_code(), [200, 304]);
     }
+
+    function getReferer()
+    {
+        if (!isset($_SERVER['HTTP_REFERER'])) {
+            return null;
+        }
+        return $_SERVER['HTTP_REFERER'];
+    }
+
+    function getLngFromUrl($url)
+    {
+        $base_urls = [];
+        foreach ($this->settings->getSelectedLanguageCodes() as $languages__value) {
+            $base_urls[$languages__value] = $this->getBaseUrlWithPrefixForLanguageCode($languages__value);
+        }
+        uasort($base_urls, function ($a, $b) {
+            return strlen($b) - strlen($a) <=> 0;
+        });
+        foreach ($base_urls as $base_urls__key => $base_urls__value) {
+            if (trim($url, '/') === trim($base_urls__value, '/')) {
+                return $base_urls__key;
+            }
+
+            if (strpos(trim($url, '/') . '/', rtrim($base_urls__value, '/') . '/') === 0) {
+                return $base_urls__key;
+            }
+        }
+        return $this->settings->getSourceLanguageCode();
+    }
+
+    function getBaseUrlWithPrefixForLanguageCode($lng)
+    {
+        return rtrim(
+            $this->getBaseUrlForLanguageCode($lng) . '/' . ($this->getPrefixForLanguageCode($lng) ?? '') . '/',
+            '/'
+        );
+    }
+
+    function getBaseUrlForSourceLanguage()
+    {
+        return $this->getBaseUrlForLanguageCode($this->settings->getSourceLanguageCode());
+    }
+
+    function getBaseUrlForLanguageCode($lng)
+    {
+        $url_base = @$this->settings->getLanguageDataForCode($lng)['url_base'];
+        if ($url_base == '') {
+            return $this->getCurrentHost();
+        }
+        return $url_base;
+    }
+
+    function getPrefixForLanguageCode($lng)
+    {
+        $data = $this->settings->getLanguageDataForCode($lng);
+        if ($data !== null && !array_key_exists('url_prefix', $data)) {
+            return $lng;
+        }
+        return $data['url_prefix'];
+    }
+
+    function getPathWithPrefixFromUrl($url)
+    {
+        $lng = $this->getLngFromUrl($url);
+        $base_url = $this->getBaseUrlForLanguageCode($lng);
+        if (mb_strpos($url, $base_url) === 0) {
+            $url = str_replace($base_url, '', $url);
+        }
+        return $url;
+    }
+
+    function getPathWithoutPrefixFromUrl($url)
+    {
+        $lng = $this->getLngFromUrl($url);
+        $strip = [];
+        $strip[] = $this->getBaseUrlWithPrefixForLanguageCode($lng);
+        $strip[] = $this->getBaseUrlForLanguageCode($lng);
+        if ($this->getPrefixForLanguageCode($lng) != '') {
+            $strip[] = '/' . $this->getPrefixForLanguageCode($lng);
+            $strip[] = $this->getPrefixForLanguageCode($lng);
+        }
+        foreach ($strip as $strip__value) {
+            if (strpos($url, $strip__value) === 0) {
+                $url = str_replace($strip__value, '', $url);
+            }
+        }
+        return $url;
+    }
+
+    function getRefererLng()
+    {
+        $referer = @$_SERVER['HTTP_REFERER'];
+        if ($referer == '') {
+            return $this->settings->getSourceLanguageCode();
+        }
+        return $this->getLngFromUrl($referer);
+    }
+
+    function getBrowserLng()
+    {
+        if (@$_SERVER['HTTP_ACCEPT_LANGUAGE'] != '') {
+            foreach ($this->settings->getSelectedLanguageCodes() as $languages__value) {
+                if (mb_strpos($_SERVER['HTTP_ACCEPT_LANGUAGE'], $languages__value) === 0) {
+                    return $languages__value;
+                }
+            }
+        }
+        return $this->settings->getSourceLanguageCode();
+    }
+
+    function getCurrentPrefix()
+    {
+        return $this->getPrefixFromUrl($this->getCurrentUrl());
+    }
+
+    function getPrefixFromUrl($url)
+    {
+        $path = $this->getPathWithPrefixFromUrl($url);
+        foreach ($this->settings->getSelectedLanguageCodes() as $languages__value) {
+            if ($path === $languages__value || mb_strpos($path, $languages__value . '/') === 0) {
+                return $languages__value;
+            }
+        }
+        return '';
+    }
 }

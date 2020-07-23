@@ -30,6 +30,7 @@ Gtbabel automatically translates your HTML/PHP pages – server sided!
 -   Multiple source languages supported concurrently.
 -   DOM change detection: Observe specific page parts and translate dynamic content.
 -   Auto throttling api translation for cost control.
+-   Custom domain support (path based, subdomain based, top level domain based)
 
 ## Requirements
 
@@ -914,8 +915,7 @@ The default configuration is:
         */
     ],
     'log_folder' => '/logs',
-    'prefix_lng_source' => true,
-    'redirect_root_domain' => 'browser', // 'browser'|'source' (only relevant if prefix_lng_source=true)
+    'redirect_root_domain' => 'browser',
     'translate_default_tag_nodes' => true,
     'translate_html' => true,
     'translate_json' => true,
@@ -1002,6 +1002,7 @@ The following features are included:
 -   Translate specific posts/pages or any other url
 -   Control publish status of posts/pages (slug changes are auto-reflected in the `prevent_publish_urls`-option)
 -   Possibility to replace files per language via the media library
+-   Multisite support
 
 ## Database and Gettext
 
@@ -1212,6 +1213,134 @@ The router automatically modifies the `$_SERVER['REQUEST_URI']` variable to catc
 Unknown translations of urls are picked up from the current url and from links that are on the page.\
 These urls are automatically added to gettext (ajax requested urls are excluded).
 
+## Domain schema
+
+Gtbabel by default uses a path based approach for your url structure.\
+That means: The language code is always appended to your main url:
+
+`https://www.tld.com/de/`
+
+You can change this behaviour in any way you like.\
+Just extend the `languages`-option with `url_base` and `url_prefix`.\
+The following configuration is the same as if no option isset:
+
+```php
+'languages' => [
+    [
+        'code' => 'de',
+        /* ... */
+        'url_base' => 'https://www.tld.com'
+        'url_prefix' => 'de'
+    ],
+    [
+        'code' => 'en',
+        /* ... */
+        'url_base' => 'https://www.tld.com'
+        'url_prefix' => 'en'
+    ]
+    /* ... */
+]
+```
+
+In order to not prefix your source language (which is common), just provide a special rule for it\
+(see we didn't specify `url_base` and any option for the other languages, because Gtbabel still uses the default there):
+
+```php
+'languages' => [
+    [
+        'code' => 'de',
+        /* ... */
+        'url_prefix' => ''
+    ],
+    [
+        'code' => 'en',
+        /* ... */
+    ]
+    /* ... */
+]
+```
+
+With this technique we can use custom language codes in our urls:
+
+```php
+'languages' => [
+    [
+        'code' => 'de',
+        /* ... */
+        'url_prefix' => 'deutsch'
+    ],
+    [
+        'code' => 'en',
+        /* ... */
+        'url_prefix' => 'english'
+    ]
+    /* ... */
+]
+```
+
+Or we can easily setup a subdomain based approach:
+
+```php
+'languages' => [
+    [
+        'code' => 'de',
+        /* ... */
+        'url_base' => 'https://de.tld.com'
+        'url_prefix' => ''
+    ],
+    [
+        'code' => 'en',
+        /* ... */
+        'url_base' => 'https://en.tld.com'
+        'url_prefix' => ''
+    ]
+    /* ... */
+]
+```
+
+Even a multidomain based approach is possible:
+
+```php
+'languages' => [
+    [
+        'code' => 'de',
+        /* ... */
+        'url_base' => 'https://www.tld.de'
+        'url_prefix' => ''
+    ],
+    [
+        'code' => 'en',
+        /* ... */
+        'url_base' => 'https://www.tld.com'
+        'url_prefix' => ''
+    ]
+    /* ... */
+]
+```
+
+If you have hosted your website on a subpath, you should provide something like:
+
+```php
+'languages' => [
+    [
+        'code' => 'de',
+        /* ... */
+        'url_base' => 'https://www.tld.com/some/sub/path'
+        'url_prefix' => 'de'
+    ],
+    [
+        'code' => 'en',
+        /* ... */
+        'url_base' => 'https://www.tld.com/some/sub/path'
+        'url_prefix' => 'en'
+    ]
+    /* ... */
+]
+```
+
+The configuration is totally up to you (you can even mix approaches).\
+You only have to make sure that all top level domains point to the same root path.
+
 ## Dealing with assets
 
 Although Gtbabel leaves static files untouched, it adds them to the template file (with context `file`). This gives you the possibility to output images, downloads and other media individually per language.
@@ -1228,6 +1357,30 @@ If `only_show_checked_strings` is set to `true`, only translations with an [extr
 ## Flow diagram
 
 ![Flow diagram](gtbabel.drawio.svg)
+
+## Language picker
+
+To output a language picker, just use this snippet:
+
+```php
+if (function_exists('gtbabel_languagepicker')) {
+    echo '<ul class="lngpicker">';
+    foreach (gtbabel_languagepicker() as $languagepicker__value) {
+        echo '<li>';
+        echo '<a href="' .
+            $languagepicker__value['url'] .
+            '"' .
+            ($languagepicker__value['active'] ? ' class="active"' : '') .
+            '>';
+        echo $languagepicker__value['label'];
+        echo '</a>';
+        echo '</li>';
+    }
+    echo '</ul>';
+}
+```
+
+Make sure that the container class is excluded from your translations.
 
 ## Helper functions
 

@@ -20,12 +20,12 @@ class Gtbabel
     function __construct(
         Settings $settings = null,
         Utils $utils = null,
+        Log $log = null,
         Tags $tags = null,
         Host $host = null,
         Publish $publish = null,
-        Altlng $altlng = null,
-        Log $log = null,
         Data $data = null,
+        Altlng $altlng = null,
         Dom $dom = null,
         Router $router = null,
         Gettext $gettext = null
@@ -36,9 +36,9 @@ class Gtbabel
         $this->tags = $tags ?: new Tags($this->utils);
         $this->host = $host ?: new Host($this->settings, $this->log);
         $this->publish = $publish ?: new Publish($this->settings, $this->host, $this->log);
-        $this->altlng = $altlng ?: new Altlng($this->settings, $this->host);
         $this->data =
             $data ?: new Data($this->utils, $this->host, $this->settings, $this->tags, $this->log, $this->publish);
+        $this->altlng = $altlng ?: new Altlng($this->settings, $this->host);
         $this->dom =
             $dom ?: new Dom($this->utils, $this->data, $this->host, $this->settings, $this->log, $this->altlng);
         $this->router = $router ?: new Router($this->data, $this->host, $this->settings, $this->publish);
@@ -59,7 +59,7 @@ class Gtbabel
         if ($this->host->currentUrlIsExcluded()) {
             return;
         }
-        $this->router->redirectPrefixedSourceLng();
+        $this->router->redirectPrefixedUrls();
         $this->router->addTrailingSlash();
         $this->router->redirectUnpublished();
         $this->router->initMagicRouter();
@@ -81,6 +81,7 @@ class Gtbabel
         ob_end_clean();
         echo $content;
         $this->data->saveCacheToDatabase();
+        $this->router->resetMagicRouter();
     }
 
     function reset()

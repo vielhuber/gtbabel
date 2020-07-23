@@ -28,7 +28,7 @@ if (!function_exists('gtbabel_referer_lng')) {
         if ($gtbabel === null) {
             $gtbabel = new \vielhuber\gtbabel\Gtbabel();
         }
-        return $gtbabel->data->getRefererLng();
+        return $gtbabel->host->getRefererLng();
     }
 }
 

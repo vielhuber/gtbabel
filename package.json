@@ -103,7 +103,7 @@
     "description": "[![Build Status](https://travis-ci.org/vielhuber/gtbabel.svg?branch=master)](https://travis-ci.org/vielhuber/gtbabel)",
     "main": "index.js",
     "directories": {
-        "test": "tests"
+        "test": "tests/phpunit"
     },
     "dependencies": {},
     "repository": {

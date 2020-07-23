@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 4.0.2
+ * Version: 4.0.3
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -97,7 +97,26 @@ class GtbabelWordPress
             'port' => 3306,
             'table' => $wpdb->prefix . 'translations'
         ];
+
         $settings['prevent_publish'] = !is_user_logged_in();
+
+        // url settings are stored in the wordpress database for migration purposes
+        $url_settings = get_option('gtbabel_url_settings');
+        if ($url_settings !== null && is_array($url_settings) && !empty($url_settings)) {
+            foreach ($url_settings as $url_settings__value) {
+                foreach ($settings['languages'] as $languages__key => $languages__value) {
+                    if ($languages__value['code'] !== $url_settings__value['code']) {
+                        continue;
+                    }
+                    if (isset($url_settings__value['url_base']) && $url_settings__value['url_base'] != '') {
+                        $settings['languages'][$languages__key]['url_base'] = $url_settings__value['url_base'];
+                    }
+                    if (isset($url_settings__value['url_prefix'])) {
+                        $settings['languages'][$languages__key]['url_prefix'] = $url_settings__value['url_prefix'];
+                    }
+                }
+            }
+        }
 
         // settings that can be changed via url
         foreach (
@@ -471,7 +490,6 @@ class GtbabelWordPress
                             'log_folder',
                             'debug_translations',
                             'hide_languages',
-                            'prefix_lng_source',
                             'redirect_root_domain',
                             'translate_default_tag_nodes',
                             'translate_html',
@@ -495,6 +513,7 @@ class GtbabelWordPress
                             'exclude_dom',
                             'force_tokenize',
                             'include_dom',
+                            'url_settings',
                             'localize_js',
                             'localize_js_strings',
                             'detect_dom_changes',
@@ -516,7 +535,6 @@ class GtbabelWordPress
 
                     foreach (
                         [
-                            'prefix_lng_source',
                             'translate_default_tag_nodes',
                             'translate_html',
                             'translate_json',
@@ -563,6 +581,27 @@ class GtbabelWordPress
                             }
                         }
                     }
+
+                    $url_settings = [];
+                    $post_data = $settings['url_settings'];
+                    if (!empty(@$post_data['code'])) {
+                        foreach ($post_data['code'] as $post_data__key => $post_data__value) {
+                            if (@$post_data['code'][$post_data__key] == '') {
+                                continue;
+                            }
+                            $url_settings[] = [
+                                'code' => $post_data['code'][$post_data__key],
+                                'url_base' => $post_data['url_base'][$post_data__key],
+                                'url_prefix' => $post_data['url_prefix'][$post_data__key]
+                            ];
+                        }
+                    }
+                    if (!empty($url_settings)) {
+                        update_option('gtbabel_url_settings', $url_settings);
+                    } else {
+                        delete_option('gtbabel_url_settings');
+                    }
+                    unset($settings['url_settings']);
 
                     $post_data = $settings['prevent_publish_urls'];
                     $settings['prevent_publish_urls'] = [];
@@ -667,6 +706,10 @@ class GtbabelWordPress
                         $settings['languages'],
                         $this->gtbabel->settings->getLanguageDataForCode($settings['lng_source'])
                     );
+                    foreach ($settings['languages'] as $languages__key => $languages__value) {
+                        unset($settings['languages'][$languages__key]['url_base']);
+                        unset($settings['languages'][$languages__key]['url_prefix']);
+                    }
 
                     $this->saveSettings($settings);
                     // refresh gtbabel with new options
@@ -823,17 +866,6 @@ class GtbabelWordPress
             echo '</li>';
         }
         echo '</ul>';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_prefix_lng_source" class="gtbabel__label">';
-        echo __('Prefix source language urls', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_prefix_lng_source" name="gtbabel[prefix_lng_source]" value="1"' .
-            ($settings['prefix_lng_source'] == '1' ? ' checked="checked"' : '') .
-            ' />';
         echo '</div>';
         echo '</li>';
 
@@ -1283,6 +1315,57 @@ class GtbabelWordPress
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
+        echo '<label class="gtbabel__label">';
+        echo __('Language specific base urls and prefixes', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<div class="gtbabel__repeater">';
+        echo '<ul class="gtbabel__repeater-list">';
+        $url_settings = [];
+        foreach ($this->gtbabel->settings->getSelectedLanguages() as $languages__value) {
+            if (!isset($languages__value['url_base']) && !isset($languages__value['url_prefix'])) {
+                continue;
+            }
+            $url_settings[] = [
+                'code' => $languages__value['code'],
+                'url_base' => $languages__value['url_base'],
+                'url_prefix' => $languages__value['url_prefix']
+            ];
+        }
+        if (empty($url_settings)) {
+            $url_settings = [['code' => '', 'url_base' => '', 'url_prefix' => '']];
+        }
+        foreach ($url_settings as $url_settings__value) {
+            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-3">';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[url_settings][code][]" value="' .
+                $url_settings__value['code'] .
+                '" placeholder="' .
+                __('Language code', 'gtbabel-plugin') .
+                '" />';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[url_settings][url_base][]" value="' .
+                $url_settings__value['url_base'] .
+                '" placeholder="' .
+                __('Base URL (only if different from host)', 'gtbabel-plugin') .
+                '" />';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[url_settings][url_prefix][]" value="' .
+                $url_settings__value['url_prefix'] .
+                '" placeholder="' .
+                __('Prefix (leave empty if no prefix)', 'gtbabel-plugin') .
+                '" />';
+            echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
+                __('Remove', 'gtbabel-plugin') .
+                '</a>';
+            echo '</li>';
+        }
+        echo '</ul>';
+        echo '<a href="#" class="gtbabel__repeater-add button button-secondary">' .
+            __('Add', 'gtbabel-plugin') .
+            '</a>';
+        echo '</div>';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
         echo '<label for="gtbabel_localize_js" class="gtbabel__label">';
         echo __('Provide strings in JavaScript', 'gtbabel-plugin');
         echo '</label>';
@@ -1580,7 +1663,7 @@ class GtbabelWordPress
                 $link_public = $url;
             } else {
                 $link_public = $this->gtbabel->data->getUrlTranslationInLanguage(
-                    $this->gtbabel->data->getLngFromUrl($url),
+                    $this->gtbabel->host->getLngFromUrl($url),
                     $lng,
                     $url
                 );
@@ -1598,7 +1681,7 @@ class GtbabelWordPress
                 $lng_link .=
                     '&url=' .
                     $this->gtbabel->data->getUrlTranslationInLanguage(
-                        $this->gtbabel->data->getLngFromUrl($url),
+                        $this->gtbabel->host->getLngFromUrl($url),
                         $this->gtbabel->settings->getSourceLanguageCode(),
                         $url
                     );
@@ -1627,7 +1710,7 @@ class GtbabelWordPress
                     $lng_link .=
                         '&url=' .
                         $this->gtbabel->data->getUrlTranslationInLanguage(
-                            $this->gtbabel->data->getLngFromUrl($url),
+                            $this->gtbabel->host->getLngFromUrl($url),
                             $lng__key,
                             $url
                         );
@@ -2301,7 +2384,7 @@ EOD;
                     continue;
                 }
                 $url_trans = $this->gtbabel->data->getUrlTranslationInLanguage(
-                    $this->gtbabel->data->getLngFromUrl($url),
+                    $this->gtbabel->host->getLngFromUrl($url),
                     $lngs__value,
                     $url
                 );
@@ -2316,7 +2399,7 @@ EOD;
             }, $discovery_strings);
         }
 
-        $translations = $this->gtbabel->data->getGroupedTranslationsFromDatabaseNEW(null, $url === null);
+        $translations = $this->gtbabel->data->getGroupedTranslationsFromDatabase(null, $url === null);
 
         // filter
         if ($url !== null) {
@@ -2531,12 +2614,7 @@ EOD;
         });
 
         // intentionally throw in a 404 page (so that content there [except the slug] is translated as well)
-        $urls[] =
-            get_bloginfo('url') .
-            ($this->gtbabel->settings->get('prefix_lng_source') === true
-                ? '/' . $this->gtbabel->settings->getSourceLanguageCode()
-                : '') .
-            '/gtbabel-force-404/';
+        $urls[] = get_bloginfo('url') . '/gtbabel-force-404/';
 
         $urls = array_unique($urls);
 
