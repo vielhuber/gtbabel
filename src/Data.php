@@ -349,8 +349,17 @@ class Data
         return $this->db->fetch_all('SELECT * FROM ' . $this->table . ' ORDER BY id ASC');
     }
 
-    function getGroupedTranslationsFromDatabase($lng_target = null, $order_by_string = true)
-    {
+    function getGroupedTranslationsFromDatabase(
+        $lng_target = null,
+        $order_by_string = true,
+        $urls = null,
+        $time = null,
+        $search_term = null,
+        $shared = null,
+        $checked = null,
+        $take = null,
+        $skip = null
+    ) {
         $data = [];
 
         /* the following approach is (surprisingly) much faster than a group by / join of a lot of columns via sql */
@@ -462,7 +471,92 @@ class Data
         foreach ($data as $data__key => $data__value) {
             unset($data[$data__key]['order']);
         }
-        return $data;
+
+        // filter
+
+        if ($urls !== null && $time !== null) {
+            $discovery_strings = $this->discoveryLogGetAfter($time, $urls, false);
+            $discovery_strings_index = array_map(function ($discovery_strings__value) {
+                return __::encode_data([$discovery_strings__value['str'], $discovery_strings__value['context']]);
+            }, $discovery_strings);
+            foreach ($data as $data__key => $data__value) {
+                if (
+                    !in_array(
+                        __::encode_data([$data__value[$data__value['lng_source']], $data__value['context']]),
+                        $discovery_strings_index
+                    )
+                ) {
+                    unset($data[$data__key]);
+                }
+            }
+        }
+
+        if ($search_term !== null && trim($search_term) != '') {
+            foreach ($data as $data__key => $data__value) {
+                $found = false;
+                foreach ($this->settings->getSelectedLanguageCodes() as $languages__value) {
+                    if (
+                        @$data__value[$languages__value] != '' &&
+                        mb_stripos($data__value[$languages__value], $search_term) !== false
+                    ) {
+                        $found = true;
+                        break;
+                    }
+                }
+                if ($found === false) {
+                    unset($data[$data__key]);
+                }
+            }
+        }
+
+        if ($shared !== null && $shared !== '') {
+            if ($shared === false) {
+                $shared = '0';
+            }
+            if ($shared === true) {
+                $shared = '1';
+            }
+            foreach ($data as $data__key => $data__value) {
+                if (
+                    ($shared == '0' && $data__value['shared'] == '1') ||
+                    ($shared == '1' && $data__value['shared'] != '1')
+                ) {
+                    unset($data[$data__key]);
+                }
+            }
+        }
+
+        if ($checked !== null && $checked !== '') {
+            if ($checked === false) {
+                $checked = '0';
+            }
+            if ($checked === true) {
+                $checked = '1';
+            }
+            foreach ($data as $data__key => $data__value) {
+                $all_checked = true;
+                foreach ($data__value as $data__value__key => $data__value__value) {
+                    if (strpos($data__value__key, 'checked') === false) {
+                        continue;
+                    }
+                    if ($data__value__value != '1') {
+                        $all_checked = false;
+                        break;
+                    }
+                }
+                if (($all_checked === true && $checked == '0') || ($all_checked !== true && $checked == '1')) {
+                    unset($data[$data__key]);
+                }
+            }
+        }
+
+        // pagination
+        $count = count($data);
+        if ($take !== null) {
+            $data = array_slice($data, $skip === null ? 0 : $skip, $take);
+        }
+
+        return ['data' => $data, 'count' => $count];
     }
 
     function editTranslation(

@@ -416,7 +416,7 @@ class Test extends \PHPUnit\Framework\TestCase
         ob_end_clean();
         $this->assertEquals($output, '<p>Haus-en</p>');
         $this->assertEquals($this->gtbabel->data->getTranslationsFromDatabase(), []);
-        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase(), []);
+        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase()['data'], []);
         $this->gtbabel->reset();
 
         $settings['auto_translation'] = true;
@@ -430,7 +430,7 @@ class Test extends \PHPUnit\Framework\TestCase
         ob_end_clean();
         $this->assertEquals($output, '<p>House</p>');
         $this->assertEquals($this->gtbabel->data->getTranslationsFromDatabase(), []);
-        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase(), []);
+        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase()['data'], []);
         $this->gtbabel->reset();
 
         $settings['auto_translation'] = true;
@@ -447,7 +447,7 @@ class Test extends \PHPUnit\Framework\TestCase
             $this->gtbabel->data->getTranslationFromDatabase('Haus', null, 'de', 'en')['trans'] === 'House',
             true
         );
-        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase()[0]['en'], 'House');
+        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase()['data'][0]['en'], 'House');
         $this->gtbabel->reset();
 
         $settings['auto_translation'] = true;
@@ -464,7 +464,7 @@ class Test extends \PHPUnit\Framework\TestCase
             $this->gtbabel->data->getTranslationFromDatabase('Haus', null, 'de', 'en')['trans'] === 'House',
             true
         );
-        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase()[0]['en'], 'House');
+        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase()['data'][0]['en'], 'House');
 
         $this->gtbabel->data->editCheckedValue('Haus', null, 'de', 'en', true);
 
@@ -479,7 +479,7 @@ class Test extends \PHPUnit\Framework\TestCase
             $this->gtbabel->data->getTranslationFromDatabase('Haus', null, 'de', 'en')['checked'] == 1,
             true
         );
-        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase()[0]['en_checked'], 1);
+        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase()['data'][0]['en_checked'], 1);
         $this->gtbabel->reset();
     }
 
@@ -581,11 +581,11 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->gtbabel->stop();
         ob_end_clean();
 
-        $data1 = $this->gtbabel->data->getGroupedTranslationsFromDatabase();
+        $data1 = $this->gtbabel->data->getGroupedTranslationsFromDatabase()['data'];
         $files = $this->gtbabel->gettext->export(false);
         $this->gtbabel->gettext->import($files[2], 'en', 'de');
         $this->gtbabel->gettext->import($files[6], 'fr', 'de');
-        $data2 = $this->gtbabel->data->getGroupedTranslationsFromDatabase();
+        $data2 = $this->gtbabel->data->getGroupedTranslationsFromDatabase()['data'];
         $this->assertEquals($data1, $data2);
         $this->assertEquals(strpos(file_get_contents($files[2]), 'msgid "Some content in english."') !== false, true);
         $this->assertEquals(
