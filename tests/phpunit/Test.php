@@ -351,6 +351,15 @@ class Test extends \PHPUnit\Framework\TestCase
         ]);
     }
 
+    public function test054()
+    {
+        $this->runDiff('54.html', 1500, [
+            'debug_translations' => false,
+            'auto_translation' => true,
+            'google_translation_api_key' => 'free'
+        ]);
+    }
+
     public function test_translate()
     {
         $output = $this->gtbabel->translate('<p>Dies ist ein Test!</p>', [

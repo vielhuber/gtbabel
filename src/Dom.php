@@ -1,6 +1,8 @@
 <?php
 namespace vielhuber\gtbabel;
 
+use vielhuber\stringhelper\__;
+
 class Dom
 {
     public $DOMDocument;
@@ -389,73 +391,19 @@ class Dom
         $this->preloadForceTokenize();
         $this->preloadLngAreas();
         $this->modifyNodes();
-        $html = $this->finishDomDocument($html);
+        $html = $this->finishDomDocument();
         return $html;
     }
 
     function setupDomDocument($html)
     {
-        $this->DOMDocument = new \DOMDocument();
-        // if the html source doesn't contain a valid utf8 header, domdocument interprets is as iso
-        // we circumvent this with mb_convert_encoding
-        //@$this->DOMDocument->loadHTML($html);
-        $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
-        if (mb_strpos($html, '</head>') !== false) {
-            $html = str_replace(
-                '</head>',
-                '<!--remove--><meta http-equiv="Content-type" content="text/html; charset=utf-8" /><!--/remove--></head>',
-                $html
-            );
-        } elseif (mb_strpos($html, '<body') !== false) {
-            $html = str_replace(
-                '<body',
-                '<!--remove--><head><meta http-equiv="content-type" content="text/html;charset=utf-8" /></head><!--/remove--><body',
-                $html
-            );
-        } else {
-            $html =
-                '<!--remove--><head><meta http-equiv="content-type" content="text/html;charset=utf-8" /></head><!--/remove-->' .
-                $html;
-        }
-        @$this->DOMDocument->loadHTML($html);
+        $this->DOMDocument = __::str_to_dom($html);
         $this->DOMXPath = new \DOMXPath($this->DOMDocument);
     }
 
-    function finishDomDocument($htmlOriginal)
+    function finishDomDocument()
     {
-        // domdocument does not close empty li tags (because they're valid html)
-        // to circumvent that, use:
-        $nodes = $this->DOMXPath->query('/html/body//*[not(node())]');
-        foreach ($nodes as $nodes__value) {
-            $nodes__value->nodeValue = '';
-        }
-
-        $htmlModified = $this->DOMDocument->saveHTML();
-        if (
-            mb_strpos($htmlModified, '<!--remove-->') !== false &&
-            mb_strpos($htmlModified, '<!--/remove-->') !== false
-        ) {
-            $htmlModified =
-                mb_substr($htmlModified, 0, mb_strpos($htmlModified, '<!--remove-->')) .
-                mb_substr($htmlModified, mb_strpos($htmlModified, '<!--/remove-->') + mb_strlen('<!--/remove-->'));
-        }
-        // if domdocument added previously a default header, we squish that
-        if (
-            mb_stripos($htmlOriginal, '<!DOCTYPE') !== 0 &&
-            mb_stripos($htmlOriginal, '<html') !== 0 &&
-            mb_stripos($htmlModified, '<body>') !== false &&
-            mb_stripos($htmlModified, '</body>') !== false
-        ) {
-            $pos1 = mb_strpos($htmlModified, '<body>') + mb_strlen('<body>');
-            $pos2 = mb_strpos($htmlModified, '</body>');
-            $htmlModified = mb_substr($htmlModified, $pos1, $pos2 - $pos1);
-            if (mb_stripos($htmlOriginal, '<p') !== 0 && mb_stripos($htmlModified, '<p') === 0) {
-                $pos1 = mb_strpos($htmlModified, '<p>') + mb_strlen('<p>');
-                $pos2 = mb_strpos($htmlModified, '</p>');
-                $htmlModified = mb_substr($htmlModified, $pos1, $pos2 - $pos1);
-            }
-        }
-        return $htmlModified;
+        return __::dom_to_str($this->DOMDocument);
     }
 
     function setLangTags()
