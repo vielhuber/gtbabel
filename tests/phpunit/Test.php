@@ -762,6 +762,7 @@ class Test extends \PHPUnit\Framework\TestCase
 <div style="background-image: url('beispiel-bilddatei3.jpg');"></div>
 <div style="background-image: url('http://test.de/beispiel-bilddatei4.jpg');"></div>
 <div style="background-image: url('beispiel-bilddatei1.jpg'), url('beispiel-bilddatei2.jpg');"></div>
+<div style="width: 20%;"></div>
 <img src="http://test.de/beispiel-bilddatei5.jpg" alt="" />
 <img src="http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei6.jpg" alt="" />
 <img src="/beispiel-bilddatei7.jpg" alt="" />
@@ -787,6 +788,7 @@ EOD;
 <div style="background-image: url('beispiel-bilddatei3_EN.jpg');"></div>
 <div style="background-image: url('http://test.de/beispiel-bilddatei4.jpg');"></div>
 <div style="background-image: url('beispiel-bilddatei1_EN.jpg'), url('beispiel-bilddatei2_EN.jpg');"></div>
+<div style="width: 20%;"></div>
 <img src="http://test.de/beispiel-bilddatei5.jpg" alt="">
 <img src="http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei6_EN.jpg" alt="">
 <img src="/beispiel-bilddatei7_EN.jpg" alt="">

@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 4.0.7
+ * Version: 4.0.8
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -60,15 +60,22 @@ class GtbabelWordPress
 
     private function startHook()
     {
-        add_action('after_setup_theme', function () {
-            $this->start();
-            if (isset($_GET['export']) && $_GET['export'] == '1') {
-                $this->gtbabel->gettext->export();
-            }
-        });
-        add_action('get_header', function () {
-            $this->gtbabel->data->addCurrentUrlToTranslations(true);
-        });
+        // use a "faster" hook for translating dom changes
+        if (isset($_GET['gtbabel_translate_part']) && $_GET['gtbabel_translate_part'] == '1' && isset($_POST['html'])) {
+            add_action('plugins_loaded', function () {
+                $this->start();
+            });
+        } else {
+            add_action('after_setup_theme', function () {
+                $this->start();
+                if (isset($_GET['export']) && $_GET['export'] == '1') {
+                    $this->gtbabel->gettext->export();
+                }
+            });
+            add_action('get_header', function () {
+                $this->gtbabel->data->addCurrentUrlToTranslations(true);
+            });
+        }
     }
 
     private function stopHook()
@@ -235,15 +242,15 @@ class GtbabelWordPress
 
     private function showWizardNotice()
     {
-        if ($this->getSetting('wizard_finished') === true) {
-            return;
-        }
         add_action('admin_notices', function () {
+            if ($this->getSetting('wizard_finished') === true) {
+                return;
+            }
             global $pagenow;
             if ($pagenow === 'admin.php' && $_GET['page'] === 'gtbabel-wizard') {
                 return;
             }
-            echo '<div class="notice">';
+            echo '<div class="notice notice-gtbabel-wizard is-dismissible">';
             echo '<p>' . __('Run the Gtbabel wizard in order to get started!', 'gtbabel-plugin') . '</p>';
             echo '<p>';
             echo '<a href="' . admin_url('admin.php?page=gtbabel-wizard') . '" class="button button-primary">';
@@ -251,6 +258,16 @@ class GtbabelWordPress
             echo '</a>';
             echo '</p>';
             echo '</div>';
+            echo "<script>
+            jQuery(function($) {
+                $(document).on('click', '.notice-gtbabel-wizard .notice-dismiss', function() {
+                    $.ajax(ajaxurl, { type: 'POST', data: { action: 'dismiss_custom_notice' } } );
+                });
+            });
+            </script>";
+        });
+        add_action('wp_ajax_dismiss_custom_notice', function () {
+            $this->saveSetting('wizard_finished', true);
         });
     }
 

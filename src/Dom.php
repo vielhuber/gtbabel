@@ -228,7 +228,7 @@ class Dom
                     'context' => 'file'
                 ],
                 [
-                    'selector' => '/html/body//*[@style]',
+                    'selector' => '/html/body//*[contains(@style, "url(")]',
                     'attribute' => 'style',
                     'context' => 'file'
                 ],
@@ -746,7 +746,6 @@ class Dom
         $tag->textContent = '
             [data-gtbabel-hide], [data-gtbabel-hide] *, [data-gtbabel-hide] *:before, [data-gtbabel-hide] *:after {
                 color:transparent !important;
-                transition: none !important;
             }
         ';
         $head->insertBefore($tag, $head->firstChild);

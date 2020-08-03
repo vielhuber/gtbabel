@@ -10,6 +10,7 @@ export default class DetectChanges {
         this.dom_not_translated = document.createElement('body');
         this.jobCur = null;
         this.jobTodo = null;
+        this.cache = {};
     }
 
     init() {
@@ -43,8 +44,6 @@ export default class DetectChanges {
                 return;
             }
 
-            this.hideNode(node);
-
             // delete html comments (diffdom needs this)
             this.pauseMutationObserverForNode(node);
             await this.deleteCommentsFromNode(node);
@@ -64,14 +63,20 @@ export default class DetectChanges {
             let node_not_translated = this.dom_not_translated.querySelectorAll(selector)[index];
             let html = node_not_translated.outerHTML;
 
-            await this.wait(1500);
+            await this.wait(document.readyState === 'complete' ? 250 : 1000);
 
             if (!this.jobIsActive(id)) {
                 return;
             }
 
             // translate (this takes time)
-            let resp = await this.getTranslation(html);
+            let resp = null;
+            if (html in this.cache) {
+                resp = this.cache[html];
+            } else {
+                resp = await this.getTranslation(html);
+                this.cache[html] = resp;
+            }
             if (
                 resp.success === false ||
                 !('data' in resp) ||
@@ -79,6 +84,7 @@ export default class DetectChanges {
                 !('output' in resp.data) ||
                 resp.data.input == resp.data.output
             ) {
+                this.showNode(node);
                 return;
             }
 
