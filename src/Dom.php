@@ -746,6 +746,7 @@ class Dom
         $tag->textContent = '
             [data-gtbabel-hide], [data-gtbabel-hide] *, [data-gtbabel-hide] *:before, [data-gtbabel-hide] *:after {
                 color:transparent !important;
+                transition: none !important;
             }
         ';
         $head->insertBefore($tag, $head->firstChild);

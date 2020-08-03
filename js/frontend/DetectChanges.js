@@ -5,9 +5,6 @@ export default class DetectChanges {
         this.dd = new DiffDOM();
         this.observer = null;
         this.blocked = [];
-        this.batch = [];
-        this.batchIsRunning = false;
-        this.debounceFn = null;
         this.included = [];
         this.dom_prev = document.createElement('body');
         this.dom_not_translated = document.createElement('body');
@@ -164,6 +161,8 @@ export default class DetectChanges {
             if (this.isInsideGroup(nodes__value, this.blocked)) {
                 continue;
             }
+            // hide most specific node
+            this.hideNode(nodes__value);
             // only add most parent
             nodes__value = this.getIncludedParent(nodes__value);
             if (!document.body.contains(nodes__value)) {
@@ -178,7 +177,6 @@ export default class DetectChanges {
             if (nodes__value.closest('iframe') !== null) {
                 continue;
             }
-            this.hideNode(nodes__value);
             this.jobTodo = ~~(Math.random() * (9999 - 1000 + 1)) + 1000;
             this.translateAll();
         }
