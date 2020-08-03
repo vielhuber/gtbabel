@@ -50,6 +50,20 @@ class Dom
                 }
             }
         }
+        /* always exclude detect_dom_changes_include (if not requested by ajax), so that this is not translated twice */
+        if (!isset($_GET['gtbabel_translate_part'])) {
+            if ($this->settings->get('detect_dom_changes_include') !== null) {
+                foreach ($this->settings->get('detect_dom_changes_include') as $exclude__value) {
+                    $nodes = $this->DOMXPath->query($this->transformSelectorToXpath($exclude__value));
+                    foreach ($nodes as $nodes__value) {
+                        $this->addToExcludedNodes($nodes__value, '*');
+                        foreach ($this->getChildrenOfNodeIncludingWhitespace($nodes__value) as $nodes__value__value) {
+                            $this->addToExcludedNodes($nodes__value__value, '*');
+                        }
+                    }
+                }
+            }
+        }
     }
 
     function addToExcludedNodes($node, $attr)
@@ -614,7 +628,7 @@ class Dom
         if (!array_key_exists($this->getIdOfNode($parent), $this->group_cache)) {
             $this->group_cache[$this->getIdOfNode($parent)] = false;
 
-            // if the tokenization is forced
+            // if the tokenization is forced on parent
             if (in_array($this->getIdOfNode($parent), $this->force_tokenize)) {
                 $this->group_cache[$this->getIdOfNode($parent)] = true;
             }
@@ -626,6 +640,8 @@ class Dom
                     continue;
                 }
                 if (
+                    // if the tokenization is forced on any child
+                    in_array($this->getIdOfNode($nodes__value), $this->force_tokenize) ||
                     !(
                         $this->isTextNode($nodes__value) ||
                         ($this->isInnerTagNode($nodes__value) &&
@@ -727,7 +743,11 @@ class Dom
         $head->insertBefore($tag, $head->firstChild);
         $tag = $this->DOMDocument->createElement('style', '');
         $tag->setAttribute('data-type', 'gtbabel-detect-dom-changes');
-        $tag->textContent = '[data-gtbabel-hide] { opacity:0.001 !important; }';
+        $tag->textContent = '
+            [data-gtbabel-hide], [data-gtbabel-hide] *, [data-gtbabel-hide] *:before, [data-gtbabel-hide] *:after {
+                color:transparent !important;
+            }
+        ';
         $head->insertBefore($tag, $head->firstChild);
     }
 

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <div class="teaser__content-meta" :class="{'canceled': post.canceled }">
+            <span class="postponded" v-if="post.postponed">
+                <span class="postponded__label">%|%Test-en%|%</span>
+                <span class="postponded__date">%|%Test-en%|%</span>
+            </span>
+            <span class="teaser__content-date" v-if="post.date">%|%Test-en%|%</span>
+            <span class="teaser__content-place" v-if="post.place">%|%Test-en%|%</span>
+            <span class="teaser__content-street" v-if="post.street">%|%Test-en%|%</span>
+            <span class="canceled__note" v-if="post.canceled">
+                <span>%|%Test-en%|%</span>
+            </span>
+        </div>
+    </body>
+</html>

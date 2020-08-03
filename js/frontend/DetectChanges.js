@@ -6,17 +6,111 @@ export default class DetectChanges {
         this.observer = null;
         this.blocked = [];
         this.batch = [];
+        this.batchIsRunning = false;
         this.debounceFn = null;
         this.included = [];
+        this.dom_prev = document.createElement('body');
+        this.dom_not_translated = document.createElement('body');
+        this.jobCur = null;
+        this.jobTodo = null;
     }
 
     init() {
-        if (window.gtbabel_detect_dom_changes_include === undefined) {
+        this.included = window.gtbabel_detect_dom_changes_include;
+        if (this.included === undefined) {
             return;
         }
-        this.included = window.gtbabel_detect_dom_changes_include;
         this.setupMutationObserver();
-        this.setupDebounce();
+    }
+
+    async translateAll() {
+        if (this.jobCur !== this.jobTodo) {
+            let id = this.jobTodo;
+            this.jobCur = id;
+            for (let included__value of this.included) {
+                await this.translate(included__value, id);
+            }
+        }
+    }
+
+    async translate(selector, id) {
+        if (document.querySelector(selector) === null) {
+            return;
+        }
+        let nodes = document.querySelectorAll(selector);
+        let index = -1;
+        for (let node of nodes) {
+            index++;
+
+            if (!this.jobIsActive(id)) {
+                return;
+            }
+
+            this.hideNode(node);
+
+            // delete html comments (diffdom needs this)
+            this.pauseMutationObserverForNode(node);
+            await this.deleteCommentsFromNode(node);
+            await this.resumeMutationObserverForNode(node);
+
+            // normalize html code (diffdom needs this)
+            this.pauseMutationObserverForNode(node);
+            node.normalize();
+            await this.resumeMutationObserverForNode(node);
+
+            if (!this.jobIsActive(id)) {
+                return;
+            }
+
+            this.sync();
+
+            let node_not_translated = this.dom_not_translated.querySelectorAll(selector)[index];
+            let html = node_not_translated.outerHTML;
+
+            await this.wait(1500);
+
+            if (!this.jobIsActive(id)) {
+                return;
+            }
+
+            // translate (this takes time)
+            let resp = await this.getTranslation(html);
+            if (
+                resp.success === false ||
+                !('data' in resp) ||
+                !('input' in resp.data) ||
+                !('output' in resp.data) ||
+                resp.data.input == resp.data.output
+            ) {
+                return;
+            }
+
+            if (!this.jobIsActive(id)) {
+                return;
+            }
+
+            this.sync();
+
+            if (!this.jobIsActive(id)) {
+                return;
+            }
+
+            await this.setHtmlAndKeepEventListeners(node, resp.data);
+            this.dom_prev = document.body.cloneNode(true);
+            this.sync();
+
+            this.showNode(node);
+        }
+    }
+
+    sync() {
+        let diff = this.dd.diff(this.dom_prev, document.body);
+        this.dd.apply(this.dom_not_translated, diff);
+        this.dom_prev = document.body.cloneNode(true);
+    }
+
+    jobIsActive(id) {
+        return this.jobTodo === id;
     }
 
     setupMutationObserver() {
@@ -24,7 +118,7 @@ export default class DetectChanges {
             mutations.forEach(mutations__value => {
                 this.onDomChange(mutations__value);
             });
-        }).observe(document.body, {
+        }).observe(document.documentElement, {
             childList: true,
             attributes: false,
             characterData: true,
@@ -34,11 +128,14 @@ export default class DetectChanges {
 
     async onDomChange(mutation) {
         // collect nodes
+        let nodeType = null;
         let nodes = [];
         if (mutation.addedNodes.length > 0) {
             nodes = mutation.addedNodes;
+            nodeType = 'added';
         } else if (mutation.target !== null) {
             nodes = [mutation.target];
+            nodeType = 'modified';
         }
         if (nodes.length === 0) {
             return;
@@ -51,13 +148,28 @@ export default class DetectChanges {
             if (nodes__value.nodeType == Node.TEXT_NODE) {
                 nodes__value = nodes__value.parentNode;
             }
+            if (nodes__value === null) {
+                continue;
+            }
+            // if added dom node consists of included
+            if (nodeType === 'added') {
+                let parent = this.getIncludedChildrenIfAvailable(nodes__value, this.included);
+                if (parent !== null) {
+                    nodes__value = parent;
+                }
+            }
             if (!this.isInsideGroup(nodes__value, this.included)) {
                 continue;
             }
             if (this.isInsideGroup(nodes__value, this.blocked)) {
                 continue;
             }
-            if (!document.body.contains(mutation.target)) {
+            // only add most parent
+            nodes__value = this.getIncludedParent(nodes__value);
+            if (!document.body.contains(nodes__value)) {
+                continue;
+            }
+            if (nodes__value.closest('body') === null) {
                 continue;
             }
             if (nodes__value.tagName === 'BODY') {
@@ -67,79 +179,66 @@ export default class DetectChanges {
                 continue;
             }
             this.hideNode(nodes__value);
-            this.batch.push(nodes__value);
-        }
-        this.runDebounce();
-    }
-
-    translateBatch() {
-        if (this.batch.length === 0) {
-            return;
-        }
-
-        let batch = this.batch.slice(0); // copy
-        this.batch = []; // destroy
-        batch = batch.filter((x, i, a) => a.indexOf(x) == i); // sort out duplicates
-
-        for (let batch__value of batch) {
-            // sort out elements that are childs of other elements
-            let hasParent = false;
-            for (let batch__value_2 of batch) {
-                if (batch__value !== batch__value_2 && batch__value_2.contains(batch__value)) {
-                    hasParent = true;
-                    break;
-                }
-            }
-            if (hasParent === true) {
-                continue;
-            }
-            // sort out elements that don't exist anymore
-            if (!document.body.contains(batch__value)) {
-                continue;
-            }
-            let clone = batch__value.cloneNode(true);
-            this.showNode(clone);
-            let html = clone.outerHTML;
-            this.getTranslation(html).then(resp => {
-                //console.log(resp.data);
-                this.showNode(batch__value);
-                if (
-                    resp.success === false ||
-                    !('data' in resp) ||
-                    !('input' in resp.data) ||
-                    !('output' in resp.data) ||
-                    resp.data.input == resp.data.output
-                ) {
-                    return;
-                }
-                this.setHtmlAndKeepEventListeners(batch__value, resp.data);
-            });
+            this.jobTodo = ~~(Math.random() * (9999 - 1000 + 1)) + 1000;
+            this.translateAll();
         }
     }
 
-    hideNode(node) {
+    async deleteCommentsFromNode(node) {
+        this.pauseMutationObserverForNode(node);
+        let nodes = [],
+            walker = document.createTreeWalker(node, NodeFilter.SHOW_COMMENT, null, false),
+            cur;
+        while ((cur = walker.nextNode())) {
+            nodes.push(cur);
+        }
+        for (let nodes__value of nodes) {
+            nodes__value.remove();
+        }
+        await this.resumeMutationObserverForNode(node);
+    }
+
+    async hideNode(node) {
+        this.pauseMutationObserverForNode(node);
         node.setAttribute('data-gtbabel-hide', '');
+        await this.resumeMutationObserverForNode(node);
     }
 
-    showNode(node) {
+    async showNode(node) {
+        this.pauseMutationObserverForNode(node);
         node.removeAttribute('data-gtbabel-hide');
         if (node.querySelectorAll('[data-gtbabel-hide]') !== null) {
             node.querySelectorAll('[data-gtbabel-hide]').forEach(el => {
                 el.removeAttribute('data-gtbabel-hide');
             });
         }
+        await this.resumeMutationObserverForNode(node);
     }
 
-    setHtmlAndKeepEventListeners(node, data) {
-        // stop mutationobserver
-        this.blocked.push(node);
+    async setHtmlAndKeepEventListeners(node, data) {
+        this.pauseMutationObserverForNode(node);
         // now this is interesting: we make a diff of input and output (not output and current node),
         // because we don't want to loose any attribute changes that have been applied in the meantime
         let diff = this.dd.diff(data.input, data.output);
         this.dd.apply(node, diff);
-        requestAnimationFrame(() => {
-            this.blocked = this.blocked.filter(blocked__value => blocked__value !== node);
-        });
+        await this.resumeMutationObserverForNode(node);
+    }
+
+    async wait(timer = 10000) {
+        await new Promise(resolve => setTimeout(() => resolve(), timer));
+    }
+
+    pauseMutationObserverForNode(node) {
+        this.blocked.push(node);
+    }
+
+    async resumeMutationObserverForNode(node) {
+        await new Promise(resolve =>
+            requestAnimationFrame(() => {
+                this.blocked = this.blocked.filter(blocked__value => blocked__value !== node);
+                resolve();
+            })
+        );
     }
 
     getTranslation(html) {
@@ -186,29 +285,32 @@ export default class DetectChanges {
         return false;
     }
 
-    setupDebounce() {
-        this.debounceFn = this.debounce(() => {
-            this.translateBatch();
-        }, 300);
+    getIncludedParent(node) {
+        let el = document.querySelectorAll(this.included);
+        if (el.length === 0) {
+            return null;
+        }
+        for (let el__value of el) {
+            if (el__value.contains(node)) {
+                return el__value;
+            }
+        }
+        return null;
     }
 
-    runDebounce() {
-        this.debounceFn();
-    }
-
-    debounce(func, wait, immediate) {
-        var timeout;
-        return function () {
-            var context = this,
-                args = arguments;
-            var later = function () {
-                timeout = null;
-                if (!immediate) func.apply(context, args);
-            };
-            var callNow = immediate && !timeout;
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-            if (callNow) func.apply(context, args);
-        };
+    getIncludedChildrenIfAvailable(node, group) {
+        for (let value of group) {
+            if (typeof value === 'string' || value instanceof String) {
+                let child = node.querySelector(value);
+                if (child !== null) {
+                    return child;
+                }
+            } else {
+                if (node.contains(value)) {
+                    return value;
+                }
+            }
+        }
+        return null;
     }
 }

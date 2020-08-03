@@ -43,7 +43,8 @@ $gtbabel->start([
     'microsoft_translation_api_key' => @$_SERVER['MICROSOFT_TRANSLATION_API_KEY'],
     'deepl_translation_api_key' => @$_SERVER['DEEPL_TRANSLATION_API_KEY'],
     'localize_js' => false,
-    'detect_dom_changes' => false
+    'detect_dom_changes' => true,
+    'detect_dom_changes_include' => ['.js']
 ]);
 ?>
 <!DOCTYPE html>
@@ -51,6 +52,17 @@ $gtbabel->start([
 <head>
     <meta charset="utf-8" />
     <title>.</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let i = 0;
+            document.addEventListener('keypress', function(e) {
+                if (e.which == 110) {
+                    document.querySelector('.timer').innerHTML = 'Meine Nummer: '+i;
+                    i++;
+                }
+            });
+        });
+    </script>
 </head>
 <body>
     <div class="notranslate" style="font-weight:bold;color:red;font-size:30px;">
@@ -74,6 +86,12 @@ $gtbabel->start([
     } ?>
     <p><a href="http://gtbabel.local.vielhuber.de/some/sub/path/">Dies ist ein Link</a></p>
     <p><a href="http://gtbabel.local.vielhuber.de/some/sub/path/datenschutz/">Dies ist ein Link</a></p>
+
+
+    <div class="js">
+        <div class="text">Dies ist ein Test</div>
+        <div class="timer"></div>
+    </div>
 </body>
 </html>
 <?php $gtbabel->stop();

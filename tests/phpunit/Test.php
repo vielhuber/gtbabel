@@ -113,7 +113,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test019()
     {
-        $this->runDiff('19.html', 1500);
+        $this->runDiff('19.html', 2500);
     }
 
     public function test020()
@@ -357,6 +357,13 @@ class Test extends \PHPUnit\Framework\TestCase
             'debug_translations' => false,
             'auto_translation' => true,
             'google_translation_api_key' => 'free'
+        ]);
+    }
+
+    public function test055()
+    {
+        $this->runDiff('55.html', 200, [
+            'force_tokenize' => ['.postponded__date']
         ]);
     }
 
