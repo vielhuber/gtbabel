@@ -918,7 +918,7 @@ The default configuration is:
     'redirect_root_domain' => 'browser',
     'translate_default_tag_nodes' => true,
     'translate_html' => true,
-    'translate_json' => true,
+    'translate_json' => false,
     'html_lang_attribute' => true,
     'html_hreflang_tags' => true,
     'debug_translations' => false, // surround outputted translations with "%|%" to see borders
@@ -962,7 +962,7 @@ The default configuration is:
     'localize_js' => true,
     'localize_js_strings' => [['string' => 'Schließen'], ['string' => 'blog', 'context' => 'slug']],
     'detect_dom_changes' => true,
-    'detect_dom_changes_include' => ['.top-button', '.swal-overlay', '.wpcf7-response-output']
+    'detect_dom_changes_include' => ['.top-button', '.swal-overlay', '.wpcf7-response-output', '.wpcf7-not-valid-tip']
 ];
 ```
 
@@ -1408,7 +1408,12 @@ gtbabel__('Hi there', null, 'de', 'en') // 'Hallo'
 
 Don't use `gtbabel__()` for echoing strings, just output them in the source language. Gtbabel will take care of the rest.
 
-## Search
+## Dealing with form data
+
+Gtbabel translates your frontend, json responses and watches dom changes.\
+Nevertheless, one has to manually take care of how multilingual input data should be further processed.
+
+### Search
 
 If you need to translate queries into your source languages (for example in searches), just do this:
 
@@ -1426,6 +1431,40 @@ add_action('pre_get_posts', function ($query) {
     $query->set('s', gtbabel__($query->get('s'), null, gtbabel_source_lng(), gtbabel_current_lng()));
 });
 ```
+
+### Contact forms
+
+Prepare your email templates only in your source language and before sending, translate them on the fly with again:
+
+```php
+$s = gtbabel__($s, null, gtbabel_source_lng(), gtbabel_current_lng());
+```
+
+In WordPress, Contact Form 7 is a popular contact form plugin.\
+Gtbabel has built in support for translating email templates. To be exact, the following code is built in by default:
+
+```php
+add_action(
+    'wpcf7_contact_form',
+    function ($form) {
+        $props = $form->get_properties();
+        $props['mail']['subject'] = gtbabel__(
+            $props['mail']['subject'],
+            null,
+            gtbabel_referer_lng(),
+            gtbabel_source_lng()
+        );
+        $props['mail']['body'] = gtbabel__($props['mail']['body'], null, gtbabel_referer_lng(), gtbabel_source_lng());
+        $form->set_properties($props);
+    },
+    9999
+);
+```
+
+### Comments
+
+Just save the comments with the current input language (that can be determined via `gtbabel_current_lng()` or `gtbabel_referer_lng()`).\
+Then output just the comments in the current language or even auto translate it using the `lang`-tag (see Multiple source languages).
 
 ## Language codes
 

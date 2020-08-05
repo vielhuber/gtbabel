@@ -35,8 +35,33 @@ class GtbabelWordPress
         $this->languagePickerWidget();
         $this->languagePickerShortcode();
         $this->disableAutoRedirect();
+        $this->autoTranslateContactForm7Mails();
         $this->startHook();
         $this->stopHook();
+    }
+
+    private function autoTranslateContactForm7Mails()
+    {
+        add_action(
+            'wpcf7_contact_form',
+            function ($form) {
+                $props = $form->get_properties();
+                $props['mail']['subject'] = gtbabel__(
+                    $props['mail']['subject'],
+                    null,
+                    gtbabel_referer_lng(),
+                    gtbabel_source_lng()
+                );
+                $props['mail']['body'] = gtbabel__(
+                    $props['mail']['body'],
+                    null,
+                    gtbabel_referer_lng(),
+                    gtbabel_source_lng()
+                );
+                $form->set_properties($props);
+            },
+            9999
+        );
     }
 
     private function disableAutoRedirect()
