@@ -1434,14 +1434,13 @@ add_action('pre_get_posts', function ($query) {
 
 ### Contact forms
 
-Prepare your email templates only in your source language and before sending, translate them on the fly with again:
+Prepare your email templates only in your source language and before sending, translate them on the fly with something like:
 
 ```php
-$s = gtbabel__($s, null, gtbabel_source_lng(), gtbabel_current_lng());
+$template = gtbabel__($template, null, gtbabel_source_lng(), gtbabel_referer_lng());
 ```
 
-In WordPress, Contact Form 7 is a popular contact form plugin.\
-Gtbabel has built in support for translating email templates. To be exact, the following code is built in by default:
+In WordPress, Contact Form 7 is a popular contact form plugin. Gtbabel has built in support for translating its email templates. To be exact, the following code is built in by default:
 
 ```php
 add_action(
@@ -1463,7 +1462,7 @@ add_action(
 
 ### Comments
 
-Just save the comments with the current input language (that can be determined via `gtbabel_current_lng()` or `gtbabel_referer_lng()`).\
+If you offer a comment function on your website, just save the incoming comments in the input language (that can be determined via `gtbabel_current_lng()` or `gtbabel_referer_lng()`).\
 Then output just the comments in the current language or even auto translate it using the `lang`-tag (see Multiple source languages).
 
 ## Language codes
