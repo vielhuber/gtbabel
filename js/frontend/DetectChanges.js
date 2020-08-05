@@ -2,7 +2,9 @@ import { DiffDOM } from 'diff-dom';
 
 export default class DetectChanges {
     constructor() {
-        this.dd = new DiffDOM();
+        this.dd = new DiffDOM({
+            maxChildCount: false
+        });
         this.observer = null;
         this.blocked = [];
         this.included = [];
@@ -11,6 +13,9 @@ export default class DetectChanges {
         this.jobCur = null;
         this.jobTodo = null;
         this.cache = {};
+        this.translateAllDebounce = this.debounce(() => {
+            this.translateAll();
+        }, 1000);
     }
 
     init() {
@@ -58,7 +63,7 @@ export default class DetectChanges {
                 return;
             }
 
-            this.sync();
+            this.sync(id);
 
             let node_not_translated = this.dom_not_translated.querySelectorAll(selector)[index];
             let html = node_not_translated.outerHTML;
@@ -92,23 +97,31 @@ export default class DetectChanges {
                 return;
             }
 
-            this.sync();
+            this.sync(id);
 
             if (!this.jobIsActive(id)) {
                 return;
             }
 
-            await this.setHtmlAndKeepEventListeners(node, resp.data);
+            // apply translation
+            this.setHtmlAndKeepEventListeners(node, resp.data, id);
+
+            // this is the most important step: SKIP the translation from the diff!
             this.dom_prev = document.body.cloneNode(true);
-            this.sync();
+
+            this.sync(id);
 
             this.showNode(node);
         }
     }
 
-    sync() {
+    sync(id) {
         let diff = this.dd.diff(this.dom_prev, document.body);
-        this.dd.apply(this.dom_not_translated, diff);
+        try {
+            this.dd.apply(this.dom_not_translated, diff);
+        } catch (e) {
+            console.log(e);
+        }
         this.dom_prev = document.body.cloneNode(true);
     }
 
@@ -184,7 +197,8 @@ export default class DetectChanges {
                 continue;
             }
             this.jobTodo = ~~(Math.random() * (9999 - 1000 + 1)) + 1000;
-            this.translateAll();
+            //this.translateAll();
+            this.translateAllDebounce();
         }
     }
 
@@ -219,13 +233,18 @@ export default class DetectChanges {
         await this.resumeMutationObserverForNode(node);
     }
 
-    async setHtmlAndKeepEventListeners(node, data) {
+    setHtmlAndKeepEventListeners(node, data, id) {
         this.pauseMutationObserverForNode(node);
         // now this is interesting: we make a diff of input and output (not output and current node),
         // because we don't want to loose any attribute changes that have been applied in the meantime
         let diff = this.dd.diff(data.input, data.output);
-        this.dd.apply(node, diff);
-        await this.resumeMutationObserverForNode(node);
+        try {
+            this.dd.apply(node, diff);
+        } catch (e) {
+            console.log(e);
+        }
+        // intentionally don't call this with await (setHtmlAndKeepEventListeners must be asap)
+        this.resumeMutationObserverForNode(node);
     }
 
     async wait(timer = 10000) {
@@ -316,5 +335,21 @@ export default class DetectChanges {
             }
         }
         return null;
+    }
+
+    debounce(func, wait, immediate) {
+        var timeout;
+        return function () {
+            var context = this,
+                args = arguments;
+            var later = function () {
+                timeout = null;
+                if (!immediate) func.apply(context, args);
+            };
+            var callNow = immediate && !timeout;
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+            if (callNow) func.apply(context, args);
+        };
     }
 }

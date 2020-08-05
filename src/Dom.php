@@ -102,6 +102,9 @@ class Dom
         $nodes = $this->DOMXPath->query('/html//*[@lang]');
         foreach ($nodes as $nodes__value) {
             $lng = $nodes__value->getAttribute('lang');
+            if (!in_array($lng, $this->settings->getSelectedLanguageCodes())) {
+                continue;
+            }
             $this->lng_areas[$this->getIdOfNode($nodes__value)] = $lng;
             foreach ($this->getChildrenOfNodeIncludingWhitespace($nodes__value) as $nodes__value__value) {
                 $this->lng_areas[$this->getIdOfNode($nodes__value__value)] = $lng;
