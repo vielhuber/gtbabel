@@ -517,13 +517,13 @@ class Test extends \PHPUnit\Framework\TestCase
         $_SERVER['HTTP_REFERER'] = 'http://gtbabel.local.vielhuber.de/de/';
         $this->gtbabel->start($settings);
         $this->gtbabel->stop();
-        $this->assertEquals($this->gtbabel->host->getRefererLng(), 'de');
+        $this->assertEquals($this->gtbabel->host->getRefererLanguageCode(), 'de');
         $this->gtbabel->reset();
 
         $_SERVER['HTTP_REFERER'] = 'http://gtbabel.local.vielhuber.de/en/';
         $this->gtbabel->start($settings);
         $this->gtbabel->stop();
-        $this->assertEquals($this->gtbabel->host->getRefererLng(), 'en');
+        $this->assertEquals($this->gtbabel->host->getRefererLanguageCode(), 'en');
         $this->gtbabel->reset();
     }
 

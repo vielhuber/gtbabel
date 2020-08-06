@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 4.1.4
+ * Version: 4.1.5
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -45,7 +45,7 @@ class GtbabelWordPress
         add_action(
             'wpcf7_contact_form',
             function ($form) {
-                if( $this->gtbabel->refererLngIsCurrentLng() ) {
+                if( $this->gtbabel->data->refererLngIsCurrentLng() ) {
                     return;
                 }
                 $props = $form->get_properties();
@@ -1735,7 +1735,7 @@ class GtbabelWordPress
                 $link_public = $url;
             } else {
                 $link_public = $this->gtbabel->data->getUrlTranslationInLanguage(
-                    $this->gtbabel->host->getLngFromUrl($url),
+                    $this->gtbabel->host->getLanguageCodeFromUrl($url),
                     $lng,
                     $url
                 );
@@ -1753,7 +1753,7 @@ class GtbabelWordPress
                 $lng_link .=
                     '&url=' .
                     $this->gtbabel->data->getUrlTranslationInLanguage(
-                        $this->gtbabel->host->getLngFromUrl($url),
+                        $this->gtbabel->host->getLanguageCodeFromUrl($url),
                         $this->gtbabel->settings->getSourceLanguageCode(),
                         $url
                     );
@@ -1782,7 +1782,7 @@ class GtbabelWordPress
                     $lng_link .=
                         '&url=' .
                         $this->gtbabel->data->getUrlTranslationInLanguage(
-                            $this->gtbabel->host->getLngFromUrl($url),
+                            $this->gtbabel->host->getLanguageCodeFromUrl($url),
                             $lng__key,
                             $url
                         );
@@ -2564,7 +2564,7 @@ EOD;
                     continue;
                 }
                 $url_trans = $this->gtbabel->data->getUrlTranslationInLanguage(
-                    $this->gtbabel->host->getLngFromUrl($url),
+                    $this->gtbabel->host->getLanguageCodeFromUrl($url),
                     $lngs__value,
                     $url
                 );

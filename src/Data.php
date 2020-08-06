@@ -848,7 +848,7 @@ class Data
             return $this->settings->get('lng_target');
         }
 
-        return $this->host->getLngFromUrl($this->host->getCurrentUrl());
+        return $this->host->getLanguageCodeFromUrl($this->host->getCurrentUrl());
     }
 
     function getLanguagePickerData($with_args = true)
@@ -884,8 +884,9 @@ class Data
         return false;
     }
 
-    function refererLngIsCurrentLng() {
-        if ($this->getCurrentLanguageCode() === $this->host->getRefererLng()) {
+    function refererLngIsCurrentLng()
+    {
+        if ($this->getCurrentLanguageCode() === $this->host->getRefererLanguageCode()) {
             return true;
         }
         return false;

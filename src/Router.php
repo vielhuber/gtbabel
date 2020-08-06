@@ -32,9 +32,9 @@ class Router
         $lng = $this->data->getCurrentLanguageCode();
         if ($this->data->sourceLngIsCurrentLng()) {
             if ($this->host->isAjaxRequest() && $this->host->getReferer() !== null) {
-                $lng = $this->host->getLngFromUrl($this->host->getReferer());
+                $lng = $this->host->getLanguageCodeFromUrl($this->host->getReferer());
             } elseif ($this->settings->get('redirect_root_domain') === 'browser') {
-                $lng = $this->host->getBrowserLng();
+                $lng = $this->host->getBrowserLanguageCode();
             }
         }
 

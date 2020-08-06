@@ -157,7 +157,7 @@ class Host
         return $_SERVER['HTTP_REFERER'];
     }
 
-    function getLngFromUrl($url)
+    function getLanguageCodeFromUrl($url)
     {
         $base_urls = [];
         foreach ($this->settings->getSelectedLanguageCodes() as $languages__value) {
@@ -211,7 +211,7 @@ class Host
 
     function getPathWithPrefixFromUrl($url)
     {
-        $lng = $this->getLngFromUrl($url);
+        $lng = $this->getLanguageCodeFromUrl($url);
         $base_url = $this->getBaseUrlForLanguageCode($lng);
         if (mb_strpos($url, $base_url) === 0) {
             $url = str_replace($base_url, '', $url);
@@ -221,7 +221,7 @@ class Host
 
     function getPathWithoutPrefixFromUrl($url)
     {
-        $lng = $this->getLngFromUrl($url);
+        $lng = $this->getLanguageCodeFromUrl($url);
         $strip = [];
         $strip[] = $this->getBaseUrlWithPrefixForLanguageCode($lng);
         $strip[] = $this->getBaseUrlForLanguageCode($lng);
@@ -237,16 +237,16 @@ class Host
         return $url;
     }
 
-    function getRefererLng()
+    function getRefererLanguageCode()
     {
         $referer = @$_SERVER['HTTP_REFERER'];
         if ($referer == '') {
             return $this->settings->getSourceLanguageCode();
         }
-        return $this->getLngFromUrl($referer);
+        return $this->getLanguageCodeFromUrl($referer);
     }
 
-    function getBrowserLng()
+    function getBrowserLanguageCode()
     {
         if (@$_SERVER['HTTP_ACCEPT_LANGUAGE'] != '') {
             foreach ($this->settings->getSelectedLanguageCodes() as $languages__value) {
