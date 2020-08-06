@@ -805,7 +805,7 @@ EOD;
 <a href="beispiel-bilddatei14_EN.jpg"></a>
 <a href="en/beispiel-script.php?foo=bar"></a>
 <a href="beispiel.html"></a>
-<a href="en/example/path/1-buch-moses"></a>
+<a href="en/example/path/1-book-moses"></a>
 EOD;
 
         $expected_data = [
@@ -813,7 +813,7 @@ EOD;
             ['beispiel-pfad11', 'slug', 'de', 'en', 'example-path11', 0],
             ['beispiel', 'slug', 'de', 'en', 'example', 0],
             ['pfad', 'slug', 'de', 'en', 'path', 0],
-            ['1._Buch_Moses', 'slug', 'de', 'en', '1-buch-moses', 0],
+            ['1._Buch_Moses', 'slug', 'de', 'en', '1-book-moses', 0],
             ['datenschutz/beispiel-bilddatei1.jpg', 'file', 'de', 'en', 'datenschutz/beispiel-bilddatei1_EN.jpg', 1],
             ['beispiel-bilddatei2.jpg', 'file', 'de', 'en', 'beispiel-bilddatei2_EN.jpg', 1],
             ['beispiel-bilddatei3.jpg', 'file', 'de', 'en', 'beispiel-bilddatei3_EN.jpg', 1],
