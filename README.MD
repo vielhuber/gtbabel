@@ -20,7 +20,7 @@ Gtbabel automatically translates your HTML/PHP pages – server sided!
 -   Router included: spoof your request uri and let the magic happen, links are automatically converted (with slug collission detection).
 -   Helper functions for current language and all languages available.
 -   Basic seo considered: title tags, seo descriptions, html lang attribute, hreflang tags included.
--   RTL support: Adds a html dir attribute if language is rtl
+-   RTL support: Adds a html dir attribute if language is rtl.
 -   WordPress plugin available.
 -   Prepared for translation management.
 -   Works seamlessly with caching/preloading plugins.
@@ -1462,8 +1462,7 @@ add_action(
 
 ### Comments
 
-If you offer a comment function on your website, just save the incoming comments in the input language (that can be determined via `gtbabel_current_lng()` or `gtbabel_referer_lng()`).\
-Then output just the comments in the current language or even auto translate it using the `lang`-tag (see Multiple source languages).
+If you offer a comment function on your website, just save the incoming comments in the input language (that can be determined via `gtbabel_current_lng()` or `gtbabel_referer_lng()`). Then output just those comments that match your current input language or even auto translate all of them using the `lang`-tag (see **Multiple source languages**).
 
 ## Language codes
 
@@ -1482,9 +1481,11 @@ Country codes (like "BR" in "pt_BR") should be used in the (unique) `code`-attri
 
 The translation apis of Google, Microsoft or DeepL can be costly. Try to keep track of your current usage stats. Gtbabel helps you by tracking the total amount of translated chars. You can also provide multiple api keys, Gtbabel then distributes the calls uniformly.
 
+You can throttle the amount of chars with the options `google_throttle_chars_per_month`, `microsoft_throttle_chars_per_month` and `deepl_throttle_chars_per_month`.
+
 ## Caveats
 
--   Gtbabel is good at translating whole pages. If you want to provide different content for different languages, Gtbabel might be the wrong tool (however you _can_ use `if( gtbabel_current_lng() === 'other-lng' ) { echo 'content in source language'; }` in your templates to achieve that).
+-   Gtbabel is good at translating whole pages. If you want to provide different content for different languages, Gtbabel might be the wrong tool (however you _can_ use `if( gtbabel_current_lng() === 'other-lng' ) { echo 'content in source language'; }` and/or the concept of **Multiple source languages** in your templates to achieve that).
 -   The source language acts as a base for every other language (however, you _can_ mark parts of a page with a different source language).
 -   Gtbabel is designed to translate every part of the page without code changes (however you can exclude translations with the `exclude_dom`-option).
 
