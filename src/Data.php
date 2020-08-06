@@ -884,9 +884,9 @@ class Data
         return false;
     }
 
-    function refererLngIsCurrentLng()
+    function sourceLngIsRefererLng()
     {
-        if ($this->getCurrentLanguageCode() === $this->host->getRefererLanguageCode()) {
+        if ($this->host->getRefererLanguageCode() === $this->settings->getSourceLanguageCode()) {
             return true;
         }
         return false;
@@ -1545,21 +1545,26 @@ class Data
                     $this->settings->getSourceLanguageCode(),
                     $context
                 );
-            }
-            $trans = $this->autoTranslateString($str_in_source, $lng_source, $lng_target, $context);
-            if ($trans !== null) {
                 $this->addTranslationToDatabaseAndToCache(
                     $str_in_source,
                     $str,
-                    $lng_target,
+                    $this->settings->getSourceLanguageCode(),
                     $lng_source,
                     $context,
                     true
                 );
+            }
+            $trans = $this->autoTranslateString(
+                $str_in_source,
+                $this->settings->getSourceLanguageCode(),
+                $lng_target,
+                $context
+            );
+            if ($trans !== null) {
                 $this->addTranslationToDatabaseAndToCache(
                     $str_in_source,
                     $trans,
-                    $lng_source,
+                    $this->settings->getSourceLanguageCode(),
                     $lng_target,
                     $context,
                     true

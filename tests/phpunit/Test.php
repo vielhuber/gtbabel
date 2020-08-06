@@ -421,6 +421,44 @@ class Test extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function test_inline_translation()
+    {
+        $settings = $this->getDefaultSettings();
+        $settings['languages'] = $this->getLanguageSettings([['code' => 'de'], ['code' => 'en'], ['code' => 'fr']]);
+        $settings['debug_translations'] = false;
+        $settings['auto_translation'] = true;
+        $settings['auto_add_translations'] = true;
+        $this->gtbabel->start($settings);
+
+        $this->assertEquals(
+            $this->gtbabel->data->getTranslationInForeignLngAndAddDynamicallyIfNeeded('Maison', 'en', 'fr', null),
+            'House'
+        );
+        $this->assertEquals(
+            $this->gtbabel->data->getTranslationInForeignLngAndAddDynamicallyIfNeeded('Haus', 'en', 'de', null),
+            'House'
+        );
+        $this->assertEquals(
+            $this->gtbabel->data->getTranslationInForeignLngAndAddDynamicallyIfNeeded('House', 'de', 'en', null),
+            'Haus'
+        );
+
+        $this->gtbabel->stop();
+
+        $translations = $this->gtbabel->data->getTranslationsFromDatabase();
+        $this->assertEquals(count($translations), 2);
+        $this->assertEquals($translations[0]['str'], 'Haus');
+        $this->assertEquals($translations[0]['lng_source'], 'de');
+        $this->assertEquals($translations[0]['lng_target'], 'fr');
+        $this->assertEquals($translations[0]['trans'], 'Maison');
+        $this->assertEquals($translations[1]['str'], 'Haus');
+        $this->assertEquals($translations[1]['lng_source'], 'de');
+        $this->assertEquals($translations[1]['lng_target'], 'en');
+        $this->assertEquals($translations[1]['trans'], 'House');
+
+        $this->gtbabel->reset();
+    }
+
     public function test_data()
     {
         $settings = $this->getDefaultSettings();
