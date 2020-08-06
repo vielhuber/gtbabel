@@ -884,6 +884,13 @@ class Data
         return false;
     }
 
+    function refererLngIsCurrentLng() {
+        if ($this->getCurrentLanguageCode() === $this->host->getRefererLng()) {
+            return true;
+        }
+        return false;
+    }
+
     function prepareTranslationAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, $context = null)
     {
         $context = $this->autoDetermineContext($orig, $context);

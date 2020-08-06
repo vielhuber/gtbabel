@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 4.1.3
+ * Version: 4.1.4
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -45,22 +45,25 @@ class GtbabelWordPress
         add_action(
             'wpcf7_contact_form',
             function ($form) {
+                if( $this->gtbabel->refererLngIsCurrentLng() ) {
+                    return;
+                }
                 $props = $form->get_properties();
-                $props['mail']['subject'] = gtbabel__(
+                $props['mail']['subject'] = $this->gtbabel->data->getTranslationInForeignLngAndAddDynamicallyIfNeeded(
                     $props['mail']['subject'],
-                    null,
                     gtbabel_referer_lng(),
                     gtbabel_source_lng()
-                );
-                $props['mail']['body'] = gtbabel__(
-                    $props['mail']['body'],
                     null,
+                );
+                $props['mail']['body'] = __::br2nl($this->gtbabel->data->getTranslationInForeignLngAndAddDynamicallyIfNeeded(
+                    nl2br($props['mail']['body']),
                     gtbabel_referer_lng(),
                     gtbabel_source_lng()
-                );
+                    null,
+                ));
                 $form->set_properties($props);
             },
-            9999
+            99999
         );
     }
 

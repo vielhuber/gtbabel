@@ -1440,25 +1440,7 @@ Prepare your email templates only in your source language and before sending, tr
 $template = gtbabel__($template, null, gtbabel_source_lng(), gtbabel_referer_lng());
 ```
 
-In WordPress, Contact Form 7 is a popular contact form plugin. Gtbabel has built in support for translating its email templates. To be exact, the following code is built in by default:
-
-```php
-add_action(
-    'wpcf7_contact_form',
-    function ($form) {
-        $props = $form->get_properties();
-        $props['mail']['subject'] = gtbabel__(
-            $props['mail']['subject'],
-            null,
-            gtbabel_referer_lng(),
-            gtbabel_source_lng()
-        );
-        $props['mail']['body'] = gtbabel__($props['mail']['body'], null, gtbabel_referer_lng(), gtbabel_source_lng());
-        $form->set_properties($props);
-    },
-    9999
-);
-```
+In WordPress, Contact Form 7 is a popular contact form plugin. Gtbabel has built in support for translating its email templates.
 
 ### Comments
 
