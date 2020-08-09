@@ -945,7 +945,8 @@ The default configuration is:
     'alt_lng_urls' => [
         '/path/in/source/lng/to/specific/page' => 'en'
     ],
-    'exclude_urls' => ['backend'],
+    'exclude_urls_content' => ['backend'],
+    'exclude_urls_slugs' => ['api/v1.0'],
     'exclude_dom' => ['.notranslate', '.lngpicker'],
     'force_tokenize' => ['.force-tokenize'],
     'include_dom' => [

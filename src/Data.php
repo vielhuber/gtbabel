@@ -285,7 +285,7 @@ class Data
         if (!($this->settings->get('discovery_log') == '1')) {
             return;
         }
-        if ($this->host->currentUrlIsExcluded()) {
+        if ($this->host->contentTranslationIsDisabledForCurrentUrl()) {
             return;
         }
         $this->data['save']['discovered'][] = [
@@ -896,7 +896,7 @@ class Data
     {
         $context = $this->autoDetermineContext($orig, $context);
 
-        if (($context === 'slug' || $context === 'file') && $this->host->urlIsExcluded($orig)) {
+        if (($context === 'slug' || $context === 'file') && $this->host->contentTranslationIsDisabledForUrl($orig)) {
             return null;
         }
 
@@ -1021,19 +1021,21 @@ class Data
         $link = $this->host->getPathWithoutPrefixFromUrl($link);
 
         if ($translate === true) {
-            $url_parts = explode('/', $link);
-            foreach ($url_parts as $url_parts__key => $url_parts__value) {
-                if ($this->stringShouldNotBeTranslated($url_parts__value, 'slug')) {
-                    continue;
+            if (!$this->host->slugTranslationIsDisabledForUrl($link)) {
+                $url_parts = explode('/', $link);
+                foreach ($url_parts as $url_parts__key => $url_parts__value) {
+                    if ($this->stringShouldNotBeTranslated($url_parts__value, 'slug')) {
+                        continue;
+                    }
+                    $url_parts[$url_parts__key] = $this->getTranslationAndAddDynamicallyIfNeeded(
+                        $url_parts__value,
+                        $lng_source,
+                        $lng_target,
+                        'slug'
+                    );
                 }
-                $url_parts[$url_parts__key] = $this->getTranslationAndAddDynamicallyIfNeeded(
-                    $url_parts__value,
-                    $lng_source,
-                    $lng_target,
-                    'slug'
-                );
+                $link = implode('/', $url_parts);
             }
-            $link = implode('/', $url_parts);
         }
         if ($is_absolute_link === true) {
             $link = rtrim($this->host->getBaseUrlWithPrefixForLanguageCode($lng_target), '/') . '/' . ltrim($link, '/');
@@ -1587,6 +1589,9 @@ class Data
         if ($from_lng === $to_lng) {
             return $path;
         }
+        if ($this->host->slugTranslationIsDisabledForUrl($path)) {
+            return $path;
+        }
         $path_parts = explode('/', $path);
         foreach ($path_parts as $path_parts__key => $path_parts__value) {
             if ($path_parts[$path_parts__key] == '') {
@@ -1633,6 +1638,9 @@ class Data
             return;
         }
         if ($this->host->isAjaxRequest()) {
+            return;
+        }
+        if ($this->host->slugTranslationIsDisabledForCurrentUrl()) {
             return;
         }
         /* on wp environments, this triggers also on 404s because it is too early called */

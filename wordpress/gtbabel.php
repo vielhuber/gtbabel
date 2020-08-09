@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 4.1.6
+ * Version: 4.1.7
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -577,7 +577,8 @@ class GtbabelWordPress
                             'deepl_throttle_chars_per_month',
                             'prevent_publish_urls',
                             'alt_lng_urls',
-                            'exclude_urls',
+                            'exclude_urls_content',
+                            'exclude_urls_slugs',
                             'exclude_dom',
                             'force_tokenize',
                             'include_dom',
@@ -631,7 +632,8 @@ class GtbabelWordPress
                             'google_translation_api_key',
                             'microsoft_translation_api_key',
                             'deepl_translation_api_key',
-                            'exclude_urls',
+                            'exclude_urls_content',
+                            'exclude_urls_slugs',
                             'exclude_dom',
                             'force_tokenize',
                             'detect_dom_changes_include'
@@ -1266,18 +1268,46 @@ class GtbabelWordPress
 
         echo '<li class="gtbabel__field">';
         echo '<label class="gtbabel__label">';
-        echo __('Exclude urls', 'gtbabel-plugin');
+        echo __('Disable translation of content for urls', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
         echo '<div class="gtbabel__repeater">';
         echo '<ul class="gtbabel__repeater-list">';
-        if (empty(@$settings['exclude_urls'])) {
-            $settings['exclude_urls'] = [''];
+        if (empty(@$settings['exclude_urls_content'])) {
+            $settings['exclude_urls_content'] = [''];
         }
-        foreach ($settings['exclude_urls'] as $exclude_urls__value) {
+        foreach ($settings['exclude_urls_content'] as $exclude_urls_content__value) {
             echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-1">';
-            echo '<input class="gtbabel__input" type="text" name="gtbabel[exclude_urls][]" value="' .
-                $exclude_urls__value .
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[exclude_urls_content][]" value="' .
+                $exclude_urls_content__value .
+                '" />';
+            echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
+                __('Remove', 'gtbabel-plugin') .
+                '</a>';
+            echo '</li>';
+        }
+        echo '</ul>';
+        echo '<a href="#" class="gtbabel__repeater-add button button-secondary">' .
+            __('Add', 'gtbabel-plugin') .
+            '</a>';
+        echo '</div>';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label class="gtbabel__label">';
+        echo __('Disable translation of slugs for urls', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<div class="gtbabel__repeater">';
+        echo '<ul class="gtbabel__repeater-list">';
+        if (empty(@$settings['exclude_urls_slugs'])) {
+            $settings['exclude_urls_slugs'] = [''];
+        }
+        foreach ($settings['exclude_urls_slugs'] as $exclude_urls_slugs__value) {
+            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-1">';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[exclude_urls_slugs][]" value="' .
+                $exclude_urls_slugs__value .
                 '" />';
             echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
                 __('Remove', 'gtbabel-plugin') .
@@ -3028,7 +3058,14 @@ EOD;
                     'languages' => $languages,
                     'lng_source' => $lng_source,
                     'log_folder' => $this->getPluginFileStorePathRelative() . '/logs',
-                    'exclude_urls' => ['wp-admin', 'feed', 'wp-login.php', 'wp-cron.php', 'wp-comments-post.php'],
+                    'exclude_urls_content' => [
+                        'wp-admin',
+                        'feed',
+                        'wp-login.php',
+                        'wp-cron.php',
+                        'wp-comments-post.php'
+                    ],
+                    'exclude_urls_slugs' => ['wp-json'],
                     'exclude_dom' => ['.notranslate', '.lngpicker', '#wpadminbar']
                 ])
             );

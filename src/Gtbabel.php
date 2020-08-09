@@ -56,7 +56,7 @@ class Gtbabel
         $this->log->setup();
         $this->data->initDatabase();
         $this->data->preloadDataInCache();
-        if ($this->host->currentUrlIsExcluded()) {
+        if ($this->host->contentTranslationIsDisabledForCurrentUrl()) {
             return;
         }
         $this->router->redirectPrefixedUrls();
@@ -73,7 +73,7 @@ class Gtbabel
             return;
         }
         $this->started = false;
-        if ($this->host->currentUrlIsExcluded()) {
+        if ($this->host->contentTranslationIsDisabledForCurrentUrl()) {
             return;
         }
         $content = ob_get_contents();

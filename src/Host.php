@@ -100,15 +100,39 @@ class Host
         return $this->original_host;
     }
 
-    function currentUrlIsExcluded()
+    function contentTranslationIsDisabledForCurrentUrl()
     {
-        return $this->urlIsExcluded($this->getCurrentPath());
+        return $this->contentTranslationIsDisabledForUrl($this->getCurrentPath());
     }
 
-    function urlIsExcluded($url)
+    function contentTranslationIsDisabledForUrl($url)
     {
-        if ($this->settings->get('exclude_urls') !== null && is_array($this->settings->get('exclude_urls'))) {
-            foreach ($this->settings->get('exclude_urls') as $exclude__value) {
+        if (
+            $this->settings->get('exclude_urls_content') !== null &&
+            is_array($this->settings->get('exclude_urls_content'))
+        ) {
+            foreach ($this->settings->get('exclude_urls_content') as $exclude__value) {
+                $regex = '/^(.+\/)?' . preg_quote(trim($exclude__value, '/'), '/') . '(\/.+)?$/';
+                if (preg_match($regex, trim($url, '/'))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    function slugTranslationIsDisabledForCurrentUrl()
+    {
+        return $this->slugTranslationIsDisabledForUrl($this->getCurrentPath());
+    }
+
+    function slugTranslationIsDisabledForUrl($url)
+    {
+        if (
+            $this->settings->get('exclude_urls_slugs') !== null &&
+            is_array($this->settings->get('exclude_urls_slugs'))
+        ) {
+            foreach ($this->settings->get('exclude_urls_slugs') as $exclude__value) {
                 $regex = '/^(.+\/)?' . preg_quote(trim($exclude__value, '/'), '/') . '(\/.+)?$/';
                 if (preg_match($regex, trim($url, '/'))) {
                     return true;

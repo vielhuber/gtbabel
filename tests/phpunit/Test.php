@@ -991,6 +991,88 @@ EOD;
         $this->gtbabel->reset();
     }
 
+    public function test_exclude_urls()
+    {
+        $settings = $this->getDefaultSettings();
+        $settings['lng_source'] = 'de';
+        $settings['lng_target'] = null;
+        $settings['debug_translations'] = false;
+        $settings['auto_translation'] = true;
+        $settings['auto_add_translations'] = true;
+        $settings['only_show_checked_strings'] = false;
+        $settings['languages'] = $this->getLanguageSettings(
+            [['code' => 'de', 'url_prefix' => ''], ['code' => 'en']],
+            true
+        );
+
+        $html = '<!DOCTYPE html><html><body>Der Inhalt</body></html>';
+
+        $settings['exclude_urls_content'] = [];
+        $settings['exclude_urls_slugs'] = [];
+        $this->setHostTo('/haus/');
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo $html;
+        $this->gtbabel->stop();
+        ob_end_clean();
+        $this->setHostTo('/en/house/');
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo $html;
+        $path = $_SERVER['REQUEST_URI'];
+        $this->gtbabel->stop();
+        ob_end_clean();
+        $translations = $this->gtbabel->data->getTranslationsFromDatabase();
+        $this->gtbabel->reset();
+        $this->assertEquals(count($translations), 2);
+        $this->assertEquals($translations[0]['str'], 'haus');
+        $this->assertEquals($translations[1]['str'], 'Der Inhalt');
+        $this->assertEquals($path, '/haus');
+
+        $settings['exclude_urls_content'] = ['house'];
+        $settings['exclude_urls_slugs'] = [];
+        $this->setHostTo('/haus/');
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo $html;
+        $this->gtbabel->stop();
+        ob_end_clean();
+        $this->setHostTo('/en/house/');
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo $html;
+        $path = $_SERVER['REQUEST_URI'];
+        $this->gtbabel->stop();
+        ob_end_clean();
+        $translations = $this->gtbabel->data->getTranslationsFromDatabase();
+        $this->gtbabel->reset();
+        $this->assertEquals(count($translations), 1);
+        $this->assertEquals($translations[0]['str'], 'haus');
+        $this->assertEquals($path, '/en/house/');
+
+        $settings['exclude_urls_content'] = [];
+        $settings['exclude_urls_slugs'] = ['house'];
+        $this->setHostTo('/haus/');
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo $html;
+        $this->gtbabel->stop();
+        ob_end_clean();
+        $this->setHostTo('/en/house/');
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo $html;
+        $path = $_SERVER['REQUEST_URI'];
+        $this->gtbabel->stop();
+        ob_end_clean();
+        $translations = $this->gtbabel->data->getTranslationsFromDatabase();
+        $this->gtbabel->reset();
+        $this->assertEquals(count($translations), 2);
+        $this->assertEquals($translations[0]['str'], 'haus');
+        $this->assertEquals($translations[1]['str'], 'Der Inhalt');
+        $this->assertEquals($path, '/house');
+    }
+
     public function test_router()
     {
         $settings = $this->getDefaultSettings();
@@ -1274,7 +1356,8 @@ EOD;
             'auto_set_new_strings_checked' => false,
             'auto_set_discovered_strings_checked' => false,
             'only_show_checked_strings' => false,
-            'exclude_urls' => null,
+            'exclude_urls_content' => null,
+            'exclude_urls_slugs' => null,
             'html_lang_attribute' => false,
             'html_hreflang_tags' => false,
             'auto_translation' => false,
