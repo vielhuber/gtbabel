@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 4.1.7
+ * Version: 4.1.8
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -562,6 +562,7 @@ class GtbabelWordPress
                             'translate_default_tag_nodes',
                             'translate_html',
                             'translate_json',
+                            'translate_json_include',
                             'html_lang_attribute',
                             'html_hreflang_tags',
                             'auto_add_translations',
@@ -686,6 +687,23 @@ class GtbabelWordPress
                             $settings['prevent_publish_urls'][$post_data['url'][$post_data__key]] = explode(
                                 ',',
                                 $post_data['lngs'][$post_data__key]
+                            );
+                        }
+                    }
+
+                    $post_data = $settings['translate_json_include'];
+                    $settings['translate_json_include'] = [];
+                    if (!empty(@$post_data['url'])) {
+                        foreach ($post_data['url'] as $post_data__key => $post_data__value) {
+                            if (
+                                @$post_data['url'][$post_data__key] == '' &&
+                                @$post_data['keys'][$post_data__key] == ''
+                            ) {
+                                continue;
+                            }
+                            $settings['translate_json_include'][$post_data['url'][$post_data__key]] = explode(
+                                ',',
+                                $post_data['keys'][$post_data__key]
                             );
                         }
                     }
@@ -989,6 +1007,40 @@ class GtbabelWordPress
         echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_translate_json" name="gtbabel[translate_json]" value="1"' .
             ($settings['translate_json'] == '1' ? ' checked="checked"' : '') .
             ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label class="gtbabel__label">';
+        echo __('Translate json for urls and keys', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<div class="gtbabel__repeater">';
+        echo '<ul class="gtbabel__repeater-list">';
+        if (empty(@$settings['translate_json_include'])) {
+            $settings['translate_json_include'] = ['' => ['']];
+        }
+        foreach (
+            $settings['translate_json_include']
+            as $translate_json_include__key => $translate_json_include__value
+        ) {
+            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-2">';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[translate_json_include][url][]" value="' .
+                $translate_json_include__key .
+                '" />';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[translate_json_include][keys][]" value="' .
+                implode(',', $translate_json_include__value) .
+                '" />';
+            echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
+                __('Remove', 'gtbabel-plugin') .
+                '</a>';
+            echo '</li>';
+        }
+        echo '</ul>';
+        echo '<a href="#" class="gtbabel__repeater-add button button-secondary">' .
+            __('Add', 'gtbabel-plugin') .
+            '</a>';
+        echo '</div>';
         echo '</div>';
         echo '</li>';
 

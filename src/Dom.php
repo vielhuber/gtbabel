@@ -670,38 +670,52 @@ class Dom
         if ($this->settings->get('translate_json') !== true) {
             return $json;
         }
+        if ($this->settings->get('translate_json_include') === null) {
+            return $json;
+        }
         if ($this->data->sourceLngIsCurrentLng()) {
             return $json;
         }
-        $json = json_decode($json);
-        $this->traverseJson($json);
-        $json = json_encode($json);
-        return $json;
-    }
-
-    function traverseJson(&$json)
-    {
-        if (is_array($json) || is_object($json) || $json instanceof \Traversable) {
-            foreach ($json as $json__key => &$json__value) {
-                if (is_array($json__value) || is_object($json__value) || $json__value instanceof \Traversable) {
-                    $this->traverseJson($json__value);
-                } elseif (is_string($json__value)) {
-                    if (!is_numeric($json__key) && !in_array($json__key, ['message'], true)) {
-                        continue;
-                    }
-                    $trans = $this->data->prepareTranslationAndAddDynamicallyIfNeeded(
-                        $json__value,
-                        $this->settings->getSourceLanguageCode(),
-                        $this->data->getCurrentLanguageCode(),
-                        null
-                    );
-                    if ($trans === null) {
-                        continue;
-                    }
-                    $json__value = $trans;
-                }
+        $keys = [];
+        $url = $this->host->getCurrentUrlConverted();
+        foreach (
+            $this->settings->get('translate_json_include')
+            as $translate_json_include__key => $translate_json_include__value
+        ) {
+            $regex = '/^(.+\/)?' . preg_quote(trim($translate_json_include__key, '/'), '/') . '(\/.+)?$/';
+            if (preg_match($regex, trim($url, '/'))) {
+                $keys = $translate_json_include__value;
+                break;
             }
         }
+        if (empty($keys)) {
+            return $json;
+        }
+        $json = json_decode($json);
+        $json = __::array_map_deep($json, function ($value, $key, $key_chain) use ($keys) {
+            $match = false;
+            foreach ($keys as $keys__value) {
+                $regex = '/' . str_replace('\*', '(.+)', preg_quote($keys__value)) . '/';
+                if (preg_match($regex, implode('.', $key_chain))) {
+                    $match = true;
+                    break;
+                }
+            }
+            if ($match === true) {
+                $trans = $this->data->prepareTranslationAndAddDynamicallyIfNeeded(
+                    $value,
+                    $this->settings->getSourceLanguageCode(),
+                    $this->data->getCurrentLanguageCode(),
+                    null
+                );
+                if ($trans !== null) {
+                    $value = $trans;
+                }
+            }
+            return $value;
+        });
+        $json = json_encode($json);
+        return $json;
     }
 
     function detectDomChanges()

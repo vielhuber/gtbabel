@@ -918,7 +918,11 @@ The default configuration is:
     'redirect_root_domain' => 'browser',
     'translate_default_tag_nodes' => true,
     'translate_html' => true,
-    'translate_json' => false,
+    'translate_json' => true,
+    'translate_json_include' => [
+        '/path/in/source/lng/to/specific/page' => ['key'],
+        'wp-json/v1/endpoint' => ['key', 'nested.key', 'key.with.*.wildcard']
+    ],
     'html_lang_attribute' => true,
     'html_hreflang_tags' => true,
     'debug_translations' => false, // surround outputted translations with "%|%" to see borders
@@ -1348,7 +1352,7 @@ Although Gtbabel leaves static files untouched, it adds them to the template fil
 
 ## JSON Responses
 
-JSON responses can also be translated by Gtbabel when setting `translate_json` to true.\
+JSON responses can also be translated by Gtbabel when setting `translate_json` to true and populating `translate_json_include`.\
 If your json endpoint is not targeted via a language specific url, you can get the language via `gtbabel_referer_lng()`.
 
 ## Translation management

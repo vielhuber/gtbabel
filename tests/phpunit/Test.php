@@ -177,12 +177,27 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test029()
     {
-        $this->runDiff('29.json', 200);
+        $this->runDiff(
+            '29.json',
+            200,
+            [
+                'translate_json' => false
+            ],
+            '/en/blog'
+        );
     }
 
     public function test030()
     {
-        $this->runDiff('30.json', 200);
+        $this->runDiff(
+            '30.json',
+            200,
+            [
+                'translate_json' => true,
+                'translate_json_include' => ['/blog' => ['das.ist.*.ein']]
+            ],
+            '/en/blog'
+        );
     }
 
     public function test031()
@@ -1351,6 +1366,10 @@ EOD;
             'redirect_root_domain' => 'browser',
             'translate_html' => true,
             'translate_json' => true,
+            'translate_json_include' => [
+                '/path/in/source/lng/to/specific/page' => ['key'],
+                'wp-json/v1/endpoint' => ['key', 'nested.key', 'key.with.*.wildcard']
+            ],
             'debug_translations' => true,
             'auto_add_translations' => false,
             'auto_set_new_strings_checked' => false,
@@ -1374,7 +1393,7 @@ EOD;
         ];
     }
 
-    public function runDiff($filename, $time_max = 0, $overwrite_settings = [])
+    public function runDiff($filename, $time_max = 0, $overwrite_settings = [], $specific_host = null)
     {
         $time_begin = microtime(true);
 
@@ -1388,7 +1407,10 @@ EOD;
             }
         }
 
-        $this->setHostTo($settings['lng_target']);
+        if ($specific_host === null) {
+            $specific_host = $settings['lng_target'];
+        }
+        $this->setHostTo($specific_host);
 
         $this->gtbabel->start($settings);
 

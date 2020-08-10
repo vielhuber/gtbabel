@@ -1,1 +1,1 @@
-{ "foo": { "bar": { "baz": { "message": "oink" }, "gnarr": 42, "foo": { "bar": ["baz"] } } }, "bar": [null] }
+{ "das": { "ist": [{ "ein": "Haus" }] }, "und": { "noch": { "ein": "Haus" } } }
