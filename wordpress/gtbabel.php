@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 4.1.9
+ * Version: 4.2.0
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -2012,6 +2012,20 @@ class GtbabelWordPress
                             $languages__key !== $translations__value['lng_source']
                         );
                     }
+                    if (
+                        $languages__key !== $translations__value['lng_source'] &&
+                        @$translations__value[$languages__key . '_discovered_last_url'] != ''
+                    ) {
+                        echo '<a class="gtbabel__discovered-last-url-link" href="' .
+                            get_bloginfo('url') .
+                            '' .
+                            $translations__value[$languages__key . '_discovered_last_url'] .
+                            '" title="' .
+                            get_bloginfo('url') .
+                            '' .
+                            $translations__value[$languages__key . '_discovered_last_url'] .
+                            '" target="_blank">🔗</a>';
+                    }
                     echo '</td>';
                 }
                 echo '<td class="gtbabel__table-cell">';
@@ -2147,10 +2161,12 @@ class GtbabelWordPress
                 if ($translation['context'] != '') {
                     echo '<div class="gtbabel__transwizard-card-context">' . $translation['context'] . '</div>';
                 }
-                echo '<div class="gtbabel__transwizard-card-source">' .
+
+                echo '<textarea class="gtbabel__input gtbabel__input--textarea gtbabel__transwizard-card-textarea gtbabel__transwizard-card-source">' .
                     $translation[$translation['lng_source']] .
-                    '</div>';
-                echo '<textarea required="required" class="gtbabel__input gtbabel__input--textarea gtbabel__transwizard-card-textarea" name="gtbabel[' .
+                    '</textarea>';
+
+                echo '<textarea required="required" class="gtbabel__input gtbabel__input--textarea gtbabel__transwizard-card-textarea gtbabel__transwizard-card-target" name="gtbabel[' .
                     __::encode_data([
                         'str' => $translation[$translation['lng_source']],
                         'context' => $translation['context'],

@@ -574,6 +574,22 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->gtbabel->reset();
     }
 
+    public function test_encoding()
+    {
+        $settings = $this->getDefaultSettings();
+        $settings['languages'] = $this->getLanguageSettings([['code' => 'de'], ['code' => 'en']]);
+        $settings['debug_translations'] = false;
+        $settings['auto_translation'] = true;
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo '<div data-title="#allesfürsklima">#allesfürsklima</div>';
+        $this->gtbabel->stop();
+        ob_end_clean();
+        $translations = $this->gtbabel->data->getTranslationsFromDatabase();
+        $this->gtbabel->reset();
+        __d($translations);
+    }
+
     public function test_referer_lng()
     {
         $settings = $this->getDefaultSettings();
