@@ -1,0 +1,9 @@
+{
+    "code": "ok",
+    "message": null,
+    "message_title": null,
+    "data": {
+        "html": "<form method=\"post\" target=\"_top\" class=\"form\">\n    <p>Dies ist ein Test</p>\n    <input type=\"hidden\" name=\"test\" value=\"DE\" /> <!-- Kommentar -->\n    <input type=\"hidden\" name=\"test\" value=\"UTF-8\" />\n</form>\n",
+        "lang": "en"
+    }
+}

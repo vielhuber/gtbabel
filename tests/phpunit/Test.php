@@ -391,6 +391,19 @@ class Test extends \PHPUnit\Framework\TestCase
         ]);
     }
 
+    public function test057()
+    {
+        $this->runDiff(
+            '57.json',
+            200,
+            [
+                'translate_json' => true,
+                'translate_json_include' => ['/blog' => ['data.html']]
+            ],
+            '/en/blog'
+        );
+    }
+
     public function test_translate()
     {
         $output = $this->gtbabel->translate('<p>Dies ist ein Test!</p>', [
@@ -833,6 +846,8 @@ class Test extends \PHPUnit\Framework\TestCase
 <a href="beispiel-script.php?foo=bar"></a>
 <a href="beispiel.html"></a>
 <a href="beispiel/pfad/1._Buch_Moses"></a>
+<a href="beispiel/pfad/1._Buch_Moses?Hund=Haus"></a>
+<a href="beispiel/pfad/1._Buch_Moses/?Hund=Haus"></a>
 EOD;
 
         $expected_html = <<<'EOD'
@@ -859,6 +874,8 @@ EOD;
 <a href="en/beispiel-script.php?foo=bar"></a>
 <a href="beispiel.html"></a>
 <a href="en/example/path/1-book-moses"></a>
+<a href="en/example/path/1-book-moses?Hund=Haus"></a>
+<a href="en/example/path/1-book-moses/?Hund=Haus"></a>
 EOD;
 
         $expected_data = [

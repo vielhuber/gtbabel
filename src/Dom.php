@@ -514,6 +514,10 @@ class Dom
             $parts[$parts__key] = $parts__value;
         }
         $xpath .= implode('//', $parts);
+        // div + div => div/following::div
+        if (mb_strpos($xpath, '//+//') !== false) {
+            $xpath = str_replace('//+//', '/following::', $xpath);
+        }
         return $xpath;
     }
 
@@ -702,12 +706,7 @@ class Dom
                 }
             }
             if ($match === true) {
-                $trans = $this->data->prepareTranslationAndAddDynamicallyIfNeeded(
-                    $value,
-                    $this->settings->getSourceLanguageCode(),
-                    $this->data->getCurrentLanguageCode(),
-                    null
-                );
+                $trans = $this->modifyContent($value);
                 if ($trans !== null) {
                     $value = $trans;
                 }

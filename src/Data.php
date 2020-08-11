@@ -1022,6 +1022,12 @@ class Data
 
         if ($translate === true) {
             if (!$this->host->slugTranslationIsDisabledForUrl($link)) {
+                // preserve (and don't translate args)
+                $link_arguments = '';
+                if (mb_strpos($link, '?') !== false) {
+                    $link_arguments = mb_substr($link, mb_strpos($link, '?'));
+                    $link = mb_substr($link, 0, mb_strpos($link, '?'));
+                }
                 $url_parts = explode('/', $link);
                 foreach ($url_parts as $url_parts__key => $url_parts__value) {
                     if ($this->stringShouldNotBeTranslated($url_parts__value, 'slug')) {
@@ -1035,6 +1041,7 @@ class Data
                     );
                 }
                 $link = implode('/', $url_parts);
+                $link .= $link_arguments;
             }
         }
         if ($is_absolute_link === true) {
