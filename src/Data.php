@@ -141,15 +141,19 @@ class Data
             $result = $this->db->fetch_all('SELECT * FROM ' . $this->table . '');
             if (!empty($result)) {
                 foreach ($result as $result__value) {
+                    // we never change the encoding of strings (after grabbing from code, translation etc.)
+                    // however, when looking up existing strings, we always use the decoded version in order
+                    // to prevent annoying duplicates in the database
                     $this->data['cache'][$result__value['lng_source'] ?? ''][$result__value['lng_target'] ?? ''][
                         $result__value['context'] ?? ''
-                    ][$result__value['str']] = $result__value['trans'];
+                    ][html_entity_decode($result__value['str'])] = $result__value['trans'];
                     $this->data['cache_reverse'][$result__value['lng_source'] ?? ''][
                         $result__value['lng_target'] ?? ''
-                    ][$result__value['context'] ?? ''][$result__value['trans']] = $result__value['str'];
+                    ][$result__value['context'] ?? ''][html_entity_decode($result__value['trans'])] =
+                        $result__value['str'];
                     $this->data['checked_strings'][$result__value['lng_source'] ?? ''][
                         $result__value['lng_target'] ?? ''
-                    ][$result__value['context'] ?? ''][$result__value['str']] =
+                    ][$result__value['context'] ?? ''][html_entity_decode($result__value['str'])] =
                         $result__value['checked'] == '1' ? true : false;
                 }
             }
@@ -305,12 +309,15 @@ class Data
             !array_key_exists($lng_source, $this->data['cache']) ||
             !array_key_exists($lng_target, $this->data['cache'][$lng_source]) ||
             !array_key_exists($context ?? '', $this->data['cache'][$lng_source][$lng_target]) ||
-            !array_key_exists($str, $this->data['cache'][$lng_source][$lng_target][$context ?? '']) ||
-            $this->data['cache'][$lng_source][$lng_target][$context ?? ''][$str] === ''
+            !array_key_exists(
+                html_entity_decode($str),
+                $this->data['cache'][$lng_source][$lng_target][$context ?? '']
+            ) ||
+            $this->data['cache'][$lng_source][$lng_target][$context ?? ''][html_entity_decode($str)] === ''
         ) {
             return false;
         }
-        return $this->data['cache'][$lng_source][$lng_target][$context ?? ''][$str];
+        return $this->data['cache'][$lng_source][$lng_target][$context ?? ''][html_entity_decode($str)];
     }
 
     function getExistingTranslationReverseFromCache($str, $lng_source, $lng_target, $context = null)
@@ -321,12 +328,15 @@ class Data
             !array_key_exists($lng_source, $this->data['cache_reverse']) ||
             !array_key_exists($lng_target, $this->data['cache_reverse'][$lng_source]) ||
             !array_key_exists($context ?? '', $this->data['cache_reverse'][$lng_source][$lng_target]) ||
-            !array_key_exists($str, $this->data['cache_reverse'][$lng_source][$lng_target][$context ?? '']) ||
-            $this->data['cache_reverse'][$lng_source][$lng_target][$context ?? ''][$str] === ''
+            !array_key_exists(
+                html_entity_decode($str),
+                $this->data['cache_reverse'][$lng_source][$lng_target][$context ?? '']
+            ) ||
+            $this->data['cache_reverse'][$lng_source][$lng_target][$context ?? ''][html_entity_decode($str)] === ''
         ) {
             return false;
         }
-        return $this->data['cache_reverse'][$lng_source][$lng_target][$context ?? ''][$str];
+        return $this->data['cache_reverse'][$lng_source][$lng_target][$context ?? ''][html_entity_decode($str)];
     }
 
     function getTranslationFromDatabase($str, $context = null, $lng_source = null, $lng_target = null)
@@ -735,8 +745,8 @@ class Data
                     ? $this->settings->get('auto_translation_service')
                     : null
         ];
-        $this->data['cache'][$lng_source][$lng_target][$context ?? ''][$str] = $trans;
-        $this->data['cache_reverse'][$lng_source][$lng_target][$context ?? ''][$trans] = $str;
+        $this->data['cache'][$lng_source][$lng_target][$context ?? ''][html_entity_decode($str)] = $trans;
+        $this->data['cache_reverse'][$lng_source][$lng_target][$context ?? ''][html_entity_decode($trans)] = $str;
     }
 
     function resetTranslations()
@@ -1311,7 +1321,7 @@ class Data
         return $trans;
     }
 
-    function removeLineBreaks($orig)
+    function removeLineBreaksAndPrepareString($orig)
     {
         $str = $orig;
         $str = trim($str);
@@ -1459,8 +1469,11 @@ class Data
             !array_key_exists($lng_source, $this->data['checked_strings']) ||
             !array_key_exists($lng_target, $this->data['checked_strings'][$lng_source]) ||
             !array_key_exists($context ?? '', $this->data['checked_strings'][$lng_source][$lng_target]) ||
-            !array_key_exists($str, $this->data['checked_strings'][$lng_source][$lng_target][$context ?? '']) ||
-            $this->data['checked_strings'][$lng_source][$lng_target][$context ?? ''][$str] != '1'
+            !array_key_exists(
+                html_entity_decode($str),
+                $this->data['checked_strings'][$lng_source][$lng_target][$context ?? '']
+            ) ||
+            $this->data['checked_strings'][$lng_source][$lng_target][$context ?? ''][html_entity_decode($str)] != '1'
         ) {
             return false;
         }

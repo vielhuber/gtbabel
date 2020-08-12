@@ -334,7 +334,8 @@ class Dom
                                 }
 
                                 $str_with_lb = $content__value['value'];
-                                $str_without_lb = $this->data->removeLineBreaks($str_with_lb);
+
+                                $str_without_lb = $this->data->removeLineBreaksAndPrepareString($str_with_lb);
 
                                 $trans = $this->data->prepareTranslationAndAddDynamicallyIfNeeded(
                                     $str_without_lb,
@@ -342,7 +343,6 @@ class Dom
                                     $lng_target,
                                     $context
                                 );
-
                                 if ($trans === null) {
                                     continue;
                                 }
@@ -353,11 +353,7 @@ class Dom
                                     // this is important: domdocument set strings with encoded html chars
                                     // for text nodes as plain text (and not html)
                                     // we therefore use the parent node and set the node value accordingly
-                                    $nodes__value->nodeValue = html_entity_decode(
-                                        $trans,
-                                        ENT_QUOTES | ENT_XML1,
-                                        'UTF-8'
-                                    );
+                                    $nodes__value->nodeValue = html_entity_decode($trans, ENT_QUOTES, 'UTF-8');
                                     $this->addToExcludedNodes($nodes__value, 'text()');
                                 } else {
                                     if ($content__value['type'] === 'attribute') {
@@ -541,7 +537,7 @@ class Dom
         if (@$node->tagName == '') {
             return false;
         }
-        return in_array($node->tagName, ['a', 'br', 'strong', 'b', 'small', 'i', 'span']);
+        return in_array($node->tagName, ['a', 'br', 'strong', 'b', 'small', 'i', 'span', 'sup']);
     }
 
     function getOuterHtml($node)

@@ -404,6 +404,11 @@ class Test extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function test058()
+    {
+        $this->runDiff('58.html');
+    }
+
     public function test_translate()
     {
         $output = $this->gtbabel->translate('<p>Dies ist ein Test!</p>', [
@@ -580,14 +585,18 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['languages'] = $this->getLanguageSettings([['code' => 'de'], ['code' => 'en']]);
         $settings['debug_translations'] = false;
         $settings['auto_translation'] = true;
+        $settings['auto_add_translations'] = true;
         ob_start();
         $this->gtbabel->start($settings);
-        echo '<div data-title="#allesfürsklima">#allesfürsklima</div>';
+        // #allesfürdich is encoded, #allesfürdich is not encoded
+        // however, gtbabel does not add two entries to avoid confusion
+        echo '<div data-title="#allesfürdich">#allesfürdich</div>';
         $this->gtbabel->stop();
         ob_end_clean();
         $translations = $this->gtbabel->data->getTranslationsFromDatabase();
         $this->gtbabel->reset();
-        __d($translations);
+        $this->assertEquals(count($translations), 1);
+        $this->assertEquals($translations[0]['str'], '#allesfürdich');
     }
 
     public function test_referer_lng()
