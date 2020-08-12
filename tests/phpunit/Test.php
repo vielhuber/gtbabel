@@ -409,6 +409,43 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->runDiff('58.html');
     }
 
+    public function test_string_detection()
+    {
+        $should_translate = ['Haus'];
+        $should_not_translate = [
+            '351',
+            '351ADBU...',
+            '350EPU-xxx.002',
+            '351ADBU_xxx-key',
+            '_TZM2042',
+            '951PTO',
+            '951PTO_xxx_xxx',
+            '951PTO16',
+            'PTO191',
+            '0,083333333',
+            '209KS19D',
+            'B06_xxx_xxx_6498_2048'
+        ];
+        foreach ($should_translate as $should_translate__value) {
+            $this->assertEquals(
+                $should_translate__value,
+                $should_translate__value .
+                    ($this->gtbabel->data->stringShouldNotBeTranslated($should_translate__value) === true
+                        ? '_FAIL'
+                        : '')
+            );
+        }
+        foreach ($should_not_translate as $should_not_translate__value) {
+            $this->assertEquals(
+                $should_not_translate__value,
+                $should_not_translate__value .
+                    ($this->gtbabel->data->stringShouldNotBeTranslated($should_not_translate__value) === false
+                        ? '_FAIL'
+                        : '')
+            );
+        }
+    }
+
     public function test_translate()
     {
         $output = $this->gtbabel->translate('<p>Dies ist ein Test!</p>', [
@@ -859,6 +896,7 @@ class Test extends \PHPUnit\Framework\TestCase
 <img src="/beispiel-bilddatei7.jpg" alt="" />
 <img src="beispiel-bilddatei8.jpg" alt="" />
 <a href="mailto:david@vielhuber.de"></a>
+<a href="mailto:david@vielhuber.de?subject=Haus&amp;body=Dies%20ist%20ein%20Test"></a>
 <a href="tel:+4989111312113"></a>
 <a href="http://test.de/beispiel-bilddatei9.jpg"></a>
 <a href="http://test.de/beispiel-pfad10"></a>
@@ -887,6 +925,7 @@ EOD;
 <img src="/beispiel-bilddatei7_EN.jpg" alt="">
 <img src="beispiel-bilddatei8_EN.jpg" alt="">
 <a href="mailto:david@vielhuber.de_EN"></a>
+<a href="mailto:david@vielhuber.de_EN?subject=House&amp;body=This%20is%20a%20test"></a>
 <a href="tel:+4989111312113"></a>
 <a href="http://test.de/beispiel-bilddatei9.jpg"></a>
 <a href="http://test.de/beispiel-pfad10"></a>
@@ -917,6 +956,8 @@ EOD;
             ['beispiel-bilddatei7.jpg', 'file', 'de', 'en', 'beispiel-bilddatei7_EN.jpg', 1],
             ['beispiel-bilddatei8.jpg', 'file', 'de', 'en', 'beispiel-bilddatei8_EN.jpg', 1],
             ['david@vielhuber.de', 'email', 'de', 'en', 'david@vielhuber.de_EN', 1],
+            ['Haus', null, 'de', 'en', 'House', 0],
+            ['Dies ist ein Test', null, 'de', 'en', 'This is a test', 0],
             ['datenschutz/beispiel-bilddatei12.jpg', 'file', 'de', 'en', 'datenschutz/beispiel-bilddatei12_EN.jpg', 1],
             ['beispiel-bilddatei13.jpg', 'file', 'de', 'en', 'beispiel-bilddatei13_EN.jpg', 1],
             ['beispiel-bilddatei14.jpg', 'file', 'de', 'en', 'beispiel-bilddatei14_EN.jpg', 1]

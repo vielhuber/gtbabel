@@ -965,6 +965,9 @@ class Data
             if (mb_strpos($orig, ' ' . $delimiters__value . ' ') !== false) {
                 $orig_parts = explode(' ' . $delimiters__value . ' ', $orig);
                 foreach ($orig_parts as $orig_parts__key => $orig_parts__value) {
+                    if ($this->stringShouldNotBeTranslated($orig_parts__value, 'title')) {
+                        continue;
+                    }
                     $trans = $this->getTranslationAndAddDynamicallyIfNeeded(
                         $orig_parts__value,
                         $lng_source,
@@ -1118,13 +1121,44 @@ class Data
         if ($is_link) {
             $orig = str_replace('mailto:', '', $orig);
         }
+        // cut off args
+        $args = null;
+        $args_pos = strpos($orig, '?');
+        if ($args_pos !== false) {
+            $args = substr($orig, $args_pos + 1);
+            $orig = substr($orig, 0, $args_pos);
+            parse_str($args, $args_array);
+            $args_array_trans = [];
+            foreach ($args_array as $args_array__key => $args_array__value) {
+                if ($this->stringShouldNotBeTranslated($args_array__value, null)) {
+                    $args_array_trans[] = $args_array__key . '=' . $args_array__value;
+                    continue;
+                }
+                $args_array__value = $this->getTranslationAndAddDynamicallyIfNeeded(
+                    $args_array__value,
+                    $lng_source,
+                    $lng_target,
+                    null
+                );
+                if ($args_array__key === 'body') {
+                    $args_array__value = rawurlencode($args_array__value);
+                }
+                $args_array_trans[] = $args_array__key . '=' . $args_array__value;
+            }
+            // don't use http_build_query, because "body" does not use rawurlencode then
+            $args = '?' . implode('&', $args_array_trans);
+        }
         $trans = $this->getExistingTranslationFromCache($orig, $lng_source, $lng_target, 'email');
         if ($trans === false) {
             $this->addTranslationToDatabaseAndToCache($orig, $orig, $lng_source, $lng_target, 'email', false);
         } elseif ($this->stringIsChecked($orig, $lng_source, $lng_target, 'email')) {
-            return ($is_link ? 'mailto:' : '') . $trans;
+            $trans = ($is_link ? 'mailto:' : '') . $trans;
+            $trans .= $args;
+            return $trans;
         }
-        return ($is_link ? 'mailto:' : '') . $orig;
+        $orig = ($is_link ? 'mailto:' : '') . $orig;
+        $orig .= $args;
+        return $orig;
     }
 
     function getTranslationAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, $context = null)
@@ -1392,8 +1426,11 @@ class Data
             return true;
         }
         // lng codes
-        if (in_array(strtolower($str), $this->settings->getSelectedLanguageCodes())) {
-            return true;
+        $lngs = $this->settings->getSelectedLanguageCodes();
+        if ($lngs !== null) {
+            if (in_array(strtolower($str), $lngs)) {
+                return true;
+            }
         }
         if ($context === 'slug') {
             if (mb_strpos(trim($str, '/'), '#') === 0) {
@@ -1424,6 +1461,22 @@ class Data
         }
         if (mb_strpos($str, '\\(') === 0 && mb_strrpos($str, '\\)') === $length - 2) {
             return true;
+        }
+        if ($context !== 'email' && $context !== 'slug' && $context !== 'file') {
+            if (strpos($str, ' ') === false) {
+                if (strpos($str, '_') !== false) {
+                    return true;
+                }
+                if (strpos($str, '.') !== false) {
+                    return true;
+                }
+                if (preg_match('/[0-9]+[A-Z]+/', $str)) {
+                    return true;
+                }
+                if (preg_match('/[A-Z]+[0-9]+/', $str)) {
+                    return true;
+                }
+            }
         }
         return false;
     }
