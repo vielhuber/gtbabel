@@ -24,6 +24,28 @@ class Tags
         return $matches[0];
     }
 
+    function catchInlineLinks($str)
+    {
+        preg_match_all(
+            '(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s\<]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s\<]{2,})',
+            $str,
+            $match
+        );
+        if (empty($match[0])) {
+            return [];
+        }
+        return $match[0];
+    }
+
+    function catchInlineLinksPlaceholders($str)
+    {
+        preg_match_all('({[0-9]+})', $str, $match);
+        if (empty($match[0])) {
+            return [];
+        }
+        return $match[0];
+    }
+
     function addIds($str)
     {
         foreach ($this->catchOpeningTags($str) as $matches__key => $matches__value) {
@@ -86,9 +108,9 @@ class Tags
         return $str;
     }
 
-    function removeAttributesAndSaveMapping($str)
+    function removeAttributes($str)
     {
-        $mappingTable = [];
+        $mappingTableTags = [];
         foreach ($this->catchOpeningTags($str) as $matches__key => $matches__value) {
             $id = $matches__key + 1;
             $pos_end = mb_strrpos($matches__value, '>');
@@ -98,7 +120,7 @@ class Tags
                 $pos_begin = $pos_end;
             }
             $attributes = mb_substr($matches__value, $pos_begin, $pos_end - $pos_begin);
-            $mappingTable[$id] = trim($attributes);
+            $mappingTableTags[$id] = trim($attributes);
             $has_no_translate_attribute = false;
             foreach (explode(' ', $attributes) as $attributes__value) {
                 if (
@@ -115,10 +137,21 @@ class Tags
             $new = str_replace($attributes, $replacement, $matches__value);
             $str = __::str_replace_first($matches__value, $new, $str);
         }
-        return [$str, $mappingTable];
+        return [$str, $mappingTableTags];
     }
 
-    function addAttributesAndRemoveIds($str, $mappingTable)
+    function removeInlineLinks($str)
+    {
+        $mappingTableInlineLinks = [];
+        foreach ($this->catchInlineLinks($str) as $matches__key => $matches__value) {
+            $id = $matches__key + 1;
+            $mappingTableInlineLinks[$id] = $matches__value;
+            $str = __::str_replace_first($matches__value, '{' . $id . '}', $str);
+        }
+        return [$str, $mappingTableInlineLinks];
+    }
+
+    function addAttributesAndRemoveIds($str, $mappingTableTags)
     {
         foreach ($this->catchOpeningTags($str) as $matches__key => $matches__value) {
             $new = $matches__value;
@@ -142,13 +175,26 @@ class Tags
             $new = str_replace($attributes, '', $new);
 
             // restore attributes
-            if (array_key_exists($id, $mappingTable)) {
-                $attributes_restored = $mappingTable[$id];
+            if (array_key_exists($id, $mappingTableTags)) {
+                $attributes_restored = $mappingTableTags[$id];
                 $pos = mb_strrpos($new, '>');
                 $new = mb_substr($new, 0, $pos) . ' ' . $attributes_restored . mb_substr($new, $pos);
             }
 
             $str = __::str_replace_first($matches__value, $new, $str);
+        }
+        return $str;
+    }
+
+    function addInlineLinks($str, $mappingTableInlineLinks)
+    {
+        foreach ($this->catchInlineLinksPlaceholders($str) as $matches__value) {
+            $id = str_replace(['{', '}'], '', $matches__value);
+            if (!array_key_exists($id, $mappingTableInlineLinks)) {
+                continue;
+            }
+            $link = $mappingTableInlineLinks[$id];
+            $str = __::str_replace_first($matches__value, $link, $str);
         }
         return $str;
     }

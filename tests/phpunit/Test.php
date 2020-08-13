@@ -409,6 +409,14 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->runDiff('58.html');
     }
 
+    public function test059()
+    {
+        $this->runDiff('59.html', 1500, [
+            'debug_translations' => false,
+            'auto_translation' => true
+        ]);
+    }
+
     public function test_string_detection()
     {
         $should_translate = ['Haus'];
@@ -886,6 +894,8 @@ class Test extends \PHPUnit\Framework\TestCase
 
         $input = <<<'EOD'
 <div style="background-image: url(http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei1.jpg);"></div>
+<div style="background-image: url('http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei1.jpg');"></div>
+<div style="background-image:    url(    'http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei1.jpg' )"></div>
 <div style="background-image: url(/beispiel-bilddatei2.jpg);"></div>
 <div style="background-image: url('beispiel-bilddatei3.jpg');"></div>
 <div style="background-image: url('http://test.de/beispiel-bilddatei4.jpg');"></div>
@@ -895,8 +905,10 @@ class Test extends \PHPUnit\Framework\TestCase
 <img src="http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei6.jpg" alt="" />
 <img src="/beispiel-bilddatei7.jpg" alt="" />
 <img src="beispiel-bilddatei8.jpg" alt="" />
+<a href="mailto:"></a>
 <a href="mailto:david@vielhuber.de"></a>
 <a href="mailto:david@vielhuber.de?subject=Haus&amp;body=Dies%20ist%20ein%20Test"></a>
+<a href="mailto:david@vielhuber.de?subject=Haus&amp;body=Dies%20ist%20ein%20Link%20http%3A%2F%2Fgtbabel.local.vielhuber.de%2Fdatenschutz"></a>
 <a href="tel:+4989111312113"></a>
 <a href="http://test.de/beispiel-bilddatei9.jpg"></a>
 <a href="http://test.de/beispiel-pfad10"></a>
@@ -915,6 +927,8 @@ EOD;
 
         $expected_html = <<<'EOD'
 <div style="background-image: url(http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei1_EN.jpg);"></div>
+<div style="background-image: url('http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei1_EN.jpg');"></div>
+<div style="background-image: url( 'http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei1_EN.jpg' )"></div>
 <div style="background-image: url(/beispiel-bilddatei2_EN.jpg);"></div>
 <div style="background-image: url('beispiel-bilddatei3_EN.jpg');"></div>
 <div style="background-image: url('http://test.de/beispiel-bilddatei4.jpg');"></div>
@@ -924,8 +938,10 @@ EOD;
 <img src="http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei6_EN.jpg" alt="">
 <img src="/beispiel-bilddatei7_EN.jpg" alt="">
 <img src="beispiel-bilddatei8_EN.jpg" alt="">
+<a href="mailto:"></a>
 <a href="mailto:david@vielhuber.de_EN"></a>
 <a href="mailto:david@vielhuber.de_EN?subject=House&amp;body=This%20is%20a%20test"></a>
+<a href="mailto:david@vielhuber.de_EN?subject=House&amp;body=This%20is%20a%20link%20http%3A%2F%2Fgtbabel.local.vielhuber.de%2Fen%2Fprivacy"></a>
 <a href="tel:+4989111312113"></a>
 <a href="http://test.de/beispiel-bilddatei9.jpg"></a>
 <a href="http://test.de/beispiel-pfad10"></a>
@@ -958,6 +974,7 @@ EOD;
             ['david@vielhuber.de', 'email', 'de', 'en', 'david@vielhuber.de_EN', 1],
             ['Haus', null, 'de', 'en', 'House', 0],
             ['Dies ist ein Test', null, 'de', 'en', 'This is a test', 0],
+            ['Dies ist ein Link {1}', null, 'de', 'en', 'This is a link {1}', 0],
             ['datenschutz/beispiel-bilddatei12.jpg', 'file', 'de', 'en', 'datenschutz/beispiel-bilddatei12_EN.jpg', 1],
             ['beispiel-bilddatei13.jpg', 'file', 'de', 'en', 'beispiel-bilddatei13_EN.jpg', 1],
             ['beispiel-bilddatei14.jpg', 'file', 'de', 'en', 'beispiel-bilddatei14_EN.jpg', 1]

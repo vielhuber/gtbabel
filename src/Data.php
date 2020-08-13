@@ -749,6 +749,19 @@ class Data
         $this->data['cache_reverse'][$lng_source][$lng_target][$context ?? ''][html_entity_decode($trans)] = $str;
     }
 
+    function translateInlineLinks($data)
+    {
+        foreach ($data as $data__key => $data__value) {
+            $data[$data__key] = $this->prepareTranslationAndAddDynamicallyIfNeeded(
+                $data__value,
+                $this->settings->getSourceLanguageCode(),
+                $this->getCurrentLanguageCode(),
+                'slug'
+            );
+        }
+        return $data;
+    }
+
     function resetTranslations()
     {
         if ($this->db->sql->engine === 'sqlite') {
@@ -943,8 +956,13 @@ class Data
             }
             return $trans;
         }
-        if ($context === 'title') {
-            $trans = $this->getTranslationOfTitleAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target);
+        if ($context === 'title' || $context === 'description') {
+            $trans = $this->getTranslationOfTitleDescriptionAndAddDynamicallyIfNeeded(
+                $orig,
+                $lng_source,
+                $lng_target,
+                $context
+            );
             if ($trans === null) {
                 return $orig;
             }
@@ -957,7 +975,7 @@ class Data
         return $this->getTranslationAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, $context);
     }
 
-    function getTranslationOfTitleAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target)
+    function getTranslationOfTitleDescriptionAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, $context)
     {
         $orig = str_replace(' ', ' ', $orig); // replace hidden &nbsp; chars
         $orig = html_entity_decode($orig);
@@ -965,14 +983,14 @@ class Data
             if (mb_strpos($orig, ' ' . $delimiters__value . ' ') !== false) {
                 $orig_parts = explode(' ' . $delimiters__value . ' ', $orig);
                 foreach ($orig_parts as $orig_parts__key => $orig_parts__value) {
-                    if ($this->stringShouldNotBeTranslated($orig_parts__value, 'title')) {
+                    if ($this->stringShouldNotBeTranslated($orig_parts__value, $context)) {
                         continue;
                     }
                     $trans = $this->getTranslationAndAddDynamicallyIfNeeded(
                         $orig_parts__value,
                         $lng_source,
                         $lng_target,
-                        'title'
+                        $context
                     );
                     $orig_parts[$orig_parts__key] = $trans;
                 }
@@ -980,7 +998,7 @@ class Data
                 return $trans;
             }
         }
-        return $this->getTranslationAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, 'title');
+        return $this->getTranslationAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, $context);
     }
 
     function modifyLink($link, $lng_source, $lng_target)
@@ -1079,7 +1097,7 @@ class Data
         if (strpos($orig, 'url(') !== false) {
             preg_match_all('/url\((.+?)\)/', $orig, $matches);
             foreach ($matches[1] as $matches__value) {
-                $urls[] = trim(trim($matches__value, '\''), '"');
+                $urls[] = trim(trim(trim(trim($matches__value), '\''), '"'));
             }
         } else {
             $urls[] = $orig;
@@ -1148,13 +1166,15 @@ class Data
             // don't use http_build_query, because "body" does not use rawurlencode then
             $args = '?' . implode('&', $args_array_trans);
         }
-        $trans = $this->getExistingTranslationFromCache($orig, $lng_source, $lng_target, 'email');
-        if ($trans === false) {
-            $this->addTranslationToDatabaseAndToCache($orig, $orig, $lng_source, $lng_target, 'email', false);
-        } elseif ($this->stringIsChecked($orig, $lng_source, $lng_target, 'email')) {
-            $trans = ($is_link ? 'mailto:' : '') . $trans;
-            $trans .= $args;
-            return $trans;
+        if (trim($orig) != '') {
+            $trans = $this->getExistingTranslationFromCache($orig, $lng_source, $lng_target, 'email');
+            if ($trans === false) {
+                $this->addTranslationToDatabaseAndToCache($orig, $orig, $lng_source, $lng_target, 'email', false);
+            } elseif ($this->stringIsChecked($orig, $lng_source, $lng_target, 'email')) {
+                $trans = ($is_link ? 'mailto:' : '') . $trans;
+                $trans .= $args;
+                return $trans;
+            }
         }
         $orig = ($is_link ? 'mailto:' : '') . $orig;
         $orig .= $args;
@@ -1168,64 +1188,104 @@ class Data
         - <a href="https://tld.com" class="foo" data-bar="baz">Hallo</a> Welt!
         - Das deutsche <a href="https://1.com">Brot</a> <a href="https://2.com">vermisse</a> ich am meisten.
         - <a class="notranslate foo">Hallo</a> Welt!
+        - Das ist ein Link https://tld.com im Text.
 
         $origWithoutAttributes
         - <a>Hallo</a> Welt!
         - Das deutsche <a>Brot</a> <a>vermisse</a> ich am meisten.
         - <a class="notranslate">Hallo</a> Welt!
+        - Das ist ein Link https://tld.com im Text.
 
-        $origWithIds
-        - <a href="https://tld.com" class="foo" data-bar="baz" p="1">Hallo</a> Welt!
-        - Das deutsche <a href="https://1.com" p="1">Brot</a> <a href="https://2.com" p="2">vermisse</a> ich am meisten.
-        - <a class="notranslate foo" p="1">Hallo</a> Welt!
+        $origWithoutAttributesWithoutInlineLinks
+        - <a>Hallo</a> Welt!
+        - Das deutsche <a>Brot</a> <a>vermisse</a> ich am meisten.
+        - <a class="notranslate">Hallo</a> Welt!
+        - Das ist ein Link {1} im Text.
 
-        $transWithIds
-        - <a href="https://tld.com" class="foo" data-bar="baz" p="1">Hello</a> world!
-        - I <a href="https://2.com" p="2">miss</a> German <a href="https://1.com" p="1">bread</a> the most.
-        - <a class="notranslate foo" p="1">Hallo</a> world!
+        $origWithoutAttributesWithoutInlineLinksWithIds
+        - <a p="1">Hallo</a> Welt!
+        - Das deutsche <a p="1">Brot</a> <a p="2">vermisse</a> ich am meisten.
+        - <a class="notranslate" p="1">Hallo</a> Welt!
+        - Das ist ein Link {1} im Text.
 
-        $transWithoutAttributes
+        $transWithoutAttributesWithoutInlineLinksWithIds
+        - <a p="1">Hello</a> world!
+        - I <a p="2">miss</a> German <a p="1">bread</a> the most.
+        - <a class="notranslate" p="1">Hallo</a> world!
+        - This is a link {1} in the text
+
+        $transWithoutAttributesWithoutInlineLinks
         - <a>Hello</a> world!
         - I <a p="2">miss</a> German <a p="1">bread</a> the most.
         - <a class="notranslate">Hallo</a> world!
+        - This is a link {1} in the text
+
+        $transWithoutInlineLinks
+        - <a href="https://tld.com" class="foo" data-bar="baz">Hello</a> world!
+        - I <a href="https://2.com">miss</a> German <a href="https://1.com">bread</a> the most.
+        - <a class="notranslate foo">Hallo</a> world!
+        - This is a link {1} in the text
 
         $trans
         - <a href="https://tld.com" class="foo" data-bar="baz">Hello</a> world!
         - I <a href="https://2.com">miss</a> German <a href="https://1.com">bread</a> the most.
         - <a class="notranslate foo">Hallo</a> world!
+        - This is a link https://tld.com/en/ in the text
         */
 
-        [$origWithoutAttributes, $mappingTable] = $this->tags->removeAttributesAndSaveMapping($orig);
+        [$origWithoutAttributes, $mappingTableTags] = $this->tags->removeAttributes($orig);
 
-        $transWithoutAttributes = $this->getExistingTranslationFromCache(
-            $origWithoutAttributes,
+        [$origWithoutAttributesWithoutInlineLinks, $mappingTableInlineLinks] = $this->tags->removeInlineLinks(
+            $origWithoutAttributes
+        );
+
+        $mappingTableInlineLinks = $this->translateInlineLinks($mappingTableInlineLinks);
+
+        $transWithoutAttributesWithoutInlineLinks = $this->getExistingTranslationFromCache(
+            $origWithoutAttributesWithoutInlineLinks,
             $lng_source,
             $lng_target,
             $context
         );
 
-        if ($transWithoutAttributes === false) {
-            $origWithIds = $this->tags->addIds($orig);
-            $transWithIds = $this->autoTranslateString($origWithIds, $lng_source, $lng_target, $context);
-            if ($transWithIds !== null) {
-                $transWithoutAttributes = $this->tags->removeAttributesExceptIrregularIds($transWithIds);
+        if ($transWithoutAttributesWithoutInlineLinks === false) {
+            $origWithoutAttributesWithoutInlineLinksWithIds = $this->tags->addIds(
+                $origWithoutAttributesWithoutInlineLinks
+            );
+            $transWithoutAttributesWithoutInlineLinksWithIds = $this->autoTranslateString(
+                $origWithoutAttributesWithoutInlineLinksWithIds,
+                $lng_source,
+                $lng_target,
+                $context
+            );
+            if ($transWithoutAttributesWithoutInlineLinksWithIds !== null) {
+                $transWithoutAttributesWithoutInlineLinks = $this->tags->removeAttributesExceptIrregularIds(
+                    $transWithoutAttributesWithoutInlineLinksWithIds
+                );
                 $this->addTranslationToDatabaseAndToCache(
-                    $origWithoutAttributes,
-                    $transWithoutAttributes,
+                    $origWithoutAttributesWithoutInlineLinks,
+                    $transWithoutAttributesWithoutInlineLinks,
                     $lng_source,
                     $lng_target,
                     $context,
                     true
                 );
             } else {
-                $transWithoutAttributes = $this->tags->removeAttributesExceptIrregularIds($origWithIds);
+                $transWithoutAttributesWithoutInlineLinks = $this->tags->removeAttributesExceptIrregularIds(
+                    $origWithoutAttributesWithoutInlineLinksWithIds
+                );
             }
         }
 
-        $trans = $this->tags->addAttributesAndRemoveIds($transWithoutAttributes, $mappingTable);
+        $transWithoutInlineLinks = $this->tags->addAttributesAndRemoveIds(
+            $transWithoutAttributesWithoutInlineLinks,
+            $mappingTableTags
+        );
 
-        if (!$this->stringIsChecked($origWithoutAttributes, $lng_source, $lng_target, $context)) {
-            return $origWithoutAttributes;
+        $trans = $this->tags->addInlineLinks($transWithoutInlineLinks, $mappingTableInlineLinks);
+
+        if (!$this->stringIsChecked($origWithoutAttributesWithoutInlineLinks, $lng_source, $lng_target, $context)) {
+            return $orig;
         }
 
         return $trans;
