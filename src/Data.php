@@ -1054,10 +1054,12 @@ class Data
         if ($translate === true) {
             if (!$this->host->slugTranslationIsDisabledForUrl($link)) {
                 // preserve (and don't translate args)
-                $link_arguments = '';
-                if (mb_strpos($link, '?') !== false) {
-                    $link_arguments = mb_substr($link, mb_strpos($link, '?'));
-                    $link = mb_substr($link, 0, mb_strpos($link, '?'));
+                $link_arguments = [];
+                foreach (['?', '#'] as $delimiter__value) {
+                    if (mb_strpos($link, $delimiter__value) !== false) {
+                        $link_arguments[$delimiter__value] = mb_substr($link, mb_strpos($link, $delimiter__value));
+                        $link = mb_substr($link, 0, mb_strpos($link, $delimiter__value));
+                    }
                 }
                 $url_parts = explode('/', $link);
                 foreach ($url_parts as $url_parts__key => $url_parts__value) {
@@ -1072,7 +1074,9 @@ class Data
                     );
                 }
                 $link = implode('/', $url_parts);
-                $link .= $link_arguments;
+                foreach ($link_arguments as $link_arguments__value) {
+                    $link .= $link_arguments__value;
+                }
             }
         }
         if ($is_absolute_link === true) {
@@ -1418,12 +1422,12 @@ class Data
     function removeLineBreaksAndPrepareString($orig)
     {
         $str = $orig;
-        $str = trim($str);
+        $str = __::trim_whitespace($str);
         $str = str_replace(['&#13;', "\r"], '', $str); // replace nasty carriage returns \r
         $str = preg_replace('/[\t]+/', ' ', $str); // replace multiple tab spaces with one tab space
         $parts = explode(PHP_EOL, $str);
         foreach ($parts as $parts__key => $parts__value) {
-            $parts__value = trim($parts__value);
+            $parts__value = __::trim_whitespace($parts__value);
             if ($parts__value == '') {
                 unset($parts[$parts__key]);
             } else {

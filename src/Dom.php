@@ -514,6 +514,10 @@ class Dom
         if (mb_strpos($xpath, '//+//') !== false) {
             $xpath = str_replace('//+//', '/following::', $xpath);
         }
+        // div > div => div / div
+        if (mb_strpos($xpath, '//>//') !== false) {
+            $xpath = str_replace('//>//', ' / ', $xpath);
+        }
         return $xpath;
     }
 

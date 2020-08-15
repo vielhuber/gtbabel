@@ -378,7 +378,7 @@ class Test extends \PHPUnit\Framework\TestCase
     public function test055()
     {
         $this->runDiff('55.html', 200, [
-            'force_tokenize' => ['.postponded__date']
+            'force_tokenize' => ['.postponded__date', '.canceled__note > *']
         ]);
     }
 
@@ -415,6 +415,16 @@ class Test extends \PHPUnit\Framework\TestCase
             'debug_translations' => false,
             'auto_translation' => true
         ]);
+    }
+
+    public function test060()
+    {
+        $this->runDiff('60.html');
+    }
+
+    public function test061()
+    {
+        $this->runDiff('61.html');
     }
 
     public function test_string_detection()
