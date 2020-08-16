@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 4.2.8
+ * Version: 4.2.9
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -2012,18 +2012,25 @@ class GtbabelWordPress
                             $languages__key !== $translations__value['lng_source']
                         );
                     }
-                    if (
-                        $languages__key !== $translations__value['lng_source'] &&
-                        @$translations__value[$languages__key . '_discovered_last_url'] != ''
-                    ) {
+                    $discovered_url = null;
+                    if ($languages__key !== $translations__value['lng_source']) {
+                        if (@$translations__value[$languages__key . '_discovered_last_url'] != '') {
+                            $discovered_url = $translations__value[$languages__key . '_discovered_last_url'];
+                        }
+                    } else {
+                        if (@$translations__value['discovered_last_url_orig'] != '') {
+                            $discovered_url = $translations__value['discovered_last_url_orig'];
+                        }
+                    }
+                    if ($discovered_url !== null) {
                         echo '<a class="gtbabel__discovered-last-url-link" href="' .
                             get_bloginfo('url') .
                             '' .
-                            $translations__value[$languages__key . '_discovered_last_url'] .
+                            $discovered_url .
                             '" title="' .
                             get_bloginfo('url') .
                             '' .
-                            $translations__value[$languages__key . '_discovered_last_url'] .
+                            $discovered_url .
                             '" target="_blank">🔗</a>';
                     }
                     echo '</td>';

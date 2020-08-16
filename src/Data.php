@@ -415,6 +415,9 @@ class Data
                 $data_grouped[$result__value['str']][$result__value['context']][
                     $result__value['lng_target'] . '_discovered_last_url_orig'
                 ] = $result__value['discovered_last_url_orig'];
+                // put this in source lng also
+                $data_grouped[$result__value['str']][$result__value['context']]['discovered_last_url_orig'] =
+                    $result__value['discovered_last_url_orig'];
                 $data_grouped[$result__value['str']][$result__value['context']][
                     $result__value['lng_target'] . '_discovered_last_url'
                 ] = $result__value['discovered_last_url'];

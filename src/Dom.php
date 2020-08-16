@@ -237,7 +237,7 @@ class Dom
                 ],
                 [
                     'selector' => '/html/body//@*[starts-with(name(), \'data-\')]/parent::*', // data-*
-                    'attribute' => '(?! data-context=)(?: (data-.+?)="([^"]+?)")', // data-* (except data-context)
+                    'attribute' => '(?! data-context=)(?: (data-.+?)="([^"]*?)")', // data-* (except data-context)
                     'context' => null
                 ],
                 [
@@ -247,7 +247,7 @@ class Dom
                 ],
                 [
                     'selector' => '/html/body//@*[contains(name(), \'text\')]/parent::*', // *text*
-                    'attribute' => '(?! data-context=)(?: ([a-zA-Z-]*?text[a-zA-Z-]*?)="([^"]+?)")', // *text* (except data-context)
+                    'attribute' => '(?! data-context=)(?: ([a-zA-Z-]*?text[a-zA-Z-]*?)="([^"]*?)")', // *text* (except data-context)
                     'context' => null
                 ]
             ]);
@@ -281,6 +281,9 @@ class Dom
                                     continue;
                                 }
                                 foreach ($matches as $matches__value) {
+                                    if ($matches__value[1] == '' || $matches__value[2] == '') {
+                                        continue;
+                                    }
                                     $content[] = [
                                         'key' => $matches__value[1],
                                         'value' => $matches__value[2],
