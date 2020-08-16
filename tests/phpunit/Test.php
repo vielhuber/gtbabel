@@ -136,7 +136,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test022()
     {
-        $this->runDiff('22.php', 3000);
+        $this->runDiff('22.php', 6000);
     }
 
     public function test023()

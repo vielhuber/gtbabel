@@ -593,6 +593,16 @@ class Dom
         return $this->DOMXPath->evaluate('count(.//*)', $node);
     }
 
+    function getSiblingCountOfNonTextNode($node)
+    {
+        return $this->DOMXPath->evaluate('count(./../node()[normalize-space()])', $node) - 1;
+    }
+
+    function getTextSiblingCountOfNonTextNode($node)
+    {
+        return $this->DOMXPath->evaluate('count(./../text()[normalize-space()])', $node);
+    }
+
     function getChildrenCountOfNode($node)
     {
         return $this->DOMXPath->evaluate('count(./node()[normalize-space()])', $node);
@@ -649,10 +659,34 @@ class Dom
                 if (
                     // if the tokenization is forced on any child
                     in_array($this->getIdOfNode($nodes__value), $this->force_tokenize) ||
+                    /*
+                    this is the most important part of the tokenization pattern:
+                    return parent node (and don't tokenize), if
+                        (
+                            it is a text node
+                        )
+                        OR
+                        (
+                            it is an inner tag node (span, br, ...)
+                            AND
+                            it has less than 2 children
+                            AND 
+                            (
+                                it has no siblings
+                                OR
+                                it has in minimum 1 text node sibling
+                                OR
+                                its siblings (and children) have not more than 3 tags
+                            )
+                        )
+                    */
                     !(
                         $this->isTextNode($nodes__value) ||
                         ($this->isInnerTagNode($nodes__value) &&
-                            $this->getChildrenCountRecursivelyOfNodeTagsOnly($nodes__value) <= 2)
+                            $this->getChildrenCountRecursivelyOfNodeTagsOnly($nodes__value) <= 2 &&
+                            ($this->getSiblingCountOfNonTextNode($nodes__value) == 0 ||
+                                $this->getTextSiblingCountOfNonTextNode($nodes__value) > 0 ||
+                                $this->getChildrenCountRecursivelyOfNodeTagsOnly($parent) <= 3))
                     )
                 ) {
                     $this->group_cache[$this->getIdOfNode($parent)] = true;
