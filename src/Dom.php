@@ -675,8 +675,6 @@ class Dom
                                 it has no siblings
                                 OR
                                 it has in minimum 1 text node sibling
-                                OR
-                                its siblings (and children) have not more than 3 tags
                             )
                         )
                     */
@@ -685,8 +683,7 @@ class Dom
                         ($this->isInnerTagNode($nodes__value) &&
                             $this->getChildrenCountRecursivelyOfNodeTagsOnly($nodes__value) <= 2 &&
                             ($this->getSiblingCountOfNonTextNode($nodes__value) == 0 ||
-                                $this->getTextSiblingCountOfNonTextNode($nodes__value) > 0 ||
-                                $this->getChildrenCountRecursivelyOfNodeTagsOnly($parent) <= 3))
+                                $this->getTextSiblingCountOfNonTextNode($nodes__value) > 0))
                     )
                 ) {
                     $this->group_cache[$this->getIdOfNode($parent)] = true;

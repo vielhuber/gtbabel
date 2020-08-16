@@ -1554,16 +1554,7 @@ EOD;
             __::minify_html($this->normalize($html_translated)) === __::minify_html($this->normalize($html_target));
 
         if ($passed === false) {
-            file_put_contents(
-                $debug_filename,
-                $html_translated .
-                    PHP_EOL .
-                    PHP_EOL .
-                    __::minify_html($this->normalize($html_translated)) .
-                    PHP_EOL .
-                    PHP_EOL .
-                    __::minify_html($this->normalize($html_target))
-            );
+            file_put_contents($debug_filename, $html_translated);
             // debug output to copy
             echo PHP_EOL . PHP_EOL . '##############################################' . PHP_EOL;
             echo json_encode([
