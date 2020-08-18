@@ -539,6 +539,17 @@ class Dom
         return $node->getNodePath();
     }
 
+    function getTagNameOfNode($node)
+    {
+        if ($node === null) {
+            return '';
+        }
+        if (@$node->tagName == '') {
+            return '';
+        }
+        return $node->tagName;
+    }
+
     function isInnerTagNode($node)
     {
         if (@$node->tagName == '') {
@@ -598,7 +609,7 @@ class Dom
 
     function getSiblingCountOfNonTextNode($node)
     {
-        return $this->DOMXPath->evaluate('count(./../node()[normalize-space()])', $node) - 1;
+        return $this->DOMXPath->evaluate('count(./../*|./../text()[normalize-space()])', $node) - 1;
     }
 
     function getTextSiblingCountOfNonTextNode($node)
@@ -608,17 +619,72 @@ class Dom
 
     function getChildrenCountOfNode($node)
     {
-        return $this->DOMXPath->evaluate('count(./node()[normalize-space()])', $node);
+        return $this->DOMXPath->evaluate('count(./*|./text()[normalize-space()])', $node);
     }
 
     function getChildrenOfNode($node)
     {
-        return $this->DOMXPath->query('.//node()[normalize-space()]', $node);
+        return $this->DOMXPath->query('.//*|.//text()[normalize-space()]', $node);
+    }
+
+    function getLastChildrenOfNode($node)
+    {
+        $children = $this->DOMXPath->query('(.//*|.//text()[normalize-space()])[last()]', $node);
+        if ($children->length === 0) {
+            return null;
+        }
+        return $children[0];
+    }
+
+    function getPreviousSiblingOfNode($node)
+    {
+        $sibling = $this->DOMXPath->query(
+            '(./preceding-sibling::*|./preceding-sibling::text()[normalize-space()])[1]',
+            $node
+        );
+        if ($sibling->length === 0) {
+            return null;
+        }
+        return $sibling[0];
+    }
+
+    function getNextSiblingOfNode($node)
+    {
+        $sibling = $this->DOMXPath->query(
+            '(./following-sibling::*|./following-sibling::text()[normalize-space()])[1]',
+            $node
+        );
+        if ($sibling->length === 0) {
+            return null;
+        }
+        return $sibling[0];
     }
 
     function getChildrenOfNodeIncludingWhitespace($node)
     {
         return $this->DOMXPath->query('.//node()', $node);
+    }
+
+    function nodeContentBeginsWith($node, $char)
+    {
+        if ($node === null) {
+            return false;
+        }
+        if ($node->nodeValue == '') {
+            return false;
+        }
+        return mb_substr($node->nodeValue, 0, 1) == $char;
+    }
+
+    function nodeContentEndsWith($node, $char)
+    {
+        if ($node === null) {
+            return false;
+        }
+        if ($node->nodeValue == '') {
+            return false;
+        }
+        return mb_substr($node->nodeValue, -1) == $char;
     }
 
     function getParentNodeWithMoreThanOneChildren($node)
@@ -677,7 +743,23 @@ class Dom
                             (
                                 it has no siblings
                                 OR
-                                it has in minimum 1 text node sibling
+                                it has 1 or more text node siblings
+                            )
+                            AND NOT
+                            (
+                                its content ends with ":"
+                                OR
+                                its next sibling content begins with ":"
+                                OR
+                                (
+                                    it has max 1 text node sibling
+                                    AND
+                                    (
+                                        its last children is a <br>
+                                        OR
+                                        its next sibling is a <br>
+                                    )
+                                )
                             )
                         )
                     */
@@ -686,7 +768,14 @@ class Dom
                         ($this->isInnerTagNode($nodes__value) &&
                             $this->getChildrenCountRecursivelyOfNodeTagsOnly($nodes__value) <= 2 &&
                             ($this->getSiblingCountOfNonTextNode($nodes__value) == 0 ||
-                                $this->getTextSiblingCountOfNonTextNode($nodes__value) > 0))
+                                $this->getTextSiblingCountOfNonTextNode($nodes__value) > 0) &&
+                            !(
+                                $this->nodeContentEndsWith($nodes__value, ':') ||
+                                $this->nodeContentBeginsWith($this->getNextSiblingOfNode($nodes__value), ':') ||
+                                ($this->getTextSiblingCountOfNonTextNode($nodes__value) <= 1 &&
+                                    ($this->getTagNameOfNode($this->getLastChildrenOfNode($nodes__value)) === 'br' ||
+                                        $this->getTagNameOfNode($this->getNextSiblingOfNode($nodes__value)) === 'br'))
+                            ))
                     )
                 ) {
                     $this->group_cache[$this->getIdOfNode($parent)] = true;

@@ -427,6 +427,11 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->runDiff('61.html');
     }
 
+    public function test062()
+    {
+        $this->runDiff('62.html');
+    }
+
     public function test_string_detection()
     {
         $should_translate = ['Haus'];
