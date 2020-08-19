@@ -673,7 +673,7 @@ class Dom
         if ($node->nodeValue == '') {
             return false;
         }
-        return mb_substr($node->nodeValue, 0, 1) == $char;
+        return mb_substr(trim($node->nodeValue), 0, 1) == $char;
     }
 
     function nodeContentEndsWith($node, $char)
@@ -684,7 +684,7 @@ class Dom
         if ($node->nodeValue == '') {
             return false;
         }
-        return mb_substr($node->nodeValue, -1) == $char;
+        return mb_substr(trim($node->nodeValue), -1) == $char;
     }
 
     function getParentNodeWithMoreThanOneChildren($node)

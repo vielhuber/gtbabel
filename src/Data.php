@@ -1518,6 +1518,10 @@ class Data
         if (mb_strpos($str, ' ') === false && mb_strpos($str, '.php') !== false) {
             return true;
         }
+        // parse errors
+        if (mb_stripos($str, 'parse error') !== false || mb_stripos($str, 'syntax error') !== false) {
+            return true;
+        }
         // detect print_r outputs
         if (mb_strpos($str, '(') === 0 && mb_strrpos($str, ')') === $length - 1 && mb_strpos($str, '=') !== false) {
             return true;

@@ -91,7 +91,7 @@ class Settings
             ],
             'exclude_urls_content' => ['backend'],
             'exclude_urls_slugs' => ['api/v1.0'],
-            'exclude_dom' => ['.notranslate', '.lngpicker'],
+            'exclude_dom' => ['.notranslate', '.lngpicker', '.xdebug-error'],
             'force_tokenize' => ['.force-tokenize'],
             'include_dom' => [
                 [

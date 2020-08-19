@@ -1206,7 +1206,7 @@ EOD;
     public function test_router()
     {
         $settings = $this->getDefaultSettings();
-        $settings['exclude_dom'] = ['.notranslate', '.lngpicker'];
+        $settings['exclude_dom'] = ['.notranslate', '.lngpicker', '.xdebug-error'];
         $settings['lng_source'] = 'de';
         $settings['lng_target'] = null;
         $settings['debug_translations'] = false;
