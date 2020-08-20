@@ -41,6 +41,8 @@ class Data
          /* (so we can call them on every page load to avoid manually calling setup functions beforehand) */
         /* we chose a flat db structure to avoid expensive joins on every page load */
         /* we also add unique index so we can INSERT OR REPLACE later on */
+        /* what's important is that "context" cannot be null (otherwise the unique index would fail) */
+        /* therefore we store null values always as the empty string "" */
         $this->db = new dbhelper();
         $db_settings = $this->settings->get('database');
         $this->table = $db_settings['table'];
@@ -56,7 +58,7 @@ class Data
                         '(
                             id INTEGER PRIMARY KEY AUTOINCREMENT, 
                             str TEXT NOT NULL,
-                            context VARCHAR(20),
+                            context VARCHAR(20) NOT NULL,
                             lng_source VARCHAR(20) NOT NULL,
                             lng_target VARCHAR(20) NOT NULL,
                             trans TEXT NOT NULL,
@@ -102,7 +104,7 @@ class Data
                     '(
                         id BIGINT PRIMARY KEY AUTO_INCREMENT, 
                         str TEXT NOT NULL,
-                        context VARCHAR(20),
+                        context VARCHAR(20) NOT NULL,
                         lng_source VARCHAR(20) NOT NULL,
                         lng_target VARCHAR(20) NOT NULL,
                         trans TEXT NOT NULL,
@@ -215,7 +217,7 @@ class Data
                     $query_q[] = '(?,?,?,?,?,?,?,?,?,?,?,?)';
                     $query_a = array_merge($query_a, [
                         $save__value['str'],
-                        $save__value['context'],
+                        $save__value['context'] ?? '',
                         $save__value['lng_source'],
                         $save__value['lng_target'],
                         $save__value['trans'],
@@ -265,7 +267,7 @@ class Data
                         $this->caseSensitiveCol('str') . ' = ? AND context = ? AND lng_source = ? AND lng_target = ?';
                     $query_a = array_merge($query_a, [
                         $save__value['str'],
-                        $save__value['context'],
+                        $save__value['context'] ?? '',
                         $save__value['lng_source'],
                         $save__value['lng_target']
                     ]);
@@ -348,7 +350,7 @@ class Data
                 $this->caseSensitiveCol('str') .
                 ' = ? AND context = ? AND lng_source = ? AND lng_target = ?',
             $str,
-            $context,
+            $context ?? '',
             $lng_source,
             $lng_target
         );
@@ -597,7 +599,7 @@ class Data
                         $this->table .
                         ' WHERE str <> ? AND context = ? AND lng_source = ? AND lng_target = ? AND trans = ?',
                     $str,
-                    $context,
+                    $context ?? '',
                     $lng_source,
                     $lng_target,
                     $trans
@@ -619,7 +621,7 @@ class Data
                 $this->caseSensitiveCol('str') .
                 ' = ? AND context = ? AND lng_source = ? AND lng_target = ?',
             $str,
-            $context,
+            $context ?? '',
             $lng_source,
             $lng_target
         );
@@ -665,7 +667,7 @@ class Data
         else {
             $this->db->insert($this->table, [
                 'str' => $str,
-                'context' => $context,
+                'context' => $context ?? '',
                 'lng_source' => $lng_source,
                 'lng_target' => $lng_target,
                 'trans' => $trans ?? '',
@@ -699,7 +701,7 @@ class Data
                 ' = ? AND context = ? AND lng_source = ? AND lng_target = ?',
             $checked === true ? 1 : 0,
             $str,
-            $context,
+            $context ?? '',
             $lng_source,
             $lng_target
         );
@@ -715,7 +717,7 @@ class Data
     {
         $args = [];
         $args['str'] = $str;
-        $args['context'] = $context;
+        $args['context'] = $context ?? '';
         $args['lng_source'] = $lng_source;
         if ($lng_target !== null) {
             $args['lng_target'] = $lng_target;
@@ -737,7 +739,7 @@ class Data
         }
         $this->data['save']['insert'][] = [
             'str' => $str,
-            'context' => $context,
+            'context' => $context ?? '',
             'lng_source' => $lng_source,
             'lng_target' => $lng_target,
             'trans' => $trans,

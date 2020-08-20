@@ -639,6 +639,24 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->gtbabel->reset();
     }
 
+    public function test_empty_dom_els()
+    {
+        $settings = $this->getDefaultSettings();
+        $settings['languages'] = $this->getLanguageSettings([['code' => 'de'], ['code' => 'en']]);
+        $settings['debug_translations'] = false;
+        $settings['auto_translation'] = true;
+        $settings['auto_add_translations'] = true;
+        ob_start();
+        $this->gtbabel->start($settings);
+        echo '<h2 class="section__hl h3">Test <span class="icon--bf icon--chevron-down"></span></h2>';
+        $this->gtbabel->stop();
+        ob_end_clean();
+        $translations = $this->gtbabel->data->getTranslationsFromDatabase();
+        $this->gtbabel->reset();
+        $this->assertEquals(count($translations), 1);
+        $this->assertEquals($translations[0]['str'], 'Test <span></span>');
+    }
+
     public function test_encoding()
     {
         $settings = $this->getDefaultSettings();
