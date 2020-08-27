@@ -1198,102 +1198,141 @@ class Data
         - Das deutsche <a href="https://1.com">Brot</a> <a href="https://2.com">vermisse</a> ich am meisten.
         - <a class="notranslate foo">Hallo</a> Welt!
         - Das ist ein Link https://tld.com im Text.
+        - <span class="logo"></span> Hallo Welt.
 
-        $origWithoutAttributes
+        $origWithoutPrefixSuffix
+        - <a href="https://tld.com" class="foo" data-bar="baz">Hallo</a> Welt!
+        - Das deutsche <a href="https://1.com">Brot</a> <a href="https://2.com">vermisse</a> ich am meisten.
+        - <a class="notranslate foo">Hallo</a> Welt!
+        - Das ist ein Link https://tld.com im Text.
+        - Hallo Welt.
+
+        $origWithoutPrefixSuffixWithoutAttributes
         - <a>Hallo</a> Welt!
         - Das deutsche <a>Brot</a> <a>vermisse</a> ich am meisten.
         - <a class="notranslate">Hallo</a> Welt!
         - Das ist ein Link https://tld.com im Text.
+        - Hallo Welt.
 
-        $origWithoutAttributesWithoutInlineLinks
+        $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks
         - <a>Hallo</a> Welt!
         - Das deutsche <a>Brot</a> <a>vermisse</a> ich am meisten.
         - <a class="notranslate">Hallo</a> Welt!
         - Das ist ein Link {1} im Text.
+        - Hallo Welt.
 
-        $origWithoutAttributesWithoutInlineLinksWithIds
+        $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinksWithIds
         - <a p="1">Hallo</a> Welt!
         - Das deutsche <a p="1">Brot</a> <a p="2">vermisse</a> ich am meisten.
         - <a class="notranslate" p="1">Hallo</a> Welt!
         - Das ist ein Link {1} im Text.
+        - Hallo Welt.
 
-        $transWithoutAttributesWithoutInlineLinksWithIds
+        $transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinksWithIds
         - <a p="1">Hello</a> world!
         - I <a p="2">miss</a> German <a p="1">bread</a> the most.
         - <a class="notranslate" p="1">Hallo</a> world!
         - This is a link {1} in the text
+        - Hallo Welt.
 
-        $transWithoutAttributesWithoutInlineLinks
+        $transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks
         - <a>Hello</a> world!
         - I <a p="2">miss</a> German <a p="1">bread</a> the most.
         - <a class="notranslate">Hallo</a> world!
         - This is a link {1} in the text
+        - Hello world.
 
-        $transWithoutInlineLinks
+        $transWithoutPrefixSuffixWithoutInlineLinks
         - <a href="https://tld.com" class="foo" data-bar="baz">Hello</a> world!
         - I <a href="https://2.com">miss</a> German <a href="https://1.com">bread</a> the most.
         - <a class="notranslate foo">Hallo</a> world!
         - This is a link {1} in the text
+        - Hello world.
+
+        $transWithoutPrefixSuffix
+        - <a href="https://tld.com" class="foo" data-bar="baz">Hello</a> world!
+        - I <a href="https://2.com">miss</a> German <a href="https://1.com">bread</a> the most.
+        - <a class="notranslate foo">Hallo</a> world!
+        - This is a link https://tld.com/en/ in the text
+        - Hello world.
 
         $trans
         - <a href="https://tld.com" class="foo" data-bar="baz">Hello</a> world!
         - I <a href="https://2.com">miss</a> German <a href="https://1.com">bread</a> the most.
         - <a class="notranslate foo">Hallo</a> world!
         - This is a link https://tld.com/en/ in the text
+        - <span class="logo"></span> Hello world.
         */
 
-        [$origWithoutAttributes, $mappingTableTags] = $this->tags->removeAttributes($orig);
+        [$origWithoutPrefixSuffix, $mappingTablePrefixSuffix] = $this->tags->removePrefixSuffix($orig);
 
-        [$origWithoutAttributesWithoutInlineLinks, $mappingTableInlineLinks] = $this->tags->removeInlineLinks(
-            $origWithoutAttributes
+        [$origWithoutPrefixSuffixWithoutAttributes, $mappingTableTags] = $this->tags->removeAttributes(
+            $origWithoutPrefixSuffix
         );
+
+        [
+            $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks,
+            $mappingTableInlineLinks
+        ] = $this->tags->removeInlineLinks($origWithoutPrefixSuffixWithoutAttributes);
 
         $mappingTableInlineLinks = $this->translateInlineLinks($mappingTableInlineLinks);
 
-        $transWithoutAttributesWithoutInlineLinks = $this->getExistingTranslationFromCache(
-            $origWithoutAttributesWithoutInlineLinks,
+        $transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks = $this->getExistingTranslationFromCache(
+            $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks,
             $lng_source,
             $lng_target,
             $context
         );
 
-        if ($transWithoutAttributesWithoutInlineLinks === false) {
-            $origWithoutAttributesWithoutInlineLinksWithIds = $this->tags->addIds(
-                $origWithoutAttributesWithoutInlineLinks
+        if ($transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks === false) {
+            $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinksWithIds = $this->tags->addIds(
+                $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks
             );
-            $transWithoutAttributesWithoutInlineLinksWithIds = $this->autoTranslateString(
-                $origWithoutAttributesWithoutInlineLinksWithIds,
+            $transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinksWithIds = $this->autoTranslateString(
+                $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinksWithIds,
                 $lng_source,
                 $lng_target,
                 $context
             );
-            if ($transWithoutAttributesWithoutInlineLinksWithIds !== null) {
-                $transWithoutAttributesWithoutInlineLinks = $this->tags->removeAttributesExceptIrregularIds(
-                    $transWithoutAttributesWithoutInlineLinksWithIds
+            if ($transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinksWithIds !== null) {
+                $transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks = $this->tags->removeAttributesExceptIrregularIds(
+                    $transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinksWithIds
                 );
                 $this->addTranslationToDatabaseAndToCache(
-                    $origWithoutAttributesWithoutInlineLinks,
-                    $transWithoutAttributesWithoutInlineLinks,
+                    $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks,
+                    $transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks,
                     $lng_source,
                     $lng_target,
                     $context,
                     true
                 );
             } else {
-                $transWithoutAttributesWithoutInlineLinks = $this->tags->removeAttributesExceptIrregularIds(
-                    $origWithoutAttributesWithoutInlineLinksWithIds
+                $transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks = $this->tags->removeAttributesExceptIrregularIds(
+                    $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinksWithIds
                 );
             }
         }
 
-        $transWithoutInlineLinks = $this->tags->addAttributesAndRemoveIds(
-            $transWithoutAttributesWithoutInlineLinks,
+        $transWithoutPrefixSuffixWithoutInlineLinks = $this->tags->addAttributesAndRemoveIds(
+            $transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks,
             $mappingTableTags
         );
 
-        $trans = $this->tags->addInlineLinks($transWithoutInlineLinks, $mappingTableInlineLinks);
+        $transWithoutPrefixSuffix = $this->tags->addInlineLinks(
+            $transWithoutPrefixSuffixWithoutInlineLinks,
+            $mappingTableInlineLinks
+        );
 
-        if (!$this->stringIsChecked($origWithoutAttributesWithoutInlineLinks, $lng_source, $lng_target, $context)) {
+        $trans = $this->tags->addPrefixSuffix($transWithoutPrefixSuffix, $mappingTablePrefixSuffix);
+
+        if (
+            !$this->stringIsChecked(
+                $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks,
+                $lng_source,
+                $lng_target,
+                $context
+            )
+        ) {
             return $orig;
         }
 
@@ -1443,7 +1482,7 @@ class Data
         return $str;
     }
 
-    function reintroduceLineBreaks($str, $orig_withoutlb, $orig_with_lb)
+    function reintroduceOuterLineBreaks($str, $orig_withoutlb, $orig_with_lb)
     {
         $pos_lb_begin = 0;
         while (mb_substr($orig_with_lb, $pos_lb_begin, 1) !== mb_substr($orig_withoutlb, 0, 1)) {

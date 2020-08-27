@@ -151,6 +151,46 @@ class Tags
         return [$str, $mappingTableInlineLinks];
     }
 
+    function removePrefixSuffix($str)
+    {
+        $prefix = '';
+        $suffix = '';
+        $prefix_pattern = '';
+        $prefix_pattern .= '^<([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>((\*|-|–|\|| )*)<\/\1>( *)'; // <span>*</span> etc.
+        $prefix_pattern .= '|';
+        $prefix_pattern .= '^<br+\b[^>]*\/?>( *)'; // <br/> etc.
+        $prefix_pattern .= '|';
+        $prefix_pattern .= '^(\*|-|–|\|)( *)'; // * etc.
+        $suffix_pattern = '';
+        $suffix_pattern .= ' *<([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>((\*|-|–|\|| )*)<\/\1>$'; // <span>*</span> etc.
+        $suffix_pattern .= '|';
+        $suffix_pattern .= '( *)<br+\b[^>]*\/?>$'; // <br/> etc.
+        $suffix_pattern .= '|';
+        $suffix_pattern .= '( *)(\*|-|–|\|)$'; // * etc.
+        $prefix_matches = [0 => ['']];
+        $suffix_matches = [0 => ['']];
+        foreach (['prefix', 'suffix'] as $types__value) {
+            while (!empty(${$types__value . '_matches'}[0])) {
+                if (${$types__value . '_matches'}[0][0] != '') {
+                    ${$types__value} .= ${$types__value . '_matches'}[0][0];
+                    if ($types__value === 'prefix') {
+                        $str = mb_substr($str, mb_strlen(${$types__value . '_matches'}[0][0]));
+                    }
+                    if ($types__value === 'suffix') {
+                        $str = mb_substr($str, 0, -mb_strlen(${$types__value . '_matches'}[0][0]));
+                    }
+                }
+                preg_match_all('/' . ${$types__value . '_pattern'} . '/', $str, ${$types__value . '_matches'});
+            }
+        }
+        return [$str, ['prefix' => $prefix, 'suffix' => $suffix]];
+    }
+
+    function addPrefixSuffix($str, $data)
+    {
+        return $data['prefix'] . $str . $data['suffix'];
+    }
+
     function addAttributesAndRemoveIds($str, $mappingTableTags)
     {
         foreach ($this->catchOpeningTags($str) as $matches__key => $matches__value) {

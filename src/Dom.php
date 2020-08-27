@@ -350,7 +350,7 @@ class Dom
                                     continue;
                                 }
 
-                                $trans = $this->data->reintroduceLineBreaks($trans, $str_without_lb, $str_with_lb);
+                                $trans = $this->data->reintroduceOuterLineBreaks($trans, $str_without_lb, $str_with_lb);
 
                                 if ($this->isTextNode($nodes__value)) {
                                     // this is important: domdocument set strings with encoded html chars

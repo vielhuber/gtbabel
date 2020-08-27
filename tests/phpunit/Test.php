@@ -432,6 +432,11 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->runDiff('62.html');
     }
 
+    public function test063()
+    {
+        $this->runDiff('63.html');
+    }
+
     public function test_string_detection()
     {
         $should_translate = ['Haus'];
@@ -648,13 +653,13 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['auto_add_translations'] = true;
         ob_start();
         $this->gtbabel->start($settings);
-        echo '<h2 class="section__hl h3">Test <span class="icon--bf icon--chevron-down"></span></h2>';
+        echo '<h2 class="section__hl h3">Test <span class="icon--bf icon--chevron-down"></span> Test</h2>';
         $this->gtbabel->stop();
         ob_end_clean();
         $translations = $this->gtbabel->data->getTranslationsFromDatabase();
         $this->gtbabel->reset();
         $this->assertEquals(count($translations), 1);
-        $this->assertEquals($translations[0]['str'], 'Test <span></span>');
+        $this->assertEquals($translations[0]['str'], 'Test <span></span> Test');
     }
 
     public function test_encoding()
