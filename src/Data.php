@@ -1534,10 +1534,12 @@ class Data
             return true;
         }
         // lng codes
-        $lngs = $this->settings->getSelectedLanguageCodes();
-        if ($lngs !== null) {
-            if (in_array(strtolower($str), $lngs)) {
-                return true;
+        if ($context === 'slug') {
+            $lngs = $this->settings->getSelectedLanguageCodes();
+            if ($lngs !== null) {
+                if (in_array(strtolower($str), $lngs)) {
+                    return true;
+                }
             }
         }
         if ($context === 'slug') {
