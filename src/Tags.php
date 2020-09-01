@@ -156,17 +156,21 @@ class Tags
         $prefix = '';
         $suffix = '';
         $prefix_pattern = '';
-        $prefix_pattern .= '^<([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>((\*|-|–|\||:|\+|●|I| )*)<\/\1>( *)'; // <span>*</span> etc.
+        $prefix_pattern .= '^<([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>((\*|-|–|\||:|\+|•|●|I| )*)<\/\1>( *)'; // <span>*</span> etc.
         $prefix_pattern .= '|';
         $prefix_pattern .= '^<br+\b[^>]*\/?>( *)'; // <br/> etc.
         $prefix_pattern .= '|';
-        $prefix_pattern .= '^(\*|-|–|\||:|\+|●)( *)'; // * etc.
+        $prefix_pattern .= '^(\*|-|–|\||:|\+|•|●)( *)'; // * etc.
+        $prefix_pattern .= '|';
+        $prefix_pattern .= '^(\.\.\.|…)'; // ...
         $suffix_pattern = '';
-        $suffix_pattern .= ' *<([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>((\*|-|–|\||:|\+|●|I| )*)<\/\1>$'; // <span>*</span> etc.
+        $suffix_pattern .= ' *<([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>((\*|-|–|\||:|\+|•|●|I| )*)<\/\1>$'; // <span>*</span> etc.
         $suffix_pattern .= '|';
         $suffix_pattern .= '( *)<br+\b[^>]*\/?>$'; // <br/> etc.
         $suffix_pattern .= '|';
-        $suffix_pattern .= '( *)(\*|-|–|\||:|\+|●)$'; // * etc.
+        $suffix_pattern .= '( *)(\*|-|–|\||:|\+|•|●)$'; // * etc.
+        $suffix_pattern .= '|';
+        $suffix_pattern .= '(\.\.\.|…)$'; // ...
         $suffix_pattern .= '|';
         $suffix_pattern .= '( *)(: \d+)$'; // : ZAHL
         $prefix_matches = [0 => ['']];
