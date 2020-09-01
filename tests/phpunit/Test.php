@@ -674,12 +674,17 @@ class Test extends \PHPUnit\Framework\TestCase
         // #allesfürdich is encoded, #allesfürdich is not encoded
         // however, gtbabel does not add two entries to avoid confusion
         echo '<div data-title="#allesfürdich">#allesfürdich</div>';
+        echo '<p>foo &amp; bar<br/>baz</p>';
+        // this is also tricky: domdocument converts the double quotes around the attribute to single quotes!
+        echo '<div data-target="' . htmlentities('"gnarr" & gnazz') . '"></div>';
         $this->gtbabel->stop();
         ob_end_clean();
         $translations = $this->gtbabel->data->getTranslationsFromDatabase();
         $this->gtbabel->reset();
-        $this->assertEquals(count($translations), 1);
+        $this->assertEquals(count($translations), 3);
         $this->assertEquals($translations[0]['str'], '#allesfürdich');
+        $this->assertEquals($translations[1]['str'], 'foo &amp; bar<br>baz');
+        $this->assertEquals($translations[2]['str'], '"gnarr" &amp; gnazz');
     }
 
     public function test_referer_lng()

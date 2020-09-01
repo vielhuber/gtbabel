@@ -144,6 +144,9 @@ class Data
             if (!empty($result)) {
                 foreach ($result as $result__value) {
                     // we never change the encoding of strings (after grabbing from code, translation etc.)
+                    // reason: sometimes, "<" must be encoded (if its part of html); sometimes, " must be encoded (if its part of an attribute)
+                    // domdocument knows and considers all of this
+                    // it's not a problem, if the strings land encoded inside the database (it's necessary!)
                     // however, when looking up existing strings, we always use the decoded version in order
                     // to prevent annoying duplicates in the database
                     $this->data['cache'][$result__value['lng_source'] ?? ''][$result__value['lng_target'] ?? ''][
