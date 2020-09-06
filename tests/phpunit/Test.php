@@ -242,7 +242,11 @@ class Test extends \PHPUnit\Framework\TestCase
     public function test037()
     {
         $this->runDiff('37.html', 200, [
-            'exclude_dom' => ['.foo', '#bar']
+            'exclude_dom' => [
+                ['selector' => '.foo'],
+                ['selector' => '#bar'],
+                ['selector' => '.gnarr', 'attribute' => 'data-text']
+            ]
         ]);
     }
 
@@ -1234,7 +1238,12 @@ EOD;
     public function test_router()
     {
         $settings = $this->getDefaultSettings();
-        $settings['exclude_dom'] = ['.notranslate', '.lngpicker', '.xdebug-error'];
+        $settings['exclude_dom'] = [
+            ['selector' => '.notranslate'],
+            ['selector' => '.lngpicker'],
+            ['selector' => '.xdebug-error'],
+            ['selector' => '.example', 'attribute' => 'data-text']
+        ];
         $settings['lng_source'] = 'de';
         $settings['lng_target'] = null;
         $settings['debug_translations'] = false;

@@ -41,11 +41,15 @@ class Dom
         $this->excluded_nodes = [];
         if ($this->settings->get('exclude_dom') !== null) {
             foreach ($this->settings->get('exclude_dom') as $exclude__value) {
-                $nodes = $this->DOMXPath->query($this->transformSelectorToXpath($exclude__value));
+                $nodes = $this->DOMXPath->query($this->transformSelectorToXpath($exclude__value['selector']));
                 foreach ($nodes as $nodes__value) {
-                    $this->addToExcludedNodes($nodes__value, '*');
-                    foreach ($this->getChildrenOfNodeIncludingWhitespace($nodes__value) as $nodes__value__value) {
-                        $this->addToExcludedNodes($nodes__value__value, '*');
+                    if (!isset($exclude__value['attribute']) || $exclude__value['attribute'] == '') {
+                        $this->addToExcludedNodes($nodes__value, '*');
+                        foreach ($this->getChildrenOfNodeIncludingWhitespace($nodes__value) as $nodes__value__value) {
+                            $this->addToExcludedNodes($nodes__value__value, '*');
+                        }
+                    } else {
+                        $this->addToExcludedNodes($nodes__value, $exclude__value['attribute']);
                     }
                 }
             }

@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 4.3.8
+ * Version: 4.3.9
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -635,7 +635,6 @@ class GtbabelWordPress
                             'deepl_translation_api_key',
                             'exclude_urls_content',
                             'exclude_urls_slugs',
-                            'exclude_dom',
                             'force_tokenize',
                             'detect_dom_changes_include'
                         ]
@@ -744,6 +743,23 @@ class GtbabelWordPress
                         }
                     }
                     unset($settings['hide_languages']);
+
+                    $post_data = $settings['exclude_dom'];
+                    $settings['exclude_dom'] = [];
+                    if (!empty(@$post_data['selector'])) {
+                        foreach ($post_data['selector'] as $post_data__key => $post_data__value) {
+                            if (
+                                @$post_data['selector'][$post_data__key] == '' &&
+                                @$post_data['attribute'][$post_data__key] == ''
+                            ) {
+                                continue;
+                            }
+                            $settings['exclude_dom'][] = [
+                                'selector' => $post_data['selector'][$post_data__key],
+                                'attribute' => $post_data['attribute'][$post_data__key]
+                            ];
+                        }
+                    }
 
                     $post_data = $settings['include_dom'];
                     $settings['include_dom'] = [];
@@ -1382,13 +1398,16 @@ class GtbabelWordPress
         echo '<div class="gtbabel__repeater">';
         echo '<ul class="gtbabel__repeater-list">';
         if (empty(@$settings['exclude_dom'])) {
-            $settings['exclude_dom'] = [''];
+            $settings['exclude_dom'] = [['selector' => '', 'attribute' => '']];
         }
         foreach ($settings['exclude_dom'] as $exclude_dom__value) {
-            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-1">';
-            echo '<input class="gtbabel__input" type="text" name="gtbabel[exclude_dom][]" value="' .
-                $exclude_dom__value .
+            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-2">';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[exclude_dom][selector][]" value="' .
+                $exclude_dom__value['selector'] .
                 '" placeholder="selector" />';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[exclude_dom][attribute][]" value="' .
+                $exclude_dom__value['attribute'] .
+                '" placeholder="attribute" />';
             echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
                 __('Remove', 'gtbabel-plugin') .
                 '</a>';
@@ -3141,7 +3160,12 @@ EOD;
                         'wp-comments-post.php'
                     ],
                     'exclude_urls_slugs' => ['wp-json'],
-                    'exclude_dom' => ['.notranslate', '.lngpicker', '.xdebug-error', '#wpadminbar']
+                    'exclude_dom' => [
+                        ['selector' => '.notranslate'],
+                        ['selector' => '.lngpicker'],
+                        ['selector' => '.xdebug-error'],
+                        ['selector' => '#wpadminbar']
+                    ]
                 ])
             );
         }
