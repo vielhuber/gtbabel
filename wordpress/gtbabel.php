@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 4.3.9
+ * Version: 4.4.0
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -1816,7 +1816,7 @@ class GtbabelWordPress
             $urls,
             $time,
             isset($_GET['s']) && $_GET['s'] != ''
-                ? htmlspecialchars_decode(wp_kses_post(stripslashes($_GET['s'])))
+                ? htmlspecialchars_decode(esc_html(stripslashes($_GET['s'])))
                 : null,
             @$_GET['shared'],
             @$_GET['checked'],
@@ -1910,7 +1910,7 @@ class GtbabelWordPress
         echo '<input type="hidden" name="lng" value="' . ($lng !== null ? $lng : '') . '" />';
         echo '<input type="hidden" name="post_id" value="' . ($post_id !== null ? $post_id : '') . '" />';
         echo '<input class="gtbabel__input" type="text" name="s" value="' .
-            (isset($_GET['s']) ? wp_kses_post(stripslashes($_GET['s'])) : '') .
+            (isset($_GET['s']) ? htmlentities(stripslashes($_GET['s'])) : '') .
             '" placeholder="' .
             __('Search term', 'gtbabel-plugin') .
             '" />';
@@ -2711,7 +2711,7 @@ EOD;
         return admin_url(
             'admin.php?page=gtbabel-trans&p=' .
                 $p .
-                (isset($_GET['s']) && $_GET['s'] !== '' ? '&s=' . wp_kses_post(stripslashes($_GET['s'])) : '') .
+                (isset($_GET['s']) && $_GET['s'] !== '' ? '&s=' . htmlentities(stripslashes($_GET['s'])) : '') .
                 (isset($_GET['post_id']) && $_GET['post_id'] !== '' ? '&post_id=' . intval($_GET['post_id']) : '') .
                 (isset($_GET['lng']) && $_GET['lng'] !== '' ? '&lng=' . sanitize_textarea_field($_GET['lng']) : '') .
                 (isset($_GET['url']) && $_GET['url'] !== '' ? '&url=' . esc_url($_GET['url']) : '') .
