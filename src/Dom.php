@@ -626,6 +626,16 @@ class Dom
         return $this->DOMXPath->evaluate('count(./../*|./../text()[normalize-space()])', $node) - 1;
     }
 
+    function getNodeSiblingCountOfNonTextNode($node)
+    {
+        return $this->DOMXPath->evaluate('count(./../*)', $node) - 1;
+    }
+
+    function getBrSiblingCountOfNonTextNode($node)
+    {
+        return $this->DOMXPath->evaluate('count(./../br)', $node);
+    }
+
     function getTextSiblingCountOfNonTextNode($node)
     {
         return $this->DOMXPath->evaluate('count(./../text()[normalize-space()])', $node);
@@ -777,12 +787,6 @@ class Dom
                             )
                             AND NOT
                             (
-                                (                                
-                                    it has 0 or 1 text node sibling
-                                    OR
-                                    it has 2 or more text node siblings less than 2 chars
-                                )
-                                AND
                                 (
                                     its content ends with ":"
                                     OR
@@ -791,6 +795,14 @@ class Dom
                                     its last children is a <br>
                                     OR
                                     its next sibling is a <br>
+                                )
+                                AND
+                                (                                
+                                    it has 0 or 1 text node sibling
+                                    OR
+                                    it has 2 or more text node siblings less than 2 chars
+                                    OR
+                                    it has only br siblings
                                 )
                             )
                         )
@@ -802,12 +814,14 @@ class Dom
                             ($this->getSiblingCountOfNonTextNode($nodes__value) == 0 ||
                                 $this->getTextSiblingCountOfNonTextNodeWithMoreChars($nodes__value, 1) > 0) &&
                             !(
-                                ($this->getTextSiblingCountOfNonTextNode($nodes__value) <= 1 ||
-                                    $this->getTextSiblingCountOfNonTextNodeWithLessChars($nodes__value, 2) >= 2) &&
                                 ($this->nodeContentEndsWith($nodes__value, ':') ||
                                     $this->nodeContentBeginsWith($this->getNextSiblingOfNode($nodes__value), ':') ||
                                     $this->getTagNameOfNode($this->getLastChildrenOfNode($nodes__value)) === 'br' ||
-                                    $this->getTagNameOfNode($this->getNextSiblingOfNode($nodes__value)) === 'br')
+                                    $this->getTagNameOfNode($this->getNextSiblingOfNode($nodes__value)) === 'br') &&
+                                ($this->getTextSiblingCountOfNonTextNode($nodes__value) <= 1 ||
+                                    $this->getTextSiblingCountOfNonTextNodeWithLessChars($nodes__value, 2) >= 2 ||
+                                    $this->getNodeSiblingCountOfNonTextNode($nodes__value) ==
+                                        $this->getBrSiblingCountOfNonTextNode($nodes__value))
                             ))
                     )
                 ) {

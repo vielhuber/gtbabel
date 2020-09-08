@@ -162,7 +162,7 @@ class Tags
         $prefix_pattern .= '|';
         $prefix_pattern .= '^(\*|-|–|\||:|\+|•|●)( +)'; // * etc.
         $prefix_pattern .= '|';
-        $prefix_pattern .= '^(\.\.\.|…)'; // ...
+        $prefix_pattern .= '^(\.\.\.|…)( *)'; // ...
         $suffix_pattern = '';
         $suffix_pattern .= ' *<([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>((\*|-|–|\||:|\+|•|●|I| )*)<\/\1>$'; // <span>*</span> etc.
         $suffix_pattern .= '|';
@@ -170,7 +170,7 @@ class Tags
         $suffix_pattern .= '|';
         $suffix_pattern .= '( *)(\*|-|–|\||:|•|●)$'; // * etc.
         $suffix_pattern .= '|';
-        $suffix_pattern .= '(\.\.\.|…)$'; // ...
+        $suffix_pattern .= '( *)(\.\.\.|…)$'; // ...
         $suffix_pattern .= '|';
         $suffix_pattern .= '( *)(: \d+)$'; // : ZAHL
         $prefix_matches = [0 => ['']];
