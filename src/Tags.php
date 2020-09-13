@@ -156,15 +156,17 @@ class Tags
         $prefix = '';
         $suffix = '';
         $prefix_pattern = '';
-        $prefix_pattern .= '^<([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>((\*|-|–|\||:|\+|•|●|I| )*)<\/\1>( *)'; // <span>*</span> etc.
+        $prefix_pattern .= '^<([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>((\*|-|–|\||:|\+|•|●|,|I| )*)<\/\1>( *)'; // <span>*</span> etc.
         $prefix_pattern .= '|';
         $prefix_pattern .= '^<br+\b[^>]*\/?>( *)'; // <br/> etc.
         $prefix_pattern .= '|';
         $prefix_pattern .= '^(\*|-|–|\||:|\+|•|●)( +)'; // * etc.
         $prefix_pattern .= '|';
+        $prefix_pattern .= '^(\d\))( +)'; // 1) 2) 3) etc.
+        $prefix_pattern .= '|';
         $prefix_pattern .= '^(\.\.\.|…)( *)'; // ...
         $suffix_pattern = '';
-        $suffix_pattern .= ' *<([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>((\*|-|–|\||:|\+|•|●|I| )*)<\/\1>$'; // <span>*</span> etc.
+        $suffix_pattern .= ' *<([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>((\*|-|–|\||:|\+|•|●|,|I| )*)<\/\1>$'; // <span>*</span> etc.
         $suffix_pattern .= '|';
         $suffix_pattern .= '( *)<br+\b[^>]*\/?>$'; // <br/> etc.
         $suffix_pattern .= '|';
@@ -188,6 +190,11 @@ class Tags
                 }
                 preg_match_all('/' . ${$types__value . '_pattern'} . '/', $str, ${$types__value . '_matches'});
             }
+        }
+        if (substr_count($str, '(') === 1 && substr_count($str, ')') === 1 && '(' . trim($str, '()') . ')' === $str) {
+            $str = trim($str, '()');
+            $prefix .= '(';
+            $suffix .= ')';
         }
         return [$str, ['prefix' => $prefix, 'suffix' => $suffix]];
     }
