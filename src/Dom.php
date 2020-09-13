@@ -278,7 +278,15 @@ class Dom
                 foreach ($nodes as $nodes__value) {
                     $content = [];
                     if ($this->isTextNode($nodes__value)) {
-                        $content[] = ['key' => null, 'value' => $nodes__value->nodeValue, 'type' => 'text'];
+                        // this is important:
+                        // if you fetch the variable of a text node with nodeValue (or even textContent)
+                        // the content is automatically is encoded (what we usually don't want)
+                        // we use htmlspecialchars to revert that
+                        $content[] = [
+                            'key' => null,
+                            'value' => htmlspecialchars($nodes__value->nodeValue),
+                            'type' => 'text'
+                        ];
                     } else {
                         if (@$include__value['attribute'] != '') {
                             // regex

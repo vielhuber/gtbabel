@@ -441,6 +441,15 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->runDiff('63.html');
     }
 
+    public function test064()
+    {
+        $this->runDiff('64.html', 1500, [
+            'debug_translations' => false,
+            'auto_translation' => true,
+            'google_translation_api_key' => 'free'
+        ]);
+    }
+
     public function test_string_detection()
     {
         $should_translate = ['Haus'];
