@@ -986,8 +986,13 @@ class Data
     function getTranslationOfTitleDescriptionAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, $context)
     {
         $orig = str_replace(' ', ' ', $orig); // replace hidden &nbsp; chars
-        $orig = html_entity_decode($orig);
-        foreach (['|', '·', '•', '>', '-', '–', '—', ':', '*', '⋆', '~', '«', '»', '<'] as $delimiters__value) {
+        $delimiters = ['|', '·', '•', '>', '-', '–', '—', ':', '*', '⋆', '~', '«', '»', '<'];
+        $delimiters_encoded = [];
+        foreach ($delimiters as $delimiters__value) {
+            $delimiters_encoded[] = htmlentities($delimiters__value);
+        }
+        $delimiters = array_merge($delimiters_encoded, $delimiters);
+        foreach ($delimiters as $delimiters__value) {
             if (mb_strpos($orig, ' ' . $delimiters__value . ' ') !== false) {
                 $orig_parts = explode(' ' . $delimiters__value . ' ', $orig);
                 foreach ($orig_parts as $orig_parts__key => $orig_parts__value) {
