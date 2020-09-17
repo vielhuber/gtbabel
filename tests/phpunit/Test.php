@@ -695,14 +695,31 @@ class Test extends \PHPUnit\Framework\TestCase
         echo '<p>foo &amp; bar<br/>baz</p>';
         // this is also tricky: domdocument converts the double quotes around the attribute to single quotes!
         echo '<div data-target="' . htmlentities('"gnarr" & gnazz') . '"></div>';
+        // this should be untouched
+        echo '<a href="https://www.url.com/foo.php?lang=de&amp;foo=bar"></a>';
+        // this should all be encoded
+        echo '<img src="" alt="Erster &amp; Test" data-alt="Zweiter &amp; Test"></div>';
+        echo '<img src="" alt="Erster & Test" data-alt="Zweiter & Test"></div>';
         $this->gtbabel->stop();
+        $output = ob_get_contents();
         ob_end_clean();
         $translations = $this->gtbabel->data->getTranslationsFromDatabase();
         $this->gtbabel->reset();
-        $this->assertEquals(count($translations), 3);
+        $this->assertEquals(
+            $output,
+            '<div data-title="#anything for you">#anything for you</div>' .
+                '<p>foo &amp; bar <br> baz</p>' .
+                '<div data-target=\'"gnarr" &amp; gnazz\'></div>' .
+                '<a href="https://www.url.com/foo.php?lang=de&amp;foo=bar"></a>' .
+                '<img src="" alt="First &amp; test" data-alt="Second &amp; test">' .
+                '<img src="" alt="First &amp; test" data-alt="Second &amp; test">'
+        );
+        $this->assertEquals(count($translations), 5);
         $this->assertEquals($translations[0]['str'], '#allesfürdich');
         $this->assertEquals($translations[1]['str'], 'foo &amp; bar<br>baz');
-        $this->assertEquals($translations[2]['str'], '"gnarr" &amp; gnazz');
+        $this->assertEquals($translations[2]['str'], 'Erster &amp; Test');
+        $this->assertEquals($translations[3]['str'], 'Zweiter &amp; Test');
+        $this->assertEquals($translations[4]['str'], '"gnarr" &amp; gnazz');
     }
 
     public function test_referer_lng()
@@ -1002,7 +1019,7 @@ EOD;
 <a href="mailto:"></a>
 <a href="mailto:david@vielhuber.de_EN"></a>
 <a href="mailto:david@vielhuber.de_EN?subject=House&amp;body=This%20is%20a%20test"></a>
-<a href="mailto:david@vielhuber.de_EN?subject=House&amp;body=This%20is%20a%20link%20http%3A%2F%2Fgtbabel.local.vielhuber.de%2Fen%2Fprivacy"></a>
+<a href="mailto:david@vielhuber.de_EN?subject=House&amp;body=This%20is%20a%20link%20http://gtbabel.local.vielhuber.de/en/privacy"></a>
 <a href="tel:+4989111312113"></a>
 <a href="http://test.de/beispiel-bilddatei9.jpg"></a>
 <a href="http://test.de/beispiel-pfad10"></a>

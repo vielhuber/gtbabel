@@ -370,6 +370,7 @@ class Data
         $urls = null,
         $time = null,
         $search_term = null,
+        $context = null,
         $shared = null,
         $checked = null,
         $take = null,
@@ -522,6 +523,14 @@ class Data
                     }
                 }
                 if ($found === false) {
+                    unset($data[$data__key]);
+                }
+            }
+        }
+
+        if ($context !== null) {
+            foreach ($data as $data__key => $data__value) {
+                if ($data__value['context'] != $context) {
                     unset($data[$data__key]);
                 }
             }
@@ -714,6 +723,11 @@ class Data
     function resetSharedValues()
     {
         $this->db->query('UPDATE ' . $this->table . ' SET shared = ?', 0);
+    }
+
+    function getDistinctContexts()
+    {
+        return $this->db->fetch_col('SELECT DISTINCT context FROM ' . $this->table . ' ORDER BY context');
     }
 
     function deleteStringFromDatabase($str, $context, $lng_source, $lng_target = null)

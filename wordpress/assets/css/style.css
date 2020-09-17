@@ -234,12 +234,15 @@
     margin-left: 0;
 }
 .gtbabel__search .gtbabel__form .gtbabel__input[name='s'] {
-    flex: 0 0 calc((100% - 80px - (4 * 5px)) * 0.8);
+    flex: 0 0 calc((100% - 80px - (4 * 5px)) * 0.7);
 }
 .gtbabel__search .gtbabel__form .gtbabel__input[name='shared'] {
     flex: 0 0 calc((100% - 80px - (4 * 5px)) * 0.1);
 }
 .gtbabel__search .gtbabel__form .gtbabel__input[name='checked'] {
+    flex: 0 0 calc((100% - 80px - (4 * 5px)) * 0.1);
+}
+.gtbabel__search .gtbabel__form .gtbabel__input[name='context'] {
     flex: 0 0 calc((100% - 80px - (4 * 5px)) * 0.1);
 }
 .gtbabel__search .gtbabel__form .gtbabel__submit {

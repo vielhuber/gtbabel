@@ -277,11 +277,11 @@ class Dom
             if (count($nodes) > 0) {
                 foreach ($nodes as $nodes__value) {
                     $content = [];
+                    // this is important:
+                    // if you fetch the variable of a text node with nodeValue (or even textContent) and also getAttribute
+                    // the content is automatically is encoded (what we usually don't want)
+                    // we use htmlspecialchars to revert that
                     if ($this->isTextNode($nodes__value)) {
-                        // this is important:
-                        // if you fetch the variable of a text node with nodeValue (or even textContent)
-                        // the content is automatically is encoded (what we usually don't want)
-                        // we use htmlspecialchars to revert that
                         $content[] = [
                             'key' => null,
                             'value' => htmlspecialchars($nodes__value->nodeValue),
@@ -315,7 +315,9 @@ class Dom
                             } else {
                                 $content[] = [
                                     'key' => $include__value['attribute'],
-                                    'value' => $nodes__value->getAttribute($include__value['attribute']),
+                                    'value' => htmlspecialchars(
+                                        $nodes__value->getAttribute($include__value['attribute'])
+                                    ),
                                     'type' => 'attribute'
                                 ];
                             }
@@ -384,7 +386,12 @@ class Dom
                                     if ($content__value['type'] === 'attribute') {
                                         // sometimes there are malformed chars; catch errors
                                         try {
-                                            $nodes__value->setAttribute($content__value['key'], $trans);
+                                            // be aware: setAttribute automatically decodes the value
+                                            // we get already a decoded string, which we need to revert to a encoded one beforehand
+                                            $nodes__value->setAttribute(
+                                                $content__value['key'],
+                                                htmlspecialchars_decode($trans)
+                                            );
                                         } catch (\Exception $e) {
                                         }
                                         $this->addToExcludedNodes($nodes__value, $content__value['key']);

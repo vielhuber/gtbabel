@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 4.4.4
+ * Version: 4.4.5
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -1815,8 +1815,11 @@ class GtbabelWordPress
             $url === null,
             $urls,
             $time,
-            isset($_GET['s']) && $_GET['s'] != ''
-                ? htmlspecialchars_decode(esc_html(stripslashes($_GET['s'])))
+            isset($_GET['s']) && $_GET['s'] != '' ? htmlspecialchars_decode(esc_html(stripslashes($_GET['s']))) : null,
+            isset($_GET['context']) && $_GET['context'] != ''
+                ? ($_GET['context'] === '-'
+                    ? ''
+                    : $_GET['context'])
                 : null,
             @$_GET['shared'],
             @$_GET['checked'],
@@ -1914,6 +1917,21 @@ class GtbabelWordPress
             '" placeholder="' .
             __('Search term', 'gtbabel-plugin') .
             '" />';
+        echo '<select class="gtbabel__input gtbabel__input--select" name="context">';
+        echo '<option value="">&ndash;&ndash;</option>';
+        foreach ($this->gtbabel->data->getDistinctContexts() as $context__value) {
+            if ($context__value == '') {
+                $context__value = '-';
+            }
+            echo '<option value="' .
+                $context__value .
+                '"' .
+                (isset($_GET['context']) && $_GET['context'] === $context__value ? ' selected="selected"' : '') .
+                '>' .
+                ($context__value == '-' ? __('No context', 'gtbabel-plugin') : $context__value) .
+                '</option>';
+        }
+        echo '</select>';
         echo '<select class="gtbabel__input gtbabel__input--select" name="checked">';
         echo '<option value="">&ndash;&ndash;</option>';
         echo '<option value="0"' .
@@ -2161,6 +2179,7 @@ class GtbabelWordPress
             $translations = $this->gtbabel->data->getGroupedTranslationsFromDatabase(
                 $lng,
                 true,
+                null,
                 null,
                 null,
                 null,
@@ -2715,6 +2734,9 @@ EOD;
                 (isset($_GET['post_id']) && $_GET['post_id'] !== '' ? '&post_id=' . intval($_GET['post_id']) : '') .
                 (isset($_GET['lng']) && $_GET['lng'] !== '' ? '&lng=' . sanitize_textarea_field($_GET['lng']) : '') .
                 (isset($_GET['url']) && $_GET['url'] !== '' ? '&url=' . esc_url($_GET['url']) : '') .
+                (isset($_GET['context']) && $_GET['context'] !== ''
+                    ? '&context=' . sanitize_textarea_field($_GET['context'])
+                    : '') .
                 (isset($_GET['shared']) && $_GET['shared'] !== ''
                     ? '&shared=' . sanitize_textarea_field($_GET['shared'])
                     : '') .
