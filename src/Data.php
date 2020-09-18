@@ -1635,6 +1635,9 @@ class Data
                 $value_modified = $this->host->getBaseUrlForSourceLanguage() . '/' . $value_modified;
             }
             $value_modified = str_replace(['.php', '.html'], '', $value_modified);
+            if (mb_strpos($value_modified, '?') !== false) {
+                $value_modified = mb_substr($value_modified, 0, mb_strpos($value_modified, '?'));
+            }
             if (preg_match('/\/.+\.[a-zA-Z\d]+$/', str_replace('://', '', $value_modified))) {
                 $context = 'file';
             } else {

@@ -81,8 +81,21 @@ class Dom
     function nodeIsExcluded($node, $attr)
     {
         if (array_key_exists($this->getIdOfNode($node), $this->excluded_nodes)) {
-            return in_array('*', $this->excluded_nodes[$this->getIdOfNode($node)]) ||
-                in_array($attr, $this->excluded_nodes[$this->getIdOfNode($node)]);
+            foreach ($this->excluded_nodes[$this->getIdOfNode($node)] as $excluded_nodes__value) {
+                if ($excluded_nodes__value === '*') {
+                    return true;
+                }
+                if ($excluded_nodes__value === $attr) {
+                    return true;
+                }
+                // accept wildcards
+                if (strpos($excluded_nodes__value, '*') !== false) {
+                    if (preg_match('/' . str_replace('*', '.*', $excluded_nodes__value) . '/', $attr)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
         return false;
     }
@@ -515,6 +528,13 @@ class Dom
 
         $parts = explode(' ', $selector);
         foreach ($parts as $parts__key => $parts__value) {
+            // [placeholder] => *[placeholder]
+            if (
+                mb_strpos($parts__value, '[') === 0 &&
+                mb_strrpos($parts__value, ']') === mb_strlen($parts__value) - 1
+            ) {
+                $parts__value = '*' . $parts__value;
+            }
             // input[placeholder] => input[@placeholder]
             if (mb_strpos($parts__value, '[') !== false && mb_strpos($parts__value, '@') === false) {
                 $parts__value = str_replace('[', '[@', $parts__value);

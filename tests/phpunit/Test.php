@@ -245,7 +245,9 @@ class Test extends \PHPUnit\Framework\TestCase
             'exclude_dom' => [
                 ['selector' => '.foo'],
                 ['selector' => '#bar'],
-                ['selector' => '.gnarr', 'attribute' => 'data-text']
+                ['selector' => '.gnarr', 'attribute' => 'data-text'],
+                ['selector' => '[data-foo]', 'attribute' => 'data-b*'],
+                ['selector' => '[class="gnaf"]', 'attribute' => '*']
             ]
         ]);
     }
@@ -1001,6 +1003,7 @@ class Test extends \PHPUnit\Framework\TestCase
 <a href="beispiel/pfad/1._Buch_Moses"></a>
 <a href="beispiel/pfad/1._Buch_Moses?Hund=Haus"></a>
 <a href="beispiel/pfad/1._Buch_Moses/?Hund=Haus"></a>
+<a href="https://lighthouse-dot-webdotdevsite.appspot.com/lh/html?url=http://gtbabel.local.vielhuber.de"></a>
 EOD;
 
         $expected_html = <<<'EOD'
@@ -1034,6 +1037,7 @@ EOD;
 <a href="en/example/path/1-book-moses"></a>
 <a href="en/example/path/1-book-moses?Hund=Haus"></a>
 <a href="en/example/path/1-book-moses/?Hund=Haus"></a>
+<a href="https://lighthouse-dot-webdotdevsite.appspot.com/lh/html?url=http://gtbabel.local.vielhuber.de"></a>
 EOD;
 
         $expected_data = [
@@ -1273,7 +1277,8 @@ EOD;
             ['selector' => '.notranslate'],
             ['selector' => '.lngpicker'],
             ['selector' => '.xdebug-error'],
-            ['selector' => '.example', 'attribute' => 'data-text']
+            ['selector' => '.example1', 'attribute' => 'data-text'],
+            ['selector' => '.example2', 'attribute' => 'data-*']
         ];
         $settings['lng_source'] = 'de';
         $settings['lng_target'] = null;

@@ -95,7 +95,8 @@ class Settings
                 ['selector' => '.notranslate'],
                 ['selector' => '.lngpicker'],
                 ['selector' => '.xdebug-error'],
-                ['selector' => '.example', 'attribute' => 'data-text']
+                ['selector' => '.example1', 'attribute' => 'data-text'],
+                ['selector' => '.example2', 'attribute' => 'data-*']
             ],
             'force_tokenize' => ['.force-tokenize'],
             'include_dom' => [
