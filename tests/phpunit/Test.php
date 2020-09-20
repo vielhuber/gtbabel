@@ -73,7 +73,19 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test011()
     {
-        $this->runDiff('11.html', 200);
+        $this->runDiff('11.html', 200, [
+            'include_dom' => array_merge($this->gtbabel->settings->getDefaultIncludeDom(), [
+                [
+                    'selector' => '.search-submit',
+                    'attribute' => 'value'
+                ],
+                [
+                    'selector' => '.js-link',
+                    'attribute' => 'alt-href',
+                    'context' => 'slug'
+                ]
+            ])
+        ]);
     }
 
     public function test012()

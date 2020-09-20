@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 4.4.6
+ * Version: 4.4.7
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -559,7 +559,6 @@ class GtbabelWordPress
                             'debug_translations',
                             'hide_languages',
                             'redirect_root_domain',
-                            'translate_default_tag_nodes',
                             'translate_html',
                             'translate_json',
                             'translate_json_include',
@@ -605,7 +604,6 @@ class GtbabelWordPress
 
                     foreach (
                         [
-                            'translate_default_tag_nodes',
                             'translate_html',
                             'translate_json',
                             'html_lang_attribute',
@@ -990,17 +988,6 @@ class GtbabelWordPress
             __('Source language', 'gtbabel-plugin') .
             '</option>';
         echo '</select>';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_translate_default_tag_nodes" class="gtbabel__label">';
-        echo __('Translate additional nodes', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_translate_default_tag_nodes" name="gtbabel[translate_default_tag_nodes]" value="1"' .
-            ($settings['translate_default_tag_nodes'] == '1' ? ' checked="checked"' : '') .
-            ' />';
         echo '</div>';
         echo '</li>';
 
@@ -1462,13 +1449,13 @@ class GtbabelWordPress
         foreach ($settings['include_dom'] as $include_dom__value) {
             echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-3">';
             echo '<input class="gtbabel__input" type="text" name="gtbabel[include_dom][selector][]" value="' .
-                $include_dom__value['selector'] .
+                esc_attr($include_dom__value['selector']) .
                 '" placeholder="selector" />';
             echo '<input class="gtbabel__input" type="text" name="gtbabel[include_dom][attribute][]" value="' .
-                $include_dom__value['attribute'] .
+                esc_attr($include_dom__value['attribute']) .
                 '" placeholder="attribute" />';
             echo '<input class="gtbabel__input" type="text" name="gtbabel[include_dom][context][]" value="' .
-                $include_dom__value['context'] .
+                esc_attr($include_dom__value['context']) .
                 '" placeholder="context" />';
             echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
                 __('Remove', 'gtbabel-plugin') .

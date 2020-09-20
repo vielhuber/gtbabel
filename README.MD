@@ -916,7 +916,6 @@ The default configuration is:
     ],
     'log_folder' => '/logs',
     'redirect_root_domain' => 'browser',
-    'translate_default_tag_nodes' => true,
     'translate_html' => true,
     'translate_json' => true,
     'translate_json_include' => [
@@ -961,11 +960,102 @@ The default configuration is:
     'force_tokenize' => ['.force-tokenize'],
     'include_dom' => [
         [
-            'selector' => '.search-submit', // css or xpath selectors supported
-            'attribute' => 'value'
+            'selector' => '/html/body//text()',
+            'attribute' => null,
+            'context' => null
         ],
         [
-            'selector' => '.js-link',
+            'selector' => '/html/body//a[starts-with(@href, \'mailto:\')]',
+            'attribute' => 'href',
+            'context' => 'email'
+        ],
+        [
+            'selector' => '/html/body//a[@href]',
+            'attribute' => 'href',
+            'context' => 'slug|file'
+        ],
+        [
+            'selector' => '/html/body//form[@action]',
+            'attribute' => 'action',
+            'context' => 'slug'
+        ],
+        [
+            'selector' => '/html/body//img[@alt]',
+            'attribute' => 'alt',
+            'context' => null
+        ],
+        [
+            'selector' => '/html/body//*[@title]',
+            'attribute' => 'title',
+            'context' => null
+        ],
+        [
+            'selector' => '/html/body//*[@placeholder]',
+            'attribute' => 'placeholder',
+            'context' => null
+        ],
+        [
+            'selector' => '/html/body//input[@type="submit"][@value]',
+            'attribute' => 'value',
+            'context' => null
+        ],
+        [
+            'selector' => '/html/body//input[@type="reset"][@value]',
+            'attribute' => 'value',
+            'context' => null
+        ],
+        [
+            'selector' => '/html/head//title',
+            'attribute' => null,
+            'context' => 'title'
+        ],
+        [
+            'selector' => '/html/head//meta[@name="description"][@content]',
+            'attribute' => 'content',
+            'context' => 'description'
+        ],
+        [
+            'selector' => '/html/head//link[@rel="canonical"][@href]',
+            'attribute' => 'href',
+            'context' => 'slug'
+        ],
+        [
+            'selector' => '/html/body//img[@src]',
+            'attribute' => 'src',
+            'context' => 'file'
+        ],
+        [
+            'selector' => '/html/body//*[contains(@style, "url(")]',
+            'attribute' => 'style',
+            'context' => 'file'
+        ],
+        [
+            'selector' => '/html/body//@*[starts-with(name(), \'data-\')]/parent::*', // data-*
+            'attribute' => '(?! data-context=)(?: (data-.+?)="([^"]*?)")', // data-* (except data-context)
+            'context' => null
+        ],
+        [
+            'selector' => '/html/body//@*[starts-with(name(), \'data-\')]/parent::*', // data-*
+            'attribute' => '(?! data-context=)(?: (data-.+?)=\'([^\']*?)\')', // same as above, but with single quotes (domdocument does use them when double quotes are used inside the attributes)
+            'context' => null
+        ],
+        [
+            'selector' => '/html/body//*[@label]',
+            'attribute' => 'label',
+            'context' => null
+        ],
+        [
+            'selector' => '/html/body//@*[contains(name(), \'text\')]/parent::*', // *text*
+            'attribute' => '(?! data-context=)(?: ([a-zA-Z-]*?text[a-zA-Z-]*?)="([^"]*?)")', // *text* (except data-context)
+            'context' => null
+        ],
+        [
+            'selector' => '/html/body//@*[contains(name(), \'text\')]/parent::*', // *text*
+            'attribute' => '(?! data-context=)(?: ([a-zA-Z-]*?text[a-zA-Z-]*?)=\'([^\']*?)\')', // same as above, but with single quotes (domdocument does use them when double quotes are used inside the attributes)
+            'context' => null
+        ],
+        [
+            'selector' => '.example-link', // css selectors are also supported
             'attribute' => 'alt-href',
             'context' => 'slug'
         ]
@@ -1061,11 +1151,7 @@ By default Gtbabel translates all text and tag nodes with the following rules:
 | `body *`                        | ✗    | `label`          | `auto`           |
 | `body *`                        | ✗    | `*text*`         | `auto`           |
 
-To disable text/tag node transformation, provide the option:
-
--   `'translate_default_tag_nodes' => false`
-
-You can add your own tag node transformations via the `include_dom` option.
+You can modify all tag node transformations via the `include_dom` option.
 
 Be aware that the rules are processed sequentially and attribute names are never transformed twice.
 

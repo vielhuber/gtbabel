@@ -57,7 +57,6 @@ class Settings
             ],
             'log_folder' => '/logs',
             'redirect_root_domain' => 'browser',
-            'translate_default_tag_nodes' => true,
             'translate_html' => true,
             'translate_json' => true,
             'translate_json_include' => [
@@ -99,17 +98,7 @@ class Settings
                 ['selector' => '.example2', 'attribute' => 'data-*']
             ],
             'force_tokenize' => ['.force-tokenize'],
-            'include_dom' => [
-                [
-                    'selector' => '.search-submit',
-                    'attribute' => 'value'
-                ],
-                [
-                    'selector' => '.js-link',
-                    'attribute' => 'alt-href',
-                    'context' => 'slug'
-                ]
-            ],
+            'include_dom' => $this->getDefaultIncludeDom(),
             'localize_js' => true,
             'localize_js_strings' => [['string' => 'Schließen'], ['string' => 'blog', 'context' => 'slug']],
             'detect_dom_changes' => true,
@@ -144,6 +133,112 @@ class Settings
             $args['languages_keyed'][$languages__value['code']] = $languages__value;
         }
         return $args;
+    }
+
+    function getDefaultIncludeDom()
+    {
+        return [
+            [
+                'selector' => '/html/body//text()',
+                'attribute' => null,
+                'context' => null
+            ],
+            [
+                'selector' => '/html/body//a[starts-with(@href, \'mailto:\')]',
+                'attribute' => 'href',
+                'context' => 'email'
+            ],
+            [
+                'selector' => '/html/body//a[@href]',
+                'attribute' => 'href',
+                'context' => 'slug|file'
+            ],
+            [
+                'selector' => '/html/body//form[@action]',
+                'attribute' => 'action',
+                'context' => 'slug'
+            ],
+            [
+                'selector' => '/html/body//img[@alt]',
+                'attribute' => 'alt',
+                'context' => null
+            ],
+            [
+                'selector' => '/html/body//*[@title]',
+                'attribute' => 'title',
+                'context' => null
+            ],
+            [
+                'selector' => '/html/body//*[@placeholder]',
+                'attribute' => 'placeholder',
+                'context' => null
+            ],
+            [
+                'selector' => '/html/body//input[@type="submit"][@value]',
+                'attribute' => 'value',
+                'context' => null
+            ],
+            [
+                'selector' => '/html/body//input[@type="reset"][@value]',
+                'attribute' => 'value',
+                'context' => null
+            ],
+            [
+                'selector' => '/html/head//title',
+                'attribute' => null,
+                'context' => 'title'
+            ],
+            [
+                'selector' => '/html/head//meta[@name="description"][@content]',
+                'attribute' => 'content',
+                'context' => 'description'
+            ],
+            [
+                'selector' => '/html/head//link[@rel="canonical"][@href]',
+                'attribute' => 'href',
+                'context' => 'slug'
+            ],
+            [
+                'selector' => '/html/body//img[@src]',
+                'attribute' => 'src',
+                'context' => 'file'
+            ],
+            [
+                'selector' => '/html/body//*[contains(@style, "url(")]',
+                'attribute' => 'style',
+                'context' => 'file'
+            ],
+            [
+                'selector' => '/html/body//@*[starts-with(name(), \'data-\')]/parent::*',
+                'attribute' => '(?! data-context=)(?: (data-.+?)="([^"]*?)")',
+                'context' => null
+            ],
+            [
+                'selector' => '/html/body//@*[starts-with(name(), \'data-\')]/parent::*',
+                'attribute' => '(?! data-context=)(?: (data-.+?)=\'([^\']*?)\')',
+                'context' => null
+            ],
+            [
+                'selector' => '/html/body//*[@label]',
+                'attribute' => 'label',
+                'context' => null
+            ],
+            [
+                'selector' => '/html/body//@*[contains(name(), \'text\')]/parent::*',
+                'attribute' => '(?! data-context=)(?: ([a-zA-Z-]*?text[a-zA-Z-]*?)="([^"]*?)")',
+                'context' => null
+            ],
+            [
+                'selector' => '/html/body//@*[contains(name(), \'text\')]/parent::*',
+                'attribute' => '(?! data-context=)(?: ([a-zA-Z-]*?text[a-zA-Z-]*?)=\'([^\']*?)\')',
+                'context' => null
+            ],
+            [
+                'selector' => '.example-link',
+                'attribute' => 'alt-href',
+                'context' => 'slug'
+            ]
+        ];
     }
 
     function getDefaultLanguages()
