@@ -191,10 +191,24 @@ class Tags
                 preg_match_all('/' . ${$types__value . '_pattern'} . '/', $str, ${$types__value . '_matches'});
             }
         }
-        if (substr_count($str, '(') === 1 && substr_count($str, ')') === 1 && '(' . trim($str, '()') . ')' === $str) {
-            $str = trim($str, '()');
-            $prefix .= '(';
-            $suffix .= ')';
+        foreach (
+            [['(', ')'], ['[', ']'], ['"', '"'], ['&quot;', '&quot;'], ['„', '“'], ['&bdquo;', '&ldquo;']]
+            as $surrounder__value
+        ) {
+            if (
+                substr_count($str, $surrounder__value[0]) ===
+                    ($surrounder__value[0] === $surrounder__value[1] ? 2 : 1) &&
+                substr_count($str, $surrounder__value[1]) ===
+                    ($surrounder__value[0] === $surrounder__value[1] ? 2 : 1) &&
+                $surrounder__value[0] .
+                    trim($str, $surrounder__value[0] . $surrounder__value[1]) .
+                    $surrounder__value[1] ===
+                    $str
+            ) {
+                $str = trim($str, $surrounder__value[0] . $surrounder__value[1]);
+                $prefix .= $surrounder__value[0];
+                $suffix .= $surrounder__value[1];
+            }
         }
         return [$str, ['prefix' => $prefix, 'suffix' => $suffix]];
     }
