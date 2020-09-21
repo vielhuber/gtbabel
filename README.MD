@@ -1047,7 +1047,7 @@ The default configuration is:
         ],
         [
             'selector' => '.example-link', // css selectors are also supported
-            'attribute' => 'alt-href',
+            'attribute' => 'alt-href|*foo*', // wildcards and | supported
             'context' => 'slug'
         ]
     ],

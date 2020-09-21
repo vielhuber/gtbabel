@@ -205,22 +205,19 @@ class Dom
                                 $opening_tag = $this->getOuterHtml($nodes__value);
                                 $opening_tag = substr($opening_tag, 0, strpos($opening_tag, '>') + 1);
                                 foreach (['"', '\''] as $quote__value) {
-                                    preg_match_all(
+                                    $regex =
                                         '/' .
-                                            '(?: (' .
-                                            str_replace('*', '[a-zA-Z-_:]*?', $include__value['attribute']) .
-                                            ')=' .
-                                            $quote__value .
-                                            '([^' .
-                                            $quote__value .
-                                            ']*?)' .
-                                            $quote__value .
-                                            ')' .
-                                            '/',
-                                        $opening_tag,
-                                        $matches,
-                                        PREG_SET_ORDER
-                                    );
+                                        '(?:(?: |\r\n|\r|\n)(' .
+                                        str_replace('*', '[a-zA-Z-_:]*?', $include__value['attribute']) .
+                                        ')=' .
+                                        $quote__value .
+                                        '([^' .
+                                        $quote__value .
+                                        ']*?)' .
+                                        $quote__value .
+                                        ')' .
+                                        '/';
+                                    preg_match_all($regex, $opening_tag, $matches, PREG_SET_ORDER);
                                     if (empty($matches)) {
                                         continue;
                                     }

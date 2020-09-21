@@ -226,7 +226,7 @@ class Settings
             ],
             [
                 'selector' => '.example-link',
-                'attribute' => 'alt-href',
+                'attribute' => 'alt-href|*foo*',
                 'context' => 'slug'
             ]
         ];

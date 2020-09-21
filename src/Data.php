@@ -703,6 +703,12 @@ class Data
         return true;
     }
 
+    function deleteUncheckedStrings()
+    {
+        $this->db->query('DELETE FROM ' . $this->table . ' WHERE checked = ?', 0);
+        return true;
+    }
+
     function editCheckedValue($str, $context = null, $lng_source, $lng_target, $checked)
     {
         $this->db->query(
@@ -1601,6 +1607,9 @@ class Data
         if ($context !== 'email' && $context !== 'slug' && $context !== 'file') {
             if (strpos($str, ' ') === false) {
                 if (strpos($str, '_') !== false) {
+                    return true;
+                }
+                if (strpos($str, '--') !== false) {
                     return true;
                 }
                 if (strpos($str, '.') !== false) {

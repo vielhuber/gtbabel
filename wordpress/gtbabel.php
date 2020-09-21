@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 4.4.9
+ * Version: 4.5.0
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -823,6 +823,10 @@ class GtbabelWordPress
                 $this->gtbabel->data->setAllStringsToChecked();
             }
 
+            if (isset($_POST['delete_unchecked_strings'])) {
+                $this->gtbabel->data->deleteUncheckedStrings();
+            }
+
             if (isset($_POST['reset_settings'])) {
                 $this->deleteSettings();
                 $this->setDefaultSettingsToOption();
@@ -1638,6 +1642,11 @@ class GtbabelWordPress
 
         echo '<h2 class="gtbabel__subtitle">' . __('Set all strings to checked', 'gtbabel-plugin') . '</h2>';
         echo '<input class="gtbabel__submit button button-secondary" name="check_all_strings" value="' .
+            __('Save', 'gtbabel-plugin') .
+            '" type="submit" />';
+
+        echo '<h2 class="gtbabel__subtitle">' . __('Delete all unchecked strings', 'gtbabel-plugin') . '</h2>';
+        echo '<input class="gtbabel__submit button button-secondary" name="delete_unchecked_strings" value="' .
             __('Save', 'gtbabel-plugin') .
             '" type="submit" />';
 

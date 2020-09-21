@@ -480,7 +480,7 @@ class Test extends \PHPUnit\Framework\TestCase
             'include_dom' => array_merge($this->gtbabel->settings->getDefaultIncludeDom(), [
                 [
                     'selector' => 'custom-component',
-                    'attribute' => '*'
+                    'attribute' => ':product-*|:url'
                 ]
             ])
         ]);
@@ -501,7 +501,8 @@ class Test extends \PHPUnit\Framework\TestCase
             'PTO191',
             '0,083333333',
             '209KS19D',
-            'B06_xxx_xxx_6498_2048'
+            'B06_xxx_xxx_6498_2048',
+            'btn--scheme-w'
         ];
         foreach ($should_translate as $should_translate__value) {
             $this->assertEquals(
