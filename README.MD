@@ -1079,7 +1079,7 @@ $gtbabel->tokenize('<p>Dies ist ein Test!</p>'); // [['string' => 'This is a tes
 
 [wordpress.org/plugins/gtbabel](https://wordpress.org/plugins/gtbabel/)
 
-You don't have to change any code in the frontend at all: If you already have functions like `__()` in your code, just leave them (since WordPress internally only knows about the source language); if not, don't add them. Gtbabel acts on the output (like on any other page).
+You don't have to change any code in the frontend at all: If you already have functions like `__()` in your code, just either remove them or simply leave them (since WordPress internally only knows about the source language and `__()` has no effect); if not, don't add them. Gtbabel acts on the output (like on any other page).
 
 The following features are included:
 
@@ -1117,6 +1117,18 @@ gtbabel__('string', 'context');
 ```
 
 Also first check, if Gtbabel is available in JavaScript with `if (typeof gtbabel__ === 'function') { }`.
+
+If you are a WordPress user, you might use the [wp_localize_script](https://developer.wordpress.org/reference/functions/wp_localize_script/) function. Keep doing that and simply use `gtbabel__()` via PHP to translate the strings you want to be provided in JavaScript:
+
+```php
+if (function_exists('gtbabel__')) {
+    wp_localize_script('script', 'strings', [
+        'baseurl' => gtbabel__(get_bloginfo('url')),
+        'lng' => gtbabel_current_lng(),
+        'example' => gtbabel__('Dies ist ein Test')
+    ]);
+}
+```
 
 ## Modified nodes
 
@@ -1494,7 +1506,7 @@ gtbabel__('Hi there', null, 'de', 'en') // 'Hallo'
 
 ## Note on gtbabel\_\_()
 
-Don't use `gtbabel__()` for echoing strings, just output them in the source language. Gtbabel will take care of the rest.
+Don't use `gtbabel__()` in your templates for echoing strings, just output them in the source language. Gtbabel will take care of the rest. However, there are some places (e.g. in your backend logic), where you need to translate strings. This is what this function is intended for.
 
 ## Dealing with form data
 
