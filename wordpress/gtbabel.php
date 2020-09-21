@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 4.4.8
+ * Version: 4.4.9
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -1390,10 +1390,10 @@ class GtbabelWordPress
         foreach ($settings['exclude_dom'] as $exclude_dom__value) {
             echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-2">';
             echo '<input class="gtbabel__input" type="text" name="gtbabel[exclude_dom][selector][]" value="' .
-                $exclude_dom__value['selector'] .
+                esc_attr($exclude_dom__value['selector']) .
                 '" placeholder="selector" />';
             echo '<input class="gtbabel__input" type="text" name="gtbabel[exclude_dom][attribute][]" value="' .
-                $exclude_dom__value['attribute'] .
+                esc_attr($exclude_dom__value['attribute']) .
                 '" placeholder="attribute" />';
             echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
                 __('Remove', 'gtbabel-plugin') .
@@ -1421,7 +1421,7 @@ class GtbabelWordPress
         foreach ($settings['force_tokenize'] as $force_tokenize__value) {
             echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-1">';
             echo '<input class="gtbabel__input" type="text" name="gtbabel[force_tokenize][]" value="' .
-                $force_tokenize__value .
+                esc_attr($force_tokenize__value) .
                 '" placeholder="selector" />';
             echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
                 __('Remove', 'gtbabel-plugin') .
@@ -1545,7 +1545,7 @@ class GtbabelWordPress
         foreach ($settings['localize_js_strings'] as $localize_js_strings__value) {
             echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-2">';
             echo '<input class="gtbabel__input" type="text" name="gtbabel[localize_js_strings][string][]" value="' .
-                $localize_js_strings__value['string'] .
+                esc_attr($localize_js_strings__value['string']) .
                 '" placeholder="string" />';
             echo '<input class="gtbabel__input" type="text" name="gtbabel[localize_js_strings][context][]" value="' .
                 $localize_js_strings__value['context'] .
@@ -1587,7 +1587,7 @@ class GtbabelWordPress
         foreach ($settings['detect_dom_changes_include'] as $detect_dom_changes_include__value) {
             echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-1">';
             echo '<input class="gtbabel__input" type="text" name="gtbabel[detect_dom_changes_include][]" value="' .
-                $detect_dom_changes_include__value .
+                esc_attr($detect_dom_changes_include__value) .
                 '" placeholder="selector" />';
             echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
                 __('Remove', 'gtbabel-plugin') .
@@ -3171,6 +3171,7 @@ EOD;
                     'exclude_urls_slugs' => ['wp-json'],
                     'exclude_dom' => [
                         ['selector' => '.notranslate'],
+                        ['selector' => '[data-context]', 'attribute' => 'data-context'],
                         ['selector' => '.lngpicker'],
                         ['selector' => '.xdebug-error'],
                         ['selector' => '#wpadminbar']

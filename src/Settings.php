@@ -92,6 +92,7 @@ class Settings
             'exclude_urls_slugs' => ['api/v1.0'],
             'exclude_dom' => [
                 ['selector' => '.notranslate'],
+                ['selector' => '[data-context]', 'attribute' => 'data-context'],
                 ['selector' => '.lngpicker'],
                 ['selector' => '.xdebug-error'],
                 ['selector' => '.example1', 'attribute' => 'data-text'],
@@ -209,28 +210,18 @@ class Settings
                 'context' => 'file'
             ],
             [
-                'selector' => '/html/body//@*[starts-with(name(), \'data-\')]/parent::*',
-                'attribute' => '(?! data-context=)(?: (data-.+?)="([^"]*?)")',
-                'context' => null
-            ],
-            [
-                'selector' => '/html/body//@*[starts-with(name(), \'data-\')]/parent::*',
-                'attribute' => '(?! data-context=)(?: (data-.+?)=\'([^\']*?)\')',
-                'context' => null
-            ],
-            [
                 'selector' => '/html/body//*[@label]',
                 'attribute' => 'label',
                 'context' => null
             ],
             [
-                'selector' => '/html/body//@*[contains(name(), \'text\')]/parent::*',
-                'attribute' => '(?! data-context=)(?: ([a-zA-Z-]*?text[a-zA-Z-]*?)="([^"]*?)")',
+                'selector' => '/html/body//@*[starts-with(name(), \'data-\')]/parent::*',
+                'attribute' => 'data-*',
                 'context' => null
             ],
             [
                 'selector' => '/html/body//@*[contains(name(), \'text\')]/parent::*',
-                'attribute' => '(?! data-context=)(?: ([a-zA-Z-]*?text[a-zA-Z-]*?)=\'([^\']*?)\')',
+                'attribute' => '*text*',
                 'context' => null
             ],
             [

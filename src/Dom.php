@@ -200,28 +200,40 @@ class Dom
                         ];
                     } else {
                         if (@$include__value['attribute'] != '') {
-                            // regex
-                            if (strpos($include__value['attribute'], '(') !== false) {
+                            // wildcards
+                            if (strpos($include__value['attribute'], '*') !== false) {
                                 $opening_tag = $this->getOuterHtml($nodes__value);
                                 $opening_tag = substr($opening_tag, 0, strpos($opening_tag, '>') + 1);
-                                preg_match_all(
-                                    '/' . $include__value['attribute'] . '/',
-                                    $opening_tag,
-                                    $matches,
-                                    PREG_SET_ORDER
-                                );
-                                if (empty($matches)) {
-                                    continue;
-                                }
-                                foreach ($matches as $matches__value) {
-                                    if ($matches__value[1] == '' || $matches__value[2] == '') {
+                                foreach (['"', '\''] as $quote__value) {
+                                    preg_match_all(
+                                        '/' .
+                                            '(?: (' .
+                                            str_replace('*', '[a-zA-Z-_:]*?', $include__value['attribute']) .
+                                            ')=' .
+                                            $quote__value .
+                                            '([^' .
+                                            $quote__value .
+                                            ']*?)' .
+                                            $quote__value .
+                                            ')' .
+                                            '/',
+                                        $opening_tag,
+                                        $matches,
+                                        PREG_SET_ORDER
+                                    );
+                                    if (empty($matches)) {
                                         continue;
                                     }
-                                    $content[] = [
-                                        'key' => $matches__value[1],
-                                        'value' => $matches__value[2],
-                                        'type' => 'attribute'
-                                    ];
+                                    foreach ($matches as $matches__value) {
+                                        if ($matches__value[1] == '' || $matches__value[2] == '') {
+                                            continue;
+                                        }
+                                        $content[] = [
+                                            'key' => $matches__value[1],
+                                            'value' => $matches__value[2],
+                                            'type' => 'attribute'
+                                        ];
+                                    }
                                 }
                             } else {
                                 $content[] = [

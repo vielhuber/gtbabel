@@ -952,6 +952,7 @@ The default configuration is:
     'exclude_urls_slugs' => ['api/v1.0'],
     'exclude_dom' => [
         ['selector' => '.notranslate'],
+        ['selector' => '[data-context]', 'attribute' => 'data-context'],
         ['selector' => '.lngpicker'],
         ['selector' => '.xdebug-error'],
         ['selector' => '.example1', 'attribute' => 'data-text'],
@@ -1030,28 +1031,18 @@ The default configuration is:
             'context' => 'file'
         ],
         [
-            'selector' => '/html/body//@*[starts-with(name(), \'data-\')]/parent::*', // data-*
-            'attribute' => '(?! data-context=)(?: (data-.+?)="([^"]*?)")', // data-* (except data-context)
-            'context' => null
-        ],
-        [
-            'selector' => '/html/body//@*[starts-with(name(), \'data-\')]/parent::*', // data-*
-            'attribute' => '(?! data-context=)(?: (data-.+?)=\'([^\']*?)\')', // same as above, but with single quotes (domdocument does use them when double quotes are used inside the attributes)
-            'context' => null
-        ],
-        [
             'selector' => '/html/body//*[@label]',
             'attribute' => 'label',
             'context' => null
         ],
         [
-            'selector' => '/html/body//@*[contains(name(), \'text\')]/parent::*', // *text*
-            'attribute' => '(?! data-context=)(?: ([a-zA-Z-]*?text[a-zA-Z-]*?)="([^"]*?)")', // *text* (except data-context)
+            'selector' => '/html/body//@*[starts-with(name(), \'data-\')]/parent::*', // data-*
+            'attribute' => 'data-*', // data-*
             'context' => null
         ],
         [
             'selector' => '/html/body//@*[contains(name(), \'text\')]/parent::*', // *text*
-            'attribute' => '(?! data-context=)(?: ([a-zA-Z-]*?text[a-zA-Z-]*?)=\'([^\']*?)\')', // same as above, but with single quotes (domdocument does use them when double quotes are used inside the attributes)
+            'attribute' => '*text*', // *text*
             'context' => null
         ],
         [

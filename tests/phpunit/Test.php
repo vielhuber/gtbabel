@@ -474,6 +474,18 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->runDiff('66.html');
     }
 
+    public function test067()
+    {
+        $this->runDiff('67.html', 200, [
+            'include_dom' => array_merge($this->gtbabel->settings->getDefaultIncludeDom(), [
+                [
+                    'selector' => 'custom-component',
+                    'attribute' => '*'
+                ]
+            ])
+        ]);
+    }
+
     public function test_string_detection()
     {
         $should_translate = ['Haus'];
@@ -737,8 +749,8 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->assertEquals($translations[0]['str'], '#allesfürdich');
         $this->assertEquals($translations[1]['str'], 'foo &amp; bar<br>baz');
         $this->assertEquals($translations[2]['str'], 'Erster &amp; Test');
-        $this->assertEquals($translations[3]['str'], 'Zweiter &amp; Test');
-        $this->assertEquals($translations[4]['str'], '"gnarr" &amp; gnazz');
+        $this->assertEquals($translations[3]['str'], '"gnarr" &amp; gnazz');
+        $this->assertEquals($translations[4]['str'], 'Zweiter &amp; Test');
     }
 
     public function test_referer_lng()
@@ -1292,6 +1304,7 @@ EOD;
         $settings = $this->getDefaultSettings();
         $settings['exclude_dom'] = [
             ['selector' => '.notranslate'],
+            ['selector' => '[data-context]', 'attribute' => 'data-context'],
             ['selector' => '.lngpicker'],
             ['selector' => '.xdebug-error'],
             ['selector' => '.example1', 'attribute' => 'data-text'],
