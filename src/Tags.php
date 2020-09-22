@@ -160,7 +160,9 @@ class Tags
         $prefix_pattern .= '|';
         $prefix_pattern .= '^<br+\b[^>]*\/?>( *)'; // <br/> etc.
         $prefix_pattern .= '|';
-        $prefix_pattern .= '^(\*|-|–|\||:|\+|•|●)( +)'; // * etc.
+        $prefix_pattern .= '^(\*|-|–|\||:|\+|•|●)( +)'; // * and space etc.
+        $prefix_pattern .= '|';
+        $prefix_pattern .= '^(\*|–|:|•|●)'; // * etc.
         $prefix_pattern .= '|';
         $prefix_pattern .= '^((\d|[a-z])\))( +)'; // 1) 2) 3) a) b) c) etc.
         $prefix_pattern .= '|';
