@@ -148,7 +148,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test022()
     {
-        $this->runDiff('22.php', 6000);
+        $this->runDiff('22.php', 8500);
     }
 
     public function test023()
@@ -486,6 +486,16 @@ class Test extends \PHPUnit\Framework\TestCase
         ]);
     }
 
+    public function test068()
+    {
+        $this->runDiff('68.html', 1500, [
+            'debug_translations' => false,
+            'auto_translation' => true,
+            'google_translation_api_key' => 'free',
+            'exclude_dom' => [['selector' => '.test']]
+        ]);
+    }
+
     public function test_string_detection()
     {
         $should_translate = ['Haus'];
@@ -502,7 +512,15 @@ class Test extends \PHPUnit\Framework\TestCase
             '0,083333333',
             '209KS19D',
             'B06_xxx_xxx_6498_2048',
-            'btn--scheme-w'
+            'btn--scheme-w',
+            '|',
+            'a)',
+            '7)',
+            '*',
+            '•',
+            '●',
+            '(',
+            ']'
         ];
         foreach ($should_translate as $should_translate__value) {
             $this->assertEquals(

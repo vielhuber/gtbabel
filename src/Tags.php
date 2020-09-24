@@ -80,21 +80,21 @@ class Tags
                 $pos_begin = $pos_end;
             }
             $attributes_cur = mb_substr($matches__value, $pos_begin, $pos_end - $pos_begin);
-            $has_no_translate_attribute = false;
+            $has_notranslate_attribute = false;
             $attributes = explode(' ', trim($attributes_cur));
             foreach ($attributes as $attributes__key => $attributes__value) {
                 if (
                     strpos($attributes__value, 'class="') !== false &&
                     strpos($attributes__value, 'notranslate') !== false
                 ) {
-                    $has_no_translate_attribute = true;
+                    $has_notranslate_attribute = true;
                 }
                 if (strpos($attributes__value, 'p="') === 0 && $attributes__value !== 'p="' . $id . '"') {
                     continue;
                 }
                 unset($attributes[$attributes__key]);
             }
-            if ($has_no_translate_attribute === true) {
+            if ($has_notranslate_attribute === true) {
                 $attributes[] = 'class="notranslate"';
             }
             if (!empty($attributes)) {
@@ -121,17 +121,12 @@ class Tags
             }
             $attributes = mb_substr($matches__value, $pos_begin, $pos_end - $pos_begin);
             $mappingTableTags[$id] = trim($attributes);
-            $has_no_translate_attribute = false;
-            foreach (explode(' ', $attributes) as $attributes__value) {
-                if (
-                    strpos($attributes__value, 'class="') !== false &&
-                    strpos($attributes__value, 'notranslate') !== false
-                ) {
-                    $has_no_translate_attribute = true;
-                }
+            $has_notranslate_attribute = false;
+            if (preg_match('/class="[^"]*?notranslate[^"]*?"/', $attributes)) {
+                $has_notranslate_attribute = true;
             }
             $replacement = '';
-            if ($has_no_translate_attribute === true) {
+            if ($has_notranslate_attribute === true) {
                 $replacement = ' class="notranslate"';
             }
             $new = str_replace($attributes, $replacement, $matches__value);

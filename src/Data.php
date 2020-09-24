@@ -1561,6 +1561,9 @@ class Data
         if (preg_match('/[a-zA-Z]/', $str) !== 1) {
             return true;
         }
+        if (preg_match('/^[a-z](\)|\])$/', $str)) {
+            return true;
+        }
         // lng codes
         if ($context === 'slug') {
             $lngs = $this->settings->getSelectedLanguageCodes();

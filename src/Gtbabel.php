@@ -40,7 +40,8 @@ class Gtbabel
             $data ?: new Data($this->utils, $this->host, $this->settings, $this->tags, $this->log, $this->publish);
         $this->altlng = $altlng ?: new Altlng($this->settings, $this->host);
         $this->dom =
-            $dom ?: new Dom($this->utils, $this->data, $this->host, $this->settings, $this->log, $this->altlng);
+            $dom ?:
+            new Dom($this->utils, $this->data, $this->host, $this->settings, $this->tags, $this->log, $this->altlng);
         $this->router = $router ?: new Router($this->data, $this->host, $this->settings, $this->publish);
         $this->gettext = $gettext ?: new Gettext($this->data, $this->settings);
     }

@@ -16,6 +16,7 @@ class Dom
     public $data;
     public $host;
     public $settings;
+    public $tags;
     public $log;
     public $altlng;
 
@@ -24,6 +25,7 @@ class Dom
         Data $data = null,
         Host $host = null,
         Settings $settings = null,
+        Tags $tags = null,
         Log $log = null,
         Altlng $altlng = null
     ) {
@@ -31,6 +33,7 @@ class Dom
         $this->data = $data ?: new Data();
         $this->host = $host ?: new Host();
         $this->settings = $settings ?: new Settings();
+        $this->tags = $tags ?: new Tags();
         $this->log = $log ?: new Log();
         $this->altlng = $altlng ?: new Altlng();
     }
@@ -78,7 +81,7 @@ class Dom
         $this->excluded_nodes[$this->getIdOfNode($node)][] = $attr;
     }
 
-    function nodeIsExcluded($node, $attr)
+    function nodeIsExcluded($node, $attr = '*')
     {
         if (array_key_exists($this->getIdOfNode($node), $this->excluded_nodes)) {
             foreach ($this->excluded_nodes[$this->getIdOfNode($node)] as $excluded_nodes__value) {
@@ -100,6 +103,23 @@ class Dom
         return false;
     }
 
+    function addNoTranslateClassToExcludedChildren($node)
+    {
+        if (!$this->isTextNode($node)) {
+            foreach ($this->getChildrenOfNodeIncludingWhitespace($node) as $nodes__value) {
+                if (!$this->isTextNode($nodes__value)) {
+                    if ($this->nodeIsExcluded($nodes__value, '*')) {
+                        $class = $nodes__value->getAttribute('class');
+                        if (strpos($class, 'notranslate') === false) {
+                            $class = trim($class . ' notranslate');
+                            $nodes__value->setAttribute('class', $class);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     function preloadForceTokenize()
     {
         $this->force_tokenize = [];
@@ -111,6 +131,11 @@ class Dom
                 }
             }
         }
+    }
+
+    function nodeIsForcedTokenized($node)
+    {
+        return in_array($this->getIdOfNode($node), $this->force_tokenize);
     }
 
     function preloadLngAreas()
@@ -187,6 +212,7 @@ class Dom
 
             if (count($nodes) > 0) {
                 foreach ($nodes as $nodes__value) {
+                    $this->addNoTranslateClassToExcludedChildren($nodes__value);
                     $content = [];
                     // this is important:
                     // if you fetch the variable of a text node with nodeValue (or even textContent) and also getAttribute
@@ -697,7 +723,7 @@ class Dom
             $this->group_cache[$this->getIdOfNode($parent)] = false;
 
             // if the tokenization is forced on parent
-            if (in_array($this->getIdOfNode($parent), $this->force_tokenize)) {
+            if ($this->nodeIsForcedTokenized($parent)) {
                 $this->group_cache[$this->getIdOfNode($parent)] = true;
             }
 
@@ -707,48 +733,66 @@ class Dom
                 if ($this->isEmptyTextNode($nodes__value)) {
                     continue;
                 }
-                if (
-                    // if the tokenization is forced on any child
-                    in_array($this->getIdOfNode($nodes__value), $this->force_tokenize) ||
-                    /*
-                    this is the most important part of the tokenization pattern:
-                    return parent node (and don't tokenize), if
+                // if the tokenization is forced on any child
+                if ($this->nodeIsForcedTokenized($nodes__value)) {
+                    $this->group_cache[$this->getIdOfNode($parent)] = true;
+                    break;
+                }
+                // if the unprefixed/suffixed version of a text node is a single dom node
+                if ($this->isTextNode($nodes__value)) {
+                    $unprefixed_suffixed = $this->tags->removePrefixSuffix(
+                        $this->getInnerHtml($nodes__value->parentNode)
+                    )[0];
+                    if (preg_match('/^<([a-zA-Z][a-zA-Z0-9]*)[^>]*>(.*?)<\/\1>$/', $unprefixed_suffixed)) {
+                        // sanity check: don't cach "a) <span>foo</span> bar <span>baz</span>"
+                        $tmp = $this->DOMDocument->createElement('div', '');
+                        $this->setInnerHtml($tmp, $unprefixed_suffixed);
+                        if ($this->getChildrenCountOfNode($tmp) === 1) {
+                            $this->group_cache[$this->getIdOfNode($parent)] = true;
+                            break;
+                        }
+                    }
+                }
+                /*
+                this is the most important part of the tokenization pattern:
+                return parent node (and don't tokenize), if
+                    (
+                        it is a text node
+                    )
+                    OR
+                    (
+                        it is an inner tag node (span, br, ...)
+                        AND
+                        it has less than 2 children
+                        AND 
                         (
-                            it is a text node
+                            it has no siblings
+                            OR
+                            it has 1 or more text node siblings longer than 1 char
                         )
-                        OR
+                        AND NOT
                         (
-                            it is an inner tag node (span, br, ...)
-                            AND
-                            it has less than 2 children
-                            AND 
                             (
-                                it has no siblings
+                                its content ends with ":"
                                 OR
-                                it has 1 or more text node siblings longer than 1 char
+                                its next sibling content begins with ":"
+                                OR
+                                its last children is a <br>
+                                OR
+                                its next sibling is a <br>
                             )
-                            AND NOT
-                            (
-                                (
-                                    its content ends with ":"
-                                    OR
-                                    its next sibling content begins with ":"
-                                    OR
-                                    its last children is a <br>
-                                    OR
-                                    its next sibling is a <br>
-                                )
-                                AND
-                                (                                
-                                    it has 0 or 1 text node sibling
-                                    OR
-                                    it has 2 or more text node siblings less than 2 chars
-                                    OR
-                                    it has only br siblings
-                                )
+                            AND
+                            (                                
+                                it has 0 or 1 text node sibling
+                                OR
+                                it has 2 or more text node siblings less than 2 chars
+                                OR
+                                it has only br siblings
                             )
                         )
-                    */
+                    )
+                */
+                if (
                     !(
                         $this->isTextNode($nodes__value) ||
                         ($this->isInnerTagNode($nodes__value) &&
