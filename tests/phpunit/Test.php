@@ -1070,11 +1070,11 @@ EOD;
 <a href="mailto:"></a>
 <a href="mailto:david@vielhuber.de_EN"></a>
 <a href="mailto:david@vielhuber.de_EN?subject=House&amp;body=This%20is%20a%20test"></a>
-<a href="mailto:david@vielhuber.de_EN?subject=House&amp;body=This%20is%20a%20link%20http://gtbabel.local.vielhuber.de/en/privacy"></a>
+<a href="mailto:david@vielhuber.de_EN?subject=House&amp;body=This%20is%20a%20link%20http://gtbabel.local.vielhuber.de/en/data-protection"></a>
 <a href="tel:+4989111312113"></a>
 <a href="http://test.de/beispiel-bilddatei9.jpg"></a>
 <a href="http://test.de/beispiel-pfad10"></a>
-<a href="http://gtbabel.local.vielhuber.de/en/privacy/example-path11"></a>
+<a href="http://gtbabel.local.vielhuber.de/en/data-protection/example-path11"></a>
 <a href="http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei12_EN.jpg"></a>
 <a href="http://gtbabel.local.vielhuber.de/en/"></a>
 <a href="http://gtbabel.local.vielhuber.de/en/"></a>
@@ -1089,7 +1089,7 @@ EOD;
 EOD;
 
         $expected_data = [
-            ['datenschutz', 'slug', 'de', 'en', 'privacy', 0],
+            ['datenschutz', 'slug', 'de', 'en', 'data-protection', 0],
             ['beispiel-pfad11', 'slug', 'de', 'en', 'example-path11', 0],
             ['beispiel', 'slug', 'de', 'en', 'example', 0],
             ['pfad', 'slug', 'de', 'en', 'path', 0],

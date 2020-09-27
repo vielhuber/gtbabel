@@ -1107,18 +1107,18 @@ The following features are included:
 
 Gtbabel itself is based on PHP and works for static pages or pages rendered via PHP.
 
-However, if you enable `detect_dom_changes`, Gtbabel monitors dom changes and translates suitable parts.\
+However, if you enable `detect_dom_changes`, Gtbabel monitors dom changes and translates suitable parts.
 
 To get translations directly in JavaScript, Gtbabel also provides a small helper function to hotload your translations in the header that works in every environment. For this purpose the option `localize_js_strings` must be filled with content. You then can access those strings easily inside JavaScript with:
 
 ```js
-gtbabel__('string');
-gtbabel__('string', 'context');
+if (typeof gtbabel__ === 'function') {
+    gtbabel__('string');
+    gtbabel__('string', 'context');
+}
 ```
 
-Also first check, if Gtbabel is available in JavaScript with `if (typeof gtbabel__ === 'function') { }`.
-
-If you are a WordPress user, you might use the [wp_localize_script](https://developer.wordpress.org/reference/functions/wp_localize_script/) function. Keep doing that and simply use `gtbabel__()` via PHP to translate the strings you want to be provided in JavaScript:
+If you are on WordPress, you might already use the [wp_localize_script](https://developer.wordpress.org/reference/functions/wp_localize_script/) function. Keep doing that and simply use `gtbabel__()` via PHP to translate the strings you want to be provided in JavaScript:
 
 ```php
 if (function_exists('gtbabel__')) {
