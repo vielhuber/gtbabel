@@ -105,9 +105,9 @@ class Dom
 
     function addNoTranslateClassToExcludedChildren($node)
     {
-        if (!$this->isTextNode($node)) {
+        if ($this->isElementNode($node)) {
             foreach ($this->getChildrenOfNodeIncludingWhitespace($node) as $nodes__value) {
-                if (!$this->isTextNode($nodes__value)) {
+                if ($this->isElementNode($nodes__value)) {
                     if ($this->nodeIsExcluded($nodes__value, '*')) {
                         $class = $nodes__value->getAttribute('class');
                         if (strpos($class, 'notranslate') === false) {
@@ -504,6 +504,11 @@ class Dom
             $xpath = str_replace('//>//', ' / ', $xpath);
         }
         return $xpath;
+    }
+
+    function isElementNode($node)
+    {
+        return @$node->nodeType === 1;
     }
 
     function isTextNode($node)
