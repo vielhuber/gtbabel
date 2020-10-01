@@ -10,13 +10,13 @@ class Settings
         $args = $this->setupArgs($args);
         $args = $this->setupSettings($args);
         $args = $this->setupCachedSettings($args);
-        $args = (object) $args;
+        $args = $args;
         $this->args = $args;
     }
 
     function set($prop, $value)
     {
-        $this->args->{$prop} = $value;
+        $this->args[$prop] = $value;
     }
 
     function get($prop)
@@ -24,7 +24,7 @@ class Settings
         if ($this->args === null) {
             return null;
         }
-        return $this->args->{$prop};
+        return $this->args[$prop];
     }
 
     function setupArgs($args)
@@ -35,13 +35,21 @@ class Settings
         if (is_array($args)) {
             return $args;
         }
+        if (is_object($args)) {
+            return (array) $args;
+        }
         if (is_string($args) && file_exists($args)) {
-            $arr = json_decode(file_Get_contents($args), true);
+            $arr = json_decode(file_get_contents($args), true);
             if ($arr === true || $arr === false || $arr === null || $arr == '' || !is_array($arr)) {
                 return [];
             }
             return $arr;
         }
+    }
+
+    function getSettings()
+    {
+        return $this->args;
     }
 
     function setupSettings($args = [])
@@ -101,7 +109,7 @@ class Settings
             'force_tokenize' => ['.force-tokenize'],
             'include_dom' => $this->getDefaultIncludeDom(),
             'localize_js' => true,
-            'localize_js_strings' => [['string' => 'Schließen'], ['string' => 'blog', 'context' => 'slug']],
+            'localize_js_strings' => ['Schließen', '/blog'],
             'detect_dom_changes' => true,
             'detect_dom_changes_include' => [
                 '.top-button',

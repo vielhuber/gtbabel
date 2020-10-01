@@ -70,9 +70,13 @@ If you don't provide an initial configuration, Gtbabel starts with reasonable de
 You also can provide settings directly as an array or pass a path to a json file to overwrite (parts) of the default settings:
 
 ```php
-$gtbabel->start(); // start with default settings
-$gtbabel->start(['languages' => [['code' => 'de', 'label' => 'Deutsch'], ['code' => 'en', 'label' => 'English']], ...]); // overwrite settings in php
-$gtbabel->start('settings.json'); // overwrite settings from json
+$gtbabel = new Gtbabel();
+
+// set settings from php
+$gtbabel->config(['languages' => [['code' => 'de', 'label' => 'Deutsch'], ['code' => 'en', 'label' => 'English']], ...]);
+
+// set settings from json
+$gtbabel->config('settings.json');
 ```
 
 The default configuration is:
@@ -898,7 +902,7 @@ The default configuration is:
         ]
     ],
     'lng_source' => 'de',
-    'lng_target' => null, // this gets automatically determined by the current url
+    'lng_target' => null, // this gets automatically determined by the current url; you can set this manually (e.g. in a non-host based environment)
     'database' => [
         'type' => 'sqlite',
         'filename' => 'data.db',
@@ -1052,7 +1056,7 @@ The default configuration is:
         ]
     ],
     'localize_js' => true,
-    'localize_js_strings' => [['string' => 'Schließen'], ['string' => 'blog', 'context' => 'slug']],
+    'localize_js_strings' => ['Schließen', '/blog'],
     'detect_dom_changes' => true,
     'detect_dom_changes_include' => ['.top-button', '.swal-overlay', '.wpcf7-response-output', '.wpcf7-not-valid-tip']
 ];
@@ -1066,11 +1070,9 @@ However, you can also use Gtbabel more directly:
 ```php
 $gtbabel = new Gtbabel();
 
-$gtbabel->translate('<p>Dies ist ein Test!</p>', [
-    'lng_source' => 'de',
-    'lng_target' => 'en',
-    'google_translation_api_key' => '...'
-]); // <p>This is a test!</p>
+$gtbabel->config([...]);
+
+$gtbabel->translate('<p>Dies ist ein Test!</p>'); // <p>This is a test!</p>
 
 $gtbabel->tokenize('<p>Dies ist ein Test!</p>'); // [['string' => 'This is a test!', 'context' => null]]
 ```
@@ -1113,8 +1115,7 @@ To get translations directly in JavaScript, Gtbabel also provides a small helper
 
 ```js
 if (typeof gtbabel__ === 'function') {
-    gtbabel__('string');
-    gtbabel__('string', 'context');
+    gtbabel__('Registered string');
 }
 ```
 
@@ -1498,15 +1499,31 @@ gtbabel_default_settings(['log_folder' => '/foo']) // ['languages' => [['code' =
 gtbabel_referer_lng() // 'de'
 
 gtbabel_languagepicker() // [['code' => 'de', 'label' => 'Deutsch', 'url' => 'https://tld.com/de/nudel', 'active' => true], ['code' => 'en', 'label' => 'English', 'url' => 'https://tld.com/en/noodle', 'active' => false], ...]
-
 gtbabel__('Hallo') // 'Hi there'
-gtbabel__('blog', 'slug') // 'blog-en'
+```
+
+## Notes on gtbabel\_\_()
+
+Don't use `gtbabel__()` in your templates for echoing strings, just output them in the source language. Gtbabel will take care of the rest. However, there are some places (e.g. in your backend logic), where you need to translate strings. This is what this function is intended for.
+
+Because translations are not injective, the following two calls create two database entries (with different source languages):
+
+```php
+gtbabel__('Hallo', null, 'en', 'de') // 'Hi there'
 gtbabel__('Hi there', null, 'de', 'en') // 'Hallo'
 ```
 
-## Note on gtbabel\_\_()
+You can provide any html to `gtbabel__()`:
 
-Don't use `gtbabel__()` in your templates for echoing strings, just output them in the source language. Gtbabel will take care of the rest. However, there are some places (e.g. in your backend logic), where you need to translate strings. This is what this function is intended for.
+```php
+gtbabel__('<p>Hallo <a href="/datenschutz">Datenschutz</a>!</p>'); // '<p>Hello <a href="/en/data-protection">data protection</a>!</p>'
+```
+
+However, it accepts a context as a second argument to translate very specific strings:
+
+```php
+gtbabel__('/datenschutz', 'slug'); // '/en/data-privacy'
+```
 
 ## Dealing with form data
 
@@ -1515,7 +1532,7 @@ Nevertheless, one has to manually take care of how multilingual input data shoul
 
 ### Search
 
-If you need to translate queries into your source languages (for example in searches), just do this:
+If you need to translate queries to your source language (for example in searches), just do this:
 
 ```php
 $s = gtbabel__($s, null, gtbabel_source_lng(), gtbabel_current_lng());
@@ -1537,7 +1554,7 @@ add_action('pre_get_posts', function ($query) {
 Prepare your email templates only in your source language and before sending, translate them on the fly with something like:
 
 ```php
-$template = gtbabel__($template, null, gtbabel_source_lng(), gtbabel_referer_lng());
+$template = gtbabel__($template, null, gtbabel_referer_lng(), gtbabel_source_lng());
 ```
 
 In WordPress, Contact Form 7 is a popular contact form plugin. Gtbabel has built in support for translating its email templates.

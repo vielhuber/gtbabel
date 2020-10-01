@@ -19,6 +19,7 @@ class Dom
     public $tags;
     public $log;
     public $altlng;
+    public $gtbabel;
 
     function __construct(
         Utils $utils = null,
@@ -27,7 +28,8 @@ class Dom
         Settings $settings = null,
         Tags $tags = null,
         Log $log = null,
-        Altlng $altlng = null
+        Altlng $altlng = null,
+        Gtbabel $gtbabel = null
     ) {
         $this->utils = $utils ?: new Utils();
         $this->data = $data ?: new Data();
@@ -36,6 +38,7 @@ class Dom
         $this->tags = $tags ?: new Tags();
         $this->log = $log ?: new Log();
         $this->altlng = $altlng ?: new Altlng();
+        $this->gtbabel = $gtbabel ?: new Gtbabel();
     }
 
     function preloadExcludedNodes()
@@ -354,17 +357,17 @@ class Dom
         }
     }
 
-    function modifyContent($content)
+    function modifyContent($content, $mode)
     {
         if ($content == '') {
             return $content;
         }
-        $content = $this->modifyHtml($content);
-        $content = $this->modifyJson($content);
+        $content = $this->modifyHtml($content, $mode);
+        $content = $this->modifyJson($content, $mode);
         return $content;
     }
 
-    function modifyHtml($html)
+    function modifyHtml($html, $mode)
     {
         if ($this->utils->getContentType($html) !== 'html') {
             return $html;
@@ -373,11 +376,13 @@ class Dom
             return $html;
         }
         $this->setupDomDocument($html);
-        $this->setLangTags();
-        $this->setRtlAttr();
-        $this->setAltLngUrls();
-        $this->detectDomChanges();
-        $this->localizeJs();
+        if ($mode === 'buffer') {
+            $this->setLangTags();
+            $this->setRtlAttr();
+            $this->setAltLngUrls();
+            $this->detectDomChanges();
+            $this->localizeJs();
+        }
         $this->preloadExcludedNodes();
         $this->preloadForceTokenize();
         $this->preloadLngAreas();
@@ -827,7 +832,7 @@ class Dom
         return $parent;
     }
 
-    function modifyJson($json)
+    function modifyJson($json, $mode)
     {
         if ($this->utils->getContentType($json) !== 'json') {
             return $json;
@@ -857,7 +862,7 @@ class Dom
             return $json;
         }
         $json = json_decode($json);
-        $json = __::array_map_deep($json, function ($value, $key, $key_chain) use ($keys) {
+        $json = __::array_map_deep($json, function ($value, $key, $key_chain) use ($keys, $mode) {
             $match = false;
             foreach ($keys as $keys__value) {
                 $regex = '/' . str_replace('\*', '(.+)', preg_quote($keys__value)) . '/';
@@ -867,7 +872,7 @@ class Dom
                 }
             }
             if ($match === true) {
-                $trans = $this->modifyContent($value);
+                $trans = $this->modifyContent($value, $mode);
                 if ($trans !== null) {
                     $value = $trans;
                 }
@@ -945,13 +950,11 @@ class Dom
         $translated_strings_json = [];
         if (!$this->data->sourceLngIsCurrentLng()) {
             foreach ($this->settings->get('localize_js_strings') as $localize_js_strings__value) {
-                $string = $localize_js_strings__value['string'];
-                $context = @$localize_js_strings__value['context'] ?? null;
-                $trans = $this->data->prepareTranslationAndAddDynamicallyIfNeeded(
+                $string = $localize_js_strings__value;
+                $trans = $this->gtbabel->translate(
                     $string,
-                    $this->settings->getSourceLanguageCode(),
                     $this->data->getCurrentLanguageCode(),
-                    $context
+                    $this->settings->getSourceLanguageCode()
                 );
                 if ($trans === null) {
                     continue;
@@ -964,7 +967,7 @@ class Dom
                     $string = addcslashes($string, $to_escape__value);
                     $trans = addcslashes($trans, $to_escape__value);
                 }
-                $translated_strings_json[$context][$string] = $trans;
+                $translated_strings_json[$string] = $trans;
             }
         }
 
@@ -974,7 +977,7 @@ class Dom
             json_encode($translated_strings_json, JSON_HEX_APOS) .
             '\');';
         $script .=
-            'function gtbabel__(string, context = \'\') { if( context in gtbabel_translated_strings && gtbabel_translated_strings[context] !== undefined && gtbabel_translated_strings[context][string] !== undefined ) { return gtbabel_translated_strings[context][string]; } return string; }';
+            'function gtbabel__(string) { if( gtbabel_translated_strings[string] !== undefined ) { return gtbabel_translated_strings[string]; } return string; }';
 
         $head = $this->DOMXPath->query('/html/head')[0];
         if ($head === null) {

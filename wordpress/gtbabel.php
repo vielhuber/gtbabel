@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 4.5.6
+ * Version: 4.5.7
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -49,19 +49,17 @@ class GtbabelWordPress
                     return;
                 }
                 $props = $form->get_properties();
-                $props['mail']['subject'] = $this->gtbabel->data->getTranslationInForeignLngAndAddDynamicallyIfNeeded(
+                $props['mail']['subject'] = $this->gtbabel->translate(
                     $props['mail']['subject'],
-                    gtbabel_referer_lng(),
-                    gtbabel_source_lng(),
-                    null
+                    $this->gtbabel->host->getRefererLanguageCode(),
+                    $this->gtbabel->settings->getSourceLanguageCode()
                 );
                 $props['mail']['body'] = __::trim_every_line(
                     __::br2nl(
-                        $this->gtbabel->data->getTranslationInForeignLngAndAddDynamicallyIfNeeded(
+                        $this->gtbabel->translate(
                             nl2br($props['mail']['body']),
-                            gtbabel_referer_lng(),
-                            gtbabel_source_lng(),
-                            null
+                            $this->gtbabel->host->getRefererLanguageCode(),
+                            $this->gtbabel->settings->getSourceLanguageCode()
                         )
                     )
                 );
@@ -95,11 +93,17 @@ class GtbabelWordPress
         // use a "faster" hook for translating dom changes
         if (isset($_GET['gtbabel_translate_part']) && $_GET['gtbabel_translate_part'] == '1' && isset($_POST['html'])) {
             add_action('plugins_loaded', function () {
-                $this->start();
+                $this->setupConfig();
+                if ($this->isFrontend()) {
+                    $this->gtbabel->start();
+                }
             });
         } else {
             add_action('after_setup_theme', function () {
-                $this->start();
+                $this->setupConfig();
+                if ($this->isFrontend()) {
+                    $this->gtbabel->start();
+                }
                 if (isset($_GET['export']) && $_GET['export'] == '1') {
                     $this->gtbabel->gettext->export();
                 }
@@ -107,7 +111,9 @@ class GtbabelWordPress
             add_action(
                 'template_redirect',
                 function () {
-                    $this->gtbabel->data->addCurrentUrlToTranslations(true);
+                    if ($this->isFrontend()) {
+                        $this->gtbabel->data->addCurrentUrlToTranslations(true);
+                    }
                 },
                 999999
             );
@@ -119,13 +125,15 @@ class GtbabelWordPress
         add_action(
             'shutdown',
             function () {
-                $this->stop();
+                if ($this->isFrontend()) {
+                    $this->gtbabel->stop();
+                }
             },
             0
         );
     }
 
-    private function start()
+    private function setupConfig()
     {
         $settings = $this->getSettings();
 
@@ -172,7 +180,7 @@ class GtbabelWordPress
             }
         }
 
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
 
         // define wpml fallback constant
         if (!defined('ICL_LANGUAGE_CODE')) {
@@ -180,9 +188,9 @@ class GtbabelWordPress
         }
     }
 
-    private function stop()
+    private function isFrontend()
     {
-        $this->gtbabel->stop();
+        return !is_admin() && $pagenow != 'wp-login.php';
     }
 
     private function reset()
@@ -598,7 +606,10 @@ class GtbabelWordPress
                     }
 
                     // sanitize
-                    $settings = __::array_map_deep($settings, function ($settings__value) {
+                    $settings = __::array_map_deep($settings, function ($settings__value, $settings__key) {
+                        if (in_array($settings__key, ['localize_js_strings'])) {
+                            return wp_kses_post($settings__value);
+                        }
                         return sanitize_textarea_field($settings__value);
                     });
 
@@ -634,7 +645,8 @@ class GtbabelWordPress
                             'exclude_urls_content',
                             'exclude_urls_slugs',
                             'force_tokenize',
-                            'detect_dom_changes_include'
+                            'detect_dom_changes_include',
+                            'localize_js_strings'
                         ]
                         as $repeater__value
                     ) {
@@ -778,26 +790,6 @@ class GtbabelWordPress
                         }
                     }
 
-                    $post_data = $settings['localize_js_strings'];
-                    $settings['localize_js_strings'] = [];
-                    if (!empty(@$post_data['string'])) {
-                        foreach ($post_data['string'] as $post_data__key => $post_data__value) {
-                            if (
-                                @$post_data['string'][$post_data__key] == '' &&
-                                @$post_data['context'][$post_data__key] == ''
-                            ) {
-                                continue;
-                            }
-                            $settings['localize_js_strings'][] = [
-                                'string' => $post_data['string'][$post_data__key],
-                                'context' =>
-                                    $post_data['context'][$post_data__key] != ''
-                                        ? $post_data['context'][$post_data__key]
-                                        : null
-                            ];
-                        }
-                    }
-
                     if (!isset($settings['languages'])) {
                         $settings = array_merge(['languages' => []], $settings);
                     }
@@ -814,8 +806,7 @@ class GtbabelWordPress
                     }
 
                     $this->saveSettings($settings);
-                    // refresh gtbabel with new options
-                    $this->start();
+                    $this->setupConfig();
                 }
             }
 
@@ -830,7 +821,7 @@ class GtbabelWordPress
             if (isset($_POST['reset_settings'])) {
                 $this->deleteSettings();
                 $this->setDefaultSettingsToOption();
-                $this->start();
+                $this->setupConfig();
             }
 
             if (isset($_POST['reset_translations'])) {
@@ -1544,16 +1535,13 @@ class GtbabelWordPress
         echo '<div class="gtbabel__repeater">';
         echo '<ul class="gtbabel__repeater-list">';
         if (empty(@$settings['localize_js_strings'])) {
-            $settings['localize_js_strings'] = [['string' => '', 'context' => '']];
+            $settings['localize_js_strings'] = [];
         }
         foreach ($settings['localize_js_strings'] as $localize_js_strings__value) {
-            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-2">';
-            echo '<input class="gtbabel__input" type="text" name="gtbabel[localize_js_strings][string][]" value="' .
-                esc_attr($localize_js_strings__value['string']) .
-                '" placeholder="string" />';
-            echo '<input class="gtbabel__input" type="text" name="gtbabel[localize_js_strings][context][]" value="' .
-                $localize_js_strings__value['context'] .
-                '" placeholder="context" />';
+            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-1">';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[localize_js_strings][]" value="' .
+                esc_html($localize_js_strings__value) .
+                '" />';
             echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
                 __('Remove', 'gtbabel-plugin') .
                 '</a>';
@@ -2502,8 +2490,7 @@ EOD;
                     $this->saveSetting('wizard_finished', true);
                 }
 
-                // restart
-                $this->start();
+                $this->setupConfig();
             }
         }
 
@@ -2701,7 +2688,7 @@ EOD;
             $time = $this->gtbabel->utils->getCurrentTime();
             $this->fetch($this->buildFetchUrl($url));
             // subsequent urls are now available (we need to refresh the current session)
-            $this->start();
+            $this->setupConfig();
             foreach ($this->gtbabel->settings->getSelectedLanguageCodesWithoutSource() as $lngs__value) {
                 if ($lng !== null && $lngs__value !== $lng) {
                     continue;
@@ -2715,7 +2702,7 @@ EOD;
                 $urls[] = $url_trans;
             }
             // restart again
-            $this->start();
+            $this->setupConfig();
             return [$urls, $time];
         }
         return [null, null];
@@ -3015,7 +3002,7 @@ EOD;
             echo '... ' . $url . '<br/>';
 
             if ($queue[$i]['refresh_after'] === true) {
-                $this->start();
+                $this->setupConfig();
             }
         }
 
@@ -3248,5 +3235,6 @@ class gtbabel_lngpicker_widget extends \WP_Widget
     }
 }
 
+// this object is passed by reference, therefore globally available (e.g. in helpers.php)
 $gtbabel = new Gtbabel();
 new GtbabelWordPress($gtbabel);

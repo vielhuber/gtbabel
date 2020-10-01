@@ -99,18 +99,13 @@ if (!function_exists('gtbabel_languagepicker')) {
 }
 
 if (!function_exists('gtbabel__')) {
-    function gtbabel__($str, $context = null, $lng_target = null, $lng_source = null)
+    function gtbabel__($str, $lng_target = null, $lng_source = null)
     {
         global $gtbabel;
         if ($gtbabel === null) {
             $gtbabel = new \vielhuber\gtbabel\Gtbabel();
         }
-        return $gtbabel->data->getTranslationInForeignLngAndAddDynamicallyIfNeeded(
-            $str,
-            $lng_target,
-            $lng_source,
-            $context
-        );
+        return $gtbabel->translate($str, $lng_target, $lng_source);
     }
 }
 

@@ -1608,7 +1608,8 @@ class Data
             return true;
         }
         if ($context !== 'email' && $context !== 'slug' && $context !== 'file') {
-            if (strpos($str, ' ') === false) {
+            // don't ignore root relative links beginning with "/"
+            if (strpos($str, ' ') === false && strpos($str, '/') === false) {
                 if (strpos($str, '_') !== false) {
                     return true;
                 }
@@ -1636,9 +1637,20 @@ class Data
             if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
                 $context = 'email';
             } elseif (mb_strpos($value, $this->host->getBaseUrlForSourceLanguage()) === 0) {
+                // absolute internal links
                 $context = 'slug|file';
-            } elseif (mb_strpos($value, 'http') === 0 && mb_strpos($value, ' ') === false) {
+            } elseif (
+                // values beginning with external http
+                mb_strpos($value, 'http') === 0 &&
+                mb_strpos($value, ' ') === false
+            ) {
                 $context = 'slug';
+            } elseif (preg_match('/^[a-z-\/]+(\.[a-z]{1,4})$/', $value)) {
+                // foo.html
+                $context = 'slug|file';
+            } elseif (preg_match('/^\/[a-z-_\/\.]+$/', $value)) {
+                // /foo/bar
+                $context = 'slug|file';
             }
         }
         if ($context === 'slug|file') {

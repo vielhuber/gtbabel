@@ -544,16 +544,73 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test_translate()
     {
-        $output = $this->gtbabel->translate('<p>Dies ist ein Test!</p>', [
-            'lng_source' => 'de',
-            'lng_target' => 'en',
-            'auto_translation' => true,
-            'auto_translation_service' => 'google',
-            'google_translation_api_key' => @$_SERVER['GOOGLE_TRANSLATION_API_KEY'],
-            'log_folder' => './tests/logs'
-        ]);
+        $settings = $this->getDefaultSettings();
+        $settings['languages'] = $this->getLanguageSettings([['code' => 'de'], ['code' => 'en'], ['code' => 'fr']]);
+        $settings['debug_translations'] = false;
+        $settings['auto_translation'] = true;
+        $settings['auto_add_translations'] = true;
+        $this->gtbabel->config($settings);
+
+        // basic
+        $output = $this->gtbabel->translate('<p>Dies ist ein Test!</p>');
         $this->assertEquals($output, '<p>This is a test!</p>');
         $this->gtbabel->reset();
+
+        // inline
+        $this->gtbabel->config($settings);
+        ob_start();
+        $this->gtbabel->start();
+        echo '<div class="translate">';
+        echo 'Hund';
+        echo '</div>';
+        echo '<div class="notranslate">';
+        echo $this->gtbabel->translate('Maison', 'en', 'fr');
+        echo $this->gtbabel->translate('Haus', 'en', 'de');
+        echo $this->gtbabel->translate('House', 'de', 'en');
+        echo '</div>';
+        $this->gtbabel->stop();
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertEquals($output, '<div class="translate">Dog</div><div class="notranslate">HouseHouseHaus</div>');
+        $this->gtbabel->reset();
+
+        // specific
+        $this->gtbabel->config($settings);
+        $this->assertEquals($this->gtbabel->translate('Hund'), 'Dog');
+        $this->assertEquals($this->gtbabel->translate('Hund', 'en', 'de'), 'Dog');
+        $this->assertEquals(
+            $this->gtbabel->translate('<p>Hallo <a href="/datenschutz">Datenschutz</a>!</p>'),
+            '<p>Hello <a href="/en/data-protection">data protection</a> !</p>'
+        );
+        $this->assertEquals($this->gtbabel->translate('Datenschutz'), 'Data protection');
+        $this->assertEquals($this->gtbabel->translate('/datenschutz'), '/en/data-protection');
+        $this->assertEquals($this->gtbabel->translate('/hund/haus/eimer'), '/en/dog/house/bucket');
+        $this->assertEquals(
+            $this->gtbabel->translate('http://gtbabel.local.vielhuber.de/katze/mund'),
+            'http://gtbabel.local.vielhuber.de/en/cat/mouth'
+        );
+
+        $translations = $this->gtbabel->data->getTranslationsFromDatabase();
+
+        $this->assertEquals(count($translations), 9);
+        $this->assertEquals($translations[0]['str'], 'Hund');
+        $this->assertEquals($translations[0]['context'], '');
+        $this->assertEquals($translations[1]['str'], 'Hallo <a>Datenschutz</a>!');
+        $this->assertEquals($translations[1]['context'], '');
+        $this->assertEquals($translations[2]['str'], 'datenschutz');
+        $this->assertEquals($translations[2]['context'], 'slug');
+        $this->assertEquals($translations[3]['str'], 'Datenschutz');
+        $this->assertEquals($translations[3]['context'], '');
+        $this->assertEquals($translations[4]['str'], 'hund');
+        $this->assertEquals($translations[4]['context'], 'slug');
+        $this->assertEquals($translations[5]['str'], 'haus');
+        $this->assertEquals($translations[5]['context'], 'slug');
+        $this->assertEquals($translations[6]['str'], 'eimer');
+        $this->assertEquals($translations[6]['context'], 'slug');
+        $this->assertEquals($translations[7]['str'], 'katze');
+        $this->assertEquals($translations[7]['context'], 'slug');
+        $this->assertEquals($translations[8]['str'], 'mund');
+        $this->assertEquals($translations[8]['context'], 'slug');
     }
 
     public function test_tokenize()
@@ -587,50 +644,13 @@ class Test extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function test_inline_translation()
-    {
-        $settings = $this->getDefaultSettings();
-        $settings['languages'] = $this->getLanguageSettings([['code' => 'de'], ['code' => 'en'], ['code' => 'fr']]);
-        $settings['debug_translations'] = false;
-        $settings['auto_translation'] = true;
-        $settings['auto_add_translations'] = true;
-        $this->gtbabel->start($settings);
-
-        $this->assertEquals(
-            $this->gtbabel->data->getTranslationInForeignLngAndAddDynamicallyIfNeeded('Maison', 'en', 'fr', null),
-            'House'
-        );
-        $this->assertEquals(
-            $this->gtbabel->data->getTranslationInForeignLngAndAddDynamicallyIfNeeded('Haus', 'en', 'de', null),
-            'House'
-        );
-        $this->assertEquals(
-            $this->gtbabel->data->getTranslationInForeignLngAndAddDynamicallyIfNeeded('House', 'de', 'en', null),
-            'Haus'
-        );
-
-        $this->gtbabel->stop();
-
-        $translations = $this->gtbabel->data->getTranslationsFromDatabase();
-        $this->assertEquals(count($translations), 2);
-        $this->assertEquals($translations[0]['str'], 'Haus');
-        $this->assertEquals($translations[0]['lng_source'], 'de');
-        $this->assertEquals($translations[0]['lng_target'], 'fr');
-        $this->assertEquals($translations[0]['trans'], 'Maison');
-        $this->assertEquals($translations[1]['str'], 'Haus');
-        $this->assertEquals($translations[1]['lng_source'], 'de');
-        $this->assertEquals($translations[1]['lng_target'], 'en');
-        $this->assertEquals($translations[1]['trans'], 'House');
-
-        $this->gtbabel->reset();
-    }
-
     public function test_data()
     {
         $settings = $this->getDefaultSettings();
         $settings['languages'] = $this->getLanguageSettings([['code' => 'de'], ['code' => 'en']]);
         $settings['debug_translations'] = false;
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         $this->gtbabel->stop();
         $this->gtbabel->reset();
 
@@ -638,7 +658,8 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['auto_add_translations'] = false;
         $settings['only_show_checked_strings'] = false;
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo '<p>Haus</p>';
         $this->gtbabel->stop();
         $output = ob_get_contents();
@@ -652,7 +673,8 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['auto_add_translations'] = false;
         $settings['only_show_checked_strings'] = false;
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo '<p>Haus</p>';
         $this->gtbabel->stop();
         $output = ob_get_contents();
@@ -666,7 +688,8 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['auto_add_translations'] = true;
         $settings['only_show_checked_strings'] = false;
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo '<p>Haus</p>';
         $this->gtbabel->stop();
         $output = ob_get_contents();
@@ -683,7 +706,8 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['auto_add_translations'] = true;
         $settings['only_show_checked_strings'] = true;
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo '<p>Haus</p>';
         $this->gtbabel->stop();
         $output = ob_get_contents();
@@ -698,7 +722,8 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->gtbabel->data->editCheckedValue('Haus', null, 'de', 'en', true);
 
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo '<p>Haus</p>';
         $this->gtbabel->stop();
         $output = ob_get_contents();
@@ -720,7 +745,8 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['auto_translation'] = true;
         $settings['auto_add_translations'] = true;
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo '<h2 class="section__hl h3">Test <span class="icon--bf icon--chevron-down"></span> Test</h2>';
         $this->gtbabel->stop();
         ob_end_clean();
@@ -738,7 +764,8 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['auto_translation'] = true;
         $settings['auto_add_translations'] = true;
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         // #allesfürdich is encoded, #allesfürdich is not encoded
         // however, gtbabel does not add two entries to avoid confusion
         echo '<div data-title="#allesfürdich">#allesfürdich</div>';
@@ -758,7 +785,7 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             $output,
             '<div data-title="#anything for you">#anything for you</div>' .
-                '<p>foo &amp; bar <br> baz</p>' .
+                '<p>foo &amp; bar<br> baz</p>' .
                 '<div data-target=\'"gnarr" &amp; gnazz\'></div>' .
                 '<a href="https://www.url.com/foo.php?lang=de&amp;foo=bar"></a>' .
                 '<img src="" alt="First &amp; test" data-alt="Second &amp; test">' .
@@ -779,13 +806,15 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['debug_translations'] = false;
 
         $_SERVER['HTTP_REFERER'] = 'http://gtbabel.local.vielhuber.de/de/';
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         $this->gtbabel->stop();
         $this->assertEquals($this->gtbabel->host->getRefererLanguageCode(), 'de');
         $this->gtbabel->reset();
 
         $_SERVER['HTTP_REFERER'] = 'http://gtbabel.local.vielhuber.de/en/';
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         $this->gtbabel->stop();
         $this->assertEquals($this->gtbabel->host->getRefererLanguageCode(), 'en');
         $this->gtbabel->reset();
@@ -804,7 +833,8 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['only_show_checked_strings'] = false;
 
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo '<!DOCTYPE html><html lang="en"><body>
             <p>
                 Some content in english.
@@ -852,7 +882,8 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['only_show_checked_strings'] = false;
 
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo '<!DOCTYPE html><html lang="en"><body>
             <p>
                 Some content in english.
@@ -899,7 +930,8 @@ class Test extends \PHPUnit\Framework\TestCase
 
         $settings['auto_translation_service'] = 'google';
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo '<!DOCTYPE html><html lang="de"><body><p>Some content in english.</p></body></html>';
         $this->gtbabel->stop();
         ob_end_clean();
@@ -910,7 +942,8 @@ class Test extends \PHPUnit\Framework\TestCase
 
         $settings['auto_translation_service'] = 'google';
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo '<!DOCTYPE html><html lang="de"><body><p>Some content in english.</p><p>Some content in english.</p></body></html>';
         $this->gtbabel->stop();
         ob_end_clean();
@@ -920,7 +953,8 @@ class Test extends \PHPUnit\Framework\TestCase
 
         $settings['auto_translation_service'] = 'microsoft';
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo '<!DOCTYPE html><html lang="de"><body><p>Some content in english.</p><p>Some content in english.</p></body></html>';
         $this->gtbabel->stop();
         ob_end_clean();
@@ -930,7 +964,8 @@ class Test extends \PHPUnit\Framework\TestCase
 
         $settings['auto_translation_service'] = 'microsoft';
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo '<!DOCTYPE html><html lang="de"><body><p>Some content in english.</p><p>Other content in english.</p></body></html>';
         $this->gtbabel->stop();
         ob_end_clean();
@@ -940,7 +975,8 @@ class Test extends \PHPUnit\Framework\TestCase
 
         $settings['auto_translation_service'] = 'deepl';
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo '<!DOCTYPE html><html lang="de"><body><p>Some content in english.</p></body></html>';
         $this->gtbabel->stop();
         ob_end_clean();
@@ -948,7 +984,8 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->gtbabel->data->statsGetTranslatedCharsByService()[0]['length'], 24);
         $settings['auto_translation_service'] = 'google';
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo '<!DOCTYPE html><html lang="de"><body><p>Other content in english.</p></body></html>';
         $this->gtbabel->stop();
         ob_end_clean();
@@ -974,7 +1011,8 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['auto_translation_service'] = 'google';
         $settings['google_throttle_chars_per_month'] = 30;
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo '<!DOCTYPE html><html><body><p>Einige Inhalte in Englisch.</p><p>Einige andere Inhalte in Englisch.</p></body></html>';
         $this->gtbabel->stop();
         $output = ob_get_contents();
@@ -992,7 +1030,8 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['auto_translation_service'] = 'google';
         $settings['google_throttle_chars_per_month'] = 20;
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo '<!DOCTYPE html><html><body><p>Einige Inhalte in Englisch.</p><p>Einige andere Inhalte in Englisch.</p></body></html>';
         $this->gtbabel->stop();
         $output = ob_get_contents();
@@ -1111,7 +1150,8 @@ EOD;
         ];
 
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo $input;
         $this->gtbabel->stop();
         ob_get_contents();
@@ -1200,7 +1240,8 @@ EOD;
         );
 
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo $input;
         $this->gtbabel->stop();
         $output = ob_get_contents();
@@ -1256,13 +1297,15 @@ EOD;
         $settings['exclude_urls_slugs'] = [];
         $this->setHostTo('/haus/');
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo $html;
         $this->gtbabel->stop();
         ob_end_clean();
         $this->setHostTo('/en/house/');
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo $html;
         $path = $_SERVER['REQUEST_URI'];
         $this->gtbabel->stop();
@@ -1278,13 +1321,15 @@ EOD;
         $settings['exclude_urls_slugs'] = [];
         $this->setHostTo('/haus/');
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo $html;
         $this->gtbabel->stop();
         ob_end_clean();
         $this->setHostTo('/en/house/');
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo $html;
         $path = $_SERVER['REQUEST_URI'];
         $this->gtbabel->stop();
@@ -1299,13 +1344,15 @@ EOD;
         $settings['exclude_urls_slugs'] = ['house'];
         $this->setHostTo('/haus/');
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo $html;
         $this->gtbabel->stop();
         ob_end_clean();
         $this->setHostTo('/en/house/');
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo $html;
         $path = $_SERVER['REQUEST_URI'];
         $this->gtbabel->stop();
@@ -1342,7 +1389,8 @@ EOD;
         );
         $this->setHostTo('/impressum/');
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo '<!DOCTYPE html><html><body><div class="lngpicker">';
         foreach ($this->gtbabel->data->getLanguagePickerData() as $lngpicker__value) {
             echo '<a href="' . $lngpicker__value['url'] . '"></a>';
@@ -1366,7 +1414,8 @@ EOD;
         );
         $this->setHostTo('/de/impressum/');
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo '<!DOCTYPE html><html><body><div class="lngpicker">';
         foreach ($this->gtbabel->data->getLanguagePickerData() as $lngpicker__value) {
             echo '<a href="' . $lngpicker__value['url'] . '"></a>';
@@ -1387,7 +1436,8 @@ EOD;
         $settings['only_show_checked_strings'] = true;
         $this->setHostTo('/de/impressum/');
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo '<!DOCTYPE html><html><body><div class="lngpicker">';
         foreach ($this->gtbabel->data->getLanguagePickerData() as $lngpicker__value) {
             echo '<a href="' . $lngpicker__value['url'] . '"></a>';
@@ -1408,7 +1458,8 @@ EOD;
         $settings['only_show_checked_strings'] = true;
         $this->setHostTo('/en/impressum/');
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo '<!DOCTYPE html><html><body><div class="lngpicker">';
         foreach ($this->gtbabel->data->getLanguagePickerData() as $lngpicker__value) {
             echo '<a href="' . $lngpicker__value['url'] . '"></a>';
@@ -1432,12 +1483,14 @@ EOD;
         );
         $settings['only_show_checked_strings'] = false;
         $this->setHostTo('/de/impressum/');
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         $this->gtbabel->stop();
 
         $this->setHostTo('/en/imprint/');
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo '<!DOCTYPE html><html><body><div class="lngpicker">';
         foreach ($this->gtbabel->data->getLanguagePickerData() as $lngpicker__value) {
             echo '<a href="' . $lngpicker__value['url'] . '"></a>';
@@ -1456,7 +1509,8 @@ EOD;
 
         $this->setHostTo('/fr/imprimer/');
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo '<!DOCTYPE html><html><body><div class="lngpicker">';
         foreach ($this->gtbabel->data->getLanguagePickerData() as $lngpicker__value) {
             echo '<a href="' . $lngpicker__value['url'] . '"></a>';
@@ -1480,12 +1534,14 @@ EOD;
             true
         );
         $this->setHostTo('/impressum/');
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         $this->gtbabel->stop();
 
         $this->setHostTo('/en/impressum/');
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo '<!DOCTYPE html><html><body><div class="lngpicker">';
         foreach ($this->gtbabel->data->getLanguagePickerData() as $lngpicker__value) {
             echo '<a href="' . $lngpicker__value['url'] . '"></a>';
@@ -1504,7 +1560,8 @@ EOD;
 
         $this->setHostTo('/fr/impressum/');
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo '<!DOCTYPE html><html><body><div class="lngpicker">';
         foreach ($this->gtbabel->data->getLanguagePickerData() as $lngpicker__value) {
             echo '<a href="' . $lngpicker__value['url'] . '"></a>';
@@ -1525,7 +1582,8 @@ EOD;
 
         $this->setHostTo('/en/imprint/');
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo '<!DOCTYPE html><html><body><div class="lngpicker">';
         foreach ($this->gtbabel->data->getLanguagePickerData() as $lngpicker__value) {
             echo '<a href="' . $lngpicker__value['url'] . '"></a>';
@@ -1546,7 +1604,8 @@ EOD;
 
         $this->setHostTo('/fr/imprimer/');
         ob_start();
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
         echo '<!DOCTYPE html><html><body><div class="lngpicker">';
         foreach ($this->gtbabel->data->getLanguagePickerData() as $lngpicker__value) {
             echo '<a href="' . $lngpicker__value['url'] . '"></a>';
@@ -1649,7 +1708,8 @@ EOD;
         }
         $this->setHostTo($specific_host);
 
-        $this->gtbabel->start($settings);
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
 
         require_once __DIR__ . '/files/in/' . $filename;
 
