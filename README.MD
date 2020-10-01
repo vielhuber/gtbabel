@@ -1534,7 +1534,7 @@ Nevertheless, one has to manually take care of how multilingual input data shoul
 If you need to translate queries to your source language (for example in searches), just do this:
 
 ```php
-$s = gtbabel__($s, null, gtbabel_source_lng(), gtbabel_current_lng());
+$s = gtbabel__($s, gtbabel_source_lng(), gtbabel_current_lng());
 ```
 
 In WordPress for example, you can modify the search query like this:
@@ -1544,7 +1544,7 @@ add_action('pre_get_posts', function ($query) {
     if (!$query->is_main_query() || is_admin() || !is_search()) {
         return;
     }
-    $query->set('s', gtbabel__($query->get('s'), null, gtbabel_source_lng(), gtbabel_current_lng()));
+    $query->set('s', gtbabel__($query->get('s'), gtbabel_source_lng(), gtbabel_current_lng()));
 });
 ```
 
@@ -1553,7 +1553,7 @@ add_action('pre_get_posts', function ($query) {
 Prepare your email templates only in your source language and before sending, translate them on the fly with something like:
 
 ```php
-$template = gtbabel__($template, null, gtbabel_referer_lng(), gtbabel_source_lng());
+$template = gtbabel__($template, gtbabel_referer_lng(), gtbabel_source_lng());
 ```
 
 In WordPress, Contact Form 7 is a popular contact form plugin. Gtbabel has built in support for translating its email templates.
