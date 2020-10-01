@@ -1589,4 +1589,4 @@ You can throttle the amount of chars with the options `google_throttle_chars_per
 
 ## Credits
 
-Greetings to my coworker, without whom this would not have been possible.
+Greetings to my coworker, without whom this project would not have been initiated.
