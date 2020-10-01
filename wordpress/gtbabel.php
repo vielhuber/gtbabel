@@ -1535,7 +1535,7 @@ class GtbabelWordPress
         echo '<div class="gtbabel__repeater">';
         echo '<ul class="gtbabel__repeater-list">';
         if (empty(@$settings['localize_js_strings'])) {
-            $settings['localize_js_strings'] = [];
+            $settings['localize_js_strings'] = [''];
         }
         foreach ($settings['localize_js_strings'] as $localize_js_strings__value) {
             echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-1">';

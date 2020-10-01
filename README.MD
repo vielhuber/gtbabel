@@ -1497,7 +1497,6 @@ gtbabel_language_label('en') // 'English'
 gtbabel_default_settings() // ['languages' => [['code' => 'de', 'label' => 'Deutsch'], ['code' => 'en', 'label' => 'English'], ...], 'log_folder' => '/logs', ...]
 gtbabel_default_settings(['log_folder' => '/foo']) // ['languages' => [['code' => 'de', 'label' => 'Deutsch'], ['code' => 'en', 'label' => 'English'], ...], 'log_folder' => '/foo', ...]
 gtbabel_referer_lng() // 'de'
-
 gtbabel_languagepicker() // [['code' => 'de', 'label' => 'Deutsch', 'url' => 'https://tld.com/de/nudel', 'active' => true], ['code' => 'en', 'label' => 'English', 'url' => 'https://tld.com/en/noodle', 'active' => false], ...]
 gtbabel__('Hallo') // 'Hi there'
 ```
@@ -1506,11 +1505,11 @@ gtbabel__('Hallo') // 'Hi there'
 
 Don't use `gtbabel__()` in your templates for echoing strings, just output them in the source language. Gtbabel will take care of the rest. However, there are some places (e.g. in your backend logic), where you need to translate strings. This is what this function is intended for.
 
-Because translations are not injective, the following two calls create two database entries (with different source languages):
+You also can set the target and source language manually to get some specific translation. Because translations are not injective, the following two calls create two database entries (with different source languages):
 
 ```php
-gtbabel__('Hallo', null, 'en', 'de') // 'Hi there'
-gtbabel__('Hi there', null, 'de', 'en') // 'Hallo'
+gtbabel__('Hallo', 'en', 'de') // 'Hi there'
+gtbabel__('Hi there', 'de', 'en') // 'Hallo'
 ```
 
 You can provide any html to `gtbabel__()`:
@@ -1519,10 +1518,10 @@ You can provide any html to `gtbabel__()`:
 gtbabel__('<p>Hallo <a href="/datenschutz">Datenschutz</a>!</p>'); // '<p>Hello <a href="/en/data-protection">data protection</a>!</p>'
 ```
 
-However, it accepts a context as a second argument to translate very specific strings:
+The function is smart enough to detect urls or even root relative urls and returns appropriate translations:
 
 ```php
-gtbabel__('/datenschutz', 'slug'); // '/en/data-privacy'
+gtbabel__('/datenschutz'); // '/en/data-protection'
 ```
 
 ## Dealing with form data
