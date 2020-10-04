@@ -924,7 +924,7 @@ The default configuration is:
     'translate_json' => true,
     'translate_json_include' => [
         '/path/in/source/lng/to/specific/page' => ['key'],
-        'wp-json/v1/endpoint' => ['key', 'nested.key', 'key.with.*.wildcard']
+        'wp-json/v1/*/endpoint' => ['key', 'nested.key', 'key.with.*.wildcard']
     ],
     'html_lang_attribute' => true,
     'html_hreflang_tags' => true,

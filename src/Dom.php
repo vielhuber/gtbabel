@@ -852,7 +852,10 @@ class Dom
             $this->settings->get('translate_json_include')
             as $translate_json_include__key => $translate_json_include__value
         ) {
-            $regex = '/^(.+\/)?' . preg_quote(trim($translate_json_include__key, '/'), '/') . '(\/.+)?$/';
+            $regex =
+                '/^(.+\/)?' .
+                str_replace('\*', '.*', preg_quote(trim($translate_json_include__key, '/'), '/')) .
+                '(\/.+)?$/';
             if (preg_match($regex, trim($url, '/'))) {
                 $keys = $translate_json_include__value;
                 break;
