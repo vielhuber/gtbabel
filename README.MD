@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/vielhuber/gtbabel.svg?branch=master)](https://travis-ci.org/vielhuber/gtbabel)
+[![Build Status](https://travis-ci.com/vielhuber/gtbabel.svg?branch=master)](https://travis-ci.org/vielhuber/gtbabel)
 
 # 🦜 Gtbabel 🦜
 
