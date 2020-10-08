@@ -65,20 +65,25 @@ class GtbabelWordPress
                     return;
                 }
                 $props = $form->get_properties();
-                $props['mail']['subject'] = $this->gtbabel->translate(
-                    $props['mail']['subject'],
-                    $this->gtbabel->host->getRefererLanguageCode(),
-                    $this->gtbabel->settings->getSourceLanguageCode()
-                );
-                $props['mail']['body'] = __::trim_every_line(
-                    __::br2nl(
-                        $this->gtbabel->translate(
-                            nl2br($props['mail']['body']),
+                foreach (['mail', 'mail_2'] as $mails__value) {
+                    if (isset($props[$mails__value]) && !empty($props[$mails__value])) {
+                        $props[$mails__value]['subject'] = $this->gtbabel->translate(
+                            $props[$mails__value]['subject'],
                             $this->gtbabel->host->getRefererLanguageCode(),
                             $this->gtbabel->settings->getSourceLanguageCode()
-                        )
-                    )
-                );
+                        );
+                        $props[$mails__value]['body'] = __::trim_every_line(
+                            __::br2nl(
+                                $this->gtbabel->translate(
+                                    nl2br($props[$mails__value]['body']),
+                                    $this->gtbabel->host->getRefererLanguageCode(),
+                                    $this->gtbabel->settings->getSourceLanguageCode()
+                                )
+                            )
+                        );
+                        $props[$mails__value]['use_html'] = true;
+                    }
+                }
                 $form->set_properties($props);
             },
             99999
