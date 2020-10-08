@@ -40,9 +40,10 @@ class Data
         /* performance here is not crucial: the following operations take ~2/1000s
          /* (so we can call them on every page load to avoid manually calling setup functions beforehand) */
         /* we chose a flat db structure to avoid expensive joins on every page load */
-        /* we also add unique index so we can INSERT OR REPLACE later on */
-        /* what's important is that "context" cannot be null (otherwise the unique index would fail) */
-        /* therefore we store null values always as the empty string "" */
+        /* we store null values as the empty string "" */
+        /* furthermore unique indexes (for using INSERT OR REPLACE later on) show a lot of caveats */
+        /* one is mainly, that mysql supports only a limited length for the unique index */
+        /* therefore we call delete_duplicates() after inserting and don't have to add indexes */
         $this->db = new dbhelper();
         $db_settings = $this->settings->get('database');
         $this->table = $db_settings['table'];
@@ -70,13 +71,6 @@ class Data
                             discovered_last_url TEXT,
                             translated_by TEXT
                         )'
-                );
-                $this->db->query(
-                    'CREATE UNIQUE INDEX ' .
-                        $this->table .
-                        '_idx ON ' .
-                        $this->table .
-                        '(str, context, lng_source, lng_target)'
                 );
             } else {
                 $this->db->connect('pdo', 'sqlite', $filename);
@@ -117,16 +111,6 @@ class Data
                         translated_by TEXT
                     ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'
             );
-            try {
-                $this->db->query(
-                    'CREATE UNIQUE INDEX ' .
-                        $this->table .
-                        '_str_context_lng ON ' .
-                        $this->table .
-                        '(str(100), context, lng_source, lng_target)'
-                );
-            } catch (\Exception $e) {
-            }
         }
     }
 
@@ -202,11 +186,6 @@ class Data
             for ($batch_cur = 0; $batch_cur * $batch_size < count($this->data['save']['insert']); $batch_cur++) {
                 $query = '';
                 $query .= 'INSERT';
-                if ($this->db->sql->engine === 'sqlite') {
-                    $query .= ' OR REPLACE';
-                } else {
-                    $query .= ' IGNORE';
-                }
                 $query .=
                     ' INTO ' .
                     $this->table .
@@ -236,6 +215,15 @@ class Data
                 $query .= implode(',', $query_q);
                 $this->db->query($query, $query_a);
             }
+            $this->db->delete_duplicates(
+                $this->table,
+                ['str', 'context', 'lng_source', 'lng_target'],
+                true,
+                [
+                    'id' => 'desc'
+                ],
+                true
+            );
         }
         if (!empty($this->data['save']['discovered'])) {
             $batch_size = 100;

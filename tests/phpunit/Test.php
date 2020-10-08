@@ -756,6 +756,67 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->assertEquals($translations[0]['str'], 'Test <span></span> Test');
     }
 
+    public function test_duplicates()
+    {
+        $settings = $this->getDefaultSettings();
+        $settings['languages'] = $this->getLanguageSettings([['code' => 'de'], ['code' => 'en']]);
+        $settings['debug_translations'] = false;
+        $settings['auto_translation'] = false;
+        $settings['auto_add_translations'] = true;
+
+        // two identical strings are added in subsequent sessions (at the second call nothing is translated)
+        ob_start();
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
+        echo '<p>Haus</p>';
+        $this->gtbabel->stop();
+        ob_end_clean();
+        $translations = $this->gtbabel->data->getTranslationsFromDatabase();
+        $this->assertEquals(count($translations), 1);
+        ob_start();
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
+        echo '<p>Haus</p>';
+        $this->gtbabel->stop();
+        ob_end_clean();
+        $translations = $this->gtbabel->data->getTranslationsFromDatabase();
+        $this->assertEquals(count($translations), 1);
+        $this->gtbabel->reset();
+
+        // now we force concurrency and test, if duplicates are correctly prevented
+        ob_start();
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
+        echo '<p>Haus</p>';
+        $this->gtbabel->data->db->insert($this->gtbabel->data->table, [
+            'str' => 'Haus',
+            'context' => '',
+            'lng_source' => 'de',
+            'lng_target' => 'en',
+            'trans' => 'Haus-en',
+            'added' => $this->gtbabel->utils->getCurrentTime(),
+            'checked' => 1,
+            'shared' => 1
+        ]);
+        $this->gtbabel->stop();
+        ob_end_clean();
+        $translations = $this->gtbabel->data->getTranslationsFromDatabase();
+        $this->assertEquals(count($translations), 1);
+        $this->gtbabel->reset();
+
+        // lowercase/uppercase
+        ob_start();
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
+        echo '<p>Xing</p>';
+        echo '<p>XING</p>';
+        $this->gtbabel->stop();
+        ob_end_clean();
+        $translations = $this->gtbabel->data->getTranslationsFromDatabase();
+        $this->assertEquals(count($translations), 2);
+        $this->gtbabel->reset();
+    }
+
     public function test_encoding()
     {
         $settings = $this->getDefaultSettings();

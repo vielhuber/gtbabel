@@ -11,6 +11,7 @@ class Dom
     public $excluded_nodes;
     public $force_tokenize;
     public $group_cache;
+    public $localize_js_script;
 
     public $utils;
     public $data;
@@ -381,7 +382,7 @@ class Dom
             $this->setRtlAttr();
             $this->setAltLngUrls();
             $this->detectDomChanges();
-            $this->localizeJs();
+            $this->localizeJsInject();
         }
         $this->preloadExcludedNodes();
         $this->preloadForceTokenize();
@@ -936,7 +937,7 @@ class Dom
         $head->insertBefore($tag, $head->firstChild);
     }
 
-    function localizeJs()
+    function localizeJsPrepare()
     {
         if ($this->settings->get('localize_js') !== true) {
             return;
@@ -954,11 +955,7 @@ class Dom
         if (!$this->data->sourceLngIsCurrentLng()) {
             foreach ($this->settings->get('localize_js_strings') as $localize_js_strings__value) {
                 $string = $localize_js_strings__value;
-                $trans = $this->gtbabel->translate(
-                    $string,
-                    $this->data->getCurrentLanguageCode(),
-                    $this->settings->getSourceLanguageCode()
-                );
+                $trans = $this->gtbabel->translate($string);
                 if ($trans === null) {
                     continue;
                 }
@@ -982,13 +979,21 @@ class Dom
         $script .=
             'function gtbabel__(string) { if( gtbabel_translated_strings[string] !== undefined ) { return gtbabel_translated_strings[string]; } return string; }';
 
+        $this->localize_js_script = $script;
+    }
+
+    function localizeJsInject()
+    {
+        if ($this->localize_js_script === null) {
+            return;
+        }
         $head = $this->DOMXPath->query('/html/head')[0];
         if ($head === null) {
             return;
         }
         $tag = $this->DOMDocument->createElement('script', '');
         $tag->setAttribute('data-type', 'gtbabel-translated-strings');
-        $tag->textContent = $script;
+        $tag->textContent = $this->localize_js_script;
         $head->insertBefore($tag, $head->firstChild);
     }
 }

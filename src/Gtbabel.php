@@ -95,6 +95,7 @@ class Gtbabel
         if ($this->host->contentTranslationIsDisabledForCurrentUrl()) {
             return;
         }
+        $this->dom->localizeJsPrepare();
         $content = $this->dom->modifyContent(ob_get_contents(), 'buffer');
         ob_end_clean();
         echo $content;
@@ -122,6 +123,8 @@ class Gtbabel
             if ($this->configured === false) {
                 $this->config();
             }
+            // what's important: this function is destroying the current domdocument
+            // therefore it must be called never *inside* modifyContent
             $trans = $this->dom->modifyContent($html, 'translate');
             $this->data->saveCacheToDatabase();
         } else {
