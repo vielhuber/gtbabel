@@ -66,6 +66,9 @@ export default class DetectChanges {
             this.sync(id);
 
             let node_not_translated = this.dom_not_translated.querySelectorAll(selector)[index];
+            // disable notranslate from most outer element (this is added, because we don't want it to be translated via php)
+            node_not_translated.classList.remove('notranslate');
+            node_not_translated.classList.add('notranslate_OFF');
             let html = node_not_translated.outerHTML;
 
             await this.wait(document.readyState === 'complete' ? 250 : 1000);
@@ -96,6 +99,9 @@ export default class DetectChanges {
             if (!this.jobIsActive(id)) {
                 return;
             }
+            
+            resp.data.input = resp.data.input.replace('notranslate_OFF', 'notranslate');
+            resp.data.output = resp.data.output.replace('notranslate_OFF', 'notranslate');
 
             this.sync(id);
 
