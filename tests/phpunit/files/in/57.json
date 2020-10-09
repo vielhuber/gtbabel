@@ -3,7 +3,7 @@
     "message": null,
     "message_title": null,
     "data": {
-        "html": "<form method=\"post\" target=\"_top\" class=\"form\">\n    <p>Dies ist ein Test</p>\n    <input type=\"hidden\" name=\"test\" value=\"DE\" /> <!-- Kommentar -->\n    <input type=\"hidden\" name=\"test\" value=\"UTF-8\" />\n</form>\n",
+        "html": "<form method=\"post\" target=\"_top\" class=\"form\"><p>Dies ist ein Test</p><input type=\"hidden\" name=\"test\" value=\"DE\" /> <!-- Kommentar --><input type=\"hidden\" name=\"test\" value=\"UTF-8\" /></form>",
         "lang": "en"
     }
 }
