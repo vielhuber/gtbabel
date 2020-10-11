@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 4.6.3
+ * Version: 4.7.1
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -589,6 +589,8 @@ class GtbabelWordPress
                             'hide_languages',
                             'redirect_root_domain',
                             'translate_html',
+                            'translate_xml',
+                            'translate_xml_include',
                             'translate_json',
                             'translate_json_include',
                             'html_lang_attribute',
@@ -637,6 +639,7 @@ class GtbabelWordPress
                     foreach (
                         [
                             'translate_html',
+                            'translate_xml',
                             'translate_json',
                             'html_lang_attribute',
                             'html_hreflang_tags',
@@ -718,6 +721,25 @@ class GtbabelWordPress
                                 ',',
                                 $post_data['lngs'][$post_data__key]
                             );
+                        }
+                    }
+
+                    $post_data = $settings['translate_xml_include'];
+                    $settings['translate_xml_include'] = [];
+                    if (!empty(@$post_data['selector'])) {
+                        foreach ($post_data['selector'] as $post_data__key => $post_data__value) {
+                            if (
+                                @$post_data['selector'][$post_data__key] == '' &&
+                                @$post_data['attribute'][$post_data__key] == '' &&
+                                @$post_data['context'][$post_data__key] == ''
+                            ) {
+                                continue;
+                            }
+                            $settings['translate_xml_include'][] = [
+                                'selector' => $post_data['selector'][$post_data__key],
+                                'attribute' => $post_data['attribute'][$post_data__key],
+                                'context' => $post_data['context'][$post_data__key]
+                            ];
                         }
                     }
 
@@ -1015,6 +1037,51 @@ class GtbabelWordPress
         echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_translate_html" name="gtbabel[translate_html]" value="1"' .
             ($settings['translate_html'] == '1' ? ' checked="checked"' : '') .
             ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_translate_xml" class="gtbabel__label">';
+        echo __('Translate xml', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_translate_xml" name="gtbabel[translate_xml]" value="1"' .
+            ($settings['translate_xml'] == '1' ? ' checked="checked"' : '') .
+            ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label class="gtbabel__label">';
+        echo __('Include xml nodes', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<div class="gtbabel__repeater">';
+        echo '<ul class="gtbabel__repeater-list">';
+        if (empty(@$settings['translate_xml_include'])) {
+            $settings['translate_xml_include'] = [['selector' => '', 'attribute' => '', 'context' => '']];
+        }
+        foreach ($settings['translate_xml_include'] as $translate_xml_include__value) {
+            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-3">';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[translate_xml_include][selector][]" value="' .
+                esc_attr($translate_xml_include__value['selector']) .
+                '" placeholder="selector" />';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[translate_xml_include][attribute][]" value="' .
+                esc_attr($translate_xml_include__value['attribute']) .
+                '" placeholder="attribute" />';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[translate_xml_include][context][]" value="' .
+                esc_attr($translate_xml_include__value['context']) .
+                '" placeholder="context" />';
+            echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
+                __('Remove', 'gtbabel-plugin') .
+                '</a>';
+            echo '</li>';
+        }
+        echo '</ul>';
+        echo '<a href="#" class="gtbabel__repeater-add button button-secondary">' .
+            __('Add', 'gtbabel-plugin') .
+            '</a>';
+        echo '</div>';
         echo '</div>';
         echo '</li>';
 

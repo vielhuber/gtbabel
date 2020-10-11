@@ -496,6 +496,26 @@ class Test extends \PHPUnit\Framework\TestCase
         ]);
     }
 
+    public function test069()
+    {
+        $this->runDiff('69.xml');
+    }
+
+    public function test070()
+    {
+        $this->runDiff('70.xml');
+    }
+
+    public function test071()
+    {
+        $this->runDiff('71.xml');
+    }
+
+    public function test072()
+    {
+        $this->runDiff('72.xml');
+    }
+
     public function test_string_detection()
     {
         $should_translate = ['Haus'];
@@ -1722,6 +1742,14 @@ EOD;
             'log_folder' => './tests/logs',
             'redirect_root_domain' => 'browser',
             'translate_html' => true,
+            'translate_xml' => true,
+            'translate_xml_include' => [
+                [
+                    'selector' => '//*[name()=\'loc\']',
+                    'attribute' => null,
+                    'context' => 'slug'
+                ]
+            ],
             'translate_json' => true,
             'translate_json_include' => [
                 '/path/in/source/lng/to/specific/page' => ['key'],

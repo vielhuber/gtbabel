@@ -24,6 +24,9 @@ class Utils
 
     function getContentType($response)
     {
+        if (mb_stripos($response, '<?xml') === 0) {
+            return 'xml';
+        }
         if (mb_stripos($response, '<!DOCTYPE') === 0) {
             return 'html';
         }

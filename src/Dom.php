@@ -203,7 +203,7 @@ class Dom
         return $groups;
     }
 
-    function modifyNodes()
+    function modifyHtmlNodes()
     {
         $include = $this->settings->get('include_dom');
 
@@ -358,12 +358,56 @@ class Dom
         }
     }
 
+    function modifyXmlNodes()
+    {
+        foreach ($this->settings->get('translate_xml_include') as $include__value) {
+            $xpath = $include__value['selector'];
+            $nodes = $this->DOMXPath->query($xpath);
+            if (count($nodes) > 0) {
+                foreach ($nodes as $nodes__value) {
+                    $content = [];
+                    $content[] = [
+                        'key' => null,
+                        'value' => $this->getInnerHtml($nodes__value),
+                        'type' => 'text'
+                    ];
+                    if (!empty($content)) {
+                        foreach ($content as $content__value) {
+                            if ($content__value['value'] != '') {
+                                $lng_source = $this->settings->getSourceLanguageCode();
+                                $lng_target = $this->data->getCurrentLanguageCode();
+                                $context = null;
+                                if (isset($include__value['context']) && $include__value['context'] != '') {
+                                    $context = $include__value['context'];
+                                }
+                                $str_with_lb = $content__value['value'];
+                                $str_without_lb = $this->data->removeLineBreaksAndPrepareString($str_with_lb);
+                                $trans = $this->data->prepareTranslationAndAddDynamicallyIfNeeded(
+                                    $str_without_lb,
+                                    $lng_source,
+                                    $lng_target,
+                                    $context
+                                );
+                                if ($trans === null) {
+                                    continue;
+                                }
+                                $trans = $this->data->reintroduceOuterLineBreaks($trans, $str_without_lb, $str_with_lb);
+                                $this->setInnerHtml($nodes__value, $trans);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     function modifyContent($content, $mode)
     {
         if ($content == '') {
             return $content;
         }
         $content = $this->modifyHtml($content, $mode);
+        $content = $this->modifyXml($content, $mode);
         $content = $this->modifyJson($content, $mode);
         return $content;
     }
@@ -387,9 +431,26 @@ class Dom
         $this->preloadExcludedNodes();
         $this->preloadForceTokenize();
         $this->preloadLngAreas();
-        $this->modifyNodes();
+        $this->modifyHtmlNodes();
         $html = $this->finishDomDocument();
         return $html;
+    }
+
+    function modifyXml($xml, $mode)
+    {
+        if ($this->utils->getContentType($xml) !== 'xml') {
+            return $xml;
+        }
+        if ($this->settings->get('translate_xml') !== true) {
+            return $xml;
+        }
+        if ($this->settings->get('translate_xml_include') === null) {
+            return $xml;
+        }
+        $this->setupDomDocument($xml);
+        $this->modifyXmlNodes();
+        $xml = $this->finishDomDocument();
+        return $xml;
     }
 
     function setupDomDocument($html)

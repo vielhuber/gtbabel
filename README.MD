@@ -921,6 +921,14 @@ The default configuration is:
     'log_folder' => '/logs',
     'redirect_root_domain' => 'browser',
     'translate_html' => true,
+    'translate_xml' => true,
+    'translate_xml_include' => [
+        [
+            'selector' => '//*[name()=\'loc\']',
+            'attribute' => null,
+            'context' => 'slug'
+        ]
+    ],
     'translate_json' => true,
     'translate_json_include' => [
         '/path/in/source/lng/to/specific/page' => ['key'],
@@ -1267,15 +1275,9 @@ In fact, parts of the content can be marked language-specific:
 <!DOCTYPE html>
 <html lang="en">
     <body>
-        <p>
-            Some content in english.
-        </p>
-        <div lang="fr">
-            Contenu en français.
-        </div>
-        <p>
-            Some other content in english.
-        </p>
+        <p>Some content in english.</p>
+        <div lang="fr">Contenu en français.</div>
+        <p>Some other content in english.</p>
     </body>
 </html>
 ```
@@ -1286,15 +1288,9 @@ This all gets translated correctly to the target language (in our case `de`):
 <!DOCTYPE html>
 <html lang="de">
     <body>
-        <p>
-            Einige Inhalte in Englisch.
-        </p>
-        <div lang="de">
-            Inhalt auf Französisch.
-        </div>
-        <p>
-            Einige andere Inhalte in Englisch.
-        </p>
+        <p>Einige Inhalte in Englisch.</p>
+        <div lang="de">Inhalt auf Französisch.</div>
+        <p>Einige andere Inhalte in Englisch.</p>
     </body>
 </html>
 ```

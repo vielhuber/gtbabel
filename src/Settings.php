@@ -66,6 +66,14 @@ class Settings
             'log_folder' => '/logs',
             'redirect_root_domain' => 'browser',
             'translate_html' => true,
+            'translate_xml' => true,
+            'translate_xml_include' => [
+                [
+                    'selector' => '//*[name()=\'loc\']',
+                    'attribute' => null,
+                    'context' => 'slug'
+                ]
+            ],
             'translate_json' => true,
             'translate_json_include' => [
                 '/path/in/source/lng/to/specific/page' => ['key'],
