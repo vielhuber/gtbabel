@@ -422,7 +422,7 @@ class Dom
         }
         $this->setupDomDocument($html);
         if ($mode === 'buffer') {
-            $this->setLangTags();
+            $this->setHtmlLangTags();
             $this->setRtlAttr();
             $this->setAltLngUrls();
             $this->detectDomChanges();
@@ -448,6 +448,7 @@ class Dom
             return $xml;
         }
         $this->setupDomDocument($xml);
+        $this->setXmlLangTags();
         $this->modifyXmlNodes();
         $xml = $this->finishDomDocument();
         return $xml;
@@ -464,7 +465,7 @@ class Dom
         return __::dom_to_str($this->DOMDocument);
     }
 
-    function setLangTags()
+    function setHtmlLangTags()
     {
         if (!$this->host->responseCodeIsSuccessful()) {
             return;
@@ -487,6 +488,33 @@ class Dom
                     $tag->setAttribute('hreflang', $data__value['code']);
                     $tag->setAttribute('href', $data__value['url']);
                     $head_node->appendChild($tag);
+                }
+            }
+        }
+    }
+
+    function setXmlLangTags()
+    {
+        if (!$this->host->responseCodeIsSuccessful()) {
+            return;
+        }
+
+        if ($this->settings->get('xml_hreflang_tags') === true) {
+            $nodes = $this->DOMXPath->query('//*[name()=\'loc\']');
+            if (count($nodes) > 0) {
+                foreach ($nodes as $nodes__value) {
+                    $data = $this->data->getLanguagePickerData(false, $nodes__value->nodeValue);
+                    foreach ($data as $data__value) {
+                        $tag = $this->DOMDocument->createElement('xhtml:link', '');
+                        $tag->setAttribute('rel', 'alternate');
+                        $tag->setAttribute('hreflang', $data__value['code']);
+                        $tag->setAttribute('href', $data__value['url']);
+                        if ($nodes__value->nextSibling === null) {
+                            $nodes__value->parentNode->appendChild($tag);
+                        } else {
+                            $nodes__value->parentNode->insertBefore($tag, $nodes__value->nextSibling);
+                        }
+                    }
                 }
             }
         }

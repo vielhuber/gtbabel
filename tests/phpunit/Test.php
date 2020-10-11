@@ -516,6 +516,14 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->runDiff('72.xml');
     }
 
+    public function test073()
+    {
+        $this->runDiff('73.xml', 200, [
+            'languages' => $this->getLanguageSettings([['code' => 'de', 'url_prefix' => ''], ['code' => 'en']]),
+            'xml_hreflang_tags' => true
+        ]);
+    }
+
     public function test_string_detection()
     {
         $should_translate = ['Haus'];
@@ -1764,6 +1772,7 @@ EOD;
             'exclude_urls_slugs' => null,
             'html_lang_attribute' => false,
             'html_hreflang_tags' => false,
+            'xml_hreflang_tags' => false,
             'auto_translation' => false,
             'auto_translation_service' => 'google',
             'google_translation_api_key' => @$_SERVER['GOOGLE_TRANSLATION_API_KEY'],

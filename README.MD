@@ -936,6 +936,7 @@ The default configuration is:
     ],
     'html_lang_attribute' => true,
     'html_hreflang_tags' => true,
+    'xml_hreflang_tags' => true,
     'debug_translations' => false, // surround outputted translations with "%|%" to see borders
     'auto_add_translations' => true,
     'auto_set_new_strings_checked' => false,

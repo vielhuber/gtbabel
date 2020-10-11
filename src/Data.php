@@ -890,13 +890,15 @@ class Data
         return $this->host->getLanguageCodeFromUrl($this->host->getCurrentUrl());
     }
 
-    function getLanguagePickerData($with_args = true)
+    function getLanguagePickerData($with_args = true, $cur_url = null)
     {
         $data = [];
         if (!$this->host->responseCodeIsSuccessful()) {
             return $data;
         }
-        $cur_url = $with_args === true ? $this->host->getCurrentUrlWithArgs() : $this->host->getCurrentUrl();
+        if ($cur_url === null) {
+            $cur_url = $with_args === true ? $this->host->getCurrentUrlWithArgs() : $this->host->getCurrentUrl();
+        }
         foreach ($this->settings->getSelectedLanguageCodesLabels() as $languages__key => $languages__value) {
             if (
                 $this->publish->isActive() &&

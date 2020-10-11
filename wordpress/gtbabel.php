@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 4.7.1
+ * Version: 4.7.2
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -595,6 +595,7 @@ class GtbabelWordPress
                             'translate_json_include',
                             'html_lang_attribute',
                             'html_hreflang_tags',
+                            'xml_hreflang_tags',
                             'auto_add_translations',
                             'only_show_checked_strings',
                             'auto_set_new_strings_checked',
@@ -643,6 +644,7 @@ class GtbabelWordPress
                             'translate_json',
                             'html_lang_attribute',
                             'html_hreflang_tags',
+                            'xml_hreflang_tags',
                             'debug_translations',
                             'auto_add_translations',
                             'only_show_checked_strings',
@@ -1148,6 +1150,17 @@ class GtbabelWordPress
         echo '<div class="gtbabel__inputbox">';
         echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_html_hreflang_tags" name="gtbabel[html_hreflang_tags]" value="1"' .
             ($settings['html_hreflang_tags'] == '1' ? ' checked="checked"' : '') .
+            ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_xml_hreflang_tags" class="gtbabel__label">';
+        echo __('Add xml hreflang tags', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_xml_hreflang_tags" name="gtbabel[xml_hreflang_tags]" value="1"' .
+            ($settings['xml_hreflang_tags'] == '1' ? ' checked="checked"' : '') .
             ' />';
         echo '</div>';
         echo '</li>';
@@ -2917,11 +2930,17 @@ EOD;
     {
         $urls = [];
 
-        // approach 1 (parse sitemap; this also works for dynamically generated sitemaps like yoast)
+        // approach 1 (parse yoast sitemap)
         $sitemap_url = get_bloginfo('url') . '/sitemap_index.xml';
         $urls = __::extract_urls_from_sitemap($sitemap_url);
 
-        // approach 2 (get all posts)
+        // approach 2 (parse wp default sitemap)
+        if (empty($urls)) {
+            $sitemap_url = get_bloginfo('url') . '/wp-sitemap.xml';
+            $urls = __::extract_urls_from_sitemap($sitemap_url);
+        }
+
+        // approach 3 (get all posts)
         if (empty($urls)) {
             $urls[] = get_bloginfo('url');
             $query = new \WP_Query(['post_type' => 'any', 'posts_per_page' => '-1', 'post_status' => 'publish']);
