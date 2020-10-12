@@ -52,7 +52,7 @@ class Gtbabel
                 $this->altlng,
                 $this
             );
-        $this->router = $router ?: new Router($this->data, $this->host, $this->settings, $this->publish);
+        $this->router = $router ?: new Router($this->data, $this->host, $this->settings, $this->publish, $this->log);
         $this->gettext = $gettext ?: new Gettext($this->data, $this->settings);
     }
 

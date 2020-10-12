@@ -240,6 +240,7 @@ class Host
         if (mb_strpos($url, $base_url) === 0) {
             $url = str_replace($base_url, '', $url);
         }
+        $url = ltrim($url, '/');
         return $url;
     }
 
@@ -249,13 +250,19 @@ class Host
         $strip = [];
         $strip[] = $this->getBaseUrlWithPrefixForLanguageCode($lng);
         $strip[] = $this->getBaseUrlForLanguageCode($lng);
-        if ($this->getPrefixForLanguageCode($lng) != '') {
-            $strip[] = '/' . $this->getPrefixForLanguageCode($lng);
-            $strip[] = $this->getPrefixForLanguageCode($lng);
-        }
         foreach ($strip as $strip__value) {
             if (strpos($url, $strip__value) === 0) {
                 $url = str_replace($strip__value, '', $url);
+            }
+        }
+        if ($this->getPrefixForLanguageCode($lng) != '') {
+            $strip = [];
+            $strip[] = '/' . $this->getPrefixForLanguageCode($lng);
+            $strip[] = $this->getPrefixForLanguageCode($lng);
+            foreach ($strip as $strip__value) {
+                if ($url === $strip__value || strpos($url, $strip__value . '/') === 0) {
+                    $url = str_replace($strip__value, '', $url);
+                }
             }
         }
         return $url;

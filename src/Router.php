@@ -7,13 +7,20 @@ class Router
     public $host;
     public $settings;
     public $publish;
+    public $log;
 
-    function __construct(Data $data = null, Host $host = null, Settings $settings = null, Publish $publish = null)
-    {
+    function __construct(
+        Data $data = null,
+        Host $host = null,
+        Settings $settings = null,
+        Publish $publish = null,
+        Log $log = null
+    ) {
         $this->data = $data ?: new Data();
         $this->host = $host ?: new Host();
         $this->settings = $settings ?: new Settings();
         $this->publish = $publish ?: new Publish();
+        $this->log = $log ?: new Log();
     }
 
     function redirectPrefixedUrls()
