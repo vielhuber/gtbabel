@@ -3238,6 +3238,7 @@ EOD;
                 [
                     'code' => 'de',
                     'label' => 'Deutsch',
+                    'hreflang_code' => 'de',
                     'google_translation_code' => 'de',
                     'microsoft_translation_code' => 'de',
                     'deepl_translation_code' => 'de'
@@ -3245,6 +3246,7 @@ EOD;
                 [
                     'code' => 'en',
                     'label' => 'English',
+                    'hreflang_code' => 'en',
                     'google_translation_code' => 'en',
                     'microsoft_translation_code' => 'en',
                     'deepl_translation_code' => 'en'
@@ -3254,6 +3256,7 @@ EOD;
                 $languages[] = $this->gtbabel->settings->getLanguageDataForCode($lng_source) ?? [
                     'code' => $lng_source,
                     'label' => $lng_source,
+                    'hreflang_code' => $lng_source,
                     'google_translation_code' => $lng_source,
                     'microsoft_translation_code' => $lng_source,
                     'deepl_translation_code' => $lng_source
