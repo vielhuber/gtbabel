@@ -1212,6 +1212,16 @@ class Settings
         return $this->getLanguageDataForCode($lng)[$service . '_translation_code'];
     }
 
+    function getHreflangCodeForLanguage($lng)
+    {
+        $data = $this->getLanguageDataForCode($lng);
+        // if nothing is set, pretend lng code (we can set null and show that the service does not provide that language)
+        if (!array_key_exists('hreflang_code', $data)) {
+            return $lng;
+        }
+        return $this->getLanguageDataForCode($lng)['hreflang_code'];
+    }
+
     function getDefaultLanguageCodes()
     {
         return array_map(function ($languages__value) {

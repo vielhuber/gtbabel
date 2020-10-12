@@ -483,9 +483,12 @@ class Dom
             if ($head_node !== null) {
                 $data = $this->data->getLanguagePickerData(false);
                 foreach ($data as $data__value) {
+                    if ($data__value['hreflang'] === null) {
+                        continue;
+                    }
                     $tag = $this->DOMDocument->createElement('link', '');
                     $tag->setAttribute('rel', 'alternate');
-                    $tag->setAttribute('hreflang', $data__value['code']);
+                    $tag->setAttribute('hreflang', $data__value['hreflang']);
                     $tag->setAttribute('href', $data__value['url']);
                     $head_node->appendChild($tag);
                 }
@@ -505,9 +508,12 @@ class Dom
                 foreach ($nodes as $nodes__value) {
                     $data = $this->data->getLanguagePickerData(false, $nodes__value->nodeValue);
                     foreach ($data as $data__value) {
+                        if ($data__value['hreflang'] === null) {
+                            continue;
+                        }
                         $tag = $this->DOMDocument->createElement('xhtml:link', '');
                         $tag->setAttribute('rel', 'alternate');
-                        $tag->setAttribute('hreflang', $data__value['code']);
+                        $tag->setAttribute('hreflang', $data__value['hreflang']);
                         $tag->setAttribute('href', $data__value['url']);
                         if ($nodes__value->nextSibling === null) {
                             $nodes__value->parentNode->appendChild($tag);

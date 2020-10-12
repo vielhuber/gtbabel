@@ -907,8 +907,10 @@ class Data
                 continue;
             }
             $trans_url = $this->getUrlTranslationInLanguage($this->getCurrentLanguageCode(), $languages__key, $cur_url);
+            $hreflang = $this->settings->getHreflangCodeForLanguage($languages__key);
             $data[] = [
                 'code' => $languages__key,
+                'hreflang' => $hreflang,
                 'label' => $languages__value,
                 'url' => $trans_url,
                 'active' => rtrim($trans_url, '/') === rtrim($cur_url, '/')
