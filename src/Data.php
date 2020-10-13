@@ -1181,7 +1181,7 @@ class Data
                     $args_array_trans[] = $args_array__key . '=' . $args_array__value;
                     continue;
                 }
-                $args_array__value = $this->getTranslationAndAddDynamicallyIfNeeded(
+                $args_array__value = $this->prepareTranslationAndAddDynamicallyIfNeeded(
                     $args_array__value,
                     $lng_source,
                     $lng_target,

@@ -845,6 +845,36 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->gtbabel->reset();
     }
 
+    public function test_inline_links()
+    {
+        $settings = $this->getDefaultSettings();
+        $settings['languages'] = $this->getLanguageSettings([['code' => 'de'], ['code' => 'en']]);
+        $settings['debug_translations'] = false;
+        $settings['auto_translation'] = false;
+        $settings['auto_add_translations'] = true;
+
+        ob_start();
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
+        echo '<p>Dies ist ein Link: https://test.de</p>';
+        $this->gtbabel->stop();
+        ob_end_clean();
+        $translations = $this->gtbabel->data->getTranslationsFromDatabase();
+        $this->assertEquals(count($translations), 1);
+        $this->assertEquals($translations[0]['str'], 'Dies ist ein Link: {1}');
+        $this->gtbabel->reset();
+
+        ob_start();
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
+        echo '<p>https://test.de</p>';
+        $this->gtbabel->stop();
+        ob_end_clean();
+        $translations = $this->gtbabel->data->getTranslationsFromDatabase();
+        $this->assertEquals(count($translations), 0);
+        $this->gtbabel->reset();
+    }
+
     public function test_encoding()
     {
         $settings = $this->getDefaultSettings();
@@ -1165,6 +1195,7 @@ class Test extends \PHPUnit\Framework\TestCase
 <a href="mailto:david@vielhuber.de"></a>
 <a href="mailto:david@vielhuber.de?subject=Haus&amp;body=Dies%20ist%20ein%20Test"></a>
 <a href="mailto:david@vielhuber.de?subject=Haus&amp;body=Dies%20ist%20ein%20Link%20http%3A%2F%2Fgtbabel.local.vielhuber.de%2Fdatenschutz"></a>
+<a href="mailto:?subject=Haus&amp;body=http%3A%2F%2Fgtbabel.local.vielhuber.de%2Fdatenschutz%2F"></a>
 <a href="tel:+4989111312113"></a>
 <a href="http://test.de/beispiel-bilddatei9.jpg"></a>
 <a href="http://test.de/beispiel-pfad10"></a>
@@ -1199,6 +1230,7 @@ EOD;
 <a href="mailto:david@vielhuber.de_EN"></a>
 <a href="mailto:david@vielhuber.de_EN?subject=House&amp;body=This%20is%20a%20test"></a>
 <a href="mailto:david@vielhuber.de_EN?subject=House&amp;body=This%20is%20a%20link%20http://gtbabel.local.vielhuber.de/en/data-protection"></a>
+<a href="mailto:?subject=House&amp;body=http://gtbabel.local.vielhuber.de/en/data-protection/"></a>
 <a href="tel:+4989111312113"></a>
 <a href="http://test.de/beispiel-bilddatei9.jpg"></a>
 <a href="http://test.de/beispiel-pfad10"></a>
