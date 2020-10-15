@@ -2765,9 +2765,15 @@ EOD;
                 plugin_dir_url(__FILE__) .
                 'assets/images/finish.gif" alt="" />';
             echo '<div class="gtbabel__wizard-buttons">';
-            echo '<a class="button button-primary" href="' . admin_url('admin.php?page=gtbabel-trans') . '">';
-            echo __('Translated strings', 'gtbabel-plugin');
-            echo '</a>';
+            if ($this->gtbabel->data->getTranslationCountFromDatabase() > 0) {
+                echo '<a class="button button-primary" href="' . admin_url('admin.php?page=gtbabel-trans') . '">';
+                echo __('Translated strings', 'gtbabel-plugin');
+                echo '</a>';
+            } else {
+                echo '<a class="button button-primary" href="' . admin_url('admin.php?page=gtbabel-settings') . '">';
+                echo __('To the settings', 'gtbabel-plugin');
+                echo '</a>';
+            }
             echo '</div>';
             echo '</div>';
         }

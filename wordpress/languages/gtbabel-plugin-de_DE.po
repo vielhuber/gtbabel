@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gtbabel-plugin\n"
-"POT-Creation-Date: 2020-10-11 23:47+0200\n"
+"POT-Creation-Date: 2020-10-15 23:29+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -44,7 +44,7 @@ msgstr "Hinweis: Der Slug muss immer in der allgemeinen Ausgangssprache sein."
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: gtbabel.php:509 gtbabel.php:510 gtbabel.php:3286
+#: gtbabel.php:509 gtbabel.php:510 gtbabel.php:3301
 msgid "Language picker"
 msgstr "Sprachauswahl"
 
@@ -359,7 +359,7 @@ msgstr "Veröffentlichen"
 msgid "Set to draft"
 msgstr "Auf Entwurf setzen"
 
-#: gtbabel.php:2210 gtbabel.php:2994
+#: gtbabel.php:2210 gtbabel.php:3006
 msgid "No translations available."
 msgstr "Keine Übersetzungen vorhanden."
 
@@ -382,7 +382,7 @@ msgstr "Alles erledigt!"
 msgid "Successfully uploaded"
 msgstr "Erfolgreich hochgeladen"
 
-#: gtbabel.php:2371 gtbabel.php:3020
+#: gtbabel.php:2371 gtbabel.php:3032
 msgid "An error occurred"
 msgstr "Es ist ein Fehler aufgetreten"
 
@@ -556,47 +556,51 @@ msgstr "Fertigstellen"
 msgid "Well done"
 msgstr "Gut gemacht"
 
-#: gtbabel.php:2769
+#: gtbabel.php:2770
 msgid "Translated strings"
 msgstr "Übersetzte Zeichenketten"
 
-#: gtbabel.php:3006
+#: gtbabel.php:2774
+msgid "To the settings"
+msgstr "Zu den Einstellungen"
+
+#: gtbabel.php:3018
 msgid "Characters"
 msgstr "Buchstaben"
 
-#: gtbabel.php:3018 gtbabel.php:3102
+#: gtbabel.php:3030 gtbabel.php:3114
 msgid "Loading"
 msgstr "Lade"
 
-#: gtbabel.php:3024
+#: gtbabel.php:3036
 msgid "Translate"
 msgstr "Übersetzen"
 
-#: gtbabel.php:3118
+#: gtbabel.php:3130
 msgid "Duration"
 msgstr "Dauer"
 
-#: gtbabel.php:3121
+#: gtbabel.php:3133
 msgid "Estimated time remaining"
 msgstr "Geschätzte Restdauer"
 
-#: gtbabel.php:3124
+#: gtbabel.php:3136
 msgid "Progress"
 msgstr "Fortschritt"
 
-#: gtbabel.php:3133
+#: gtbabel.php:3145
 msgid "Deleted strings"
 msgstr "Gelöschte Zeichenketten"
 
-#: gtbabel.php:3137
+#: gtbabel.php:3149
 msgid "Finished"
 msgstr "Erledigt"
 
-#: gtbabel.php:3287
+#: gtbabel.php:3302
 msgid "A language picker of Gtbabel."
 msgstr "Eine Sprachauswahl von Gtbabel."
 
-#: gtbabel.php:3321
+#: gtbabel.php:3336
 msgid "Title"
 msgstr "Titel"
 

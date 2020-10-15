@@ -352,6 +352,11 @@ class Data
         return $this->db->fetch_all('SELECT * FROM ' . $this->table . ' ORDER BY id ASC');
     }
 
+    function getTranslationCountFromDatabase()
+    {
+        return intval($this->db->fetch_var('SELECT COUNT(*) FROM ' . $this->table));
+    }
+
     function getGroupedTranslationsFromDatabase(
         $lng_target = null,
         $order_by_string = true,
