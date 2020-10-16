@@ -347,34 +347,54 @@
 .gtbabel__transwizard-languages {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    align-content: center;
+    align-items: flex-start;
+    align-content: flex-start;
 }
 .gtbabel__transwizard-language {
     margin: 0;
 }
+.gtbabel__transwizard-language--disabled {
+    opacity: 0.35;
+    pointer-events: none;
+}
 .gtbabel__transwizard-language-link {
     display: block;
     text-decoration: none;
-    background-color: #a2a2a2;
-    box-shadow: 0px 20px 30px 0px rgb(0 0 0 / 0.25);
+    background-color: #ffffff;
+    box-shadow: 0px 10px 20px -10px rgba(0, 0, 0, 0.15);
     width: 140px;
     height: 100px;
-    margin: 20px;
+    margin: 0 30px 30px 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    transition: all 0.25s ease-in-out;
+    transition: all 0.1s ease-in-out;
+    position: relative;
 }
 .gtbabel__transwizard-language-link:hover {
-    transform: scale(0.9);
-    opacity: 0.75;
+    transform: scale(0.95);
 }
 .gtbabel__transwizard-language-linktext {
-    font-size: 20px;
+    font-size: 14px;
+    color: #23282d;
+}
+.gtbabel__transwizard-language-count {
+    background-color: grey;
     color: #fff;
+    font-weight: bold;
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    font-size: 18px;
+}
+.gtbabel__transwizard-language-count--highlight {
+    background-color: red;
 }
 
 .gtbabel__transwizard-card {
@@ -383,8 +403,8 @@
     margin: 0 auto;
     padding: 30px 20px;
     max-width: 100%;
-    border-radius: 30px;
-    box-shadow: 0px 30px 20px -10px rgb(0 0 0 / 32%);
+    border-radius: 0px;
+    box-shadow: 0px 10px 20px -10px rgb(0 0 0 / 32%);
     position: relative;
 }
 .gtbabel__transwizard-card-context {

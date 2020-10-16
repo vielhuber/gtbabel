@@ -352,9 +352,31 @@ class Data
         return $this->db->fetch_all('SELECT * FROM ' . $this->table . ' ORDER BY id ASC');
     }
 
-    function getTranslationCountFromDatabase()
+    function getTranslationCountFromDatabase($lng_target = null, $checked = null)
     {
-        return intval($this->db->fetch_var('SELECT COUNT(*) FROM ' . $this->table));
+        $query = 'SELECT COUNT(*) FROM ' . $this->table;
+        $args = [];
+        if ($lng_target !== null || $checked !== null) {
+            $query .= ' WHERE ';
+            if ($lng_target !== null) {
+                $query .= 'lng_target = ?';
+                $args[] = $lng_target;
+            }
+            if ($lng_target !== null && $checked !== null) {
+                $query .= ' AND ';
+            }
+            if ($checked !== null) {
+                $query .= 'checked = ?';
+                $args[] = $checked === true ? 1 : 0;
+            }
+        }
+        try {
+            $count = $this->db->fetch_var($query, $args);
+        } catch (\Exception $e) {
+            $count = 0;
+        }
+        $count = intval($count);
+        return $count;
     }
 
     function getGroupedTranslationsFromDatabase(

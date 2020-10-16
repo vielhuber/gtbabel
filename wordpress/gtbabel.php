@@ -506,6 +506,18 @@ class GtbabelWordPress
 
             $submenu = add_submenu_page(
                 'gtbabel-settings',
+                __('Actions', 'gtbabel-plugin'),
+                __('Actions', 'gtbabel-plugin'),
+                'manage_options',
+                'gtbabel-actions',
+                function () {
+                    $this->initBackendActions();
+                }
+            );
+            $menus[] = $submenu;
+
+            $submenu = add_submenu_page(
+                'gtbabel-settings',
                 __('Language picker', 'gtbabel-plugin'),
                 __('Language picker', 'gtbabel-plugin'),
                 'manage_options',
@@ -853,24 +865,6 @@ class GtbabelWordPress
                     $this->saveSettings($settings);
                     $this->setupConfig();
                 }
-            }
-
-            if (isset($_POST['check_all_strings'])) {
-                $this->gtbabel->data->setAllStringsToChecked();
-            }
-
-            if (isset($_POST['delete_unchecked_strings'])) {
-                $this->gtbabel->data->deleteUncheckedStrings();
-            }
-
-            if (isset($_POST['reset_settings'])) {
-                $this->deleteSettings();
-                $this->setDefaultSettingsToOption();
-                $this->setupConfig();
-            }
-
-            if (isset($_POST['reset_translations'])) {
-                $this->reset();
             }
 
             if (isset($_POST['edit_alt_lng_urls'])) {
@@ -1701,58 +1695,6 @@ class GtbabelWordPress
             __('Save', 'gtbabel-plugin') .
             '" type="submit" />';
 
-        echo '<h2 class="gtbabel__subtitle">' . __('Translate complete website', 'gtbabel-plugin') . '</h2>';
-        echo '<p class="gtbabel__paragraph">' . __('Only new strings are translated.', 'gtbabel-plugin') . '</p>';
-        echo '<ul class="gtbabel__fields">';
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_delete_unused" class="gtbabel__label">';
-        echo __('Delete unused translations', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" id="gtbabel_delete_unused" type="checkbox" checked="checked" value="1" />';
-        echo '</div>';
-        echo '</li>';
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_auto_set_discovered_strings_checked" class="gtbabel__label">';
-        echo __('Auto set discovered strings to checked', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" id="gtbabel_auto_set_discovered_strings_checked" type="checkbox" checked="checked" value="1" />';
-        echo '</div>';
-        echo '</li>';
-        echo '</ul>';
-
-        $this->initBackendAutoTranslate('page=gtbabel-settings');
-
-        echo '<div class="gtbabel__stats-log">';
-        echo '<h2 class="gtbabel__subtitle">' . __('Translation api usage stats', 'gtbabel-plugin') . '</h2>';
-        echo $this->showStatsLog();
-        echo '</div>';
-
-        echo '<h2 class="gtbabel__subtitle">' . __('Set all strings to checked', 'gtbabel-plugin') . '</h2>';
-        echo '<input class="gtbabel__submit button button-secondary" name="check_all_strings" value="' .
-            __('Save', 'gtbabel-plugin') .
-            '" type="submit" />';
-
-        echo '<h2 class="gtbabel__subtitle">' . __('Delete all unchecked strings', 'gtbabel-plugin') . '</h2>';
-        echo '<input class="gtbabel__submit button button-secondary" name="delete_unchecked_strings" value="' .
-            __('Save', 'gtbabel-plugin') .
-            '" type="submit" />';
-
-        echo '<h2 class="gtbabel__subtitle">' . __('Reset settings', 'gtbabel-plugin') . '</h2>';
-        echo '<input data-question="' .
-            __('Please enter REMOVE to confirm!', 'gtbabel-plugin') .
-            '" class="gtbabel__submit gtbabel__submit--reset button button-secondary" name="reset_settings" value="' .
-            __('Reset', 'gtbabel-plugin') .
-            '" type="submit" />';
-
-        echo '<h2 class="gtbabel__subtitle">' . __('Reset translations', 'gtbabel-plugin') . '</h2>';
-        echo '<input data-question="' .
-            __('Please enter REMOVE to confirm!', 'gtbabel-plugin') .
-            '" class="gtbabel__submit gtbabel__submit--reset button button-secondary" name="reset_translations" value="' .
-            __('Reset', 'gtbabel-plugin') .
-            '" type="submit" />';
-
         echo '</form>';
         echo '</div>';
     }
@@ -2250,12 +2192,20 @@ class GtbabelWordPress
             if (!empty($languages)) {
                 echo '<ul class="gtbabel__transwizard-languages">';
                 foreach ($languages as $languages__key => $languages__value) {
-                    echo '<li class="gtbabel__transwizard-language">';
+                    $count = $this->gtbabel->data->getTranslationCountFromDatabase($languages__key, false);
+                    echo '<li class="gtbabel__transwizard-language' .
+                        ($count === 0 ? ' gtbabel__transwizard-language--disabled' : '') .
+                        '">';
                     echo '<a class="gtbabel__transwizard-language-link" href="' .
                         admin_url('admin.php?page=gtbabel-transwizard&lng=' . $languages__key) .
-                        '"><span class="gtbabel__transwizard-language-linktext">' .
-                        $languages__value .
-                        '</span></a>';
+                        '">';
+                    echo '<span class="gtbabel__transwizard-language-linktext">' . $languages__value . '</span>';
+                    echo '<span class="gtbabel__transwizard-language-count' .
+                        ($count > 0 ? ' gtbabel__transwizard-language-count--highlight wp-ui-highlight' : '') .
+                        '">' .
+                        $count .
+                        '</span>';
+                    echo '</a>';
                     echo '</li>';
                 }
                 echo '</ul>';
@@ -2282,7 +2232,7 @@ class GtbabelWordPress
 
                 echo '<p class="gtbabel__paragraph">';
                 echo sprintf(
-                    _n('%s translation left', '%s translations left', $translations['count'], 'gtbabel-plugin'),
+                    _n('%s translation left.', '%s translations left.', $translations['count'], 'gtbabel-plugin'),
                     $translations['count']
                 );
                 echo '</p>';
@@ -2319,10 +2269,104 @@ class GtbabelWordPress
                 echo '<p class="gtbabel__paragraph gtbabel__transwizard-done-text">' .
                     __('All done!', 'gtbabel-plugin') .
                     '</p>';
+                echo '<a class="button button-primary" href="' . admin_url('admin.php?page=gtbabel-transwizard') . '">';
+                echo __('To the overview', 'gtbabel-plugin');
+                echo '</a>';
                 echo '</div>';
             }
         }
 
+        echo '</div>';
+    }
+
+    private function initBackendActions()
+    {
+        $message = '';
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (isset($_POST['check_all_strings'])) {
+                $this->gtbabel->data->setAllStringsToChecked();
+            }
+
+            if (isset($_POST['delete_unchecked_strings'])) {
+                $this->gtbabel->data->deleteUncheckedStrings();
+            }
+
+            if (isset($_POST['reset_settings'])) {
+                $this->deleteSettings();
+                $this->setDefaultSettingsToOption();
+                $this->setupConfig();
+            }
+
+            if (isset($_POST['reset_translations'])) {
+                $this->reset();
+            }
+
+            $message =
+                '<div class="gtbabel__notice notice notice-success is-dismissible"><p>' .
+                __('Successfully edited', 'gtbabel-plugin') .
+                '</p></div>';
+        }
+
+        echo '<div class="gtbabel gtbabel--actions wrap">';
+        echo '<form class="gtbabel__form" method="post" action="' . admin_url('admin.php?page=gtbabel-actions') . '">';
+        wp_nonce_field('gtbabel-actions');
+        echo '<h1 class="gtbabel__title">🦜 Gtbabel 🦜</h1>';
+        echo $message;
+
+        echo '<h2 class="gtbabel__subtitle">' . __('Translate complete website', 'gtbabel-plugin') . '</h2>';
+        echo '<p class="gtbabel__paragraph">' . __('Only new strings are translated.', 'gtbabel-plugin') . '</p>';
+        echo '<ul class="gtbabel__fields">';
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_delete_unused" class="gtbabel__label">';
+        echo __('Delete unused translations', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" id="gtbabel_delete_unused" type="checkbox" checked="checked" value="1" />';
+        echo '</div>';
+        echo '</li>';
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_auto_set_discovered_strings_checked" class="gtbabel__label">';
+        echo __('Auto set discovered strings to checked', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" id="gtbabel_auto_set_discovered_strings_checked" type="checkbox" checked="checked" value="1" />';
+        echo '</div>';
+        echo '</li>';
+        echo '</ul>';
+
+        $this->initBackendAutoTranslate('page=gtbabel-actions');
+
+        echo '<div class="gtbabel__stats-log">';
+        echo '<h2 class="gtbabel__subtitle">' . __('Translation api usage stats', 'gtbabel-plugin') . '</h2>';
+        echo $this->showStatsLog();
+        echo '</div>';
+
+        echo '<h2 class="gtbabel__subtitle">' . __('Set all strings to checked', 'gtbabel-plugin') . '</h2>';
+        echo '<input class="gtbabel__submit button button-secondary" name="check_all_strings" value="' .
+            __('Save', 'gtbabel-plugin') .
+            '" type="submit" />';
+
+        echo '<h2 class="gtbabel__subtitle">' . __('Delete all unchecked strings', 'gtbabel-plugin') . '</h2>';
+        echo '<input class="gtbabel__submit button button-secondary" name="delete_unchecked_strings" value="' .
+            __('Save', 'gtbabel-plugin') .
+            '" type="submit" />';
+
+        echo '<h2 class="gtbabel__subtitle">' . __('Reset settings', 'gtbabel-plugin') . '</h2>';
+        echo '<input data-question="' .
+            __('Please enter REMOVE to confirm!', 'gtbabel-plugin') .
+            '" class="gtbabel__submit gtbabel__submit--reset button button-secondary" name="reset_settings" value="' .
+            __('Reset', 'gtbabel-plugin') .
+            '" type="submit" />';
+
+        echo '<h2 class="gtbabel__subtitle">' . __('Reset translations', 'gtbabel-plugin') . '</h2>';
+        echo '<input data-question="' .
+            __('Please enter REMOVE to confirm!', 'gtbabel-plugin') .
+            '" class="gtbabel__submit gtbabel__submit--reset button button-secondary" name="reset_translations" value="' .
+            __('Reset', 'gtbabel-plugin') .
+            '" type="submit" />';
+
+        echo '</form>';
         echo '</div>';
     }
 
