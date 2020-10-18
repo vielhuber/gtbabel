@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 4.7.8
+ * Version: 4.7.9
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free

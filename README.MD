@@ -1214,19 +1214,19 @@ The following features are included:
 
 Gtbabel for WordPress uses the following capabilities:
 
--   `gtbabel__edit_settings`
+-   `gtbabel__edit_settings`: capability to edit settings
 -   `gtbabel__translation_list`: capability to use the list of translations
 -   `gtbabel__translation_assistant`: capability to use the translation assistant
 -   `gtbabel__translate_xx`: capability to translate the language with code `xx`
 
 By default, administrators have all capabilities.\
-You can add these capabilities individually to your WordPress user roles:
+You can add these capabilities to your WordPress user roles individually
 
 -   in your WordPress backend under Gtbabel > Permissions,
 -   with plugins like [User Role Editor](https://de.wordpress.org/plugins/user-role-editor/),
 -   by using custom code.
 
-The following example gives the role "Editor" translation permissions for the languages English and Français in the translation wizard:
+The following example gives the role "Editor" translation permissions for the languages English and Français in the translation assistant:
 
 ```php
 // only run this once
