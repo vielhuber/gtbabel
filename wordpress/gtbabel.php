@@ -35,6 +35,7 @@ class GtbabelWordPress
         $this->languagePickerWidget();
         $this->languagePickerShortcode();
         $this->disableAutoRedirect();
+        $this->initUpdateCapabilities();
         $this->filterRestUrl();
         $this->autoTranslateContactForm7Mails();
         $this->startHook();
@@ -351,6 +352,10 @@ class GtbabelWordPress
                     ? null
                     : $this->gtbabel->data->getCurrentLanguageCode();
 
+                if ($lng !== null && !current_user_can('gtbabel__translate_' . $lng)) {
+                    return;
+                }
+
                 $admin_bar->add_menu([
                     'id' => 'gtbabel-translate',
                     'parent' => null,
@@ -376,6 +381,9 @@ class GtbabelWordPress
                         $this->gtbabel->settings->getSelectedLanguageCodesLabelsWithoutSource()
                         as $languages__key => $languages__value
                     ) {
+                        if (!current_user_can('gtbabel__translate_' . $languages__key)) {
+                            continue;
+                        }
                         echo '<li><a href="' .
                             admin_url('admin.php?page=gtbabel-trans&post_id=' . $post->ID) .
                             '&lng=' .
@@ -474,7 +482,7 @@ class GtbabelWordPress
             $menu = add_menu_page(
                 'Gtbabel',
                 'Gtbabel',
-                'manage_options',
+                'gtbabel__edit_settings',
                 'gtbabel-settings',
                 function () {
                     $this->initBackendSettings();
@@ -488,7 +496,7 @@ class GtbabelWordPress
                 'gtbabel-settings',
                 __('Settings', 'gtbabel-plugin'),
                 __('Settings', 'gtbabel-plugin'),
-                'manage_options',
+                'gtbabel__edit_settings',
                 'gtbabel-settings'
             );
 
@@ -496,7 +504,7 @@ class GtbabelWordPress
                 'gtbabel-settings',
                 __('Translations', 'gtbabel-plugin'),
                 __('Translations', 'gtbabel-plugin'),
-                'manage_options',
+                'gtbabel__translation_list',
                 'gtbabel-trans',
                 function () {
                     $this->initBackendStringTranslation();
@@ -508,7 +516,7 @@ class GtbabelWordPress
                 'gtbabel-settings',
                 __('Actions', 'gtbabel-plugin'),
                 __('Actions', 'gtbabel-plugin'),
-                'manage_options',
+                'gtbabel__edit_settings',
                 'gtbabel-actions',
                 function () {
                     $this->initBackendActions();
@@ -520,7 +528,7 @@ class GtbabelWordPress
                 'gtbabel-settings',
                 __('Language picker', 'gtbabel-plugin'),
                 __('Language picker', 'gtbabel-plugin'),
-                'manage_options',
+                'gtbabel__edit_settings',
                 'gtbabel-lngpicker',
                 function () {
                     $this->initBackendLanguagePicker();
@@ -532,7 +540,7 @@ class GtbabelWordPress
                 'gtbabel-settings',
                 __('Gettext', 'gtbabel-plugin'),
                 __('Gettext', 'gtbabel-plugin'),
-                'manage_options',
+                'gtbabel__edit_settings',
                 'gtbabel-gettext',
                 function () {
                     $this->initBackendGettext();
@@ -542,9 +550,21 @@ class GtbabelWordPress
 
             $submenu = add_submenu_page(
                 'gtbabel-settings',
+                __('Permissions', 'gtbabel-plugin'),
+                __('Permissions', 'gtbabel-plugin'),
+                'gtbabel__edit_settings',
+                'gtbabel-permissions',
+                function () {
+                    $this->initBackendPermissions();
+                }
+            );
+            $menus[] = $submenu;
+
+            $submenu = add_submenu_page(
+                'gtbabel-settings',
                 __('Translation wizard', 'gtbabel-plugin'),
                 __('Translation wizard', 'gtbabel-plugin'),
-                'manage_options',
+                'gtbabel__translation_assistant',
                 'gtbabel-transwizard',
                 function () {
                     $this->initBackendTranslationWizard();
@@ -556,7 +576,7 @@ class GtbabelWordPress
                 'gtbabel-settings',
                 __('Setup wizard', 'gtbabel-plugin'),
                 __('Setup wizard', 'gtbabel-plugin'),
-                'manage_options',
+                'gtbabel__edit_settings',
                 'gtbabel-wizard',
                 function () {
                     $this->initBackendWizard();
@@ -1908,6 +1928,9 @@ class GtbabelWordPress
             echo '</li>';
         }
         foreach ($this->gtbabel->settings->getSelectedLanguageCodesLabelsWithoutSource() as $lng__key => $lng__value) {
+            if (!current_user_can('gtbabel__translate_' . $lng__key)) {
+                continue;
+            }
             echo '<li class="gtbabel__transmeta-listitem">';
             if ($lng === null || $lng !== $lng__key) {
                 $lng_link = 'admin.php?page=gtbabel-trans&lng=' . $lng__key;
@@ -2017,6 +2040,12 @@ class GtbabelWordPress
                 ) {
                     continue;
                 }
+                if (
+                    $this->gtbabel->settings->getSourceLanguageCode() !== $languages__key &&
+                    !current_user_can('gtbabel__translate_' . $languages__key)
+                ) {
+                    continue;
+                }
                 echo '<td class="gtbabel__table-cell">' . $languages__value . '</td>';
             }
             echo '<td class="gtbabel__table-cell">' . __('Context', 'gtbabel-plugin') . '</td>';
@@ -2035,6 +2064,12 @@ class GtbabelWordPress
                         $lng !== null &&
                         $lng !== $languages__key &&
                         $this->gtbabel->settings->getSourceLanguageCode() !== $languages__key
+                    ) {
+                        continue;
+                    }
+                    if (
+                        $this->gtbabel->settings->getSourceLanguageCode() !== $languages__key &&
+                        !current_user_can('gtbabel__translate_' . $languages__key)
                     ) {
                         continue;
                     }
@@ -2192,6 +2227,9 @@ class GtbabelWordPress
             if (!empty($languages)) {
                 echo '<ul class="gtbabel__transwizard-languages">';
                 foreach ($languages as $languages__key => $languages__value) {
+                    if (!current_user_can('gtbabel__translate_' . $languages__key)) {
+                        continue;
+                    }
                     $count = $this->gtbabel->data->getTranslationCountFromDatabase($languages__key, false);
                     echo '<li class="gtbabel__transwizard-language' .
                         ($count === 0 ? ' gtbabel__transwizard-language--disabled' : '') .
@@ -2514,6 +2552,91 @@ class GtbabelWordPress
         echo '</li>';
         echo '</ol>';
 
+        echo '</div>';
+    }
+
+    private function initBackendPermissions()
+    {
+        $message = '';
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (isset($_POST['save_permissions'])) {
+                check_admin_referer('gtbabel-permissions');
+                if (!empty($_POST['permissions'])) {
+                    foreach ($_POST['permissions'] as $permissions__key => $permissions__value) {
+                        $role = get_role($permissions__key);
+                        foreach ($permissions__value as $permissions__value__key => $permissions__value__value) {
+                            if ($permissions__value__value == '1') {
+                                $role->add_cap($permissions__value__key);
+                            } else {
+                                $role->remove_cap($permissions__value__key);
+                            }
+                        }
+                    }
+                }
+            }
+            $message =
+                '<div class="gtbabel__notice notice notice-success is-dismissible"><p>' .
+                __('Successfully edited', 'gtbabel-plugin') .
+                '</p></div>';
+        }
+
+        echo '<div class="gtbabel gtbabel--permissions wrap">';
+        echo '<form class="gtbabel__form" method="post" action="' .
+            admin_url('admin.php?page=gtbabel-permissions') .
+            '">';
+        wp_nonce_field('gtbabel-permissions');
+        echo '<h1 class="gtbabel__title">🦜 Gtbabel 🦜</h1>';
+        echo $message;
+        echo '<h2 class="gtbabel__subtitle">' . __('Permissions', 'gtbabel-plugin') . '</h2>';
+
+        $roles = get_editable_roles();
+        $capabilities = $this->getAvailableCapabilities();
+        echo '<table class="gtbabel__table">';
+        echo '<thead class="gtbabel__table-head">';
+        echo '<tr class="gtbabel__table-row">';
+        echo '<td class="gtbabel__table-cell">';
+        echo '</td>';
+        foreach ($roles as $roles__value) {
+            echo '<td class="gtbabel__table-cell">';
+            echo _x($roles__value['name'], 'User role');
+            echo '</td>';
+        }
+        echo '</tr>';
+        echo '</thead>';
+        echo '<tbody class="gtbabel__table-body">';
+        foreach ($capabilities as $capabilities__key => $capabilities__value) {
+            echo '<tr class="gtbabel__table-row">';
+            echo '<td class="gtbabel__table-cell">';
+            echo $capabilities__value;
+            echo '</td>';
+            foreach ($roles as $roles__key => $roles__value) {
+                echo '<td class="gtbabel__table-cell">';
+                echo '<input type="checkbox" class="gtbabel__input gtbabel__input--checkbox gtbabel__input--submit-unchecked" name="permissions[' .
+                    $roles__key .
+                    '][' .
+                    $capabilities__key .
+                    ']" ' .
+                    ($roles__key === 'administrator' ? 'disabled="disabled"' : '') .
+                    ' ' .
+                    ($roles__key === 'administrator' ||
+                    (in_array($capabilities__key, $roles__value['capabilities']) &&
+                        $roles__value['capabilities'][$capabilities__key] == '1')
+                        ? 'checked="checked"'
+                        : '') .
+                    ' value="1" />';
+                echo '</td>';
+            }
+            echo '</tr>';
+        }
+        echo '</tbody>';
+        echo '</table>';
+
+        echo '<input class="gtbabel__submit button button-primary" name="save_permissions" value="' .
+            __('Save', 'gtbabel-plugin') .
+            '" type="submit" />';
+
+        echo '</form>';
         echo '</div>';
     }
 
@@ -3335,6 +3458,49 @@ EOD;
                 ])
             );
         }
+    }
+
+    private function initUpdateCapabilities()
+    {
+        // this is run on every page load in backend
+        // running it only on plugin activation / deactivation is problematic (due to changes of lngs etc)
+        // load time is irrelevant (0.0001s)
+        add_action('admin_init', function () {
+            $roles = get_editable_roles();
+            $caps = array_keys($this->getAvailableCapabilities());
+            foreach ($roles as $roles__key => $roles__value) {
+                $roles_value_capabilities = array_filter(array_keys($roles__value['capabilities']), function ($a) {
+                    return strpos($a, 'gtbabel__') === 0;
+                });
+                // remove caps, that are not existing anymore
+                foreach ($roles_value_capabilities as $roles_value_capabilities__value) {
+                    if (!in_array($roles_value_capabilities__value, $caps)) {
+                        get_role($roles__key)->remove_cap($roles_value_capabilities__value);
+                    }
+                }
+                // add all caps to admin role (so they are visible in plugins like User Role Editor)
+                if ($roles__key === 'administrator') {
+                    foreach (array_diff($caps, array_keys($roles__value['capabilities'])) as $caps__value) {
+                        get_role($roles__key)->add_cap($caps__value);
+                    }
+                }
+            }
+        });
+    }
+
+    private function getAvailableCapabilities()
+    {
+        $caps = [];
+        $caps['gtbabel__edit_settings'] = __('Edit settings', 'gtbabel-plugin');
+        $caps['gtbabel__translation_list'] = __('Use translation list', 'gtbabel-plugin');
+        $caps['gtbabel__translation_assistant'] = __('Use translation assistant', 'gtbabel-plugin');
+        foreach ($this->gtbabel->settings->getSelectedLanguageCodesLabels() as $languages__key => $languages__value) {
+            $caps['gtbabel__translate_' . $languages__key] = sprintf(
+                __('Translate %s', 'gtbabel-plugin'),
+                $languages__value
+            );
+        }
+        return $caps;
     }
 }
 

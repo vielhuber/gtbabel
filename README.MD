@@ -1208,6 +1208,34 @@ The following features are included:
 -   Control publish status of posts/pages (slug changes are auto-reflected in the `prevent_publish_urls`-option)
 -   Possibility to replace files per language via the media library
 -   Multisite support
+-   Flexible permission system based on capabilities
+
+### Permissions
+
+Gtbabel for WordPress uses the following capabilities:
+
+-   `gtbabel__edit_settings`
+-   `gtbabel__translation_list`: capability to use the list of translations
+-   `gtbabel__translation_assistant`: capability to use the translation assistant
+-   `gtbabel__translate_xx`: capability to translate the language with code `xx`
+
+By default, administrators have all capabilities.\
+You can add these capabilities individually to your WordPress user roles:
+
+-   in your WordPress backend under Gtbabel > Permissions,
+-   with plugins like [User Role Editor](https://de.wordpress.org/plugins/user-role-editor/),
+-   by using custom code.
+
+The following example gives the role "Editor" translation permissions for the languages English and Français in the translation wizard:
+
+```php
+// only run this once
+add_action('admin_init', function () {
+    get_role('editor')->add_cap('gtbabel__translation_assistant');
+    get_role('editor')->add_cap('gtbabel__translate_en');
+    get_role('editor')->add_cap('gtbabel__translate_fr');
+});
+```
 
 ## Database and Gettext
 

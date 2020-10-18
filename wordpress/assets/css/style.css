@@ -435,7 +435,6 @@
 .gtbabel__transwizard-card-button {
     width: 100%;
 }
-
 .gtbabel__transwizard-done {
     text-align: center;
 }
@@ -445,4 +444,25 @@
     margin: 0 auto;
     display: block;
     box-shadow: 0px 10px 30px 0px rgb(0 0 0 / 0.2);
+}
+
+.gtbabel--permissions .gtbabel__table {
+    width: 100%;
+    margin-bottom: 20px;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+.gtbabel--permissions .gtbabel__table-head .gtbabel__table-cell {
+    font-weight: bold;
+}
+.gtbabel--permissions .gtbabel__table-cell {
+    width: auto;
+    border: 1px solid gainsboro;
+    position: relative;
+    padding: 2px 7px;
+    text-align: center;
+}
+.gtbabel--permissions .gtbabel__table-cell:nth-child(1) {
+    text-align: left;
+    width: 200px;
 }

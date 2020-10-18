@@ -124,8 +124,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.addEventListener('submit', e => {
-        if (e.target.closest('.gtbabel--trans form')) {
-            let form = e.target.closest('.gtbabel--trans form'),
+        if (e.target.closest('.gtbabel__form')) {
+            let form = e.target.closest('.gtbabel__form'),
                 els = null;
             els = form.querySelectorAll(
                 '.gtbabel__input--submit-unchecked:not(:checked)[name]:not([name$=\'[]\']):not([disabled="disabled"])'
