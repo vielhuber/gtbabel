@@ -272,6 +272,7 @@ $functions = [
         'get_dirsize',
         'get_edit_post_link',
         'get_edit_term_link',
+        'get_editable_roles',
         'get_enclosed',
         'get_extended',
         'get_footer',
