@@ -14,6 +14,7 @@ class Gtbabel
     public $dom;
     public $router;
     public $gettext;
+    public $excel;
 
     public $configured = false;
     public $started = false;
@@ -29,7 +30,8 @@ class Gtbabel
         Altlng $altlng = null,
         Dom $dom = null,
         Router $router = null,
-        Gettext $gettext = null
+        Gettext $gettext = null,
+        Excel $excel = null
     ) {
         $this->settings = $settings ?: new Settings();
         $this->utils = $utils ?: new Utils();
@@ -54,6 +56,7 @@ class Gtbabel
             );
         $this->router = $router ?: new Router($this->data, $this->host, $this->settings, $this->publish, $this->log);
         $this->gettext = $gettext ?: new Gettext($this->data, $this->settings);
+        $this->excel = $excel ?: new Excel($this->data, $this->settings);
     }
 
     function config($args = [])

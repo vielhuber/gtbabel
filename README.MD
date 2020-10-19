@@ -1242,7 +1242,7 @@ add_action('admin_init', function () {
 -   The final html gets parsed and is split up in reasonable strings.
 -   Gtbabel operates on a database layer (e.g. sqlite) to ensure fast load times.
 -   The database structure reflects the structure of [GNU gettext](https://www.gnu.org/software/gettext/).
--   You can export and import the data at any time.
+-   You can export and import the data as po or even and xlsx files at any time.
 
 ## JavaScript
 
@@ -1309,8 +1309,8 @@ If you want to influence that special tags should not be auto translated by the 
 
 `<p>Das ist das <span class="notranslate">Haus</span> vom Nikolaus</p>`
 
-The part before and after the `span`-tag gets translated (and added to gettext).\
-If you want to exclude a complete node of being translated (and not added to gettext), add a class with the value `notranslate` (or any other value defined in `exclude_dom`) to the parent node:
+The part before and after the `span`-tag gets translated (and added to the database).\
+If you want to exclude a complete node of being translated (and not added to the database), add a class with the value `notranslate` (or any other value defined in `exclude_dom`) to the parent node:
 
 `<p class="notranslate">Das ist das <span>Haus</span> vom Nikolaus</p>`
 
@@ -1322,9 +1322,9 @@ However, if you want the `href`-attribute to be modified, do something like
 
 `<a href="/home"><span class="notranslate">Link</span></a>`
 
-## HTML in gettext
+## HTML
 
-Gtbabel preserves inline HTML-tags and leaves them inside your gettext strings.\
+Gtbabel preserves inline HTML-tags and leaves them inside your translations.\
 However, attributes are automatically stripped. So
 
 `<a href="https://tld.com" class="foo" data-bar="baz">Hallo</a> Welt!`
@@ -1347,11 +1347,11 @@ So for example
 
 `Das deutsche <a href="https://1.com">Brot</a> <a href="https://2.com">vermisse</a> ich am meisten.`
 
-is stored in your gettext files as
+is stored in the database as
 
 `Das deutsche <a>Brot</a> <a>vermisse</a> ich am meisten.`
 
-If your translations don't reflect the original order, in gettext they include hints like
+If your translations don't reflect the original order, in the database they include hints like
 
 `I <a p="2">miss</a> German <a p="1">bread</a> the most.`
 
@@ -1439,7 +1439,7 @@ You can provide those settings beforehand via the `alt_lng_urls` option.
 
 The router automatically modifies the `$_SERVER['REQUEST_URI']` variable to catch translated urls.\
 Unknown translations of urls are picked up from the current url and from links that are on the page.\
-These urls are automatically added to gettext (ajax requested urls are excluded).
+These urls are automatically added to the database (ajax requested urls are excluded).
 
 ## Domain schema
 
@@ -1580,7 +1580,7 @@ If your json endpoint is not targeted via a language specific url, you can get t
 
 ## Translation management
 
-If `only_show_checked_strings` is set to `true`, only translations with an [extracted comment](https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html) of `#. checked` are shown. This way you can build an approval system in your backend, where translators can check strings before they are published.
+If `only_show_checked_strings` is set to `true`, only translations that are checked are shown. This way you can build an approval system in your backend, where translators can check strings before they are published.
 
 ## Flow diagram
 

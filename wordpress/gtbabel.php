@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 4.7.9
+ * Version: 4.8.0
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -126,8 +126,13 @@ class GtbabelWordPress
                 if ($this->isFrontend()) {
                     $this->gtbabel->start();
                 }
-                if (isset($_GET['export']) && $_GET['export'] == '1') {
-                    $this->gtbabel->gettext->export();
+                if (isset($_GET['gtbabel_export'])) {
+                    if ($_GET['gtbabel_export'] == 'po') {
+                        $this->gtbabel->gettext->export();
+                    }
+                    if ($_GET['gtbabel_export'] == 'xlsx') {
+                        $this->gtbabel->excel->export();
+                    }
                 }
             });
             add_action(
@@ -538,12 +543,12 @@ class GtbabelWordPress
 
             $submenu = add_submenu_page(
                 'gtbabel-settings',
-                __('Gettext', 'gtbabel-plugin'),
-                __('Gettext', 'gtbabel-plugin'),
+                __('Export/import', 'gtbabel-plugin'),
+                __('Export/import', 'gtbabel-plugin'),
                 'gtbabel__edit_settings',
-                'gtbabel-gettext',
+                'gtbabel-exportimport',
                 function () {
-                    $this->initBackendGettext();
+                    $this->initBackendImportExport();
                 }
             );
             $menus[] = $submenu;
@@ -2408,13 +2413,19 @@ class GtbabelWordPress
         echo '</div>';
     }
 
-    private function initBackendGettext()
+    private function initBackendImportExport()
     {
         $message = '';
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            if (isset($_POST['upload_file'])) {
-                check_admin_referer('gtbabel-gettext-import');
+            if (
+                isset($_POST['import']) &&
+                @$_POST['gtbabel']['lng_source'] != '' &&
+                @$_POST['gtbabel']['lng_target'] != '' &&
+                @$_POST['gtbabel']['type'] != '' &&
+                @$_FILES['gtbabel']['name']['file'] != ''
+            ) {
+                check_admin_referer('gtbabel-exportimport');
                 // remove slashes
                 $_POST['gtbabel'] = stripslashes_deep($_POST['gtbabel']);
                 $_POST['gtbabel'] = __::array_map_deep($_POST['gtbabel'], function ($settings__value) {
@@ -2423,57 +2434,77 @@ class GtbabelWordPress
                 $_FILES['gtbabel'] = __::array_map_deep($_FILES['gtbabel'], function ($settings__value) {
                     return sanitize_textarea_field($settings__value);
                 });
+
+                $extension = strtolower(end(explode('.', $_FILES['gtbabel']['name']['file'])));
+                $allowed_extension = [
+                    'po' => ['application/octet-stream'],
+                    'xlsx' => ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
+                ];
                 if (
-                    @$_POST['gtbabel']['lng_source'] != '' &&
-                    @$_POST['gtbabel']['lng_target'] != '' &&
-                    @$_FILES['gtbabel']['name']['file'] != ''
+                    array_key_exists($extension, $allowed_extension) &&
+                    in_array($_FILES['gtbabel']['type']['file'], $allowed_extension[$extension]) &&
+                    $_FILES['gtbabel']['size']['file'] < 4000 * 1024 &&
+                    $_FILES['gtbabel']['error']['file'] == 0
                 ) {
-                    $extension = strtolower(end(explode('.', $_FILES['gtbabel']['name']['file'])));
-                    $allowed_extension = [
-                        'po' => ['application/octet-stream']
-                    ];
-                    if (
-                        array_key_exists($extension, $allowed_extension) &&
-                        in_array($_FILES['gtbabel']['type']['file'], $allowed_extension[$extension]) &&
-                        $_FILES['gtbabel']['size']['file'] < 4000 * 1024 &&
-                        $_FILES['gtbabel']['error']['file'] == 0
-                    ) {
-                        $this->gtbabel->gettext->import(
-                            $_FILES['gtbabel']['tmp_name']['file'],
-                            $_POST['gtbabel']['lng_source'],
-                            $_POST['gtbabel']['lng_target']
-                        );
-                        $message =
-                            '<div class="gtbabel__notice notice notice-success is-dismissible"><p>' .
-                            __('Successfully uploaded', 'gtbabel-plugin') .
-                            '</p></div>';
-                    } else {
-                        $message =
-                            '<div class="gtbabel__notice notice notice-error is-dismissible"><p>' .
-                            __('An error occurred', 'gtbabel-plugin') .
-                            '</p></div>';
-                    }
+                    $this->gtbabel->{$_POST['gtbabel']['type'] === 'po' ? 'gettext' : 'excel'}->import(
+                        $_FILES['gtbabel']['tmp_name']['file'],
+                        $_POST['gtbabel']['lng_source'],
+                        $_POST['gtbabel']['lng_target']
+                    );
+                    $message =
+                        '<div class="gtbabel__notice notice notice-success is-dismissible"><p>' .
+                        __('Successfully uploaded', 'gtbabel-plugin') .
+                        '</p></div>';
+                } else {
+                    $message =
+                        '<div class="gtbabel__notice notice notice-error is-dismissible"><p>' .
+                        __('An error occurred', 'gtbabel-plugin') .
+                        '</p></div>';
                 }
             }
         }
 
-        echo '<div class="gtbabel gtbabel--gettext wrap">';
+        echo '<div class="gtbabel gtbabel--exportimport wrap">';
         echo '<h1 class="gtbabel__title">🦜 Gtbabel 🦜</h1>';
         echo $message;
 
-        echo '<h2 class="gtbabel__subtitle">' . __('Export translations', 'gtbabel-plugin') . '</h2>';
-        echo '<a class="button button-primary" href="' .
-            admin_url('admin.php?page=gtbabel-gettext&export=1') .
-            '">' .
-            __('Export', 'gtbabel-plugin') .
-            '</a>';
+        echo '<h2 class="gtbabel__subtitle">' . __('Export', 'gtbabel-plugin') . '</h2>';
 
-        echo '<h2 class="gtbabel__subtitle">' . __('Import translations', 'gtbabel-plugin') . '</h2>';
+        echo '<form class="gtbabel__form" method="get" action="' . admin_url('admin.php') . '">';
+        echo '<input type="hidden" name="page" value="gtbabel-exportimport" />';
+        echo '<ul class="gtbabel__fields">';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_export_type" class="gtbabel__label">';
+        echo __('Format', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<select required="required" class="gtbabel__input gtbabel__input--select" id="gtbabel_export_type" name="gtbabel_export">';
+        echo '<option value="">&ndash;&ndash;</option>';
+        foreach (
+            ['po' => __('Gettext (*.po)', 'gtbabel-plugin'), 'xlsx' => __('Excel (*.xlsx)', 'gtbabel-plugin')]
+            as $types__key => $types__value
+        ) {
+            echo '<option value="' . $types__key . '">' . $types__value . '</option>';
+        }
+        echo '</select>';
+        echo '</div>';
+        echo '</li>';
+
+        echo '</ul>';
+
+        echo '<input class="gtbabel__submit button button-secondary" name="export" value="' .
+            __('Export', 'gtbabel-plugin') .
+            '" type="submit" />';
+
+        echo '</form>';
+
+        echo '<h2 class="gtbabel__subtitle">' . __('Import', 'gtbabel-plugin') . '</h2>';
 
         echo '<form enctype="multipart/form-data" class="gtbabel__form" method="post" action="' .
-            admin_url('admin.php?page=gtbabel-gettext') .
+            admin_url('admin.php?page=gtbabel-exportimport') .
             '">';
-        wp_nonce_field('gtbabel-gettext-import');
+        wp_nonce_field('gtbabel-exportimport');
         echo '<ul class="gtbabel__fields">';
 
         echo '<li class="gtbabel__field">';
@@ -2505,16 +2536,33 @@ class GtbabelWordPress
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_file" class="gtbabel__label">';
-        echo __('*.po-file', 'gtbabel-plugin');
+        echo '<label for="gtbabel_import_type" class="gtbabel__label">';
+        echo __('Format', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        echo '<input required="required" class="gtbabel__input gtbabel__input--file" type="file" name="gtbabel[file]" id="gtbabel_file" accept=".po" />';
+        echo '<select required="required" class="gtbabel__input gtbabel__input--select" id="gtbabel_import_type" name="gtbabel[type]">';
+        echo '<option value="">&ndash;&ndash;</option>';
+        foreach (
+            ['po' => __('Gettext (*.po)', 'gtbabel-plugin'), 'xlsx' => __('Excel (*.xlsx)', 'gtbabel-plugin')]
+            as $types__key => $types__value
+        ) {
+            echo '<option value="' . $types__key . '">' . $types__value . '</option>';
+        }
+        echo '</select>';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_file" class="gtbabel__label">';
+        echo __('File', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input required="required" class="gtbabel__input gtbabel__input--file" type="file" name="gtbabel[file]" id="gtbabel_file" accept=".po,.xlsx" />';
         echo '</div>';
         echo '</li>';
         echo '</ul>';
 
-        echo '<input class="gtbabel__submit button button-primary" name="upload_file" value="' .
+        echo '<input class="gtbabel__submit button button-secondary" name="import" value="' .
             __('Import', 'gtbabel-plugin') .
             '" type="submit" />';
         echo '</form>';

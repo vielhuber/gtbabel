@@ -988,7 +988,7 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->gtbabel->reset();
     }
 
-    public function test_gettext()
+    public function test_exportimport()
     {
         $settings = $this->getDefaultSettings();
         $settings['languages'] = $this->getLanguageSettings([['code' => 'de'], ['code' => 'en'], ['code' => 'fr']]);
@@ -1032,6 +1032,12 @@ class Test extends \PHPUnit\Framework\TestCase
             true
         );
 
+        $data1 = $this->gtbabel->data->getGroupedTranslationsFromDatabase()['data'];
+        $files = $this->gtbabel->excel->export(false);
+        $this->gtbabel->excel->import($files[0], 'en', 'de');
+        $this->gtbabel->excel->import($files[2], 'fr', 'de');
+        $data2 = $this->gtbabel->data->getGroupedTranslationsFromDatabase()['data'];
+        $this->assertEquals($data1, $data2);
         $this->gtbabel->reset();
     }
 

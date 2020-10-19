@@ -15,7 +15,8 @@
         "vlucas/phpdotenv": "*",
         "cocur/slugify": "*",
         "vielhuber/stringhelper": "*",
-        "vielhuber/dbhelper": "*"
+        "vielhuber/dbhelper": "*",
+        "vielhuber/excelhelper": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "*"
