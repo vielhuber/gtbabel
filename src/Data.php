@@ -917,7 +917,7 @@ class Data
         return $this->host->getLanguageCodeFromUrl($this->host->getCurrentUrl());
     }
 
-    function getLanguagePickerData($with_args = true, $cur_url = null)
+    function getLanguagePickerData($with_args = true, $cur_url = null, $hide_active = false)
     {
         $data = [];
         if (!$this->host->responseCodeIsSuccessful()) {
@@ -933,6 +933,9 @@ class Data
             ) {
                 continue;
             }
+            if ($hide_active === true && $this->getCurrentLanguageCode() === $languages__key) {
+                continue;
+            }
             $trans_url = $this->getUrlTranslationInLanguage($this->getCurrentLanguageCode(), $languages__key, $cur_url);
             $hreflang = $this->settings->getHreflangCodeForLanguage($languages__key);
             $data[] = [
@@ -944,6 +947,22 @@ class Data
             ];
         }
         return $data;
+    }
+
+    function getLanguagePickerHtml($with_args = true, $cur_url = null, $hide_active = false)
+    {
+        $data = $this->getLanguagePickerData($with_args, $cur_url, $hide_active);
+        $html = '';
+        $html .= '<ul class="lngpicker">';
+        foreach ($data as $data__value) {
+            $html .= '<li>';
+            $html .= '<a href="' . $data__value['url'] . '"' . ($data__value['active'] ? ' class="active"' : '') . '>';
+            $html .= $data__value['label'];
+            $html .= '</a>';
+            $html .= '</li>';
+        }
+        $html .= '</ul>';
+        return $html;
     }
 
     function sourceLngIsCurrentLng()

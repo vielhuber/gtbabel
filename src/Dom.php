@@ -427,6 +427,7 @@ class Dom
             $this->setAltLngUrls();
             $this->detectDomChanges();
             $this->localizeJsInject();
+            $this->replaceMenuLanguagePicker();
         }
         $this->preloadExcludedNodes();
         $this->preloadForceTokenize();
@@ -688,6 +689,15 @@ class Dom
                 }
             }
         }
+    }
+
+    function replaceNodeWithString($node, $str)
+    {
+        $str = mb_convert_encoding($str, 'HTML-ENTITIES', 'UTF-8');
+        $tmp = new \DOMDocument();
+        $tmp->loadHTML($str, LIBXML_HTML_NOIMPLIED);
+        $repl = $this->DOMDocument->importNode($tmp->documentElement, true);
+        $node->parentNode->replaceChild($repl, $node);
     }
 
     function getChildrenCountRecursivelyOfNodeTagsOnly($node)
@@ -1090,5 +1100,21 @@ class Dom
         $tag->setAttribute('data-type', 'gtbabel-translated-strings');
         $tag->textContent = $this->localize_js_script;
         $head->insertBefore($tag, $head->firstChild);
+    }
+
+    function replaceMenuLanguagePicker()
+    {
+        $nodes = $this->DOMXPath->query('/html/body//a[@href="#gtbabel_languagepicker"]');
+        if (count($nodes) > 0) {
+            foreach ($nodes as $nodes__value) {
+                $this->replaceNodeWithString($nodes__value, $this->data->getLanguagePickerHtml());
+            }
+        }
+        $nodes = $this->DOMXPath->query('/html/body//a[@href="#gtbabel_languagepicker_hide_active"]');
+        if (count($nodes) > 0) {
+            foreach ($nodes as $nodes__value) {
+                $this->replaceNodeWithString($nodes__value, $this->data->getLanguagePickerHtml(true, null, true));
+            }
+        }
     }
 }

@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 4.8.3
+ * Version: 4.8.4
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -34,6 +34,7 @@ class GtbabelWordPress
         $this->showWizardNotice();
         $this->languagePickerWidget();
         $this->languagePickerShortcode();
+        $this->languagePickerMenu();
         $this->disableAutoRedirect();
         $this->initUpdateCapabilities();
         $this->filterRestUrl();
@@ -461,23 +462,89 @@ class GtbabelWordPress
     private function languagePickerShortcode()
     {
         add_shortcode('gtbabel_languagepicker', function () {
-            $html = '';
-            $html .= '<ul class="lngpicker">';
-            foreach ($this->gtbabel->data->getLanguagePickerData() as $languagepicker__value) {
-                $html .= '<li>';
-                $html .=
-                    '<a href="' .
-                    $languagepicker__value['url'] .
-                    '"' .
-                    ($languagepicker__value['active'] ? ' class="active"' : '') .
-                    '>';
-                $html .= $languagepicker__value['label'];
-                $html .= '</a>';
-                $html .= '</li>';
-            }
-            $html .= '</ul>';
-            return $html;
+            return $this->gtbabel->data->getLanguagePickerHtml();
         });
+    }
+
+    private function languagePickerMenu()
+    {
+        add_filter(
+            'nav_menu_meta_box_object',
+            function ($object) {
+                add_meta_box(
+                    'custom-menu-metabox',
+                    __('Language picker', 'gtbabel-plugin'),
+                    function () {
+                        global $nav_menu_selected_id;
+                        echo '
+                        <div id="gtbabel-slug-div">
+                            <div id="tabs-panel-gtbabel-slug-all" class="tabs-panel tabs-panel-active">
+                            <ul id="gtbabel-slug-checklist-pop" class="categorychecklist form-no-clear">
+                            ' .
+                            walk_nav_menu_tree(
+                                array_map('wp_setup_nav_menu_item', [
+                                    (object) [
+                                        'ID' => 1,
+                                        'object_id' => 1,
+                                        'type_label' => '',
+                                        'title' => __('All languages', 'gtbabel-plugin'),
+                                        'url' => '#gtbabel_languagepicker',
+                                        'type' => 'custom',
+                                        'object' => 'gtbabel-slug-slug',
+                                        'db_id' => 0,
+                                        'menu_item_parent' => 0,
+                                        'post_parent' => 0,
+                                        'target' => '',
+                                        'attr_title' => '',
+                                        'description' => '',
+                                        'classes' => [],
+                                        'xfn' => ''
+                                    ],
+                                    (object) [
+                                        'ID' => 1,
+                                        'object_id' => 1,
+                                        'type_label' => '',
+                                        'title' => __('Hide active language', 'gtbabel-plugin'),
+                                        'url' => '#gtbabel_languagepicker_hide_active',
+                                        'type' => 'custom',
+                                        'object' => 'gtbabel-slug-slug',
+                                        'db_id' => 0,
+                                        'menu_item_parent' => 0,
+                                        'post_parent' => 0,
+                                        'target' => '',
+                                        'attr_title' => '',
+                                        'description' => '',
+                                        'classes' => [],
+                                        'xfn' => ''
+                                    ]
+                                ]),
+                                0,
+                                (object) ['walker' => new \Walker_Nav_Menu_Checklist(false)]
+                            ) .
+                            '
+                            </ul>
+                            <p class="button-controls">
+                                <span class="add-to-menu">
+                                    <input type="submit" ' .
+                            wp_nav_menu_disabled_check($nav_menu_selected_id, false) .
+                            ' class="button-secondary submit-add-to-menu right" value="' .
+                            __('Add to Menu', 'gtbabel-plugin') .
+                            '" name="add-gtbabel-slug-menu-item" id="submit-gtbabel-slug-div" />
+                                    <span class="spinner"></span>
+                                </span>
+                            </p>
+                        </div>
+                        ';
+                    },
+                    'nav-menus',
+                    'side',
+                    'default'
+                );
+                return $object;
+            },
+            10,
+            1
+        );
     }
 
     private function initBackend()
@@ -2739,6 +2806,15 @@ class GtbabelWordPress
         echo sprintf(__('Just add %s to your code.', 'gtbabel-plugin'), '<code>[gtbabel_languagepicker]</code>');
         echo '</p>';
 
+        echo '<h2 class="gtbabel__subtitle">' . __('Menu', 'gtbabel-plugin') . '</h2>';
+        echo '<p class="gtbabel__paragraph">';
+        echo sprintf(
+            __('Simply add the %sLanguage picker menu item%s to one of your menus.', 'gtbabel-plugin'),
+            '<a href="' . admin_url('nav-menus.php') . '">',
+            '</a>'
+        );
+        echo '</p>';
+
         echo '<h2 class="gtbabel__subtitle">' . __('Template', 'gtbabel-plugin') . '</h2>';
         echo '<p class="gtbabel__paragraph">';
         echo __('If you need more control, use the following php-code:', 'gtbabel-plugin');
@@ -3192,7 +3268,8 @@ EOD;
             $urls = __::extract_urls_from_sitemap($sitemap_url);
         }
 
-        // approach 3 (get all posts)
+        // approach 3 (get all posts; this is disabled, because every wp installation should provide a sitemap by default now)
+        /*
         if (empty($urls)) {
             $urls[] = get_bloginfo('url');
             $query = new \WP_Query(['post_type' => 'any', 'posts_per_page' => '-1', 'post_status' => 'publish']);
@@ -3212,6 +3289,11 @@ EOD;
                     $urls[] = $url;
                 }
             }
+        }
+        */
+
+        if (empty($urls)) {
+            return $urls;
         }
 
         $urls = array_filter($urls, function ($urls__value) {
@@ -3316,6 +3398,10 @@ EOD;
         $queue = [];
         if ($chunk === 0 || get_transient('gtbabel_public_urls') === false) {
             $urls = $this->getAllPublicUrlsForSite();
+            if (empty($urls)) {
+                echo __('An error occured. Is your website accessible? Try the basic auth option.', 'gtbabel-plugin');
+                die();
+            }
             set_transient('gtbabel_public_urls', $urls);
         } else {
             $urls = get_transient('gtbabel_public_urls');
