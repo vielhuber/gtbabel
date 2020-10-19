@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 4.8.0
+ * Version: 4.8.1
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -625,6 +625,7 @@ class GtbabelWordPress
                             'debug_translations',
                             'hide_languages',
                             'redirect_root_domain',
+                            'basic_auth',
                             'translate_html',
                             'translate_xml',
                             'translate_xml_include',
@@ -1047,6 +1048,17 @@ class GtbabelWordPress
             __('Source language', 'gtbabel-plugin') .
             '</option>';
         echo '</select>';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_basic_auth" class="gtbabel__label">';
+        echo __('Basic auth', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input placeholder="username:password" class="gtbabel__input" type="text" id="gtbabel_basic_auth" name="gtbabel[basic_auth]" value="' .
+            $settings['basic_auth'] .
+            '" />';
         echo '</div>';
         echo '</li>';
 
@@ -3143,6 +3155,10 @@ EOD;
         if ($redirect_root_domain !== null) {
             $args[] = 'gtbabel_redirect_root_domain=' . $redirect_root_domain;
         }
+        if ($this->gtbabel->settings->get('basic_auth') !== null) {
+            $url = str_replace('http://', 'http://' . $this->gtbabel->settings->get('basic_auth') . '@', $url);
+            $url = str_replace('https://', 'https://' . $this->gtbabel->settings->get('basic_auth') . '@', $url);
+        }
         $url .= implode('&', $args);
         return $url;
     }
@@ -3152,12 +3168,26 @@ EOD;
         $urls = [];
 
         // approach 1 (parse yoast sitemap)
-        $sitemap_url = get_bloginfo('url') . '/sitemap_index.xml';
+        $sitemap_url = $this->buildFetchUrl(
+            get_bloginfo('url') . '/sitemap_index.xml',
+            true,
+            false,
+            $auto_set_discovered_strings_checked = false,
+            false,
+            'source'
+        );
         $urls = __::extract_urls_from_sitemap($sitemap_url);
 
         // approach 2 (parse wp default sitemap)
         if (empty($urls)) {
-            $sitemap_url = get_bloginfo('url') . '/wp-sitemap.xml';
+            $sitemap_url = $this->buildFetchUrl(
+                get_bloginfo('url') . '/wp-sitemap.xml',
+                true,
+                false,
+                $auto_set_discovered_strings_checked = false,
+                false,
+                'source'
+            );
             $urls = __::extract_urls_from_sitemap($sitemap_url);
         }
 

@@ -65,6 +65,7 @@ class Settings
             ],
             'log_folder' => '/logs',
             'redirect_root_domain' => 'browser',
+            'basic_auth' => null,
             'translate_html' => true,
             'translate_xml' => true,
             'translate_xml_include' => [

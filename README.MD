@@ -1022,6 +1022,7 @@ The default configuration is:
     ],
     'log_folder' => '/logs',
     'redirect_root_domain' => 'browser',
+    'basic_auth' => null, // provide basic auth (in the format "username:password") if you use Gtbabel in a password protected environment
     'translate_html' => true,
     'translate_xml' => true,
     'translate_xml_include' => [
