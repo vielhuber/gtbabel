@@ -1645,6 +1645,10 @@ class Data
         if (mb_strpos($str, '\\(') === 0 && mb_strrpos($str, '\\)') === $length - 2) {
             return true;
         }
+        // (multiple) classes
+        if (preg_match('/^(\.)[a-z][a-z0-9 \.]*$/', $str)) {
+            return true;
+        }
         if ($context !== 'email' && $context !== 'slug' && $context !== 'file') {
             // don't ignore root relative links beginning with "/"
             if (strpos($str, ' ') === false && strpos($str, '/') === false) {
@@ -1661,9 +1665,6 @@ class Data
                     return true;
                 }
                 if (preg_match('/[A-Z]+[0-9]+/', $str)) {
-                    return true;
-                }
-                if (preg_match('/(\.\#)[a-z0-9 ]+/', $str)) {
                     return true;
                 }
             }
