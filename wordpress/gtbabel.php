@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 4.8.5
+ * Version: 4.8.6
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -478,6 +478,7 @@ class GtbabelWordPress
                         global $nav_menu_selected_id;
                         echo '
                         <div id="gtbabel-slug-div">
+                            <div id="tabs-panel-gtbabel-slug-all" class="tabs-panel tabs-panel-active">
                             <ul id="gtbabel-slug-checklist-pop" class="categorychecklist form-no-clear">
                             ' .
                             walk_nav_menu_tree(
@@ -532,6 +533,7 @@ class GtbabelWordPress
                                     <span class="spinner"></span>
                                 </span>
                             </p>
+                            </div>
                         </div>
                         ';
                     },
