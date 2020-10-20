@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.com/vielhuber/gtbabel.svg?branch=master)](https://travis-ci.com/vielhuber/gtbabel)
 
-# 🦜 Gtbabel 🦜
+# 🌐 Gtbabel 🌐
 
 Gtbabel automatically translates your HTML/PHP pages – server sided!
 

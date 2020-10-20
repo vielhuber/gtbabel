@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 4.8.7
+ * Version: 4.8.8
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -984,7 +984,7 @@ class GtbabelWordPress
         echo '<input type="hidden" name="gtbabel[wizard_finished]" value="' .
             (isset($settings['wizard_finished']) && $settings['wizard_finished'] == 1 ? 1 : 0) .
             '" />';
-        echo '<h1 class="gtbabel__title">🦜 Gtbabel 🦜</h1>';
+        echo '<h1 class="gtbabel__title">🌐 Gtbabel 🌐</h1>';
         echo $message;
         echo '<h2 class="gtbabel__subtitle">' . __('Settings', 'gtbabel-plugin') . '</h2>';
         echo '<ul class="gtbabel__fields">';
@@ -1965,7 +1965,7 @@ class GtbabelWordPress
         $pagination = $this->initBackendPagination($data['count'], $lng);
 
         echo '<div class="gtbabel gtbabel--trans wrap">';
-        echo '<h1 class="gtbabel__title">🦜 Gtbabel 🦜</h1>';
+        echo '<h1 class="gtbabel__title">🌐 Gtbabel 🌐</h1>';
         echo $message;
         echo '<h2 class="gtbabel__subtitle">' . __('String translations', 'gtbabel-plugin') . '</h2>';
 
@@ -2306,7 +2306,7 @@ class GtbabelWordPress
         $lng = isset($_GET['lng']) && $_GET['lng'] != '' ? sanitize_textarea_field($_GET['lng']) : null;
 
         echo '<div class="gtbabel gtbabel--transwizard wrap">';
-        echo '<h1 class="gtbabel__title">🦜 Gtbabel 🦜</h1>';
+        echo '<h1 class="gtbabel__title">🌐 Gtbabel 🌐</h1>';
         echo '<h2 class="gtbabel__subtitle">' . __('Translation wizard', 'gtbabel-plugin') . '</h2>';
         if ($lng === null) {
             $languages = $this->gtbabel->settings->getSelectedLanguageCodesLabels();
@@ -2435,7 +2435,7 @@ class GtbabelWordPress
         echo '<div class="gtbabel gtbabel--actions wrap">';
         echo '<form class="gtbabel__form" method="post" action="' . admin_url('admin.php?page=gtbabel-actions') . '">';
         wp_nonce_field('gtbabel-actions');
-        echo '<h1 class="gtbabel__title">🦜 Gtbabel 🦜</h1>';
+        echo '<h1 class="gtbabel__title">🌐 Gtbabel 🌐</h1>';
         echo $message;
 
         echo '<h2 class="gtbabel__subtitle">' . __('Translate complete website', 'gtbabel-plugin') . '</h2>';
@@ -2546,7 +2546,7 @@ class GtbabelWordPress
         }
 
         echo '<div class="gtbabel gtbabel--exportimport wrap">';
-        echo '<h1 class="gtbabel__title">🦜 Gtbabel 🦜</h1>';
+        echo '<h1 class="gtbabel__title">🌐 Gtbabel 🌐</h1>';
         echo $message;
 
         echo '<h2 class="gtbabel__subtitle">' . __('Export', 'gtbabel-plugin') . '</h2>';
@@ -2715,7 +2715,7 @@ class GtbabelWordPress
             admin_url('admin.php?page=gtbabel-permissions') .
             '">';
         wp_nonce_field('gtbabel-permissions');
-        echo '<h1 class="gtbabel__title">🦜 Gtbabel 🦜</h1>';
+        echo '<h1 class="gtbabel__title">🌐 Gtbabel 🌐</h1>';
         echo $message;
         echo '<h2 class="gtbabel__subtitle">' . __('Permissions', 'gtbabel-plugin') . '</h2>';
 
@@ -2772,7 +2772,7 @@ class GtbabelWordPress
     private function initBackendLanguagePicker()
     {
         echo '<div class="gtbabel gtbabel--lngpicker wrap">';
-        echo '<h1 class="gtbabel__title">🦜 Gtbabel 🦜</h1>';
+        echo '<h1 class="gtbabel__title">🌐 Gtbabel 🌐</h1>';
         echo $this->initBackendLanguagePickerContent();
         echo '</div>';
     }
@@ -2904,7 +2904,7 @@ EOD;
 
         echo '<div class="gtbabel gtbabel--wizard">';
 
-        echo '<h1 class="gtbabel__title">🦜 Gtbabel 🦜</h1>';
+        echo '<h1 class="gtbabel__title">🌐 Gtbabel 🌐</h1>';
 
         // progressbar
         echo '<div class="gtbabel__progress">';
