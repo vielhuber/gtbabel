@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 4.8.6
+ * Version: 4.8.7
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -2791,7 +2791,7 @@ class GtbabelWordPress
         if (count(wp_get_sidebars_widgets()) > 1) {
             echo sprintf(
                 __('Simply add the %sLanguage picker widget%s to one of your sidebars.', 'gtbabel-plugin'),
-                '<a href="' . admin_url('widgets.php') . '">',
+                '<a target="_blank" href="' . admin_url('widgets.php') . '">',
                 '</a>'
             );
         } else {
@@ -2811,7 +2811,7 @@ class GtbabelWordPress
         echo '<p class="gtbabel__paragraph">';
         echo sprintf(
             __('Simply add the %sLanguage picker menu item%s to one of your menus.', 'gtbabel-plugin'),
-            '<a href="' . admin_url('nav-menus.php') . '">',
+            '<a target="_blank" href="' . admin_url('nav-menus.php') . '">',
             '</a>'
         );
         echo '</p>';
@@ -3400,7 +3400,16 @@ EOD;
         if ($chunk === 0 || get_transient('gtbabel_public_urls') === false) {
             $urls = $this->getAllPublicUrlsForSite();
             if (empty($urls)) {
-                echo __('An error occured. Is your website accessible? Try the basic auth option.', 'gtbabel-plugin');
+                echo '<span style="color:red;font-weight:bold;">';
+                echo sprintf(
+                    __(
+                        'An error occured. Is your website accessible? Try the %sbasic auth option%s.',
+                        'gtbabel-plugin'
+                    ),
+                    '<a href="' . admin_url('admin.php?page=gtbabel-settings') . '">',
+                    '</a>'
+                );
+                echo '</span>';
                 die();
             }
             set_transient('gtbabel_public_urls', $urls);

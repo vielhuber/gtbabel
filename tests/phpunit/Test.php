@@ -548,7 +548,10 @@ class Test extends \PHPUnit\Framework\TestCase
             '•',
             '●',
             '(',
-            ']'
+            ']',
+            '.foo',
+            '.foo .bar',
+            '#foo .bar'
         ];
         foreach ($should_translate as $should_translate__value) {
             $this->assertEquals(

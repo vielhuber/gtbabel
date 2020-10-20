@@ -1663,6 +1663,9 @@ class Data
                 if (preg_match('/[A-Z]+[0-9]+/', $str)) {
                     return true;
                 }
+                if (preg_match('/(\.\#)[a-z0-9 ]+/', $str)) {
+                    return true;
+                }
             }
         }
         return false;
