@@ -1646,7 +1646,7 @@ class Data
             return true;
         }
         // (multiple) classes
-        if (preg_match('/^(\.)[a-z][a-z0-9 \.]*$/', $str)) {
+        if (preg_match('/^(\.)[a-z][a-z0-9- \.]*$/', $str)) {
             return true;
         }
         if ($context !== 'email' && $context !== 'slug' && $context !== 'file') {
