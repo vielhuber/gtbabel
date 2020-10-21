@@ -81,6 +81,9 @@ class Gtbabel
         if ($this->host->contentTranslationIsDisabledForCurrentUrl()) {
             return;
         }
+        if ($this->host->contentTypeIsInappropriate()) {
+            return;
+        }
         $this->router->redirectPrefixedUrls();
         $this->router->addTrailingSlash();
         $this->router->redirectUnpublished();
@@ -96,6 +99,9 @@ class Gtbabel
             return;
         }
         if ($this->host->contentTranslationIsDisabledForCurrentUrl()) {
+            return;
+        }
+        if ($this->host->contentTypeIsInappropriate()) {
             return;
         }
         $this->dom->localizeJsPrepare();

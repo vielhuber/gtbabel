@@ -22,7 +22,7 @@ class Utils
         return @$_SERVER['DOCUMENT_ROOT'] == '' ? './' : $_SERVER['DOCUMENT_ROOT'];
     }
 
-    function getContentType($response)
+    function guessContentType($response)
     {
         if (mb_stripos($response, '<?xml') === 0) {
             return 'xml';

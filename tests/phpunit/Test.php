@@ -524,6 +524,13 @@ class Test extends \PHPUnit\Framework\TestCase
         ]);
     }
 
+    public function test074()
+    {
+        $_SERVER['CONTENT_TYPE'] = 'text/css';
+        $this->runDiff('74.css');
+        $_SERVER['CONTENT_TYPE'] = null;
+    }
+
     public function test_string_detection()
     {
         $should_translate = ['Haus'];

@@ -14,7 +14,7 @@ class Tags
 
     function catchOpeningTags($str)
     {
-        if ($this->utils->getContentType($str) === 'json') {
+        if ($this->utils->guessContentType($str) === 'json') {
             return [];
         }
         preg_match_all('/<[a-zA-Z]+(>|.*?[^?]>)/', $str, $matches);

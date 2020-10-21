@@ -414,7 +414,7 @@ class Dom
 
     function modifyHtml($html, $mode)
     {
-        if ($this->utils->getContentType($html) !== 'html') {
+        if ($this->utils->guessContentType($html) !== 'html') {
             return $html;
         }
         if ($this->settings->get('translate_html') !== true) {
@@ -439,7 +439,7 @@ class Dom
 
     function modifyXml($xml, $mode)
     {
-        if ($this->utils->getContentType($xml) !== 'xml') {
+        if ($this->utils->guessContentType($xml) !== 'xml') {
             return $xml;
         }
         if ($this->settings->get('translate_xml') !== true) {
@@ -940,7 +940,7 @@ class Dom
 
     function modifyJson($json, $mode)
     {
-        if ($this->utils->getContentType($json) !== 'json') {
+        if ($this->utils->guessContentType($json) !== 'json') {
             return $json;
         }
         if ($this->settings->get('translate_json') !== true) {

@@ -100,6 +100,41 @@ class Host
         return $this->original_host;
     }
 
+    function getContentType()
+    {
+        if (isset($_SERVER['CONTENT_TYPE'])) {
+            return $_SERVER['CONTENT_TYPE'];
+        }
+        return null;
+    }
+
+    function contentTypeIsInappropriate()
+    {
+        $type = $this->getContentType();
+        if ($type == '') {
+            return false;
+        }
+        if (strpos($type, 'html') !== false) {
+            return false;
+        }
+        if (strpos($type, 'php') !== false) {
+            return false;
+        }
+        if (strpos($type, 'php') !== false) {
+            return false;
+        }
+        if (strpos($type, 'plain') !== false) {
+            return false;
+        }
+        if (strpos($type, 'xml') !== false) {
+            return false;
+        }
+        if (strpos($type, 'json') !== false) {
+            return false;
+        }
+        return true;
+    }
+
     function contentTranslationIsDisabledForCurrentUrl()
     {
         return $this->contentTranslationIsDisabledForUrl($this->getCurrentPath());

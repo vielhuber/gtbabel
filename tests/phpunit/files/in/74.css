@@ -1,0 +1,9 @@
+body,
+nav.navigation.post-navigation a,
+.nav-subtitle {
+    font-family: Montserrat;
+    font-size: 17px;
+    font-weight: 300;
+    letter-spacing: 0px;
+    line-height: 1.6;
+}
