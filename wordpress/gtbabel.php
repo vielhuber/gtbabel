@@ -94,6 +94,10 @@ class GtbabelWordPress
 
     private function disableAutoRedirect()
     {
+        // possibility #1 (this is currently disabled)
+        //remove_filter( 'template_redirect', 'redirect_canonical' );
+
+        // possibility #2 (we want to intentionally throw a 404)
         add_filter('redirect_canonical', function ($redirect_url) {
             $url =
                 'http' .
@@ -101,7 +105,10 @@ class GtbabelWordPress
                 '://' .
                 $_SERVER['HTTP_HOST'] .
                 $_SERVER['REQUEST_URI'];
-            if (trim($redirect_url, '/') !== trim($url, '/')) {
+            if (
+                strpos(trim($redirect_url, '/'), trim($url, '/')) !== 0 &&
+                strpos(trim($url, '/'), trim($redirect_url, '/')) !== 0
+            ) {
                 global $wp_query;
                 $wp_query->set_404();
                 status_header(404);
@@ -2987,7 +2994,7 @@ EOD;
                 __('Your Google Translation API Key', 'gtbabel-plugin') .
                 '" class="gtbabel__input gtbabel__input--big" type="text" id="gtbabel_google_translation_api_key" name="gtbabel[google_translation_api_key]" value="' .
                 (is_array($settings['google_translation_api_key'])
-                    ? $settings['google_translation_api_key'][0]
+                    ? @$settings['google_translation_api_key'][0]
                     : $settings['google_translation_api_key']) .
                 '" />';
             echo '<div class="gtbabel__wizard-buttons">';
