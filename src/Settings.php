@@ -233,11 +233,6 @@ class Settings
                 'context' => null
             ],
             [
-                'selector' => '/html/body//@*[starts-with(name(), \'data-\')]/parent::*',
-                'attribute' => 'data-*',
-                'context' => null
-            ],
-            [
                 'selector' => '/html/body//@*[contains(name(), \'text\')]/parent::*',
                 'attribute' => '*text*',
                 'context' => null

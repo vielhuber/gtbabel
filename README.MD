@@ -1152,11 +1152,6 @@ The default configuration is:
             'context' => null
         ],
         [
-            'selector' => '/html/body//@*[starts-with(name(), \'data-\')]/parent::*', // data-*
-            'attribute' => 'data-*', // data-*
-            'context' => null
-        ],
-        [
             'selector' => '/html/body//@*[contains(name(), \'text\')]/parent::*', // *text*
             'attribute' => '*text*', // *text*
             'context' => null
@@ -1273,9 +1268,9 @@ if (function_exists('gtbabel__')) {
 
 ## Modified nodes
 
-By default Gtbabel translates all text and tag nodes with the following rules:
+By default Gtbabel translates all text and tag nodes with the following reasonable default rules:
 
-| selector                        | text | attribute        | context          |
+| css selector                    | text | attribute        | context          |
 | ------------------------------- | ---- | ---------------- | ---------------- |
 | `body *`                        | ✓    | ✗                | `auto`           |
 | `body a`                        | ✗    | `href^="mailto"` | `email`          |
@@ -1291,11 +1286,30 @@ By default Gtbabel translates all text and tag nodes with the following rules:
 | `head link[rel="canonical"]`    | ✗    | `href`           | `'slug'`         |
 | `body img`                      | ✗    | `src`            | `'file'`         |
 | `body *`                        | ✗    | `style`          | `'file'`         |
-| `body *`                        | ✗    | `data-*`         | `auto`           |
 | `body *`                        | ✗    | `label`          | `auto`           |
 | `body *`                        | ✗    | `*text*`         | `auto`           |
 
-You can modify all tag node transformations via the `include_dom` option.
+You can modify or add new tag node transformations via the `include_dom` option.
+
+For example if you want to translate all data attributes, add this rule:
+
+```php
+[
+    'selector' => '/html/body//@*[starts-with(name(), \'data-\')]/parent::*',
+    'attribute' => 'data-*',
+    'context' => null
+];
+```
+
+Or if you want to translate a specific data attribute (and want to use css selectors instead of xpath), you can use:
+
+```php
+[
+    'selector' => '.foo[data-bar]',
+    'attribute' => 'data-bar',
+    'context' => null
+];
+```
 
 Be aware that the rules are processed sequentially and attribute names are never transformed twice.
 

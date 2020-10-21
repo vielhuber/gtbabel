@@ -258,7 +258,7 @@ class Test extends \PHPUnit\Framework\TestCase
                 ['selector' => '.foo'],
                 ['selector' => '#bar'],
                 ['selector' => '.gnarr', 'attribute' => 'data-text'],
-                ['selector' => '[data-foo]', 'attribute' => 'data-b*'],
+                ['selector' => '[data-text-foo]', 'attribute' => 'data-text-f*'],
                 ['selector' => '[class="gnaf"]', 'attribute' => '*']
             ]
         ]);
@@ -902,15 +902,15 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->gtbabel->start();
         // #allesfürdich is encoded, #allesfürdich is not encoded
         // however, gtbabel does not add two entries to avoid confusion
-        echo '<div data-title="#allesfürdich">#allesfürdich</div>';
+        echo '<div data-text="#allesfürdich">#allesfürdich</div>';
         echo '<p>foo &amp; bar<br/>baz</p>';
         // this is also tricky: domdocument converts the double quotes around the attribute to single quotes!
-        echo '<div data-target="' . htmlentities('"gnarr" & gnazz') . '"></div>';
+        echo '<div data-text="' . htmlentities('"gnarr" & gnazz') . '"></div>';
         // this should be untouched
         echo '<a href="https://www.url.com/foo.php?lang=de&amp;foo=bar"></a>';
         // this should all be encoded
-        echo '<img src="" alt="Erster &amp; Test" data-alt="Zweiter &amp; Test"></div>';
-        echo '<img src="" alt="Erster & Test" data-alt="Zweiter & Test"></div>';
+        echo '<img src="" alt="Erster &amp; Test" data-text="Zweiter &amp; Test"></div>';
+        echo '<img src="" alt="Erster & Test" data-text="Zweiter & Test"></div>';
         $this->gtbabel->stop();
         $output = ob_get_contents();
         ob_end_clean();
@@ -918,12 +918,12 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->gtbabel->reset();
         $this->assertEquals(
             $output,
-            '<div data-title="#anything for you">#anything for you</div>' .
+            '<div data-text="#anything for you">#anything for you</div>' .
                 '<p>foo &amp; bar<br> baz</p>' .
-                '<div data-target=\'"gnarr" &amp; gnazz\'></div>' .
+                '<div data-text=\'"gnarr" &amp; gnazz\'></div>' .
                 '<a href="https://www.url.com/foo.php?lang=de&amp;foo=bar"></a>' .
-                '<img src="" alt="First &amp; test" data-alt="Second &amp; test">' .
-                '<img src="" alt="First &amp; test" data-alt="Second &amp; test">'
+                '<img src="" alt="First &amp; test" data-text="Second &amp; test">' .
+                '<img src="" alt="First &amp; test" data-text="Second &amp; test">'
         );
         $this->assertEquals(count($translations), 5);
         $this->assertEquals($translations[0]['str'], '#allesfürdich');
