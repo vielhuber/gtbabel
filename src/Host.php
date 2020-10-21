@@ -105,6 +105,9 @@ class Host
         if (isset($_SERVER['CONTENT_TYPE'])) {
             return $_SERVER['CONTENT_TYPE'];
         }
+        if (isset($_SERVER['HTTP_ACCEPT'])) {
+            return $_SERVER['HTTP_ACCEPT'];
+        }
         return null;
     }
 

@@ -132,7 +132,7 @@ class Gtbabel
             if ($this->configured === false) {
                 $this->config();
             }
-            // what's important: this function is destroying the current domdocument
+            // what's important: this function ("translate") is destroying the current domdocument
             // therefore it must be called never *inside* modifyContent
             $trans = $this->dom->modifyContent($html, 'translate');
             $this->data->saveCacheToDatabase();

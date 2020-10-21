@@ -981,7 +981,7 @@ class Dom
                 }
             }
             if ($match === true) {
-                $trans = $this->modifyContent($value, $mode);
+                $trans = $this->modifyContent($value, 'translate');
                 if ($trans !== null) {
                     $value = $trans;
                 }
