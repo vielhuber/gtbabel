@@ -135,6 +135,9 @@ class Host
         if (strpos($type, 'json') !== false) {
             return false;
         }
+        if (strpos($type, '*/*') !== false) {
+            return false;
+        }
         return true;
     }
 
