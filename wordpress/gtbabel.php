@@ -94,6 +94,9 @@ class GtbabelWordPress
 
     private function disableAutoRedirect()
     {
+        // this is important in the following cases:
+        // woocommerce storefront filtering pagination (paged=1 does not properly redirect)
+
         // possibility #1 (this is currently disabled)
         //remove_filter( 'template_redirect', 'redirect_canonical' );
 
