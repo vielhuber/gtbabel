@@ -953,7 +953,7 @@ class Dom
             return $json;
         }
         $keys = [];
-        $url = $this->host->getCurrentUrlConverted();
+        $url = $this->host->getCurrentUrlWithArgsConverted();
         foreach (
             $this->settings->get('translate_json_include')
             as $translate_json_include__key => $translate_json_include__value

@@ -138,6 +138,9 @@ class Host
         if (strpos($type, '*/*') !== false) {
             return false;
         }
+        if (strpos($type, 'form') !== false) {
+            return false;
+        }
         return true;
     }
 

@@ -88,7 +88,7 @@ class Router
         if ($this->host->currentUrlIsStaticFile()) {
             return;
         }
-        $path = $this->host->getPathWithoutPrefixFromUrl($this->host->getCurrentUrl());
+        $path = $this->host->getPathWithoutPrefixFromUrl($this->host->getCurrentUrlWithArgs());
         if (!$this->data->sourceLngIsCurrentLng()) {
             $path = $this->data->getPathTranslationInLanguage(
                 $this->data->getCurrentLanguageCode(),
