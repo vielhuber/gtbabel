@@ -855,7 +855,7 @@ class Data
             if ($slim_output === false) {
                 $query .= ' *';
             } else {
-                $query .= ' DISTINCT str, context';
+                $query .= ' str, context';
             }
         } else {
             $query .= 'DELETE';
