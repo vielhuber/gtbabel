@@ -49,8 +49,14 @@ class Data
         $this->table = $db_settings['table'];
 
         if ($db_settings['type'] === 'sqlite') {
-            $filename = $db_settings['filename'];
+            $filename = $this->utils->getFileOrFolderWithAbsolutePath($db_settings['filename']);
             if (!file_exists($filename)) {
+                if (strpos($filename, '/') !== false) {
+                    $path = substr($filename, 0, strrpos($filename, '/'));
+                    if ($path != '' && !file_exists($path)) {
+                        mkdir($path, 0777, true);
+                    }
+                }
                 file_put_contents($filename, '');
                 $this->db->connect('pdo', 'sqlite', $filename);
                 $this->db->query(
@@ -808,7 +814,7 @@ class Data
     function resetTranslations()
     {
         if ($this->db->sql->engine === 'sqlite') {
-            @unlink($this->settings->get('database')['filename']);
+            @unlink($this->utils->getFileOrFolderWithAbsolutePath($this->settings->get('database')['filename']));
         } else {
             $this->db->delete_table($this->table);
         }

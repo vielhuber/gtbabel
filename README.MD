@@ -1165,7 +1165,18 @@ The default configuration is:
     'localize_js' => true,
     'localize_js_strings' => ['Schließen', '/blog'],
     'detect_dom_changes' => true,
-    'detect_dom_changes_include' => ['.top-button', '.swal-overlay', '.wpcf7-response-output', '.wpcf7-not-valid-tip']
+    'detect_dom_changes_include' => ['.top-button', '.swal-overlay', '.wpcf7-response-output', '.wpcf7-not-valid-tip'],
+    'parser' => [
+        [
+            'url' => '*',
+            'type_source' => 'html',
+            'type_target' => 'text',
+            'selector' => '.example-link',
+            'attribute' => 'alt-href|*foo*',
+            'context' => 'slug',
+            'ignore' => false
+        ]
+    ]
 ];
 ```
 

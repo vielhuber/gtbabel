@@ -161,20 +161,110 @@ class Gtbabel
         if ($this->configured === false) {
             $this->config();
         }
-        // set fixed source and target (important: they just need to be different)
+        $tmp_folder = $this->utils->getDocRoot() . '/gtbabel-tokenize';
         $settings = $this->settings->getSettings();
+        // set fixed source and target (important: they just need to be different)
         $settings['lng_source'] = 'de';
         $settings['lng_target'] = 'en';
+        $settings['exclude_urls_content'] = null;
         $settings['localize_js'] = false;
         $settings['discovery_log'] = true;
+        $settings['auto_add_translations'] = true;
+        $settings['log_folder'] = $tmp_folder;
+        $settings['database'] = [
+            'type' => 'sqlite',
+            'filename' => $tmp_folder . '/tmp.db',
+            'table' => 'translations'
+        ];
         $this->config($settings);
-
         $time = $this->utils->getCurrentTime();
         $content = $this->dom->modifyContent($content, 'tokenize');
         $this->data->saveCacheToDatabase();
         $data = $this->data->discoveryLogGetAfter($time, null, true);
         $this->reset();
+        $this->utils->rrmdir($tmp_folder);
         return $data;
+    }
+
+    function migrate($url)
+    {
+        $tmp_folder = $this->utils->getDocRoot() . '/gtbabel-migrate';
+        if (1 == 0) {
+            $de = __curl('https://www.tld.com/de/')->result;
+            $en = __curl('https://www.tld.com/en/')->result;
+        } else {
+            $de = '<p>Dies ist ein Test</p>';
+            $en = '<p>This is a test!</p>';
+        }
+
+        if ($this->configured === false) {
+            $this->config();
+        }
+        $settings = $this->settings->getSettings();
+        $settings['exclude_urls_content'] = null;
+        $settings['localize_js'] = false;
+        $settings['discovery_log'] = true;
+        $settings['auto_add_translations'] = true;
+        $settings['log_folder'] = $tmp_folder;
+        $settings['database'] = [
+            'type' => 'sqlite',
+            'filename' => $tmp_folder . '/tmp.db',
+            'table' => 'translations'
+        ];
+
+        $settings['auto_translation'] = true;
+        $settings['lng_source'] = 'de';
+        $settings['lng_target'] = 'en';
+        $this->config($settings);
+        $time = $this->utils->getCurrentTime();
+        $this->dom->modifyContent($de, 'tokenize');
+        $this->data->saveCacheToDatabase();
+        $de_tokens = $this->data->discoveryLogGetAfter($time, null, false);
+
+        $settings['auto_translation'] = false;
+        $settings['lng_source'] = 'en';
+        $settings['lng_target'] = 'de'; // doesn't matter
+        $this->config($settings);
+        $time = $this->utils->getCurrentTime();
+        $this->dom->modifyContent($en, 'tokenize');
+        $this->data->saveCacheToDatabase();
+        $en_tokens = $this->data->discoveryLogGetAfter($time, null, false);
+
+        $data = [];
+
+        foreach ($de_tokens as $de_tokens__value) {
+            if ($de_tokens__value['lng_source'] !== 'de') {
+                continue;
+            }
+            if ($de_tokens__value['lng_target'] !== 'en') {
+                continue;
+            }
+            $data[] = [
+                'de' => $de_tokens__value['str'],
+                'en_translated' => $de_tokens__value['trans'],
+                'en_real' => null,
+                'similarity' => 0
+            ];
+        }
+        foreach ($en_tokens as $en_tokens__value) {
+            if ($en_tokens__value['lng_source'] !== 'en') {
+                continue;
+            }
+            if ($en_tokens__value['lng_target'] !== 'de') {
+                continue;
+            }
+            foreach ($data as $data__key => $data__value) {
+                similar_text($en_tokens__value['str'], $data__value['en_translated'], $similarity);
+                $similarity = round($similarity);
+                if ($similarity > $data__value['similarity']) {
+                    $data[$data__key]['similarity'] = $similarity;
+                    $data[$data__key]['en_real'] = $en_tokens__value['str'];
+                }
+            }
+        }
+        $this->log->generalLog($data);
+        $this->reset();
+        $this->utils->rrmdir($tmp_folder);
     }
 
     function detectDomChanges()

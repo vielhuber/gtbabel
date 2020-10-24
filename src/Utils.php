@@ -22,6 +22,15 @@ class Utils
         return @$_SERVER['DOCUMENT_ROOT'] == '' ? './' : $_SERVER['DOCUMENT_ROOT'];
     }
 
+    function getFileOrFolderWithAbsolutePath($folder)
+    {
+        $root = $this->getDocRoot();
+        if (strpos($folder, $root) === false) {
+            $folder = rtrim($root, '/') . '/' . $folder;
+        }
+        return $folder;
+    }
+
     function guessContentType($response)
     {
         if (mb_stripos($response, '<?xml') === 0) {
@@ -58,5 +67,10 @@ class Utils
     function isWordPress()
     {
         return function_exists('get_bloginfo');
+    }
+
+    function rrmdir($folder)
+    {
+        __::rrmdir($folder);
     }
 }

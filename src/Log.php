@@ -31,7 +31,7 @@ class Log
 
     function getLogFolder()
     {
-        return rtrim($this->utils->getDocRoot(), '/') . '/' . trim($this->settings->get('log_folder'), '/');
+        return $this->utils->getFileOrFolderWithAbsolutePath($this->settings->get('log_folder'));
     }
 
     function generalLogReset()
