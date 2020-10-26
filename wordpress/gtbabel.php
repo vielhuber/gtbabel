@@ -721,6 +721,10 @@ class GtbabelWordPress
                             'translate_json_include',
                             'translate_wp_localize_script',
                             'translate_wp_localize_script_include',
+                            'prevent_publish_urls',
+                            'alt_lng_urls',
+                            'exclude_urls_content',
+                            'exclude_urls_slugs',
                             'html_lang_attribute',
                             'html_hreflang_tags',
                             'xml_hreflang_tags',
@@ -735,10 +739,6 @@ class GtbabelWordPress
                             'google_throttle_chars_per_month',
                             'microsoft_throttle_chars_per_month',
                             'deepl_throttle_chars_per_month',
-                            'prevent_publish_urls',
-                            'alt_lng_urls',
-                            'exclude_urls_content',
-                            'exclude_urls_slugs',
                             'url_settings',
                             'wizard_finished'
                         ]

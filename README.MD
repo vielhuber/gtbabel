@@ -1144,6 +1144,18 @@ The default configuration is:
     ],
     'translate_wp_localize_script' => true,
     'translate_wp_localize_script_include' => ['wc_*.locale.*', 'wc_*.i18n_*', 'wc_*.cart_url'],
+    'prevent_publish' => true,
+    'prevent_publish_urls' => [
+        '/path/in/source/lng/to/specific/page' => ['en', 'fr'],
+        '/slug1/*' => ['en'], // you can also use wildcards here
+        '/slug1/*/slug2' => ['fr']
+        //'/*' => ['en', 'fr'] // disable whole languages
+    ],
+    'alt_lng_urls' => [
+        '/path/in/source/lng/to/specific/page' => 'en'
+    ],
+    'exclude_urls_content' => ['backend'],
+    'exclude_urls_slugs' => ['api/v1.0'],
     'html_lang_attribute' => true,
     'html_hreflang_tags' => true,
     'xml_hreflang_tags' => true,
@@ -1160,19 +1172,7 @@ The default configuration is:
     'google_throttle_chars_per_month' => 1000000,
     'microsoft_throttle_chars_per_month' => 1000000,
     'deepl_throttle_chars_per_month' => 1000000,
-    'discovery_log' => false,
-    'prevent_publish' => true,
-    'prevent_publish_urls' => [
-        '/path/in/source/lng/to/specific/page' => ['en', 'fr'],
-        '/slug1/*' => ['en'], // you can also use wildcards here
-        '/slug1/*/slug2' => ['fr']
-        //'/*' => ['en', 'fr'] // disable whole languages
-    ],
-    'alt_lng_urls' => [
-        '/path/in/source/lng/to/specific/page' => 'en'
-    ],
-    'exclude_urls_content' => ['backend'],
-    'exclude_urls_slugs' => ['api/v1.0']
+    'discovery_log' => false
 ];
 ```
 
