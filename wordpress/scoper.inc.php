@@ -28,6 +28,7 @@ $functions = [
         'DB_PASSWORD',
         'DB_NAME',
         'WP_Query',
+        'WP_Scripts',
         'WP_Term_Query',
         'WP_Widget',
         'Walker_Nav_Menu_Checklist',
