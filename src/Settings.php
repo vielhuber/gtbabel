@@ -128,7 +128,7 @@ class Settings
             ],
             'exclude_urls_content' => ['backend'],
             'exclude_urls_slugs' => ['api/v1.0'],
-            'force_tokenize' => ['.force-tokenize']
+            'translate_html_force_tokenize' => ['.force-tokenize']
         ];
         if (!empty($args)) {
             foreach ($args as $args__key => $args__value) {

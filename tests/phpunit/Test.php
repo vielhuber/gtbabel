@@ -396,7 +396,7 @@ class Test extends \PHPUnit\Framework\TestCase
     public function test055()
     {
         $this->runDiff('55.html', 200, [
-            'force_tokenize' => ['.postponded__date', '.canceled__note > *']
+            'translate_html_force_tokenize' => ['.postponded__date', '.canceled__note > *']
         ]);
     }
 

@@ -118,8 +118,8 @@ class Dom
     function preloadForceTokenize()
     {
         $this->force_tokenize = [];
-        if ($this->settings->get('force_tokenize') !== null) {
-            foreach ($this->settings->get('force_tokenize') as $tokenize__value) {
+        if ($this->settings->get('translate_html_force_tokenize') !== null) {
+            foreach ($this->settings->get('translate_html_force_tokenize') as $tokenize__value) {
                 $nodes = $this->DOMXPath->query($this->transformSelectorToXpath($tokenize__value));
                 foreach ($nodes as $nodes__value) {
                     $this->force_tokenize[] = $this->getIdOfNode($nodes__value);

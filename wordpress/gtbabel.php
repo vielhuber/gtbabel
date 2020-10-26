@@ -738,7 +738,7 @@ class GtbabelWordPress
                             'alt_lng_urls',
                             'exclude_urls_content',
                             'exclude_urls_slugs',
-                            'force_tokenize',
+                            'translate_html_force_tokenize',
                             'url_settings',
                             'wizard_finished'
                         ]
@@ -792,7 +792,7 @@ class GtbabelWordPress
                             'deepl_translation_api_key',
                             'exclude_urls_content',
                             'exclude_urls_slugs',
-                            'force_tokenize',
+                            'translate_html_force_tokenize',
                             'translate_wp_localize_script_include',
                             'detect_dom_changes_include',
                             'localize_js_strings'
@@ -1778,13 +1778,13 @@ class GtbabelWordPress
         echo '<div class="gtbabel__inputbox">';
         echo '<div class="gtbabel__repeater">';
         echo '<ul class="gtbabel__repeater-list">';
-        if (empty(@$settings['force_tokenize'])) {
-            $settings['force_tokenize'] = [''];
+        if (empty(@$settings['translate_html_force_tokenize'])) {
+            $settings['translate_html_force_tokenize'] = [''];
         }
-        foreach ($settings['force_tokenize'] as $force_tokenize__value) {
+        foreach ($settings['translate_html_force_tokenize'] as $translate_html_force_tokenize__value) {
             echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-1">';
-            echo '<input class="gtbabel__input" type="text" name="gtbabel[force_tokenize][]" value="' .
-                esc_attr($force_tokenize__value) .
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[translate_html_force_tokenize][]" value="' .
+                esc_attr($translate_html_force_tokenize__value) .
                 '" placeholder="selector" />';
             echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
                 __('Remove', 'gtbabel-plugin') .

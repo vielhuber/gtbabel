@@ -1172,7 +1172,7 @@ The default configuration is:
     ],
     'exclude_urls_content' => ['backend'],
     'exclude_urls_slugs' => ['api/v1.0'],
-    'force_tokenize' => ['.force-tokenize']
+    'translate_html_force_tokenize' => ['.force-tokenize']
 ];
 ```
 
@@ -1327,7 +1327,7 @@ The following code gets converted to 1 token (not 3):
 
 `<p>This is a <a href="#">link</a> inside a text.</p>`
 
-If you want to influence that behaviour, use the `force_tokenize` option and provide the selector of the parent element in order to not tokenize its children.
+If you want to influence that behaviour, use the `translate_html_force_tokenize` option and provide the selector of the parent element in order to not tokenize its children.
 
 If you want to influence that special tags should not be auto translated by the Google/Microsoft/DeepL Translation API, use a special class:
 
