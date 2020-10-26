@@ -3,19 +3,6 @@ namespace vielhuber\gtbabel;
 
 class Gtbabel
 {
-    public $settings;
-    public $utils;
-    public $tags;
-    public $host;
-    public $publish;
-    public $altlng;
-    public $log;
-    public $data;
-    public $dom;
-    public $router;
-    public $gettext;
-    public $excel;
-
     public $configured = false;
     public $started = false;
 
@@ -28,7 +15,7 @@ class Gtbabel
         Publish $publish = null,
         Data $data = null,
         Altlng $altlng = null,
-        Dom $dom = null,
+        DomFactory $domfactory = null,
         Router $router = null,
         Gettext $gettext = null,
         Excel $excel = null
@@ -42,17 +29,16 @@ class Gtbabel
         $this->data =
             $data ?: new Data($this->utils, $this->host, $this->settings, $this->tags, $this->log, $this->publish);
         $this->altlng = $altlng ?: new Altlng($this->settings, $this->host);
-        $this->dom =
-            $dom ?:
-            new Dom(
+        $this->domfactory =
+            $domfactory ?:
+            new DomFactory(
                 $this->utils,
                 $this->data,
                 $this->host,
                 $this->settings,
                 $this->tags,
                 $this->log,
-                $this->altlng,
-                $this
+                $this->altlng
             );
         $this->router = $router ?: new Router($this->data, $this->host, $this->settings, $this->publish, $this->log);
         $this->gettext = $gettext ?: new Gettext($this->data, $this->settings);
@@ -104,8 +90,7 @@ class Gtbabel
         if ($this->host->contentTypeIsInappropriate()) {
             return;
         }
-        $this->dom->localizeJsPrepare();
-        $content = $this->dom->modifyContent(ob_get_contents(), 'buffer');
+        $content = $this->domfactory->modifyContentFactory(ob_get_contents(), 'buffer');
         ob_end_clean();
         echo $content;
         $this->data->saveCacheToDatabase();
@@ -125,34 +110,36 @@ class Gtbabel
 
     function translate($html, $lng_target = null, $lng_source = null)
     {
-        // this function has two "modes"
-        // if you don't specify $lng_target and $lng_source, it uses the current $gtbabel instance
-        // however, if you provide it, the current instance is untouched and a new one is temporarily created
-        if ($lng_target === null && $lng_source === null) {
-            if ($this->configured === false) {
-                $this->config();
-            }
-            // what's important: this function ("translate") is destroying the current domdocument
-            // therefore it must be called never *inside* modifyContent
-            $trans = $this->dom->modifyContent($html, 'translate');
-            $this->data->saveCacheToDatabase();
-        } else {
-            // use settings of already started instance
-            $settings = $this->settings->getSettings();
-            if ($lng_target === null) {
-                $lng_target = $this->data->getCurrentLanguageCode();
-            }
-            if ($lng_source === null) {
-                $lng_source = $this->settings->getSourceLanguageCode();
-            }
-            $settings['lng_target'] = $lng_target;
-            $settings['lng_source'] = $lng_source;
-            // start a totally independent session
-            $tmp = new \vielhuber\gtbabel\Gtbabel();
-            $tmp->config($settings);
-            $trans = $tmp->dom->modifyContent($html, 'translate');
-            $tmp->data->saveCacheToDatabase();
+        if ($this->configured === false) {
+            $this->config();
         }
+
+        $lng_source_prev = false;
+        if ($lng_source !== null) {
+            $lng_source_prev = $this->settings->get('lng_source');
+            if ($lng_source != $lng_source_prev) {
+                $this->settings->set('lng_source', $lng_source);
+            }
+        }
+        $lng_target_prev = false;
+        if ($lng_target !== null) {
+            $lng_target_prev = $this->settings->get('lng_target');
+            if ($lng_target != $lng_target_prev) {
+                $this->settings->set('lng_target', $lng_target);
+            }
+        }
+
+        $trans = $this->domfactory->modifyContentFactory($html, 'translate');
+
+        if ($lng_source_prev !== false) {
+            $this->settings->set('lng_source', $lng_source_prev);
+        }
+        if ($lng_target_prev !== false) {
+            $this->settings->set('lng_target', $lng_target_prev);
+        }
+
+        $this->data->saveCacheToDatabase();
+
         return $trans;
     }
 
@@ -178,7 +165,7 @@ class Gtbabel
         ];
         $this->config($settings);
         $time = $this->utils->getCurrentTime();
-        $content = $this->dom->modifyContent($content, 'tokenize');
+        $content = $this->domfactory->modifyContentFactory($content, 'tokenize');
         $this->data->saveCacheToDatabase();
         $data = $this->data->discoveryLogGetAfter($time, null, true);
         $this->reset();
@@ -217,7 +204,7 @@ class Gtbabel
         $settings['lng_target'] = 'en';
         $this->config($settings);
         $time = $this->utils->getCurrentTime();
-        $this->dom->modifyContent($de, 'tokenize');
+        $this->domfactory->modifyContentFactory($de, 'tokenize');
         $this->data->saveCacheToDatabase();
         $de_tokens = $this->data->discoveryLogGetAfter($time, null, false);
 
@@ -226,7 +213,7 @@ class Gtbabel
         $settings['lng_target'] = 'de'; // doesn't matter
         $this->config($settings);
         $time = $this->utils->getCurrentTime();
-        $this->dom->modifyContent($en, 'tokenize');
+        $this->domfactory->modifyContentFactory($en, 'tokenize');
         $this->data->saveCacheToDatabase();
         $en_tokens = $this->data->discoveryLogGetAfter($time, null, false);
 

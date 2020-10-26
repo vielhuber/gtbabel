@@ -5,9 +5,6 @@ use vielhuber\stringhelper\__;
 
 class Log
 {
-    public $utils;
-    public $settings;
-
     function __construct(Utils $utils = null, Settings $settings = null)
     {
         $this->utils = $utils ?: new Utils();

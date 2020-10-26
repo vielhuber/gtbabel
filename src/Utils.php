@@ -48,12 +48,12 @@ class Utils
         if (strip_tags($response) !== $response) {
             return 'html';
         }
-        // detect dynamically generated css/js files (that don't have an appropriate content header)
+        // detect dynamically generated css files (that don't have an appropriate content header)
         if (
             strpos($response, '{') !== false &&
             (strpos($response, ':') === false || strpos($response, ';') !== false)
         ) {
-            return null;
+            return 'css';
         }
         return 'html';
     }

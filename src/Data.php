@@ -11,13 +11,6 @@ class Data
     public $table;
     public $stats;
 
-    public $utils;
-    public $host;
-    public $settings;
-    public $tags;
-    public $log;
-    public $publish;
-
     function __construct(
         Utils $utils = null,
         Host $host = null,
@@ -921,6 +914,11 @@ class Data
         }
 
         return $this->host->getLanguageCodeFromUrl($this->host->getCurrentUrl());
+    }
+
+    function getCurrentLanguageLabel()
+    {
+        return $this->settings->getLabelForLanguageCode($this->getCurrentLanguageCode());
     }
 
     function getLanguagePickerData($with_args = true, $cur_url = null, $hide_active = false)

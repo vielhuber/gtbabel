@@ -80,6 +80,8 @@ class Settings
                 '/path/in/source/lng/to/specific/page' => ['key'],
                 'wp-json/v1/*/endpoint' => ['key', 'nested.key', 'key.with.*.wildcard']
             ],
+            'translate_wp_localize_script' => true,
+            'translate_wp_localize_script_include' => ['wc_*.locale.*', 'wc_*.i18n_*'],
             'html_lang_attribute' => true,
             'html_hreflang_tags' => true,
             'xml_hreflang_tags' => true,

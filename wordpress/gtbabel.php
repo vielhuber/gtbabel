@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 4.9.3
+ * Version: 4.9.4
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -32,6 +32,7 @@ class GtbabelWordPress
         $this->addTopBarItem();
         $this->modifyGutenbergSidebar();
         $this->showWizardNotice();
+        $this->translateLocalizeScript();
         $this->languagePickerWidget();
         $this->languagePickerShortcode();
         $this->languagePickerMenu();
@@ -41,6 +42,22 @@ class GtbabelWordPress
         $this->autoTranslateContactForm7Mails();
         $this->startHook();
         $this->stopHook();
+    }
+
+    private function translateLocalizeScript()
+    {
+        add_action('wp_loaded', function () {
+            if (is_admin() || in_array($GLOBALS['pagenow'], ['wp-login.php', 'wp-register.php'])) {
+                return;
+            }
+            if ($this->gtbabel->settings->get('translate_wp_localize_script') !== true) {
+                return;
+            }
+            if ($this->gtbabel->settings->get('translate_wp_localize_script_include') === null) {
+                return;
+            }
+            $GLOBALS['wp_scripts'] = new gtbabel_localize_script();
+        });
     }
 
     private function filterRestUrl()
@@ -497,25 +514,8 @@ class GtbabelWordPress
                                         'ID' => 1,
                                         'object_id' => 1,
                                         'type_label' => '',
-                                        'title' => __('All languages', 'gtbabel-plugin'),
+                                        'title' => __('Language picker', 'gtbabel-plugin'),
                                         'url' => '#gtbabel_languagepicker',
-                                        'type' => 'custom',
-                                        'object' => 'gtbabel-slug-slug',
-                                        'db_id' => 0,
-                                        'menu_item_parent' => 0,
-                                        'post_parent' => 0,
-                                        'target' => '',
-                                        'attr_title' => '',
-                                        'description' => '',
-                                        'classes' => [],
-                                        'xfn' => ''
-                                    ],
-                                    (object) [
-                                        'ID' => 1,
-                                        'object_id' => 1,
-                                        'type_label' => '',
-                                        'title' => __('Hide active language', 'gtbabel-plugin'),
-                                        'url' => '#gtbabel_languagepicker_hide_active',
                                         'type' => 'custom',
                                         'object' => 'gtbabel-slug-slug',
                                         'db_id' => 0,
@@ -710,6 +710,8 @@ class GtbabelWordPress
                             'translate_xml_include',
                             'translate_json',
                             'translate_json_include',
+                            'translate_wp_localize_script',
+                            'translate_wp_localize_script_include',
                             'html_lang_attribute',
                             'html_hreflang_tags',
                             'xml_hreflang_tags',
@@ -759,6 +761,7 @@ class GtbabelWordPress
                             'translate_html',
                             'translate_xml',
                             'translate_json',
+                            'translate_wp_localize_script',
                             'html_lang_attribute',
                             'html_hreflang_tags',
                             'xml_hreflang_tags',
@@ -788,6 +791,7 @@ class GtbabelWordPress
                             'exclude_urls_content',
                             'exclude_urls_slugs',
                             'force_tokenize',
+                            'translate_wp_localize_script_include',
                             'detect_dom_changes_include',
                             'localize_js_strings'
                         ]
@@ -894,7 +898,7 @@ class GtbabelWordPress
                         }
                     }
 
-                    $post_data = $settings['hide_languages'];
+                    $post_data = @$settings['hide_languages'];
                     if (array_key_exists('/*', $settings['prevent_publish_urls'])) {
                         unset($settings['prevent_publish_urls']['/*']);
                     }
@@ -1229,6 +1233,45 @@ class GtbabelWordPress
             echo '<input class="gtbabel__input" type="text" name="gtbabel[translate_json_include][keys][]" value="' .
                 implode(',', $translate_json_include__value) .
                 '" />';
+            echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
+                __('Remove', 'gtbabel-plugin') .
+                '</a>';
+            echo '</li>';
+        }
+        echo '</ul>';
+        echo '<a href="#" class="gtbabel__repeater-add button button-secondary">' .
+            __('Add', 'gtbabel-plugin') .
+            '</a>';
+        echo '</div>';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_translate_wp_localize_script" class="gtbabel__label">';
+        echo __('Translate wp_localize_script', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_translate_wp_localize_script" name="gtbabel[translate_wp_localize_script]" value="1"' .
+            (@$settings['translate_wp_localize_script'] == '1' ? ' checked="checked"' : '') .
+            ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label class="gtbabel__label">';
+        echo __('Translate wp_localize_script paths', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<div class="gtbabel__repeater">';
+        echo '<ul class="gtbabel__repeater-list">';
+        if (empty(@$settings['translate_wp_localize_script_include'])) {
+            $settings['translate_wp_localize_script_include'] = [''];
+        }
+        foreach ($settings['translate_wp_localize_script_include'] as $translate_wp_localize_script_include__value) {
+            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-1">';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[translate_wp_localize_script_include][]" value="' .
+                esc_attr($translate_wp_localize_script_include__value) .
+                '" placeholder="path" />';
             echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
                 __('Remove', 'gtbabel-plugin') .
                 '</a>';
@@ -1596,10 +1639,10 @@ class GtbabelWordPress
         foreach ($settings['exclude_dom'] as $exclude_dom__value) {
             echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-2">';
             echo '<input class="gtbabel__input" type="text" name="gtbabel[exclude_dom][selector][]" value="' .
-                esc_attr($exclude_dom__value['selector']) .
+                esc_attr(@$exclude_dom__value['selector']) .
                 '" placeholder="selector" />';
             echo '<input class="gtbabel__input" type="text" name="gtbabel[exclude_dom][attribute][]" value="' .
-                esc_attr($exclude_dom__value['attribute']) .
+                esc_attr(@$exclude_dom__value['attribute']) .
                 '" placeholder="attribute" />';
             echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
                 __('Remove', 'gtbabel-plugin') .
@@ -2863,15 +2906,17 @@ EOD;
             if (isset($_POST['save_step'])) {
                 $settings = [];
 
-                // remove slashes
-                $_POST['gtbabel'] = stripslashes_deep($_POST['gtbabel']);
+                if (isset($_POST['gtbabel'])) {
+                    // remove slashes
+                    $_POST['gtbabel'] = stripslashes_deep($_POST['gtbabel']);
 
-                // whitelist
-                foreach (['languages', 'google_translation_api_key'] as $fields__value) {
-                    if (!isset($_POST['gtbabel'][$fields__value])) {
-                        continue;
+                    // whitelist
+                    foreach (['languages', 'google_translation_api_key'] as $fields__value) {
+                        if (!isset($_POST['gtbabel'][$fields__value])) {
+                            continue;
+                        }
+                        $settings[$fields__value] = $_POST['gtbabel'][$fields__value];
                     }
-                    $settings[$fields__value] = $_POST['gtbabel'][$fields__value];
                 }
 
                 // sanitize
@@ -3626,8 +3671,9 @@ EOD;
                     'lng_source' => $lng_source,
                     'log_folder' => $this->getPluginFileStorePathRelative() . '/logs',
                     'translate_json_include' => [
-                        '?wc-ajax=*' => ['fragments.*'] // woocommerce
+                        '?wc-ajax=*' => ['fragments.*', 'messages'] // woocommerce
                     ],
+                    'translate_wp_localize_script_include' => ['wc_*.locale.*', 'wc_*.i18n_*'], // woocommerce
                     'exclude_urls_content' => [
                         'wp-admin',
                         'feed',
@@ -3746,6 +3792,44 @@ class gtbabel_lngpicker_widget extends \WP_Widget
         $instance = [];
         $instance['title'] = !empty($new_instance['title']) ? strip_tags($new_instance['title']) : '';
         return $instance;
+    }
+}
+
+class gtbabel_localize_script extends \WP_Scripts
+{
+    function localize($handle, $object_name, $l10n)
+    {
+        global $gtbabel;
+        if ($gtbabel !== null) {
+            $localize = $gtbabel->settings->get('translate_wp_localize_script_include');
+            foreach ($localize as $localize__value) {
+                if (
+                    $localize__value === '*' ||
+                    preg_match(
+                        '/' . str_replace('\*', '.*', preg_quote(explode('.', $localize__value)[0])) . '/',
+                        $object_name
+                    )
+                ) {
+                    $l10n = __::array_map_deep($l10n, function ($value, $key, $key_chain) use (
+                        $object_name,
+                        $localize__value,
+                        $gtbabel
+                    ) {
+                        $path = $object_name . '.' . implode('.', $key_chain);
+                        if (
+                            $localize__value === '*' ||
+                            preg_match('/' . str_replace('\*', '.*', preg_quote($localize__value)) . '/', $path)
+                        ) {
+                            if (is_string($value)) {
+                                $value = $gtbabel->translate($value);
+                            }
+                        }
+                        return $value;
+                    });
+                }
+            }
+        }
+        return parent::localize($handle, $object_name, $l10n);
     }
 }
 

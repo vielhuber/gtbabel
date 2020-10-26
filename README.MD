@@ -1037,6 +1037,8 @@ The default configuration is:
         '/path/in/source/lng/to/specific/page' => ['key'],
         'wp-json/v1/*/endpoint' => ['key', 'nested.key', 'key.with.*.wildcard']
     ],
+    'translate_wp_localize_script' => true,
+    'translate_wp_localize_script_include' => ['wc_*.locale.*', 'wc_*.i18n_*'],
     'html_lang_attribute' => true,
     'html_hreflang_tags' => true,
     'xml_hreflang_tags' => true,
@@ -1165,18 +1167,7 @@ The default configuration is:
     'localize_js' => true,
     'localize_js_strings' => ['Schließen', '/blog'],
     'detect_dom_changes' => true,
-    'detect_dom_changes_include' => ['.top-button', '.swal-overlay', '.wpcf7-response-output', '.wpcf7-not-valid-tip'],
-    'parser' => [
-        [
-            'url' => '*',
-            'type_source' => 'html',
-            'type_target' => 'text',
-            'selector' => '.example-link',
-            'attribute' => 'alt-href|*foo*',
-            'context' => 'slug',
-            'ignore' => false
-        ]
-    ]
+    'detect_dom_changes_include' => ['.top-button', '.swal-overlay', '.wpcf7-response-output', '.wpcf7-not-valid-tip']
 ];
 ```
 
@@ -1276,6 +1267,8 @@ if (function_exists('gtbabel__')) {
     ]);
 }
 ```
+
+Another way of doing this is using the `translate_wp_localize_script` option: Populate `translate_wp_localize_script_include` with key chained paths to (possibly nested) strings and Gtbabel translates whem automatically.
 
 ## Modified nodes
 

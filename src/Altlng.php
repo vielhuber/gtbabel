@@ -3,9 +3,6 @@ namespace vielhuber\gtbabel;
 
 class Altlng
 {
-    public $settings;
-    public $host;
-
     function __construct(Settings $settings = null, Host $host = null)
     {
         $this->settings = $settings ?: new Settings();

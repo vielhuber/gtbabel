@@ -3,12 +3,6 @@ namespace vielhuber\gtbabel;
 
 class Router
 {
-    public $data;
-    public $host;
-    public $settings;
-    public $publish;
-    public $log;
-
     function __construct(
         Data $data = null,
         Host $host = null,

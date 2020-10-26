@@ -3,10 +3,6 @@ namespace vielhuber\gtbabel;
 
 class Publish
 {
-    public $settings;
-    public $host;
-    public $log;
-
     function __construct(Settings $settings = null, Host $host = null, Log $log = null)
     {
         $this->settings = $settings ?: new Settings();

@@ -10,9 +10,6 @@ class Host
     public $original_url_with_args;
     public $original_host;
 
-    public $settings;
-    public $log;
-
     function __construct(Settings $settings = null, Log $log = null)
     {
         $this->settings = $settings ?: new Settings();

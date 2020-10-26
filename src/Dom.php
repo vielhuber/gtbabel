@@ -7,20 +7,11 @@ class Dom
 {
     public $DOMDocument;
     public $DOMXPath;
-
     public $excluded_nodes;
+    public $lng_areas;
     public $force_tokenize;
     public $group_cache;
     public $localize_js_script;
-
-    public $utils;
-    public $data;
-    public $host;
-    public $settings;
-    public $tags;
-    public $log;
-    public $altlng;
-    public $gtbabel;
 
     function __construct(
         Utils $utils = null,
@@ -30,7 +21,7 @@ class Dom
         Tags $tags = null,
         Log $log = null,
         Altlng $altlng = null,
-        Gtbabel $gtbabel = null
+        DomFactory $domfactory = null
     ) {
         $this->utils = $utils ?: new Utils();
         $this->data = $data ?: new Data();
@@ -39,7 +30,7 @@ class Dom
         $this->tags = $tags ?: new Tags();
         $this->log = $log ?: new Log();
         $this->altlng = $altlng ?: new Altlng();
-        $this->gtbabel = $gtbabel ?: new Gtbabel();
+        $this->domfactory = $domfactory ?: new DomFactory();
     }
 
     function preloadExcludedNodes()
@@ -426,8 +417,10 @@ class Dom
             $this->setRtlAttr();
             $this->setAltLngUrls();
             $this->detectDomChanges();
+            $this->fixWooCommerceCardCache();
+            $this->localizeJsPrepare();
             $this->localizeJsInject();
-            $this->replaceMenuLanguagePicker();
+            $this->injectMenuLanguagePicker();
         }
         $this->preloadExcludedNodes();
         $this->preloadForceTokenize();
@@ -700,6 +693,24 @@ class Dom
         $node->parentNode->replaceChild($repl, $node);
     }
 
+    function insertAfter($node, $newNode)
+    {
+        if ($node->nextSibling === null) {
+            $node->parentNode->appendChild($newNode);
+        } else {
+            $node->parentNode->insertBefore($newNode, $node->nextSibling);
+        }
+    }
+
+    function stringToNode($str)
+    {
+        $str = mb_convert_encoding($str, 'HTML-ENTITIES', 'UTF-8');
+        $tmp = new \DOMDocument();
+        $tmp->loadHTML($str, LIBXML_HTML_NOIMPLIED);
+        $node = $this->DOMDocument->importNode($tmp->documentElement, true);
+        return $node;
+    }
+
     function getChildrenCountRecursivelyOfNodeTagsOnly($node)
     {
         return $this->DOMXPath->evaluate('count(.//*)', $node);
@@ -949,9 +960,6 @@ class Dom
         if ($this->settings->get('translate_json_include') === null) {
             return $json;
         }
-        if ($this->data->sourceLngIsCurrentLng()) {
-            return $json;
-        }
         $keys = [];
         $url = $this->host->getCurrentUrlWithArgsConverted();
         foreach (
@@ -981,7 +989,7 @@ class Dom
                 }
             }
             if ($match === true) {
-                $trans = $this->modifyContent($value, 'translate');
+                $trans = $this->domfactory->modifyContentFactory($value, 'translate');
                 if ($trans !== null) {
                     $value = $trans;
                 }
@@ -1042,6 +1050,25 @@ class Dom
         $head->insertBefore($tag, $head->firstChild);
     }
 
+    function fixWooCommerceCardCache()
+    {
+        // woocommerce uses a nasty cache in session storage
+        // this causes the card on the top right of "storefront" to have a wrong language after switching languages
+        // this fixes this behaviour
+        $wc_card_fragments = $this->DOMXPath->query('/html/body//*[@id="wc-cart-fragments-js-extra"]');
+        if ($wc_card_fragments->length > 0) {
+            foreach ($wc_card_fragments as $wc_card_fragments__value) {
+                $wc_card_fragments__value->textContent =
+                    $wc_card_fragments__value->textContent .
+                    "
+                        if ( typeof wc_cart_fragments_params !== 'undefined' && typeof wc_cart_fragments_params.fragment_name !== 'undefined' ) {
+                            window.sessionStorage.removeItem(wc_cart_fragments_params.fragment_name);
+                        }
+                    ";
+            }
+        }
+    }
+
     function localizeJsPrepare()
     {
         if ($this->settings->get('localize_js') !== true) {
@@ -1060,7 +1087,7 @@ class Dom
         if (!$this->data->sourceLngIsCurrentLng()) {
             foreach ($this->settings->get('localize_js_strings') as $localize_js_strings__value) {
                 $string = $localize_js_strings__value;
-                $trans = $this->gtbabel->translate($string);
+                $trans = $this->domfactory->modifyContentFactory($string, 'translate');
                 if ($trans === null) {
                     continue;
                 }
@@ -1102,18 +1129,17 @@ class Dom
         $head->insertBefore($tag, $head->firstChild);
     }
 
-    function replaceMenuLanguagePicker()
+    function injectMenuLanguagePicker()
     {
         $nodes = $this->DOMXPath->query('/html/body//a[@href="#gtbabel_languagepicker"]');
         if (count($nodes) > 0) {
             foreach ($nodes as $nodes__value) {
-                $this->replaceNodeWithString($nodes__value, $this->data->getLanguagePickerHtml());
-            }
-        }
-        $nodes = $this->DOMXPath->query('/html/body//a[@href="#gtbabel_languagepicker_hide_active"]');
-        if (count($nodes) > 0) {
-            foreach ($nodes as $nodes__value) {
-                $this->replaceNodeWithString($nodes__value, $this->data->getLanguagePickerHtml(true, null, true));
+                $nodes__value->setAttribute('onclick', 'return false;');
+                $nodes__value->nodeValue = $this->data->getCurrentLanguageLabel();
+                $this->insertAfter(
+                    $nodes__value,
+                    $this->stringToNode($this->data->getLanguagePickerHtml(true, null, true))
+                );
             }
         }
     }
