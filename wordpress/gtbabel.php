@@ -710,6 +710,7 @@ class GtbabelWordPress
                             'translate_html',
                             'translate_html_include',
                             'translate_html_exclude',
+                            'translate_html_force_tokenize',
                             'localize_js',
                             'localize_js_strings',
                             'detect_dom_changes',
@@ -738,7 +739,6 @@ class GtbabelWordPress
                             'alt_lng_urls',
                             'exclude_urls_content',
                             'exclude_urls_slugs',
-                            'translate_html_force_tokenize',
                             'url_settings',
                             'wizard_finished'
                         ]

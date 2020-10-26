@@ -76,6 +76,7 @@ class Settings
                 ['selector' => '.example1', 'attribute' => 'data-text'],
                 ['selector' => '.example2', 'attribute' => 'data-*']
             ],
+            'translate_html_force_tokenize' => ['.force-tokenize'],
             'localize_js' => true,
             'localize_js_strings' => ['Schließen', '/blog'],
             'detect_dom_changes' => true,
@@ -127,8 +128,7 @@ class Settings
                 '/path/in/source/lng/to/specific/page' => 'en'
             ],
             'exclude_urls_content' => ['backend'],
-            'exclude_urls_slugs' => ['api/v1.0'],
-            'translate_html_force_tokenize' => ['.force-tokenize']
+            'exclude_urls_slugs' => ['api/v1.0']
         ];
         if (!empty($args)) {
             foreach ($args as $args__key => $args__value) {
