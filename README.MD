@@ -1068,14 +1068,6 @@ The default configuration is:
     ],
     'exclude_urls_content' => ['backend'],
     'exclude_urls_slugs' => ['api/v1.0'],
-    'translate_html_exclude' => [
-        ['selector' => '.notranslate'],
-        ['selector' => '[data-context]', 'attribute' => 'data-context'],
-        ['selector' => '.lngpicker'],
-        ['selector' => '.xdebug-error'],
-        ['selector' => '.example1', 'attribute' => 'data-text'],
-        ['selector' => '.example2', 'attribute' => 'data-*']
-    ],
     'force_tokenize' => ['.force-tokenize'],
     'translate_html_include' => [
         [
@@ -1168,6 +1160,14 @@ The default configuration is:
             'attribute' => 'alt-href|*foo*', // wildcards and | supported
             'context' => 'slug'
         ]
+    ],
+    'translate_html_exclude' => [
+        ['selector' => '.notranslate'],
+        ['selector' => '[data-context]', 'attribute' => 'data-context'],
+        ['selector' => '.lngpicker'],
+        ['selector' => '.xdebug-error'],
+        ['selector' => '.example1', 'attribute' => 'data-text'],
+        ['selector' => '.example2', 'attribute' => 'data-*']
     ],
     'localize_js' => true,
     'localize_js_strings' => ['Schließen', '/blog'],

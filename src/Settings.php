@@ -110,6 +110,8 @@ class Settings
             ],
             'exclude_urls_content' => ['backend'],
             'exclude_urls_slugs' => ['api/v1.0'],
+            'force_tokenize' => ['.force-tokenize'],
+            'translate_html_include' => $this->getDefaultTranslateHtmlInclude(),
             'translate_html_exclude' => [
                 ['selector' => '.notranslate'],
                 ['selector' => '[data-context]', 'attribute' => 'data-context'],
@@ -118,8 +120,6 @@ class Settings
                 ['selector' => '.example1', 'attribute' => 'data-text'],
                 ['selector' => '.example2', 'attribute' => 'data-*']
             ],
-            'force_tokenize' => ['.force-tokenize'],
-            'translate_html_include' => $this->getDefaultTranslateHtmlInclude(),
             'localize_js' => true,
             'localize_js_strings' => ['Schließen', '/blog'],
             'detect_dom_changes' => true,
