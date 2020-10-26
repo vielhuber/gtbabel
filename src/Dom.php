@@ -222,7 +222,10 @@ class Dom
                     } else {
                         if (@$include__value['attribute'] != '') {
                             // wildcards
-                            if (strpos($include__value['attribute'], '*') !== false) {
+                            if (
+                                strpos($include__value['attribute'], '*') !== false ||
+                                strpos($include__value['attribute'], '|') !== false
+                            ) {
                                 $opening_tag = $this->getOuterHtml($nodes__value);
                                 $opening_tag = substr($opening_tag, 0, strpos($opening_tag, '>') + 1);
                                 foreach (['"', '\''] as $quote__value) {

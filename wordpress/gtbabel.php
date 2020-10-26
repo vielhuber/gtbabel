@@ -38,7 +38,7 @@ class GtbabelWordPress
         $this->languagePickerMenu();
         $this->disableAutoRedirect();
         $this->initUpdateCapabilities();
-        $this->filterRestUrl();
+        $this->filterSpecificUrls();
         $this->autoTranslateContactForm7Mails();
         $this->startHook();
         $this->stopHook();
@@ -60,19 +60,21 @@ class GtbabelWordPress
         });
     }
 
-    private function filterRestUrl()
+    private function filterSpecificUrls()
     {
-        add_filter(
-            'rest_url',
-            function ($url) {
-                return $this->gtbabel->data->getUrlTranslationInLanguage(
-                    $this->gtbabel->settings->getSourceLanguageCode(),
-                    $this->gtbabel->data->getCurrentLanguageCode(),
-                    $url
-                );
-            },
-            PHP_INT_MAX
-        );
+        foreach (['rest_url', 'woocommerce_get_return_url'] as $names__value) {
+            add_filter(
+                $names__value,
+                function ($url) {
+                    return $this->gtbabel->data->getUrlTranslationInLanguage(
+                        $this->gtbabel->settings->getSourceLanguageCode(),
+                        $this->gtbabel->data->getCurrentLanguageCode(),
+                        $url
+                    );
+                },
+                PHP_INT_MAX
+            );
+        }
     }
 
     private function autoTranslateContactForm7Mails()
@@ -3673,7 +3675,7 @@ EOD;
                     'translate_json_include' => [
                         '?wc-ajax=*' => ['fragments.*', 'messages'] // woocommerce
                     ],
-                    'translate_wp_localize_script_include' => ['wc_*.locale.*', 'wc_*.i18n_*'], // woocommerce
+                    'translate_wp_localize_script_include' => ['wc_*.locale.*', 'wc_*.i18n_*', 'wc_*.cart_url'], // woocommerce
                     'exclude_urls_content' => [
                         'wp-admin',
                         'feed',

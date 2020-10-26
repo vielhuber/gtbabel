@@ -1038,7 +1038,7 @@ The default configuration is:
         'wp-json/v1/*/endpoint' => ['key', 'nested.key', 'key.with.*.wildcard']
     ],
     'translate_wp_localize_script' => true,
-    'translate_wp_localize_script_include' => ['wc_*.locale.*', 'wc_*.i18n_*'],
+    'translate_wp_localize_script_include' => ['wc_*.locale.*', 'wc_*.i18n_*', 'wc_*.cart_url'],
     'html_lang_attribute' => true,
     'html_hreflang_tags' => true,
     'xml_hreflang_tags' => true,
@@ -1156,6 +1156,11 @@ The default configuration is:
         [
             'selector' => '/html/body//@*[contains(name(), \'text\')]/parent::*', // *text*
             'attribute' => '*text*', // *text*
+            'context' => null
+        ],
+        [
+            'selector' => '#payment .place-order .button', // woocommerce
+            'attribute' => 'data-value|value',
             'context' => null
         ],
         [

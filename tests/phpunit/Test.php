@@ -1818,7 +1818,7 @@ EOD;
                 'wp-json/v1/*/endpoint' => ['key', 'nested.key', 'key.with.*.wildcard']
             ],
             'translate_wp_localize_script' => true,
-            'translate_wp_localize_script_include' => ['wc_*.locale.*', 'wc_*.i18n_*'],
+            'translate_wp_localize_script_include' => ['wc_*.locale.*', 'wc_*.i18n_*', 'wc_*.cart_url'],
             'debug_translations' => true,
             'auto_add_translations' => false,
             'auto_set_new_strings_checked' => false,
