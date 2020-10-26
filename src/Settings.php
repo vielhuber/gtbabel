@@ -110,7 +110,7 @@ class Settings
             ],
             'exclude_urls_content' => ['backend'],
             'exclude_urls_slugs' => ['api/v1.0'],
-            'exclude_dom' => [
+            'translate_html_exclude' => [
                 ['selector' => '.notranslate'],
                 ['selector' => '[data-context]', 'attribute' => 'data-context'],
                 ['selector' => '.lngpicker'],
@@ -119,7 +119,7 @@ class Settings
                 ['selector' => '.example2', 'attribute' => 'data-*']
             ],
             'force_tokenize' => ['.force-tokenize'],
-            'include_dom' => $this->getDefaultIncludeDom(),
+            'translate_html_include' => $this->getDefaultTranslateHtmlInclude(),
             'localize_js' => true,
             'localize_js_strings' => ['Schließen', '/blog'],
             'detect_dom_changes' => true,
@@ -156,7 +156,7 @@ class Settings
         return $args;
     }
 
-    function getDefaultIncludeDom()
+    function getDefaultTranslateHtmlInclude()
     {
         return [
             [

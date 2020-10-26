@@ -732,9 +732,9 @@ class GtbabelWordPress
                             'alt_lng_urls',
                             'exclude_urls_content',
                             'exclude_urls_slugs',
-                            'exclude_dom',
+                            'translate_html_exclude',
                             'force_tokenize',
-                            'include_dom',
+                            'translate_html_include',
                             'url_settings',
                             'localize_js',
                             'localize_js_strings',
@@ -922,8 +922,8 @@ class GtbabelWordPress
                     }
                     unset($settings['hide_languages']);
 
-                    $post_data = $settings['exclude_dom'];
-                    $settings['exclude_dom'] = [];
+                    $post_data = $settings['translate_html_exclude'];
+                    $settings['translate_html_exclude'] = [];
                     if (!empty(@$post_data['selector'])) {
                         foreach ($post_data['selector'] as $post_data__key => $post_data__value) {
                             if (
@@ -932,15 +932,15 @@ class GtbabelWordPress
                             ) {
                                 continue;
                             }
-                            $settings['exclude_dom'][] = [
+                            $settings['translate_html_exclude'][] = [
                                 'selector' => $post_data['selector'][$post_data__key],
                                 'attribute' => $post_data['attribute'][$post_data__key]
                             ];
                         }
                     }
 
-                    $post_data = $settings['include_dom'];
-                    $settings['include_dom'] = [];
+                    $post_data = $settings['translate_html_include'];
+                    $settings['translate_html_include'] = [];
                     if (!empty(@$post_data['selector'])) {
                         foreach ($post_data['selector'] as $post_data__key => $post_data__value) {
                             if (
@@ -950,7 +950,7 @@ class GtbabelWordPress
                             ) {
                                 continue;
                             }
-                            $settings['include_dom'][] = [
+                            $settings['translate_html_include'][] = [
                                 'selector' => $post_data['selector'][$post_data__key],
                                 'attribute' => $post_data['attribute'][$post_data__key],
                                 'context' => $post_data['context'][$post_data__key]
@@ -1635,16 +1635,16 @@ class GtbabelWordPress
         echo '<div class="gtbabel__inputbox">';
         echo '<div class="gtbabel__repeater">';
         echo '<ul class="gtbabel__repeater-list">';
-        if (empty(@$settings['exclude_dom'])) {
-            $settings['exclude_dom'] = [['selector' => '', 'attribute' => '']];
+        if (empty(@$settings['translate_html_exclude'])) {
+            $settings['translate_html_exclude'] = [['selector' => '', 'attribute' => '']];
         }
-        foreach ($settings['exclude_dom'] as $exclude_dom__value) {
+        foreach ($settings['translate_html_exclude'] as $translate_html_exclude__value) {
             echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-2">';
-            echo '<input class="gtbabel__input" type="text" name="gtbabel[exclude_dom][selector][]" value="' .
-                esc_attr(@$exclude_dom__value['selector']) .
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[translate_html_exclude][selector][]" value="' .
+                esc_attr(@$translate_html_exclude__value['selector']) .
                 '" placeholder="selector" />';
-            echo '<input class="gtbabel__input" type="text" name="gtbabel[exclude_dom][attribute][]" value="' .
-                esc_attr(@$exclude_dom__value['attribute']) .
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[translate_html_exclude][attribute][]" value="' .
+                esc_attr(@$translate_html_exclude__value['attribute']) .
                 '" placeholder="attribute" />';
             echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
                 __('Remove', 'gtbabel-plugin') .
@@ -1694,19 +1694,19 @@ class GtbabelWordPress
         echo '<div class="gtbabel__inputbox">';
         echo '<div class="gtbabel__repeater">';
         echo '<ul class="gtbabel__repeater-list">';
-        if (empty(@$settings['include_dom'])) {
-            $settings['include_dom'] = [['selector' => '', 'attribute' => '', 'context' => '']];
+        if (empty(@$settings['translate_html_include'])) {
+            $settings['translate_html_include'] = [['selector' => '', 'attribute' => '', 'context' => '']];
         }
-        foreach ($settings['include_dom'] as $include_dom__value) {
+        foreach ($settings['translate_html_include'] as $translate_html_include__value) {
             echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-3">';
-            echo '<input class="gtbabel__input" type="text" name="gtbabel[include_dom][selector][]" value="' .
-                esc_attr($include_dom__value['selector']) .
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[translate_html_include][selector][]" value="' .
+                esc_attr($translate_html_include__value['selector']) .
                 '" placeholder="selector" />';
-            echo '<input class="gtbabel__input" type="text" name="gtbabel[include_dom][attribute][]" value="' .
-                esc_attr($include_dom__value['attribute']) .
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[translate_html_include][attribute][]" value="' .
+                esc_attr($translate_html_include__value['attribute']) .
                 '" placeholder="attribute" />';
-            echo '<input class="gtbabel__input" type="text" name="gtbabel[include_dom][context][]" value="' .
-                esc_attr($include_dom__value['context']) .
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[translate_html_include][context][]" value="' .
+                esc_attr($translate_html_include__value['context']) .
                 '" placeholder="context" />';
             echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
                 __('Remove', 'gtbabel-plugin') .
@@ -3684,7 +3684,7 @@ EOD;
                         'wp-comments-post.php'
                     ],
                     'exclude_urls_slugs' => ['wp-json'],
-                    'exclude_dom' => [
+                    'translate_html_exclude' => [
                         ['selector' => '.notranslate'],
                         ['selector' => '[data-context]', 'attribute' => 'data-context'],
                         ['selector' => '.lngpicker'],

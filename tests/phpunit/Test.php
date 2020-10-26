@@ -74,7 +74,7 @@ class Test extends \PHPUnit\Framework\TestCase
     public function test011()
     {
         $this->runDiff('11.html', 200, [
-            'include_dom' => array_merge($this->gtbabel->settings->getDefaultIncludeDom(), [
+            'translate_html_include' => array_merge($this->gtbabel->settings->getDefaultTranslateHtmlInclude(), [
                 [
                     'selector' => '.search-submit',
                     'attribute' => 'value'
@@ -254,7 +254,7 @@ class Test extends \PHPUnit\Framework\TestCase
     public function test037()
     {
         $this->runDiff('37.html', 200, [
-            'exclude_dom' => [
+            'translate_html_exclude' => [
                 ['selector' => '.foo'],
                 ['selector' => '#bar'],
                 ['selector' => '.gnarr', 'attribute' => 'data-text'],
@@ -477,7 +477,7 @@ class Test extends \PHPUnit\Framework\TestCase
     public function test067()
     {
         $this->runDiff('67.html', 200, [
-            'include_dom' => array_merge($this->gtbabel->settings->getDefaultIncludeDom(), [
+            'translate_html_include' => array_merge($this->gtbabel->settings->getDefaultTranslateHtmlInclude(), [
                 [
                     'selector' => 'custom-component',
                     'attribute' => ':product-*|:url'
@@ -492,7 +492,7 @@ class Test extends \PHPUnit\Framework\TestCase
             'debug_translations' => false,
             'auto_translation' => true,
             'google_translation_api_key' => 'free',
-            'exclude_dom' => [['selector' => '.test']]
+            'translate_html_exclude' => [['selector' => '.test']]
         ]);
     }
 
@@ -1510,7 +1510,7 @@ EOD;
     public function test_router()
     {
         $settings = $this->getDefaultSettings();
-        $settings['exclude_dom'] = [
+        $settings['translate_html_exclude'] = [
             ['selector' => '.notranslate'],
             ['selector' => '[data-context]', 'attribute' => 'data-context'],
             ['selector' => '.lngpicker'],

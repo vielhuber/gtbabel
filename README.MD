@@ -1068,7 +1068,7 @@ The default configuration is:
     ],
     'exclude_urls_content' => ['backend'],
     'exclude_urls_slugs' => ['api/v1.0'],
-    'exclude_dom' => [
+    'translate_html_exclude' => [
         ['selector' => '.notranslate'],
         ['selector' => '[data-context]', 'attribute' => 'data-context'],
         ['selector' => '.lngpicker'],
@@ -1077,7 +1077,7 @@ The default configuration is:
         ['selector' => '.example2', 'attribute' => 'data-*']
     ],
     'force_tokenize' => ['.force-tokenize'],
-    'include_dom' => [
+    'translate_html_include' => [
         [
             'selector' => '/html/body//text()',
             'attribute' => null,
@@ -1298,7 +1298,7 @@ By default Gtbabel translates all text and tag nodes with the following reasonab
 | `body *`                        | ✗    | `label`          | `auto`           |
 | `body *`                        | ✗    | `*text*`         | `auto`           |
 
-You can modify or add new tag node transformations via the `include_dom` option.
+You can modify or add new tag node transformations via the `translate_html_include` option.
 
 For example if you want to translate all data attributes, add this rule:
 
@@ -1334,7 +1334,7 @@ If you want to influence that special tags should not be auto translated by the 
 `<p>Das ist das <span class="notranslate">Haus</span> vom Nikolaus</p>`
 
 The part before and after the `span`-tag gets translated (and added to the database).\
-If you want to exclude a complete node of being translated (and not added to the database), add a class with the value `notranslate` (or any other value defined in `exclude_dom`) to the parent node:
+If you want to exclude a complete node of being translated (and not added to the database), add a class with the value `notranslate` (or any other value defined in `translate_html_exclude`) to the parent node:
 
 `<p class="notranslate">Das ist das <span>Haus</span> vom Nikolaus</p>`
 
@@ -1737,7 +1737,7 @@ You can throttle the amount of chars with the options `google_throttle_chars_per
 
 -   Gtbabel is good at translating whole pages. If you want to provide different content for different languages, Gtbabel might be the wrong tool (however you _can_ use `if( gtbabel_current_lng() === 'other-lng' ) { echo 'content in source language'; }` and/or the concept of **Multiple source languages** in your templates to achieve that).
 -   The source language acts as a base for every other language (however, you _can_ mark parts of a page with a different source language).
--   Gtbabel is designed to translate every part of the page without code changes (however you can exclude translations with the `exclude_dom`-option).
+-   Gtbabel is designed to translate every part of the page without code changes (however you can exclude translations with the `translate_html_exclude`-option).
 
 ## Credits
 

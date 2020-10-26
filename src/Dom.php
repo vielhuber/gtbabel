@@ -37,8 +37,8 @@ class Dom
     {
         /* excluded nodes are nodes that are excluded beforehand and contain also attributes of nodes that are already translated */
         $this->excluded_nodes = [];
-        if ($this->settings->get('exclude_dom') !== null) {
-            foreach ($this->settings->get('exclude_dom') as $exclude__value) {
+        if ($this->settings->get('translate_html_exclude') !== null) {
+            foreach ($this->settings->get('translate_html_exclude') as $exclude__value) {
                 $nodes = $this->DOMXPath->query($this->transformSelectorToXpath($exclude__value['selector']));
                 foreach ($nodes as $nodes__value) {
                     if (!isset($exclude__value['attribute']) || $exclude__value['attribute'] == '') {
@@ -196,7 +196,7 @@ class Dom
 
     function modifyHtmlNodes()
     {
-        $include = $this->settings->get('include_dom');
+        $include = $this->settings->get('translate_html_include');
 
         foreach ($include as $include__value) {
             $xpath = $this->transformSelectorToXpath($include__value['selector']);
