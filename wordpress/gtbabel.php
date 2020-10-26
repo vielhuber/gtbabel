@@ -708,6 +708,12 @@ class GtbabelWordPress
                             'redirect_root_domain',
                             'basic_auth',
                             'translate_html',
+                            'translate_html_include',
+                            'translate_html_exclude',
+                            'localize_js',
+                            'localize_js_strings',
+                            'detect_dom_changes',
+                            'detect_dom_changes_include',
                             'translate_xml',
                             'translate_xml_include',
                             'translate_json',
@@ -733,13 +739,7 @@ class GtbabelWordPress
                             'exclude_urls_content',
                             'exclude_urls_slugs',
                             'force_tokenize',
-                            'translate_html_include',
-                            'translate_html_exclude',
                             'url_settings',
-                            'localize_js',
-                            'localize_js_strings',
-                            'detect_dom_changes',
-                            'detect_dom_changes_include',
                             'wizard_finished'
                         ]
                         as $fields__value
@@ -1155,6 +1155,149 @@ class GtbabelWordPress
         echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_translate_html" name="gtbabel[translate_html]" value="1"' .
             ($settings['translate_html'] == '1' ? ' checked="checked"' : '') .
             ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label class="gtbabel__label">';
+        echo __('Include dom nodes', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<div class="gtbabel__repeater">';
+        echo '<ul class="gtbabel__repeater-list">';
+        if (empty(@$settings['translate_html_include'])) {
+            $settings['translate_html_include'] = [['selector' => '', 'attribute' => '', 'context' => '']];
+        }
+        foreach ($settings['translate_html_include'] as $translate_html_include__value) {
+            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-3">';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[translate_html_include][selector][]" value="' .
+                esc_attr($translate_html_include__value['selector']) .
+                '" placeholder="selector" />';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[translate_html_include][attribute][]" value="' .
+                esc_attr($translate_html_include__value['attribute']) .
+                '" placeholder="attribute" />';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[translate_html_include][context][]" value="' .
+                esc_attr($translate_html_include__value['context']) .
+                '" placeholder="context" />';
+            echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
+                __('Remove', 'gtbabel-plugin') .
+                '</a>';
+            echo '</li>';
+        }
+        echo '</ul>';
+        echo '<a href="#" class="gtbabel__repeater-add button button-secondary">' .
+            __('Add', 'gtbabel-plugin') .
+            '</a>';
+        echo '</div>';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label class="gtbabel__label">';
+        echo __('Exclude dom nodes', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<div class="gtbabel__repeater">';
+        echo '<ul class="gtbabel__repeater-list">';
+        if (empty(@$settings['translate_html_exclude'])) {
+            $settings['translate_html_exclude'] = [['selector' => '', 'attribute' => '']];
+        }
+        foreach ($settings['translate_html_exclude'] as $translate_html_exclude__value) {
+            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-2">';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[translate_html_exclude][selector][]" value="' .
+                esc_attr(@$translate_html_exclude__value['selector']) .
+                '" placeholder="selector" />';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[translate_html_exclude][attribute][]" value="' .
+                esc_attr(@$translate_html_exclude__value['attribute']) .
+                '" placeholder="attribute" />';
+            echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
+                __('Remove', 'gtbabel-plugin') .
+                '</a>';
+            echo '</li>';
+        }
+        echo '</ul>';
+        echo '<a href="#" class="gtbabel__repeater-add button button-secondary">' .
+            __('Add', 'gtbabel-plugin') .
+            '</a>';
+        echo '</div>';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_localize_js" class="gtbabel__label">';
+        echo __('Provide strings in JavaScript', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_localize_js" name="gtbabel[localize_js]" value="1"' .
+            ($settings['localize_js'] == '1' ? ' checked="checked"' : '') .
+            ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label class="gtbabel__label">';
+        echo __('Strings in JavaScript', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<div class="gtbabel__repeater">';
+        echo '<ul class="gtbabel__repeater-list">';
+        if (empty(@$settings['localize_js_strings'])) {
+            $settings['localize_js_strings'] = [''];
+        }
+        foreach ($settings['localize_js_strings'] as $localize_js_strings__value) {
+            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-1">';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[localize_js_strings][]" value="' .
+                esc_html($localize_js_strings__value) .
+                '" />';
+            echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
+                __('Remove', 'gtbabel-plugin') .
+                '</a>';
+            echo '</li>';
+        }
+        echo '</ul>';
+        echo '<a href="#" class="gtbabel__repeater-add button button-secondary">' .
+            __('Add', 'gtbabel-plugin') .
+            '</a>';
+        echo '</div>';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_detect_dom_changes" class="gtbabel__label">';
+        echo __('Detect dom changes', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_detect_dom_changes" name="gtbabel[detect_dom_changes]" value="1"' .
+            ($settings['detect_dom_changes'] == '1' ? ' checked="checked"' : '') .
+            ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label class="gtbabel__label">';
+        echo __('Detect dom changes in areas', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<div class="gtbabel__repeater">';
+        echo '<ul class="gtbabel__repeater-list">';
+        if (empty(@$settings['detect_dom_changes_include'])) {
+            $settings['detect_dom_changes_include'] = [''];
+        }
+        foreach ($settings['detect_dom_changes_include'] as $detect_dom_changes_include__value) {
+            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-1">';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[detect_dom_changes_include][]" value="' .
+                esc_attr($detect_dom_changes_include__value) .
+                '" placeholder="selector" />';
+            echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
+                __('Remove', 'gtbabel-plugin') .
+                '</a>';
+            echo '</li>';
+        }
+        echo '</ul>';
+        echo '<a href="#" class="gtbabel__repeater-add button button-secondary">' .
+            __('Add', 'gtbabel-plugin') .
+            '</a>';
+        echo '</div>';
         echo '</div>';
         echo '</li>';
 
@@ -1658,71 +1801,6 @@ class GtbabelWordPress
 
         echo '<li class="gtbabel__field">';
         echo '<label class="gtbabel__label">';
-        echo __('Include dom nodes', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<div class="gtbabel__repeater">';
-        echo '<ul class="gtbabel__repeater-list">';
-        if (empty(@$settings['translate_html_include'])) {
-            $settings['translate_html_include'] = [['selector' => '', 'attribute' => '', 'context' => '']];
-        }
-        foreach ($settings['translate_html_include'] as $translate_html_include__value) {
-            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-3">';
-            echo '<input class="gtbabel__input" type="text" name="gtbabel[translate_html_include][selector][]" value="' .
-                esc_attr($translate_html_include__value['selector']) .
-                '" placeholder="selector" />';
-            echo '<input class="gtbabel__input" type="text" name="gtbabel[translate_html_include][attribute][]" value="' .
-                esc_attr($translate_html_include__value['attribute']) .
-                '" placeholder="attribute" />';
-            echo '<input class="gtbabel__input" type="text" name="gtbabel[translate_html_include][context][]" value="' .
-                esc_attr($translate_html_include__value['context']) .
-                '" placeholder="context" />';
-            echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
-                __('Remove', 'gtbabel-plugin') .
-                '</a>';
-            echo '</li>';
-        }
-        echo '</ul>';
-        echo '<a href="#" class="gtbabel__repeater-add button button-secondary">' .
-            __('Add', 'gtbabel-plugin') .
-            '</a>';
-        echo '</div>';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label class="gtbabel__label">';
-        echo __('Exclude dom nodes', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<div class="gtbabel__repeater">';
-        echo '<ul class="gtbabel__repeater-list">';
-        if (empty(@$settings['translate_html_exclude'])) {
-            $settings['translate_html_exclude'] = [['selector' => '', 'attribute' => '']];
-        }
-        foreach ($settings['translate_html_exclude'] as $translate_html_exclude__value) {
-            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-2">';
-            echo '<input class="gtbabel__input" type="text" name="gtbabel[translate_html_exclude][selector][]" value="' .
-                esc_attr(@$translate_html_exclude__value['selector']) .
-                '" placeholder="selector" />';
-            echo '<input class="gtbabel__input" type="text" name="gtbabel[translate_html_exclude][attribute][]" value="' .
-                esc_attr(@$translate_html_exclude__value['attribute']) .
-                '" placeholder="attribute" />';
-            echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
-                __('Remove', 'gtbabel-plugin') .
-                '</a>';
-            echo '</li>';
-        }
-        echo '</ul>';
-        echo '<a href="#" class="gtbabel__repeater-add button button-secondary">' .
-            __('Add', 'gtbabel-plugin') .
-            '</a>';
-        echo '</div>';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label class="gtbabel__label">';
         echo __('Language specific base urls and prefixes', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
@@ -1759,84 +1837,6 @@ class GtbabelWordPress
                 '" placeholder="' .
                 __('Prefix (leave empty if no prefix)', 'gtbabel-plugin') .
                 '" />';
-            echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
-                __('Remove', 'gtbabel-plugin') .
-                '</a>';
-            echo '</li>';
-        }
-        echo '</ul>';
-        echo '<a href="#" class="gtbabel__repeater-add button button-secondary">' .
-            __('Add', 'gtbabel-plugin') .
-            '</a>';
-        echo '</div>';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_localize_js" class="gtbabel__label">';
-        echo __('Provide strings in JavaScript', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_localize_js" name="gtbabel[localize_js]" value="1"' .
-            ($settings['localize_js'] == '1' ? ' checked="checked"' : '') .
-            ' />';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label class="gtbabel__label">';
-        echo __('Strings in JavaScript', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<div class="gtbabel__repeater">';
-        echo '<ul class="gtbabel__repeater-list">';
-        if (empty(@$settings['localize_js_strings'])) {
-            $settings['localize_js_strings'] = [''];
-        }
-        foreach ($settings['localize_js_strings'] as $localize_js_strings__value) {
-            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-1">';
-            echo '<input class="gtbabel__input" type="text" name="gtbabel[localize_js_strings][]" value="' .
-                esc_html($localize_js_strings__value) .
-                '" />';
-            echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
-                __('Remove', 'gtbabel-plugin') .
-                '</a>';
-            echo '</li>';
-        }
-        echo '</ul>';
-        echo '<a href="#" class="gtbabel__repeater-add button button-secondary">' .
-            __('Add', 'gtbabel-plugin') .
-            '</a>';
-        echo '</div>';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_detect_dom_changes" class="gtbabel__label">';
-        echo __('Detect dom changes', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_detect_dom_changes" name="gtbabel[detect_dom_changes]" value="1"' .
-            ($settings['detect_dom_changes'] == '1' ? ' checked="checked"' : '') .
-            ' />';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label class="gtbabel__label">';
-        echo __('Detect dom changes in areas', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<div class="gtbabel__repeater">';
-        echo '<ul class="gtbabel__repeater-list">';
-        if (empty(@$settings['detect_dom_changes_include'])) {
-            $settings['detect_dom_changes_include'] = [''];
-        }
-        foreach ($settings['detect_dom_changes_include'] as $detect_dom_changes_include__value) {
-            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-1">';
-            echo '<input class="gtbabel__input" type="text" name="gtbabel[detect_dom_changes_include][]" value="' .
-                esc_attr($detect_dom_changes_include__value) .
-                '" placeholder="selector" />';
             echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
                 __('Remove', 'gtbabel-plugin') .
                 '</a>';

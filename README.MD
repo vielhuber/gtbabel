@@ -1024,51 +1024,6 @@ The default configuration is:
     'redirect_root_domain' => 'browser',
     'basic_auth' => null, // provide basic auth (in the format "username:password") if you use Gtbabel in a password protected environment
     'translate_html' => true,
-    'translate_xml' => true,
-    'translate_xml_include' => [
-        [
-            'selector' => '//*[name()=\'loc\']',
-            'attribute' => null,
-            'context' => 'slug'
-        ]
-    ],
-    'translate_json' => true,
-    'translate_json_include' => [
-        '/path/in/source/lng/to/specific/page' => ['key'],
-        'wp-json/v1/*/endpoint' => ['key', 'nested.key', 'key.with.*.wildcard']
-    ],
-    'translate_wp_localize_script' => true,
-    'translate_wp_localize_script_include' => ['wc_*.locale.*', 'wc_*.i18n_*', 'wc_*.cart_url'],
-    'html_lang_attribute' => true,
-    'html_hreflang_tags' => true,
-    'xml_hreflang_tags' => true,
-    'debug_translations' => false, // surround outputted translations with "%|%" to see borders
-    'auto_add_translations' => true,
-    'auto_set_new_strings_checked' => false,
-    'auto_set_discovered_strings_checked' => false,
-    'only_show_checked_strings' => false,
-    'auto_translation' => true,
-    'auto_translation_service' => 'google', // google|microsoft|deepl
-    'google_translation_api_key' => [], // use a string or array of strings to provide multiple keys at once
-    'microsoft_translation_api_key' => [], // use a string or array of strings to provide multiple keys at once
-    'deepl_translation_api_key' => [], // use a string or array of strings to provide multiple keys at once
-    'google_throttle_chars_per_month' => 1000000,
-    'microsoft_throttle_chars_per_month' => 1000000,
-    'deepl_throttle_chars_per_month' => 1000000,
-    'discovery_log' => false,
-    'prevent_publish' => true,
-    'prevent_publish_urls' => [
-        '/path/in/source/lng/to/specific/page' => ['en', 'fr'],
-        '/slug1/*' => ['en'], // you can also use wildcards here
-        '/slug1/*/slug2' => ['fr']
-        //'/*' => ['en', 'fr'] // disable whole languages
-    ],
-    'alt_lng_urls' => [
-        '/path/in/source/lng/to/specific/page' => 'en'
-    ],
-    'exclude_urls_content' => ['backend'],
-    'exclude_urls_slugs' => ['api/v1.0'],
-    'force_tokenize' => ['.force-tokenize'],
     'translate_html_include' => [
         [
             'selector' => '/html/body//text()',
@@ -1172,7 +1127,52 @@ The default configuration is:
     'localize_js' => true,
     'localize_js_strings' => ['Schließen', '/blog'],
     'detect_dom_changes' => true,
-    'detect_dom_changes_include' => ['.top-button', '.swal-overlay', '.wpcf7-response-output', '.wpcf7-not-valid-tip']
+    'detect_dom_changes_include' => ['.top-button', '.swal-overlay', '.wpcf7-response-output', '.wpcf7-not-valid-tip'],
+    'translate_xml' => true,
+    'translate_xml_include' => [
+        [
+            'selector' => '//*[name()=\'loc\']',
+            'attribute' => null,
+            'context' => 'slug'
+        ]
+    ],
+    'translate_json' => true,
+    'translate_json_include' => [
+        '/path/in/source/lng/to/specific/page' => ['key'],
+        'wp-json/v1/*/endpoint' => ['key', 'nested.key', 'key.with.*.wildcard']
+    ],
+    'translate_wp_localize_script' => true,
+    'translate_wp_localize_script_include' => ['wc_*.locale.*', 'wc_*.i18n_*', 'wc_*.cart_url'],
+    'html_lang_attribute' => true,
+    'html_hreflang_tags' => true,
+    'xml_hreflang_tags' => true,
+    'debug_translations' => false, // surround outputted translations with "%|%" to see borders
+    'auto_add_translations' => true,
+    'auto_set_new_strings_checked' => false,
+    'auto_set_discovered_strings_checked' => false,
+    'only_show_checked_strings' => false,
+    'auto_translation' => true,
+    'auto_translation_service' => 'google', // google|microsoft|deepl
+    'google_translation_api_key' => [], // use a string or array of strings to provide multiple keys at once
+    'microsoft_translation_api_key' => [], // use a string or array of strings to provide multiple keys at once
+    'deepl_translation_api_key' => [], // use a string or array of strings to provide multiple keys at once
+    'google_throttle_chars_per_month' => 1000000,
+    'microsoft_throttle_chars_per_month' => 1000000,
+    'deepl_throttle_chars_per_month' => 1000000,
+    'discovery_log' => false,
+    'prevent_publish' => true,
+    'prevent_publish_urls' => [
+        '/path/in/source/lng/to/specific/page' => ['en', 'fr'],
+        '/slug1/*' => ['en'], // you can also use wildcards here
+        '/slug1/*/slug2' => ['fr']
+        //'/*' => ['en', 'fr'] // disable whole languages
+    ],
+    'alt_lng_urls' => [
+        '/path/in/source/lng/to/specific/page' => 'en'
+    ],
+    'exclude_urls_content' => ['backend'],
+    'exclude_urls_slugs' => ['api/v1.0'],
+    'force_tokenize' => ['.force-tokenize']
 ];
 ```
 

@@ -67,6 +67,24 @@ class Settings
             'redirect_root_domain' => 'browser',
             'basic_auth' => null,
             'translate_html' => true,
+            'translate_html_include' => $this->getDefaultTranslateHtmlInclude(),
+            'translate_html_exclude' => [
+                ['selector' => '.notranslate'],
+                ['selector' => '[data-context]', 'attribute' => 'data-context'],
+                ['selector' => '.lngpicker'],
+                ['selector' => '.xdebug-error'],
+                ['selector' => '.example1', 'attribute' => 'data-text'],
+                ['selector' => '.example2', 'attribute' => 'data-*']
+            ],
+            'localize_js' => true,
+            'localize_js_strings' => ['Schließen', '/blog'],
+            'detect_dom_changes' => true,
+            'detect_dom_changes_include' => [
+                '.top-button',
+                '.swal-overlay',
+                '.wpcf7-response-output',
+                '.wpcf7-not-valid-tip'
+            ],
             'translate_xml' => true,
             'translate_xml_include' => [
                 [
@@ -110,25 +128,7 @@ class Settings
             ],
             'exclude_urls_content' => ['backend'],
             'exclude_urls_slugs' => ['api/v1.0'],
-            'force_tokenize' => ['.force-tokenize'],
-            'translate_html_include' => $this->getDefaultTranslateHtmlInclude(),
-            'translate_html_exclude' => [
-                ['selector' => '.notranslate'],
-                ['selector' => '[data-context]', 'attribute' => 'data-context'],
-                ['selector' => '.lngpicker'],
-                ['selector' => '.xdebug-error'],
-                ['selector' => '.example1', 'attribute' => 'data-text'],
-                ['selector' => '.example2', 'attribute' => 'data-*']
-            ],
-            'localize_js' => true,
-            'localize_js_strings' => ['Schließen', '/blog'],
-            'detect_dom_changes' => true,
-            'detect_dom_changes_include' => [
-                '.top-button',
-                '.swal-overlay',
-                '.wpcf7-response-output',
-                '.wpcf7-not-valid-tip'
-            ]
+            'force_tokenize' => ['.force-tokenize']
         ];
         if (!empty($args)) {
             foreach ($args as $args__key => $args__value) {
