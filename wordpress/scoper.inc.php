@@ -35,6 +35,7 @@ $functions = [
         'WP_PLUGIN_DIR',
         'url_to_postid',
         'get_home_url',
+        'get_file_data',
         '__',
         '_admin_notice_multisite_activate_plugins_page',
         '_e',

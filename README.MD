@@ -1682,22 +1682,14 @@ Nevertheless, one has to manually take care of how multilingual input data shoul
 
 ### Search
 
-If you need to translate queries to your source language (for example in searches), just do this:
+If you need to translate queries to your source language (for example in searches),\
+translate the search term into the source language before actually querying your content:
 
 ```php
 $s = gtbabel__($s, gtbabel_source_lng(), gtbabel_current_lng());
 ```
 
-In WordPress for example, you can modify the search query like this:
-
-```php
-add_action('pre_get_posts', function ($query) {
-    if (!$query->is_main_query() || is_admin() || !is_search()) {
-        return;
-    }
-    $query->set('s', gtbabel__($query->get('s'), gtbabel_source_lng(), gtbabel_current_lng()));
-});
-```
+In WordPress this is done automatically for you.
 
 ### Contact forms
 

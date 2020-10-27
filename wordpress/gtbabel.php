@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 4.9.8
+ * Version: 4.9.9
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -40,6 +40,7 @@ class GtbabelWordPress
         $this->initUpdateCapabilities();
         $this->filterSpecificUrls();
         $this->autoTranslateContactForm7Mails();
+        $this->autoTranslateSearch();
         $this->startHook();
         $this->stopHook();
     }
@@ -62,7 +63,7 @@ class GtbabelWordPress
 
     private function filterSpecificUrls()
     {
-        foreach (['rest_url', 'woocommerce_get_return_url'] as $names__value) {
+        foreach (['rest_url', 'woocommerce_get_return_url', 'comment_post_redirect'] as $names__value) {
             add_filter(
                 $names__value,
                 function ($url) {
@@ -109,6 +110,23 @@ class GtbabelWordPress
             },
             99999
         );
+    }
+
+    private function autoTranslateSearch()
+    {
+        add_action('pre_get_posts', function ($query) {
+            if (!$query->is_main_query() || is_admin() || !is_search()) {
+                return;
+            }
+            $query->set(
+                's',
+                $this->gtbabel->translate(
+                    $query->get('s'),
+                    $this->gtbabel->settings->getSourceLanguageCode(),
+                    $this->gtbabel->data->getCurrentLanguageCode()
+                )
+            );
+        });
     }
 
     private function disableAutoRedirect()
@@ -3746,7 +3764,8 @@ EOD;
                         ['selector' => '[data-context]', 'attribute' => 'data-context'],
                         ['selector' => '.lngpicker'],
                         ['selector' => '.xdebug-error'],
-                        ['selector' => '#wpadminbar']
+                        ['selector' => '#wpadminbar'],
+                        ['selector' => '#comments .comment-content']
                     ]
                 ])
             );

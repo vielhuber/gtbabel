@@ -258,7 +258,11 @@ class Host
 
     function getBaseUrlForLanguageCode($lng)
     {
-        $url_base = @$this->settings->getLanguageDataForCode($lng)['url_base'];
+        $url_base = '';
+        $data = $this->settings->getLanguageDataForCode($lng);
+        if ($data !== null && array_key_exists('url_base', $data)) {
+            $url_base = $data['url_base'];
+        }
         if ($url_base == '') {
             return $this->getCurrentHost();
         }

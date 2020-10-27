@@ -909,10 +909,17 @@ class Data
 
     function getCurrentLanguageCode()
     {
+        // hard set
         if ($this->settings->get('lng_target') !== null) {
             return $this->settings->get('lng_target');
         }
 
+        // if is static file (and nothing is redirected to prefix), determine from referer
+        if ($this->host->currentUrlIsStaticFile()) {
+            return $this->host->getRefererLanguageCode();
+        }
+
+        // dynamically determine from url
         return $this->host->getLanguageCodeFromUrl($this->host->getCurrentUrl());
     }
 
