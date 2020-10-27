@@ -110,6 +110,20 @@ class Settings
             'alt_lng_urls' => [
                 '/path/in/source/lng/to/specific/page' => 'en'
             ],
+            'url_query_args' => [
+                [
+                    'type' => 'keep',
+                    'selector' => '*'
+                ],
+                [
+                    'type' => 'translate',
+                    'selector' => 's'
+                ],
+                [
+                    'type' => 'discard',
+                    'selector' => 'nonce'
+                ]
+            ],
             'exclude_urls_content' => ['backend'],
             'exclude_urls_slugs' => ['api/v1.0'],
             'html_lang_attribute' => true,

@@ -1824,6 +1824,20 @@ EOD;
             'auto_set_new_strings_checked' => false,
             'auto_set_discovered_strings_checked' => false,
             'only_show_checked_strings' => false,
+            'url_query_args' => [
+                [
+                    'type' => 'keep',
+                    'selector' => '*'
+                ],
+                [
+                    'type' => 'translate',
+                    'selector' => 's'
+                ],
+                [
+                    'type' => 'discard',
+                    'selector' => 'nonce'
+                ]
+            ],
             'exclude_urls_content' => null,
             'exclude_urls_slugs' => null,
             'html_lang_attribute' => false,

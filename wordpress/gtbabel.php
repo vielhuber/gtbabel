@@ -780,6 +780,7 @@ class GtbabelWordPress
                             'translate_wp_localize_script',
                             'translate_wp_localize_script_include',
                             'prevent_publish_urls',
+                            'url_query_args',
                             'alt_lng_urls',
                             'exclude_urls_content',
                             'exclude_urls_slugs',
@@ -922,6 +923,23 @@ class GtbabelWordPress
                                 'selector' => $post_data['selector'][$post_data__key],
                                 'attribute' => $post_data['attribute'][$post_data__key],
                                 'context' => $post_data['context'][$post_data__key]
+                            ];
+                        }
+                    }
+
+                    $post_data = $settings['url_query_args'];
+                    $settings['url_query_args'] = [];
+                    if (!empty(@$post_data['type'])) {
+                        foreach ($post_data['type'] as $post_data__key => $post_data__value) {
+                            if (
+                                @$post_data['type'][$post_data__key] == '' &&
+                                @$post_data['selector'][$post_data__key] == ''
+                            ) {
+                                continue;
+                            }
+                            $settings['url_query_args'][] = [
+                                'type' => $post_data['type'][$post_data__key],
+                                'selector' => $post_data['selector'][$post_data__key]
                             ];
                         }
                     }
@@ -1760,6 +1778,37 @@ class GtbabelWordPress
             echo '<input class="gtbabel__input" type="text" name="gtbabel[alt_lng_urls][lng][]" value="' .
                 $alt_lng_urls__value .
                 '" />';
+            echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
+                __('Remove', 'gtbabel-plugin') .
+                '</a>';
+            echo '</li>';
+        }
+        echo '</ul>';
+        echo '<a href="#" class="gtbabel__repeater-add button button-secondary">' .
+            __('Add', 'gtbabel-plugin') .
+            '</a>';
+        echo '</div>';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label class="gtbabel__label">';
+        echo __('URL query arguments', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<div class="gtbabel__repeater">';
+        echo '<ul class="gtbabel__repeater-list">';
+        if (empty(@$settings['url_query_args'])) {
+            $settings['url_query_args'] = [['type' => '', 'selector' => '']];
+        }
+        foreach ($settings['url_query_args'] as $url_query_args__value) {
+            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-2">';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[url_query_args][type][]" value="' .
+                esc_attr($url_query_args__value['type']) .
+                '" placeholder="type" />';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[url_query_args][selector][]" value="' .
+                esc_attr($url_query_args__value['selector']) .
+                '" placeholder="selector" />';
             echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
                 __('Remove', 'gtbabel-plugin') .
                 '</a>';

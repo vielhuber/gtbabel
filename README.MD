@@ -1154,6 +1154,20 @@ The default configuration is:
     'alt_lng_urls' => [
         '/path/in/source/lng/to/specific/page' => 'en'
     ],
+    'url_query_args' => [
+        [
+            'type' => 'keep',
+            'selector' => '*'
+        ],
+        [
+            'type' => 'translate',
+            'selector' => 's'
+        ],
+        [
+            'type' => 'discard',
+            'selector' => 'nonce'
+        ]
+    ],
     'exclude_urls_content' => ['backend'],
     'exclude_urls_slugs' => ['api/v1.0'],
     'html_lang_attribute' => true,
@@ -1690,6 +1704,20 @@ $s = gtbabel__($s, gtbabel_source_lng(), gtbabel_current_lng());
 ```
 
 In WordPress this is done automatically for you.
+
+### URL query arguments
+
+As for url query arguments, you have fine grained control over whether arguments should be kept, translated or discarded via the `url_query_args`-option.
+
+Be aware: If you set a key to `translate`, external content potentially gets automatically translated.
+
+Note that query arguments for email links get automatically translated:
+
+`<a href="mailto:?subject=Dies%20ist%20ein%20Test&amp;body=Das%20funktioniert">E-Mail senden</a>`
+
+gets transformed to
+
+`<a href="mailto:?subject=This%20is%20a%20test&amp;body=That%20work%27s">Send email</a>`
 
 ### Contact forms
 
