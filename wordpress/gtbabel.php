@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 4.9.7
+ * Version: 4.9.8
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -243,12 +243,20 @@ class GtbabelWordPress
         if (!defined('ICL_LANGUAGE_CODE')) {
             define('ICL_LANGUAGE_CODE', $this->gtbabel->data->getCurrentLanguageCode());
         }
+
+        // run update migrations
+        $this->runUpdateMigrations();
     }
 
     private function isFrontend()
     {
         global $pagenow;
-        return !is_admin() && $pagenow != 'wp-login.php';
+        return !is_admin() && $pagenow != 'wp-login.php' && $pagenow != 'wp-register.php';
+    }
+
+    private function isBackend()
+    {
+        return !$this->isFrontend();
     }
 
     private function reset()
@@ -262,6 +270,38 @@ class GtbabelWordPress
             $this->setupPluginFileStoreFolder();
             $this->setDefaultSettingsToOption();
         });
+    }
+
+    private function runUpdateMigrations()
+    {
+        if ($this->isFrontend()) {
+            return;
+        }
+        $version_prev = get_option('gtbabel_plugin_version');
+        $version_next = get_file_data(__FILE__, ['Version' => 'Version'], false)['Version'];
+        if ($version_prev === false || $version_prev === null || $version_prev === '') {
+            $version_prev = $version_next;
+        }
+        // debug
+        //$version_prev = '4.9.5';
+        if ($version_next === $version_prev) {
+            return;
+        }
+        $migrations = [
+            '1.0.0' => function () {
+                $this->gtbabel->log->generalLog('running update 1.0.0...');
+                $this->renameSetting('example1', 'example2');
+            }
+        ];
+        foreach ($migrations as $migrations__key => $migrations__value) {
+            if (
+                intval(str_replace('.', '', $migrations__key)) > intval(str_replace('.', '', $version_prev)) &&
+                intval(str_replace('.', '', $migrations__key)) <= intval(str_replace('.', '', $version_next))
+            ) {
+                $migrations__value();
+            }
+        }
+        update_option('gtbabel_plugin_version', $version_next);
     }
 
     private function localizePlugin()
@@ -3617,6 +3657,22 @@ EOD;
         $this->saveSettings($settings);
     }
 
+    private function unsetSetting($key)
+    {
+        $settings = $this->getSettings();
+        if (array_key_exists($key, $settings)) {
+            unset($settings[$key]);
+        }
+        $this->saveSettings($settings);
+    }
+
+    private function renameSetting($key_old, $key_new)
+    {
+        $value = $this->getSetting($key_old);
+        $this->saveSetting($key_new, $value);
+        $this->unsetSetting($key_old);
+    }
+
     private function deleteSettings()
     {
         @unlink($this->getSettingsFilename());
@@ -3680,6 +3736,7 @@ EOD;
                         'wp-admin',
                         'feed',
                         'wp-login.php',
+                        'wp-register.php',
                         'wp-cron.php',
                         'wp-comments-post.php'
                     ],
