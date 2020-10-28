@@ -954,6 +954,99 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->gtbabel->reset();
     }
 
+    public function test_url_query_args()
+    {
+        $settings = $this->getDefaultSettings();
+        $settings['languages'] = $this->getLanguageSettings([['code' => 'de'], ['code' => 'en']]);
+        $settings['lng_source'] = 'de';
+        $settings['lng_target'] = 'en';
+        $settings['debug_translations'] = false;
+        $settings['auto_translation'] = true;
+        $settings['auto_add_translations'] = true;
+        $settings['only_show_checked_strings'] = false;
+        $settings['url_query_args'] = [
+            [
+                'type' => 'keep',
+                'selector' => '*'
+            ],
+            [
+                'type' => 'translate',
+                'selector' => 'foo'
+            ],
+            [
+                'type' => 'discard',
+                'selector' => 'bar'
+            ]
+        ];
+
+        $html_in = '';
+        $html_in .=
+            '<a href="/suche?foo=' .
+            urlencode('Coole Sache') .
+            '&amp;bar=' .
+            urlencode('Das funktioniert') .
+            '&amp;baz=' .
+            urlencode('Richtig gut') .
+            '">hier</a>';
+        $html_in .=
+            '<p>http://gtbabel.local.vielhuber.de/suche?foo=' .
+            urlencode('Coole Sache') .
+            '&bar=' .
+            urlencode('Das funktioniert') .
+            '&baz=' .
+            urlencode('Richtig gut') .
+            '</p>';
+        $html_in .=
+            '<a href="/suche?foo=' .
+            urlencode('Coole Sache') .
+            '&amp;bar=' .
+            urlencode('Das funktioniert') .
+            '&amp;baz=' .
+            urlencode('Richtig gut') .
+            '#some-hash-after">hier</a>';
+
+        $html_out = '';
+        $html_out .=
+            '<a href="/en/search?foo=' .
+            urlencode('Cool thing') .
+            '&amp;baz=' .
+            urlencode('Richtig gut') .
+            '">here</a>';
+        $html_out .=
+            '<p>http://gtbabel.local.vielhuber.de/en/search?foo=' .
+            urlencode('Cool thing') .
+            '&amp;baz=' .
+            urlencode('Richtig gut') .
+            '</p>';
+        $html_out .=
+            '<a href="/en/search?foo=' .
+            urlencode('Cool thing') .
+            '&amp;baz=' .
+            urlencode('Richtig gut') .
+            '#some-hash-after">here</a>';
+
+        ob_start();
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
+        echo $html_in;
+        $this->gtbabel->stop();
+        $output = ob_get_contents();
+        ob_end_clean();
+
+        $this->assertEquals($output, $html_out);
+
+        $translations = $this->gtbabel->data->getTranslationsFromDatabase();
+        $this->assertEquals(count($translations), 3);
+        $this->assertEquals($translations[0]['str'], 'hier');
+        $this->assertEquals($translations[0]['trans'], 'here');
+        $this->assertEquals($translations[1]['str'], 'Coole Sache');
+        $this->assertEquals($translations[1]['trans'], 'Cool thing');
+        $this->assertEquals($translations[2]['str'], 'suche');
+        $this->assertEquals($translations[2]['trans'], 'search');
+
+        $this->gtbabel->reset();
+    }
+
     public function test_multiple_sources()
     {
         $settings = $this->getDefaultSettings();

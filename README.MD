@@ -1689,7 +1689,7 @@ The function is smart enough to detect urls or even root relative urls and retur
 gtbabel__('/datenschutz'); // '/en/data-protection'
 ```
 
-## Dealing with form data
+## Dealing with dynamic data
 
 Gtbabel translates your frontend, json responses and watches dom changes.\
 Nevertheless, one has to manually take care of how multilingual input data should be further processed.
@@ -1710,6 +1710,8 @@ In WordPress this is done automatically for you.
 As for url query arguments, you have fine grained control over whether arguments should be kept, translated or discarded via the `url_query_args`-option.
 
 Be aware: If you set a key to `translate`, external content potentially gets automatically translated.
+
+Furthermore url hashes (beginning with `#`) are always kept.
 
 Note that query arguments for email links get automatically translated:
 

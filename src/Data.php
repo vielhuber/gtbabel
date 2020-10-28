@@ -1135,11 +1135,64 @@ class Data
 
         if ($translate === true) {
             if (!$this->host->slugTranslationIsDisabledForUrl($link)) {
-                // preserve (and don't translate args)
+                // handle url args
+                $link_rules = $this->settings->get('url_query_args');
+                if ($link_rules === null || empty($link_rules)) {
+                    $link_rules = ['type' => 'keep', 'selector' => '*'];
+                }
                 $link_arguments = [];
-                foreach (['?', '#'] as $delimiter__value) {
+                foreach (['#', '?'] as $delimiter__value) {
                     if (mb_strpos($link, $delimiter__value) !== false) {
-                        $link_arguments[$delimiter__value] = mb_substr($link, mb_strpos($link, $delimiter__value));
+                        $link_arguments_before = mb_substr($link, mb_strpos($link, $delimiter__value));
+                        $link_arguments_after = $link_arguments_before;
+                        if ($delimiter__value === '?') {
+                            $link_arguments_query = [];
+                            $link_arguments_parts = parse_url($link_arguments_before);
+                            parse_str(html_entity_decode($link_arguments_parts['query']), $link_arguments_query);
+                            foreach (
+                                $link_arguments_query
+                                as $link_arguments_query__key => $link_arguments_query__value
+                            ) {
+                                $should_keep = true;
+                                $should_translate = false;
+                                $should_discard = false;
+                                foreach ($link_rules as $link_rules__value) {
+                                    if (
+                                        $link_rules__value['selector'] === '*' ||
+                                        $link_rules__value['selector'] === $link_arguments_query__key
+                                    ) {
+                                        ${'should_' . $link_rules__value['type']} = true;
+                                    }
+                                }
+                                if ($should_keep === false || $should_discard === true) {
+                                    unset($link_arguments_query[$link_arguments_query__key]);
+                                    continue;
+                                }
+                                if ($should_translate === true) {
+                                    if (
+                                        $this->stringShouldNotBeTranslated(
+                                            $link_arguments_query[$link_arguments_query__key],
+                                            null
+                                        )
+                                    ) {
+                                        continue;
+                                    }
+                                    $link_arguments_query[
+                                        $link_arguments_query__key
+                                    ] = $this->getTranslationAndAddDynamicallyIfNeeded(
+                                        $link_arguments_query[$link_arguments_query__key],
+                                        $lng_source,
+                                        $lng_target,
+                                        null
+                                    );
+                                }
+                            }
+                            $link_arguments_after = '?' . http_build_query($link_arguments_query, '', '&');
+                        }
+                        $link_arguments[$delimiter__value] = [
+                            'before' => $link_arguments_before,
+                            'after' => $link_arguments_after
+                        ];
                         $link = mb_substr($link, 0, mb_strpos($link, $delimiter__value));
                     }
                 }
@@ -1156,8 +1209,10 @@ class Data
                     );
                 }
                 $link = implode('/', $url_parts);
-                foreach ($link_arguments as $link_arguments__value) {
-                    $link .= $link_arguments__value;
+                foreach (['?', '#'] as $delimiter__value) {
+                    if (array_key_exists($delimiter__value, $link_arguments)) {
+                        $link .= $link_arguments[$delimiter__value]['after'];
+                    }
                 }
             }
         }
