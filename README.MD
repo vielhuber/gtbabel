@@ -1737,9 +1737,10 @@ If you offer a comment function on your website, just save the incoming comments
 
 ## Language codes
 
-It is recommended to use iso language codes in lowercase. But you can use any language code you want (even i-klingon).\
+It is recommended to use iso language codes in lowercase.\
+But you can use any language code you want (even [i-klingon](https://en.wikipedia.org/wiki/Klingon_language)).\
 For every language, you should provide language codes that are used for auto translation. If a language is not supported in your translation service, use `null`.\
-Country codes (like "BR" in "pt_BR") should be used in the (unique) `code`-attribute with a dash: `pt-br`.\
+Country/region codes (like "BR" in "pt_BR") should be used in the (unique) `code`-attribute with a dash: `pt-br`. Gtbabel by default does not distinct between English (British) and English (American), however you can simply add a new language or instruct Gtbabel to use a specific language code (e.g. for automatic translation).\
 Hreflang codes must be in [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes), so some languages don't have an official hreflang code in the settings array.
 
 ## Google Translation API

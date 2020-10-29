@@ -63,7 +63,7 @@ class GtbabelWordPress
 
     private function filterSpecificUrls()
     {
-        foreach (['rest_url', 'woocommerce_get_return_url', 'comment_post_redirect'] as $names__value) {
+        foreach (['rest_url', 'wp_redirect'] as $names__value) {
             add_filter(
                 $names__value,
                 function ($url) {
@@ -3796,7 +3796,7 @@ EOD;
                     'lng_source' => $lng_source,
                     'log_folder' => $this->getPluginFileStorePathRelative() . '/logs',
                     'translate_json_include' => [
-                        '?wc-ajax=*' => ['fragments.*', 'messages'] // woocommerce
+                        '?wc-ajax=*' => ['fragments.*', 'messages', 'redirect'] // woocommerce
                     ],
                     'translate_wp_localize_script_include' => ['wc_*.locale.*', 'wc_*.i18n_*', 'wc_*.cart_url'], // woocommerce
                     'exclude_urls_content' => [
