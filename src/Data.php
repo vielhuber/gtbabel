@@ -960,11 +960,11 @@ class Data
         return $data;
     }
 
-    function getLanguagePickerHtml($with_args = true, $cur_url = null, $hide_active = false)
+    function getLanguagePickerHtml($with_args = true, $cur_url = null, $hide_active = false, $class = 'lngpicker')
     {
         $data = $this->getLanguagePickerData($with_args, $cur_url, $hide_active);
         $html = '';
-        $html .= '<ul class="lngpicker">';
+        $html .= '<ul class="' . $class . '">';
         foreach ($data as $data__value) {
             $html .= '<li>';
             $html .= '<a href="' . $data__value['url'] . '"' . ($data__value['active'] ? ' class="active"' : '') . '>';
@@ -1239,6 +1239,13 @@ class Data
             preg_match_all('/url\((.+?)\)/', $orig, $matches);
             foreach ($matches[1] as $matches__value) {
                 $urls[] = trim(trim(trim(trim($matches__value), '\''), '"'));
+            }
+        }
+        // extract urls from srcset
+        elseif (strpos($orig, ',') !== false) {
+            $urls = explode(',', $orig);
+            foreach ($urls as $urls__key => $urls__value) {
+                $urls[$urls__key] = trim(explode(' ', trim($urls__value))[0]);
             }
         } else {
             $urls[] = $orig;

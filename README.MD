@@ -1091,6 +1091,11 @@ The default configuration is:
             'context' => 'file'
         ],
         [
+            'selector' => '/html/body//img[@srcset]',
+            'attribute' => 'srcset',
+            'context' => 'file'
+        ],
+        [
             'selector' => '/html/body//*[contains(@style, "url(")]',
             'attribute' => 'style',
             'context' => 'file'
@@ -1308,6 +1313,7 @@ By default Gtbabel translates all text and tag nodes with the following reasonab
 | `head meta[name="description"]` | ✗    | `content`        | `'description'`  |
 | `head link[rel="canonical"]`    | ✗    | `href`           | `'slug'`         |
 | `body img`                      | ✗    | `src`            | `'file'`         |
+| `body img`                      | ✗    | `srcset`         | `'file'`         |
 | `body *`                        | ✗    | `style`          | `'file'`         |
 | `body *`                        | ✗    | `label`          | `auto`           |
 | `body *`                        | ✗    | `*text*`         | `auto`           |

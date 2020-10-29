@@ -89,6 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
             image_frame.on('close', () => {
                 let url = null,
                     selection = image_frame.state().get('selection'),
+                    preview = el.closest('.gtbabel__table-cell').querySelector('.gtbabel__file-info-img'),
                     textarea = el.closest('.gtbabel__table-cell').querySelector('.gtbabel__input--textarea');
                 if (selection.length > 0) {
                     selection.forEach(attachment => {
@@ -96,6 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
                 if (url !== null) {
+                    preview.setAttribute('src', url);
                     url = url.replace(window.location.protocol + '//' + window.location.host, '');
                     url = url.replace(/^\/+|\/+$/g, '');
                     textarea.value = url;

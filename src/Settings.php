@@ -239,6 +239,11 @@ class Settings
                 'context' => 'file'
             ],
             [
+                'selector' => '/html/body//img[@srcset]',
+                'attribute' => 'srcset',
+                'context' => 'file'
+            ],
+            [
                 'selector' => '/html/body//*[contains(@style, "url(")]',
                 'attribute' => 'style',
                 'context' => 'file'

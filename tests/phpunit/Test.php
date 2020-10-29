@@ -1305,6 +1305,12 @@ class Test extends \PHPUnit\Framework\TestCase
 <img src="http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei6.jpg" alt="" />
 <img src="/beispiel-bilddatei7.jpg" alt="" />
 <img src="beispiel-bilddatei8.jpg" alt="" />
+<img srcset="http://gtbabel.local.vielhuber.de/320x100.png?text=small,
+             http://gtbabel.local.vielhuber.de/600x100.png?text=medium 600w,
+             http://gtbabel.local.vielhuber.de/900x100.png?text=large 2x"
+    src="http://gtbabel.local.vielhuber.de/900x200.png?text=fallback"
+    alt=""
+/>
 <a href="mailto:"></a>
 <a href="mailto:david@vielhuber.de"></a>
 <a href="mailto:david@vielhuber.de?subject=Haus&amp;body=Dies%20ist%20ein%20Test"></a>
@@ -1340,6 +1346,7 @@ EOD;
 <img src="http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei6_EN.jpg" alt="">
 <img src="/beispiel-bilddatei7_EN.jpg" alt="">
 <img src="beispiel-bilddatei8_EN.jpg" alt="">
+<img srcset="http://gtbabel.local.vielhuber.de/320x100_EN.png?text=small, http://gtbabel.local.vielhuber.de/600x100_EN.png?text=medium 600w, http://gtbabel.local.vielhuber.de/900x100_EN.png?text=large 2x" src="http://gtbabel.local.vielhuber.de/900x200_EN.png?text=fallback" alt="" />
 <a href="mailto:"></a>
 <a href="mailto:david@vielhuber.de_EN"></a>
 <a href="mailto:david@vielhuber.de_EN?subject=House&amp;body=This%20is%20a%20test"></a>
@@ -1375,6 +1382,10 @@ EOD;
             ['datenschutz/beispiel-bilddatei6.jpg', 'file', 'de', 'en', 'datenschutz/beispiel-bilddatei6_EN.jpg', 1],
             ['beispiel-bilddatei7.jpg', 'file', 'de', 'en', 'beispiel-bilddatei7_EN.jpg', 1],
             ['beispiel-bilddatei8.jpg', 'file', 'de', 'en', 'beispiel-bilddatei8_EN.jpg', 1],
+            ['320x100.png?text=small', 'file', 'de', 'en', '320x100_EN.png?text=small', 1],
+            ['600x100.png?text=medium', 'file', 'de', 'en', '600x100_EN.png?text=medium', 1],
+            ['900x100.png?text=large', 'file', 'de', 'en', '900x100_EN.png?text=large', 1],
+            ['900x200.png?text=fallback', 'file', 'de', 'en', '900x200_EN.png?text=fallback', 1],
             ['david@vielhuber.de', 'email', 'de', 'en', 'david@vielhuber.de_EN', 1],
             ['Haus', null, 'de', 'en', 'House', 0],
             ['Dies ist ein Test', null, 'de', 'en', 'This is a test', 0],
@@ -1446,6 +1457,38 @@ EOD;
             'de',
             'en',
             'beispiel-bilddatei8_EN.jpg',
+            true
+        );
+        $this->gtbabel->data->editTranslation(
+            '320x100.png?text=small',
+            'file',
+            'de',
+            'en',
+            '320x100_EN.png?text=small',
+            true
+        );
+        $this->gtbabel->data->editTranslation(
+            '600x100.png?text=medium',
+            'file',
+            'de',
+            'en',
+            '600x100_EN.png?text=medium',
+            true
+        );
+        $this->gtbabel->data->editTranslation(
+            '900x100.png?text=large',
+            'file',
+            'de',
+            'en',
+            '900x100_EN.png?text=large',
+            true
+        );
+        $this->gtbabel->data->editTranslation(
+            '900x200.png?text=fallback',
+            'file',
+            'de',
+            'en',
+            '900x200_EN.png?text=fallback',
             true
         );
         $this->gtbabel->data->editTranslation('david@vielhuber.de', 'email', 'de', 'en', 'david@vielhuber.de_EN', true);

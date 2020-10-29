@@ -696,6 +696,17 @@ class Dom
         $node->parentNode->replaceChild($repl, $node);
     }
 
+    function addClass($node, $new_class)
+    {
+        $class = $node->getAttribute('class');
+        if ($class == '') {
+            $class = $new_class;
+        } else {
+            $class .= ' ' . $new_class;
+        }
+        $node->setAttribute('class', $class);
+    }
+
     function insertAfter($node, $newNode)
     {
         if ($node->nextSibling === null) {
@@ -1138,10 +1149,12 @@ class Dom
         if (count($nodes) > 0) {
             foreach ($nodes as $nodes__value) {
                 $nodes__value->setAttribute('onclick', 'return false;');
+                $this->addClass($nodes__value, 'notranslate');
+                $this->addClass($nodes__value->parentNode, 'menu-item-has-children');
                 $nodes__value->nodeValue = $this->data->getCurrentLanguageLabel();
                 $this->insertAfter(
                     $nodes__value,
-                    $this->stringToNode($this->data->getLanguagePickerHtml(true, null, true))
+                    $this->stringToNode($this->data->getLanguagePickerHtml(true, null, true, 'lngpicker sub-menu'))
                 );
             }
         }

@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 5.0.0
+ * Version: 5.0.2
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -67,6 +67,9 @@ class GtbabelWordPress
             add_filter(
                 $names__value,
                 function ($url) {
+                    if ($this->gtbabel->host->contentTranslationIsDisabledForUrl($url)) {
+                        return $url;
+                    }
                     return $this->gtbabel->data->getUrlTranslationInLanguage(
                         $this->gtbabel->settings->getSourceLanguageCode(),
                         $this->gtbabel->data->getCurrentLanguageCode(),
@@ -114,10 +117,13 @@ class GtbabelWordPress
 
     private function autoTranslateSearch()
     {
+        $original_query = null;
         add_action('pre_get_posts', function ($query) {
             if (!$query->is_main_query() || is_admin() || !is_search()) {
                 return;
             }
+            global $original_query;
+            $original_query = $query->get('s');
             $query->set(
                 's',
                 $this->gtbabel->translate(
@@ -126,6 +132,15 @@ class GtbabelWordPress
                     $this->gtbabel->data->getCurrentLanguageCode()
                 )
             );
+        });
+        // reset again (so that in the output on the page it's the original query)
+        add_action('template_redirect', function ($query) {
+            global $original_query;
+            if ($original_query === null) {
+                return;
+            }
+            global $wp_query;
+            $wp_query->query_vars['s'] = $original_query;
         });
     }
 
@@ -3565,12 +3580,17 @@ EOD;
             $urls = $this->getAllPublicUrlsForSite();
             if (empty($urls)) {
                 echo '<span style="color:red;font-weight:bold;">';
+                echo __('An error occured. Is your website accessible?', 'gtbabel-plugin');
+                echo '<br/>';
                 echo sprintf(
-                    __(
-                        'An error occured. Is your website accessible? Try the %sbasic auth option%s.',
-                        'gtbabel-plugin'
-                    ),
+                    __('If your site is password protected, populate the %sbasic auth option%s.', 'gtbabel-plugin'),
                     '<a href="' . admin_url('admin.php?page=gtbabel-settings') . '">',
+                    '</a>'
+                );
+                echo '<br/>';
+                echo sprintf(
+                    __('If your site does not use pretty permalinks, %sactivate them%s.', 'gtbabel-plugin'),
+                    '<a href="' . admin_url('options-permalink.php') . '">',
                     '</a>'
                 );
                 echo '</span>';
