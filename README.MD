@@ -1184,7 +1184,13 @@ The default configuration is:
     'auto_set_discovered_strings_checked' => false,
     'only_show_checked_strings' => false,
     'auto_translation' => true,
-    'auto_translation_service' => 'google', // google|microsoft|deepl
+    'auto_translation_service' => [
+        [
+            'provider' => 'google', // google|microsoft|deepl
+            'lng' => null
+            //'lng' => ['en', 'fr'] // populate if provider should act only on a specific language
+        ]
+    ],
     'google_translation_api_key' => [], // use a string or array of strings to provide multiple keys at once
     'microsoft_translation_api_key' => [], // use a string or array of strings to provide multiple keys at once
     'deepl_translation_api_key' => [], // use a string or array of strings to provide multiple keys at once

@@ -135,7 +135,12 @@ class Settings
             'auto_set_discovered_strings_checked' => false,
             'only_show_checked_strings' => false,
             'auto_translation' => false,
-            'auto_translation_service' => 'google',
+            'auto_translation_service' => [
+                [
+                    'provider' => 'google',
+                    'lng' => null
+                ]
+            ],
             'google_translation_api_key' => [],
             'microsoft_translation_api_key' => [],
             'deepl_translation_api_key' => [],
@@ -1232,6 +1237,34 @@ class Settings
             return $lng;
         }
         return $this->getLanguageDataForCode($lng)[$service . '_translation_code'];
+    }
+
+    function getAutoTranslationService($lng)
+    {
+        $service = $this->get('auto_translation_service');
+        if (is_string($service)) {
+            if ($service != '') {
+                return $service;
+            }
+        }
+        if (is_array($service)) {
+            shuffle($service);
+            foreach ($service as $service__value) {
+                if (
+                    !isset($service__value['lng']) ||
+                    (is_string($service__value['lng']) &&
+                        ($service__value['lng'] === null ||
+                            $service__value['lng'] === '' ||
+                            $service__value['lng'] === '*' ||
+                            $service__value['lng'] === $lng)) ||
+                    (is_array($service__value['lng']) &&
+                        (in_array($lng, $service__value['lng']) || in_array('*', $service__value['lng'])))
+                ) {
+                    return $service__value['provider'];
+                }
+            }
+        }
+        return null;
     }
 
     function getHreflangCodeForLanguage($lng)

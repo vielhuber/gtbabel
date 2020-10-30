@@ -40,7 +40,12 @@ $gtbabel->start([
     ],
     'log_folder' => './../logs',
     'auto_translation' => true,
-    'auto_translation_service' => 'google',
+    'auto_translation_service' => [
+        [
+            'provider' => 'google',
+            'lng' => null
+        ]
+    ],
     'google_translation_api_key' => @$_SERVER['GOOGLE_TRANSLATION_API_KEY'],
     'microsoft_translation_api_key' => @$_SERVER['MICROSOFT_TRANSLATION_API_KEY'],
     'deepl_translation_api_key' => @$_SERVER['DEEPL_TRANSLATION_API_KEY'],

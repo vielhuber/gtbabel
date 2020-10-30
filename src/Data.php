@@ -784,7 +784,7 @@ class Data
             'shared' => 0,
             'translated_by' =>
                 $translated_by_current_service === true && $this->settings->get('auto_translation') === true
-                    ? $this->settings->get('auto_translation_service')
+                    ? $this->settings->getAutoTranslationService($lng_target)
                     : null
         ];
         $this->data['cache'][$lng_source][$lng_target][$context ?? ''][html_entity_decode($str)] = $trans;
@@ -1486,7 +1486,7 @@ class Data
 
         $trans = null;
 
-        $service = $this->settings->get('auto_translation_service');
+        $service = $this->settings->getAutoTranslationService($lng_target);
 
         if ($this->settings->get('auto_translation') === true) {
             // determine lng codes

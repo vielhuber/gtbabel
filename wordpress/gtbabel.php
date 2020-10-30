@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 5.0.2
+ * Version: 5.0.3
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -942,6 +942,24 @@ class GtbabelWordPress
                         }
                     }
 
+                    $post_data = $settings['auto_translation_service'];
+                    $settings['auto_translation_service'] = [];
+                    if (!empty(@$post_data['provider'])) {
+                        foreach ($post_data['provider'] as $post_data__key => $post_data__value) {
+                            if (@$post_data['provider'][$post_data__key] == '') {
+                                continue;
+                            }
+                            $auto_translation_service_lng = null;
+                            if (@$post_data['lng'][$post_data__key] != '') {
+                                $auto_translation_service_lng = explode(',', $post_data['lng'][$post_data__key]);
+                            }
+                            $settings['auto_translation_service'][] = [
+                                'provider' => $post_data['provider'][$post_data__key],
+                                'lng' => $auto_translation_service_lng
+                            ];
+                        }
+                    }
+
                     $post_data = $settings['url_query_args'];
                     $settings['url_query_args'] = [];
                     if (!empty(@$post_data['type'])) {
@@ -1599,22 +1617,37 @@ class GtbabelWordPress
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_auto_translation_service" class="gtbabel__label">';
+        echo '<label class="gtbabel__label">';
         echo __('Translation service', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        echo '<select class="gtbabel__input gtbabel__input--select" id="gtbabel_auto_translation_service" name="gtbabel[auto_translation_service]">';
-        echo '<option value="">&ndash;&ndash;</option>';
-        echo '<option value="google"' .
-            ($settings['auto_translation_service'] == 'google' ? ' selected="selected"' : '') .
-            '>Google</option>';
-        echo '<option value="microsoft"' .
-            ($settings['auto_translation_service'] == 'microsoft' ? ' selected="selected"' : '') .
-            '>Microsoft</option>';
-        echo '<option value="deepl"' .
-            ($settings['auto_translation_service'] == 'deepl' ? ' selected="selected"' : '') .
-            '>DeepL</option>';
-        echo '</select>';
+        echo '<div class="gtbabel__repeater">';
+        echo '<ul class="gtbabel__repeater-list">';
+        if (empty(@$settings['auto_translation_service'])) {
+            $settings['auto_translation_service'] = [['provider' => '', 'lng' => '']];
+        }
+        foreach ($settings['auto_translation_service'] as $auto_translation_service__value) {
+            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-2">';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[auto_translation_service][provider][]" value="' .
+                esc_attr($auto_translation_service__value['provider']) .
+                '" placeholder="google|microsoft|deepl" />';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[auto_translation_service][lng][]" value="' .
+                esc_attr(
+                    @$auto_translation_service__value['lng'] != ''
+                        ? implode(',', $auto_translation_service__value['lng'])
+                        : ''
+                ) .
+                '" placeholder="lng" />';
+            echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
+                __('Remove', 'gtbabel-plugin') .
+                '</a>';
+            echo '</li>';
+        }
+        echo '</ul>';
+        echo '<a href="#" class="gtbabel__repeater-add button button-secondary">' .
+            __('Add', 'gtbabel-plugin') .
+            '</a>';
+        echo '</div>';
         echo '</div>';
         echo '</li>';
 

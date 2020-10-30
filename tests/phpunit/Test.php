@@ -1161,7 +1161,12 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['auto_add_translations'] = true;
         $settings['only_show_checked_strings'] = false;
 
-        $settings['auto_translation_service'] = 'google';
+        $settings['auto_translation_service'] = [
+            [
+                'provider' => 'google',
+                'lng' => null
+            ]
+        ];
         ob_start();
         $this->gtbabel->config($settings);
         $this->gtbabel->start();
@@ -1173,7 +1178,12 @@ class Test extends \PHPUnit\Framework\TestCase
 
         $this->gtbabel->reset();
 
-        $settings['auto_translation_service'] = 'google';
+        $settings['auto_translation_service'] = [
+            [
+                'provider' => 'google',
+                'lng' => null
+            ]
+        ];
         ob_start();
         $this->gtbabel->config($settings);
         $this->gtbabel->start();
@@ -1184,7 +1194,12 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->gtbabel->data->statsGetTranslatedCharsByService()[0]['length'], 24);
         $this->gtbabel->reset();
 
-        $settings['auto_translation_service'] = 'microsoft';
+        $settings['auto_translation_service'] = [
+            [
+                'provider' => 'microsoft',
+                'lng' => null
+            ]
+        ];
         ob_start();
         $this->gtbabel->config($settings);
         $this->gtbabel->start();
@@ -1195,7 +1210,12 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->gtbabel->data->statsGetTranslatedCharsByService()[0]['length'], 24);
         $this->gtbabel->reset();
 
-        $settings['auto_translation_service'] = 'microsoft';
+        $settings['auto_translation_service'] = [
+            [
+                'provider' => 'microsoft',
+                'lng' => null
+            ]
+        ];
         ob_start();
         $this->gtbabel->config($settings);
         $this->gtbabel->start();
@@ -1206,7 +1226,12 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->gtbabel->data->statsGetTranslatedCharsByService()[0]['length'], 49);
         $this->gtbabel->reset();
 
-        $settings['auto_translation_service'] = 'deepl';
+        $settings['auto_translation_service'] = [
+            [
+                'provider' => 'deepl',
+                'lng' => null
+            ]
+        ];
         ob_start();
         $this->gtbabel->config($settings);
         $this->gtbabel->start();
@@ -1215,7 +1240,12 @@ class Test extends \PHPUnit\Framework\TestCase
         ob_end_clean();
         $this->assertSame($this->gtbabel->data->statsGetTranslatedCharsByService()[0]['service'], 'deepl');
         $this->assertSame($this->gtbabel->data->statsGetTranslatedCharsByService()[0]['length'], 24);
-        $settings['auto_translation_service'] = 'google';
+        $settings['auto_translation_service'] = [
+            [
+                'provider' => 'google',
+                'lng' => null
+            ]
+        ];
         ob_start();
         $this->gtbabel->config($settings);
         $this->gtbabel->start();
@@ -1241,7 +1271,12 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['auto_add_translations'] = true;
         $settings['only_show_checked_strings'] = false;
 
-        $settings['auto_translation_service'] = 'google';
+        $settings['auto_translation_service'] = [
+            [
+                'provider' => 'google',
+                'lng' => null
+            ]
+        ];
         $settings['google_throttle_chars_per_month'] = 30;
         ob_start();
         $this->gtbabel->config($settings);
@@ -1260,7 +1295,12 @@ class Test extends \PHPUnit\Framework\TestCase
         );
         $this->gtbabel->reset();
 
-        $settings['auto_translation_service'] = 'google';
+        $settings['auto_translation_service'] = [
+            [
+                'provider' => 'google',
+                'lng' => null
+            ]
+        ];
         $settings['google_throttle_chars_per_month'] = 20;
         ob_start();
         $this->gtbabel->config($settings);
@@ -1980,7 +2020,12 @@ EOD;
             'html_hreflang_tags' => false,
             'xml_hreflang_tags' => false,
             'auto_translation' => false,
-            'auto_translation_service' => 'google',
+            'auto_translation_service' => [
+                [
+                    'provider' => 'google',
+                    'lng' => null
+                ]
+            ],
             'google_translation_api_key' => @$_SERVER['GOOGLE_TRANSLATION_API_KEY'],
             'microsoft_translation_api_key' => @$_SERVER['MICROSOFT_TRANSLATION_API_KEY'],
             'deepl_translation_api_key' => @$_SERVER['DEEPL_TRANSLATION_API_KEY'],
