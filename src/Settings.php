@@ -79,13 +79,8 @@ class Settings
             'translate_html_force_tokenize' => ['.force-tokenize'],
             'localize_js' => true,
             'localize_js_strings' => ['Schließen', '/blog'],
-            'detect_dom_changes' => true,
-            'detect_dom_changes_include' => [
-                '.top-button',
-                '.swal-overlay',
-                '.wpcf7-response-output',
-                '.wpcf7-not-valid-tip'
-            ],
+            'detect_dom_changes' => false,
+            'detect_dom_changes_include' => ['.top-button', '.swal-overlay'],
             'translate_xml' => true,
             'translate_xml_include' => [
                 [

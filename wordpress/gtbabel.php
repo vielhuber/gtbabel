@@ -92,6 +92,13 @@ class GtbabelWordPress
                 $props = $form->get_properties();
                 foreach (['mail', 'mail_2'] as $mails__value) {
                     if (isset($props[$mails__value]) && !empty($props[$mails__value])) {
+                        foreach (['subject', 'body'] as $types__value) {
+                            $props[$mails__value][$types__value] = preg_replace(
+                                '/(\[.+?\])/',
+                                '<span class="notranslate">$1</span>',
+                                $props[$mails__value][$types__value]
+                            );
+                        }
                         $props[$mails__value]['subject'] = $this->gtbabel->translate(
                             $props[$mails__value]['subject'],
                             $this->gtbabel->host->getRefererLanguageCode(),
@@ -3849,7 +3856,8 @@ EOD;
                     'lng_source' => $lng_source,
                     'log_folder' => $this->getPluginFileStorePathRelative() . '/logs',
                     'translate_json_include' => [
-                        '?wc-ajax=*' => ['fragments.*', 'messages', 'redirect'] // woocommerce
+                        '?wc-ajax=*' => ['fragments.*', 'messages', 'redirect'], // woocommerce
+                        'wp-json' => ['message'] // contact form 7
                     ],
                     'translate_wp_localize_script_include' => ['wc_*.locale.*', 'wc_*.i18n_*', 'wc_*.cart_url'], // woocommerce
                     'exclude_urls_content' => [
