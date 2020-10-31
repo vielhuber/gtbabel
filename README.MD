@@ -1165,13 +1165,16 @@ The default configuration is:
             'selector' => '*'
         ],
         [
-            'type' => 'translate',
-            'selector' => 's'
-        ],
-        [
             'type' => 'discard',
             'selector' => 'nonce'
         ]
+        /*
+        // if you want to translate strings (be careful with dynamic content)
+        [
+            'type' => 'translate',
+            'selector' => 's'
+        ]
+        */
     ],
     'exclude_urls_content' => ['backend'],
     'exclude_urls_slugs' => ['api/v1.0'],

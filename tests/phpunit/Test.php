@@ -538,7 +538,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test_string_detection()
     {
-        $should_translate = ['Haus'];
+        $should_translate = ['Haus', 'Sending...'];
         $should_not_translate = [
             '351',
             '351ADBU...',
@@ -2004,10 +2004,6 @@ EOD;
                 [
                     'type' => 'keep',
                     'selector' => '*'
-                ],
-                [
-                    'type' => 'translate',
-                    'selector' => 's'
                 ],
                 [
                     'type' => 'discard',

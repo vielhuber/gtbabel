@@ -111,10 +111,6 @@ class Settings
                     'selector' => '*'
                 ],
                 [
-                    'type' => 'translate',
-                    'selector' => 's'
-                ],
-                [
                     'type' => 'discard',
                     'selector' => 'nonce'
                 ]

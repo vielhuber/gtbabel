@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 5.0.3
+ * Version: 5.0.4
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -40,6 +40,7 @@ class GtbabelWordPress
         $this->initUpdateCapabilities();
         $this->filterSpecificUrls();
         $this->autoTranslateContactForm7Mails();
+        $this->autoTranslateWPForms();
         $this->autoTranslateSearch();
         $this->startHook();
         $this->stopHook();
@@ -119,6 +120,22 @@ class GtbabelWordPress
                 $form->set_properties($props);
             },
             99999
+        );
+    }
+
+    private function autoTranslateWPForms()
+    {
+        add_filter(
+            'wpforms_frontend_strings',
+            function ($data) {
+                foreach ($data as $data__key => $data__value) {
+                    if (strpos($data__key, 'val_') === 0 && $data__value != '') {
+                        $data[$data__key] = $this->gtbabel->translate($data__value);
+                    }
+                }
+                return $data;
+            },
+            PHP_INT_MAX
         );
     }
 

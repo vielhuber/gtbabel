@@ -1731,9 +1731,6 @@ class Data
                 if (strpos($str, '--') !== false) {
                     return true;
                 }
-                if (strpos($str, '.') !== false) {
-                    return true;
-                }
                 if (preg_match('/[0-9]+[A-Z]+/', $str)) {
                     return true;
                 }
