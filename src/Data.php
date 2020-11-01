@@ -1135,67 +1135,7 @@ class Data
 
         if ($translate === true) {
             if (!$this->host->slugTranslationIsDisabledForUrl($link)) {
-                // handle url args
-                $link_rules = $this->settings->get('url_query_args');
-                if ($link_rules === null || empty($link_rules)) {
-                    $link_rules = ['type' => 'keep', 'selector' => '*'];
-                }
-                $link_arguments = [];
-                foreach (['#', '?'] as $delimiter__value) {
-                    if (mb_strpos($link, $delimiter__value) !== false) {
-                        $link_arguments_before = mb_substr($link, mb_strpos($link, $delimiter__value));
-                        $link_arguments_after = $link_arguments_before;
-                        if ($delimiter__value === '?') {
-                            $link_arguments_query = [];
-                            $link_arguments_parts = parse_url($link_arguments_before);
-                            parse_str(html_entity_decode($link_arguments_parts['query']), $link_arguments_query);
-                            foreach (
-                                $link_arguments_query
-                                as $link_arguments_query__key => $link_arguments_query__value
-                            ) {
-                                $should_keep = true;
-                                $should_translate = false;
-                                $should_discard = false;
-                                foreach ($link_rules as $link_rules__value) {
-                                    if (
-                                        $link_rules__value['selector'] === '*' ||
-                                        $link_rules__value['selector'] === $link_arguments_query__key
-                                    ) {
-                                        ${'should_' . $link_rules__value['type']} = true;
-                                    }
-                                }
-                                if ($should_keep === false || $should_discard === true) {
-                                    unset($link_arguments_query[$link_arguments_query__key]);
-                                    continue;
-                                }
-                                if ($should_translate === true) {
-                                    if (
-                                        $this->stringShouldNotBeTranslated(
-                                            $link_arguments_query[$link_arguments_query__key],
-                                            null
-                                        )
-                                    ) {
-                                        continue;
-                                    }
-                                    $link_arguments_query[
-                                        $link_arguments_query__key
-                                    ] = $this->getTranslationAndAddDynamicallyIfNeeded(
-                                        $link_arguments_query[$link_arguments_query__key],
-                                        $lng_source,
-                                        $lng_target,
-                                        null
-                                    );
-                                }
-                            }
-                            $link_arguments_after = '?' . http_build_query($link_arguments_query, '', '&');
-                        }
-                        $link_arguments[$delimiter__value] = [
-                            'before' => $link_arguments_before,
-                            'after' => $link_arguments_after
-                        ];
-                        $link = mb_substr($link, 0, mb_strpos($link, $delimiter__value));
-                    }
-                }
+                [$link, $link_arguments] = $this->urlQueryArgsStripAndTranslate($link, $lng_source, $lng_target);
                 $url_parts = explode('/', $link);
                 foreach ($url_parts as $url_parts__key => $url_parts__value) {
                     if ($this->stringShouldNotBeTranslated($url_parts__value, 'slug')) {
@@ -1209,11 +1149,7 @@ class Data
                     );
                 }
                 $link = implode('/', $url_parts);
-                foreach (['?', '#'] as $delimiter__value) {
-                    if (array_key_exists($delimiter__value, $link_arguments)) {
-                        $link .= $link_arguments[$delimiter__value]['after'];
-                    }
-                }
+                $link = $this->urlQueryArgsAppend($link, $link_arguments);
             }
         }
         if ($is_absolute_link === true) {
@@ -1931,6 +1867,9 @@ class Data
 
     function getPathTranslationInLanguage($from_lng, $to_lng, $path = null)
     {
+        /* this is a different approach than modifyLinkAndGetTranslationOfLinkHrefAndAddDynamicallyIfNeeded:
+        if does not translate actively a link (which is generally in the source language)
+        but tries to convert an already translated link to its source language (or any other language) */
         if ($path == '') {
             return $path;
         }
@@ -1940,7 +1879,11 @@ class Data
         if ($this->host->slugTranslationIsDisabledForUrl($path)) {
             return $path;
         }
+
+        [$path, $link_arguments] = $this->urlQueryArgsStripAndTranslate($path, $from_lng, $to_lng);
+
         $path_parts = explode('/', $path);
+
         foreach ($path_parts as $path_parts__key => $path_parts__value) {
             if ($path_parts[$path_parts__key] == '') {
                 unset($path_parts[$path_parts__key]);
@@ -1973,7 +1916,11 @@ class Data
                 $path_parts[$path_parts__key] = $trans;
             }
         }
-        $path = implode('/', $path_parts);
+
+        $path = implode('/', $path_parts) . '/';
+
+        $path = $this->urlQueryArgsAppend($path, $link_arguments);
+
         return $path;
     }
 
@@ -2007,6 +1954,78 @@ class Data
                 'slug'
             );
         }
+    }
+
+    function urlQueryArgsStripAndTranslate($link, $lng_source, $lng_target)
+    {
+        $link_rules = $this->settings->get('url_query_args');
+        if ($link_rules === null || empty($link_rules)) {
+            $link_rules = ['type' => 'keep', 'selector' => '*'];
+        }
+        $link_arguments = [];
+        foreach (['#', '?'] as $delimiter__value) {
+            if (mb_strpos($link, $delimiter__value) !== false) {
+                $link_arguments_before = mb_substr($link, mb_strpos($link, $delimiter__value));
+                $link_arguments_after = $link_arguments_before;
+                if ($delimiter__value === '?') {
+                    $link_arguments_query = [];
+                    $link_arguments_parts = parse_url($link_arguments_before);
+                    parse_str(html_entity_decode($link_arguments_parts['query']), $link_arguments_query);
+                    foreach ($link_arguments_query as $link_arguments_query__key => $link_arguments_query__value) {
+                        $should_keep = true;
+                        $should_translate = false;
+                        $should_discard = false;
+                        foreach ($link_rules as $link_rules__value) {
+                            if (
+                                $link_rules__value['selector'] === '*' ||
+                                $link_rules__value['selector'] === $link_arguments_query__key
+                            ) {
+                                ${'should_' . $link_rules__value['type']} = true;
+                            }
+                        }
+                        if ($should_keep === false || $should_discard === true) {
+                            unset($link_arguments_query[$link_arguments_query__key]);
+                            continue;
+                        }
+                        if ($should_translate === true) {
+                            if (
+                                $this->stringShouldNotBeTranslated(
+                                    $link_arguments_query[$link_arguments_query__key],
+                                    null
+                                )
+                            ) {
+                                continue;
+                            }
+                            $link_arguments_query[
+                                $link_arguments_query__key
+                            ] = $this->getTranslationAndAddDynamicallyIfNeeded(
+                                $link_arguments_query[$link_arguments_query__key],
+                                $lng_source,
+                                $lng_target,
+                                null
+                            );
+                        }
+                    }
+                    $link_arguments_after = '?' . http_build_query($link_arguments_query, '', '&');
+                }
+                $link_arguments[$delimiter__value] = [
+                    'before' => $link_arguments_before,
+                    'after' => $link_arguments_after
+                ];
+                $link = mb_substr($link, 0, mb_strpos($link, $delimiter__value));
+            }
+        }
+        return [$link, $link_arguments];
+    }
+
+    function urlQueryArgsAppend($link, $link_arguments)
+    {
+        foreach (['?', '#'] as $delimiter__value) {
+            if (array_key_exists($delimiter__value, $link_arguments)) {
+                $link .= $link_arguments[$delimiter__value]['after'];
+            }
+        }
+        return $link;
     }
 
     function statsGetTranslatedCharsByService($since = null)

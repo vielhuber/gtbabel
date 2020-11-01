@@ -57,11 +57,11 @@ class Router
         if ($this->host->currentUrlIsStaticFile()) {
             return;
         }
+        $url = $this->host->getCurrentUrl();
         $args = $this->host->getCurrentArgs();
         if ($args != '') {
-            return;
+            $url = str_replace($args, '', $url);
         }
-        $url = $this->host->getCurrentUrl();
         if (mb_strrpos($url, '/') === mb_strlen($url) - 1) {
             return;
         }
@@ -73,6 +73,9 @@ class Router
             return;
         }
         $url = $url . '/';
+        if ($args != '') {
+            $url .= $args;
+        }
         header('Location: ' . $url, true, @$_SERVER['REQUEST_METHOD'] === 'POST' ? 307 : 301); // 307 forces the browser to repost to the new url
         die();
     }
