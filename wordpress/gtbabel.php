@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 5.0.4
+ * Version: 5.0.5
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -392,9 +392,10 @@ class GtbabelWordPress
 
                 $trigger1 = $post_after_status === 'trash';
                 $trigger2 =
-                    ($post_before_status === 'auto-draft' && $post_after_status === 'publish') ||
-                    ($post_before_status === 'draft' && $post_after_status === 'publish') ||
-                    ($post_before_status === 'publish' && $post_after_status === 'draft');
+                    $this->gtbabel->settings->get('prevent_publish_wp_new_posts') === true &&
+                    (($post_before_status === 'auto-draft' && $post_after_status === 'publish') ||
+                        ($post_before_status === 'draft' && $post_after_status === 'publish') ||
+                        ($post_before_status === 'publish' && $post_after_status === 'draft'));
                 $trigger3 = $post_before_url != $post_after_url;
 
                 // remove trashed
@@ -819,6 +820,7 @@ class GtbabelWordPress
                             'translate_wp_localize_script',
                             'translate_wp_localize_script_include',
                             'prevent_publish_urls',
+                            'prevent_publish_wp_new_posts',
                             'url_query_args',
                             'alt_lng_urls',
                             'exclude_urls_content',
@@ -862,6 +864,7 @@ class GtbabelWordPress
                             'translate_xml',
                             'translate_json',
                             'translate_wp_localize_script',
+                            'prevent_publish_wp_new_posts',
                             'html_lang_attribute',
                             'html_hreflang_tags',
                             'xml_hreflang_tags',
@@ -1829,6 +1832,17 @@ class GtbabelWordPress
             __('Add', 'gtbabel-plugin') .
             '</a>';
         echo '</div>';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_prevent_publish_wp_new_posts" class="gtbabel__label">';
+        echo __('Auto prevent publish of new posts', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_prevent_publish_wp_new_posts" name="gtbabel[prevent_publish_wp_new_posts]" value="1"' .
+            (@$settings['prevent_publish_wp_new_posts'] == '1' ? ' checked="checked"' : '') .
+            ' />';
         echo '</div>';
         echo '</li>';
 

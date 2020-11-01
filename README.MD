@@ -1156,6 +1156,7 @@ The default configuration is:
         '/slug1/*/slug2' => ['fr']
         //'/*' => ['en', 'fr'] // disable whole languages
     ],
+    'prevent_publish_wp_new_posts' => false,
     'alt_lng_urls' => [
         '/path/in/source/lng/to/specific/page' => 'en'
     ],

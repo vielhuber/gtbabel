@@ -102,6 +102,7 @@ class Settings
                 '/slug1/*' => ['en'],
                 '/slug1/*/slug2' => ['fr']
             ],
+            'prevent_publish_wp_new_posts' => false,
             'alt_lng_urls' => [
                 '/path/in/source/lng/to/specific/page' => 'en'
             ],
