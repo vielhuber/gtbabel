@@ -55,7 +55,7 @@ class Utils
         ) {
             return 'css';
         }
-        return 'html';
+        return 'plain';
     }
 
     function getCurrentTime()

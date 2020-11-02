@@ -24,8 +24,9 @@ class Router
         }
 
         if (
+            $this->host->shouldUseLangQueryArg() === false &&
             $this->host->getCurrentPrefix() ==
-            $this->host->getPrefixForLanguageCode($this->data->getCurrentLanguageCode())
+                $this->host->getPrefixForLanguageCode($this->data->getCurrentLanguageCode())
         ) {
             return;
         }
@@ -43,6 +44,10 @@ class Router
             rtrim($this->host->getBaseUrlWithPrefixForLanguageCode($lng), '/') .
             '/' .
             ltrim($this->host->getPathWithoutPrefixFromUrl($this->host->getCurrentUrlWithArgs()), '/');
+
+        if ($this->host->shouldUseLangQueryArg()) {
+            $url = $this->host->appendArgToUrl($url, 'lang', $lng);
+        }
 
         if ($this->host->getCurrentUrlWithArgs() === $url) {
             return;

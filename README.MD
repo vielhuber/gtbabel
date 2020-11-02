@@ -1524,7 +1524,7 @@ The following configuration is the same as if no option isset:
 ]
 ```
 
-In order to not prefix your source language (which is common), just provide a special rule for it\
+In order to not prefix your source language (which is often common), just provide a special rule for it\
 (see we didn't specify `url_base` and any option for the other languages, because Gtbabel still uses the default there):
 
 ```php
@@ -1617,6 +1617,24 @@ If you have hosted your website on a subpath, you should provide something like:
         'url_prefix' => 'en'
     ]
     /* ... */
+]
+```
+
+And if you don\'t even use pretty links, leave all prefixes empty (the url query argument `lang` decides then):
+
+```php
+'languages' => [
+    [
+        'code' => 'de',
+        /* ... */
+        'url_prefix' => ''
+    ],
+    [
+        'code' => 'en',
+        /* ... */
+        'url_prefix' => ''
+    ]
+    /* ... */,
 ]
 ```
 

@@ -408,7 +408,8 @@ class Dom
 
     function modifyHtml($html, $mode)
     {
-        if ($this->utils->guessContentType($html) !== 'html') {
+        $content_type = $this->utils->guessContentType($html);
+        if (!in_array($content_type, ['plain', 'html'])) {
             return $html;
         }
         if ($this->settings->get('translate_html') !== true) {
@@ -430,6 +431,10 @@ class Dom
         $this->preloadLngAreas();
         $this->modifyHtmlNodes();
         $html = $this->finishDomDocument();
+        // DomDocument always encodes characters (meaning we receive plain text links with &amp; inside, which is bad for plain text)
+        if ($content_type === 'plain') {
+            $html = htmlspecialchars_decode($html);
+        }
         return $html;
     }
 

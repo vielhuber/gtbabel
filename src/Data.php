@@ -920,7 +920,7 @@ class Data
         }
 
         // dynamically determine from url
-        return $this->host->getLanguageCodeFromUrl($this->host->getCurrentUrl());
+        return $this->host->getLanguageCodeFromUrl($this->host->getCurrentUrlWithArgs());
     }
 
     function getCurrentLanguageLabel()
@@ -1004,8 +1004,9 @@ class Data
             if (
                 $context === 'slug' &&
                 $this->settings->getSourceLanguageCode() === $lng_source &&
-                $this->host->getPrefixForLanguageCode($lng_source) != '' &&
-                $this->host->getPrefixFromUrl($orig) != $this->host->getPrefixForLanguageCode($lng_source)
+                (($this->host->getPrefixForLanguageCode($lng_source) != '' &&
+                    $this->host->getPrefixFromUrl($orig) != $this->host->getPrefixForLanguageCode($lng_source)) ||
+                    $this->host->shouldUseLangQueryArg())
             ) {
                 return $this->modifyLink($orig, $lng_source, $lng_target);
             }
@@ -1111,13 +1112,19 @@ class Data
         if (mb_strpos(trim($link, '/'), '#') === 0) {
             return $link;
         }
-        if (mb_strpos(trim($link, '/'), '?') === 0) {
-            return $link;
-        }
         if (mb_strpos(trim($link, '/'), '&') === 0) {
             return $link;
         }
         if ($this->host->urlIsStaticFile($link)) {
+            return $link;
+        }
+
+        // append lang parameter
+        if ($this->host->shouldUseLangQueryArg()) {
+            $link = $this->host->appendArgToUrl($link, 'lang', $lng_target);
+        }
+
+        if (mb_strpos(trim($link, '/'), '?') === 0) {
             return $link;
         }
 
@@ -1880,6 +1887,11 @@ class Data
             return $path;
         }
 
+        // append lang parameter
+        if ($this->host->shouldUseLangQueryArg()) {
+            $path = $this->host->appendArgToUrl($path, 'lang', $to_lng);
+        }
+
         [$path, $link_arguments] = $this->urlQueryArgsStripAndTranslate($path, $from_lng, $to_lng);
 
         $path_parts = explode('/', $path);
@@ -1972,38 +1984,42 @@ class Data
                     $link_arguments_parts = parse_url($link_arguments_before);
                     parse_str(html_entity_decode($link_arguments_parts['query']), $link_arguments_query);
                     foreach ($link_arguments_query as $link_arguments_query__key => $link_arguments_query__value) {
-                        $should_keep = true;
-                        $should_translate = false;
-                        $should_discard = false;
-                        foreach ($link_rules as $link_rules__value) {
-                            if (
-                                $link_rules__value['selector'] === '*' ||
-                                $link_rules__value['selector'] === $link_arguments_query__key
-                            ) {
-                                ${'should_' . $link_rules__value['type']} = true;
+                        if ($link_arguments_query__key === 'lang') {
+                            $link_arguments_query[$link_arguments_query__key] = $lng_target;
+                        } else {
+                            $should_keep = true;
+                            $should_translate = false;
+                            $should_discard = false;
+                            foreach ($link_rules as $link_rules__value) {
+                                if (
+                                    $link_rules__value['selector'] === '*' ||
+                                    $link_rules__value['selector'] === $link_arguments_query__key
+                                ) {
+                                    ${'should_' . $link_rules__value['type']} = true;
+                                }
                             }
-                        }
-                        if ($should_keep === false || $should_discard === true) {
-                            unset($link_arguments_query[$link_arguments_query__key]);
-                            continue;
-                        }
-                        if ($should_translate === true) {
-                            if (
-                                $this->stringShouldNotBeTranslated(
-                                    $link_arguments_query[$link_arguments_query__key],
-                                    null
-                                )
-                            ) {
+                            if ($should_keep === false || $should_discard === true) {
+                                unset($link_arguments_query[$link_arguments_query__key]);
                                 continue;
                             }
-                            $link_arguments_query[
-                                $link_arguments_query__key
-                            ] = $this->getTranslationAndAddDynamicallyIfNeeded(
-                                $link_arguments_query[$link_arguments_query__key],
-                                $lng_source,
-                                $lng_target,
-                                null
-                            );
+                            if ($should_translate === true) {
+                                if (
+                                    $this->stringShouldNotBeTranslated(
+                                        $link_arguments_query[$link_arguments_query__key],
+                                        null
+                                    )
+                                ) {
+                                    continue;
+                                }
+                                $link_arguments_query[
+                                    $link_arguments_query__key
+                                ] = $this->getTranslationAndAddDynamicallyIfNeeded(
+                                    $link_arguments_query[$link_arguments_query__key],
+                                    $lng_source,
+                                    $lng_target,
+                                    null
+                                );
+                            }
                         }
                     }
                     $link_arguments_after = '?' . http_build_query($link_arguments_query, '', '&');

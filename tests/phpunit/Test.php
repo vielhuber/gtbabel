@@ -536,6 +536,19 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->runDiff('75.css');
     }
 
+    public function test076()
+    {
+        $this->runDiff(
+            '76.json',
+            200,
+            [
+                'translate_json' => true,
+                'translate_json_include' => ['/' => ['link']]
+            ],
+            '/en/'
+        );
+    }
+
     public function test_string_detection()
     {
         $should_translate = ['Haus', 'Sending...'];

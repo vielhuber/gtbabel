@@ -222,9 +222,63 @@ class Host
         return $_SERVER['HTTP_REFERER'];
     }
 
+    function getArgsFromUrl($url)
+    {
+        $url_parts = parse_url($url);
+        if (!isset($url_parts['query']) || empty($url_parts['query'])) {
+            return [];
+        }
+        parse_str(html_entity_decode($url_parts['query']), $url_args);
+        if (empty($url_args)) {
+            return [];
+        }
+        return $url_args;
+    }
+
+    function stripArgsFromUrl($url)
+    {
+        $pos = mb_strrpos('?', $url);
+        if ($pos !== false) {
+            return mb_substr($url, 0, $pos);
+        }
+        return $url;
+    }
+
+    function appendArgToUrl($url, $key, $value)
+    {
+        $append = $key . '=' . urlencode($value);
+        if (mb_strpos($url, $append) !== false) {
+            return $url;
+        }
+        $hash = '';
+        $hash_pos = mb_strrpos($url, '#');
+        if ($hash_pos !== false) {
+            $hash = mb_substr($url, $hash_pos);
+            $url = str_replace($hash, '', $url);
+        }
+        if (strpos($url, '?') === false) {
+            $url .= '?';
+        } else {
+            $url .= '&';
+        }
+        $url .= $append . $hash;
+        return $url;
+    }
+
     function getLanguageCodeFromUrl($url)
     {
-        $base_urls = [];
+        // if query parameter is provided
+        $url_args = $this->getArgsFromUrl($url);
+        if (!empty($url_args)) {
+            if (array_key_exists('lang', $url_args)) {
+                $suggested_lng = $url_args['lang'];
+                if (in_array($suggested_lng, $this->settings->getSelectedLanguageCodes())) {
+                    return $suggested_lng;
+                }
+            }
+        }
+        // strip args
+        $url = $this->stripArgsFromUrl($url);
         foreach ($this->settings->getSelectedLanguageCodes() as $languages__value) {
             $base_urls[$languages__value] = $this->getBaseUrlWithPrefixForLanguageCode($languages__value);
         }
@@ -276,6 +330,20 @@ class Host
             return $lng;
         }
         return $data['url_prefix'];
+    }
+
+    function shouldUseLangQueryArg()
+    {
+        $count = 0;
+        foreach ($this->settings->getSelectedLanguageCodes() as $languages__value) {
+            if ($this->getPrefixForLanguageCode($languages__value) == '') {
+                $count++;
+            }
+            if ($count >= 2) {
+                return true;
+            }
+        }
+        return false;
     }
 
     function getPathWithPrefixFromUrl($url)
