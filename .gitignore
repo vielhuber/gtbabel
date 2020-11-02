@@ -9,6 +9,8 @@ log.txt
 /.phpunit.result.cache
 /tests/phpunit/files/**/*_expected
 /tests/phpunit/data.db
+/tests/integration/logs/*
+/tests/integration/data.db
 gtbabel-*-log.txt
 /node_modules/
 /package-lock.json

@@ -1,12 +1,108 @@
 <?php
 require_once dirname(__DIR__, 2) . '/vendor/autoload.php';
+
+$test = 1;
+if ($test === 1) {
+    $settings = [
+        'de' => [
+            'url_base' => 'http://gtbabel.local.vielhuber.de',
+            'url_prefix' => 'de'
+        ],
+        'en' => [
+            'url_base' => 'http://gtbabel.local.vielhuber.de',
+            'url_prefix' => 'en'
+        ]
+    ];
+}
+if ($test === 2) {
+    $settings = [
+        'de' => [
+            'url_base' => 'http://gtbabel.local.vielhuber.de',
+            'url_prefix' => ''
+        ],
+        'en' => [
+            'url_base' => 'http://gtbabel.local.vielhuber.de',
+            'url_prefix' => 'en'
+        ]
+    ];
+}
+if ($test === 3) {
+    $settings = [
+        'de' => [
+            'url_base' => 'http://gtbabel.local.vielhuber.de',
+            'url_prefix' => 'deutsch'
+        ],
+        'en' => [
+            'url_base' => 'http://gtbabel.local.vielhuber.de',
+            'url_prefix' => 'english'
+        ]
+    ];
+}
+if ($test === 4) {
+    $settings = [
+        'de' => [
+            'url_base' => 'http://gtbabel-de.local.vielhuber.de',
+            'url_prefix' => ''
+        ],
+        'en' => [
+            'url_base' => 'http://gtbabel-en.local.vielhuber.de',
+            'url_prefix' => ''
+        ]
+    ];
+    if (
+        'http' .
+            (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 's' : '') .
+            '://' .
+            $_SERVER['HTTP_HOST'] .
+            $_SERVER['REQUEST_URI'] ===
+        'http://gtbabel.local.vielhuber.de/'
+    ) {
+        header('Location: http://gtbabel-de.local.vielhuber.de');
+        die();
+    }
+}
+if ($test === 5) {
+    $settings = [
+        'de' => [
+            'url_base' => 'http://gtbabel.local.vielhuber.de/some/sub/path',
+            'url_prefix' => 'de'
+        ],
+        'en' => [
+            'url_base' => 'http://gtbabel.local.vielhuber.de/some/sub/path',
+            'url_prefix' => 'en'
+        ]
+    ];
+    if (
+        'http' .
+            (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 's' : '') .
+            '://' .
+            $_SERVER['HTTP_HOST'] .
+            $_SERVER['REQUEST_URI'] ===
+        'http://gtbabel.local.vielhuber.de/'
+    ) {
+        header('Location: http://gtbabel.local.vielhuber.de/some/sub/path/');
+        die();
+    }
+}
+if ($test === 6) {
+    $settings = [
+        'de' => [
+            'url_base' => 'http://gtbabel.local.vielhuber.de',
+            'url_prefix' => ''
+        ],
+        'en' => [
+            'url_base' => 'http://gtbabel.local.vielhuber.de',
+            'url_prefix' => ''
+        ]
+    ];
+}
+
 use vielhuber\gtbabel\Gtbabel;
 use Dotenv\Dotenv;
 $dotenv = Dotenv::createImmutable(dirname(__DIR__, 2));
 $dotenv->load();
 $gtbabel = new Gtbabel();
-
-$gtbabel->start([
+$gtbabel->config([
     'languages' => [
         [
             'code' => 'de',
@@ -16,8 +112,8 @@ $gtbabel->start([
             'google_translation_code' => 'de',
             'microsoft_translation_code' => 'de',
             'deepl_translation_code' => 'de',
-            'url_base' => 'http://gtbabel.local.vielhuber.de/some/sub/path',
-            'url_prefix' => 'de'
+            'url_base' => $settings['de']['url_base'],
+            'url_prefix' => $settings['de']['url_prefix']
         ],
         [
             'code' => 'en',
@@ -27,8 +123,8 @@ $gtbabel->start([
             'google_translation_code' => 'en',
             'microsoft_translation_code' => 'en',
             'deepl_translation_code' => 'en',
-            'url_base' => 'http://gtbabel.local.vielhuber.de/some/sub/path',
-            'url_prefix' => 'en'
+            'url_base' => $settings['en']['url_base'],
+            'url_prefix' => $settings['en']['url_prefix']
         ]
     ],
     'lng_source' => 'de',
@@ -53,6 +149,8 @@ $gtbabel->start([
     'detect_dom_changes' => true,
     'detect_dom_changes_include' => ['.js']
 ]);
+
+$gtbabel->start();
 ?>
 <!DOCTYPE html>
 <html>
@@ -91,8 +189,10 @@ $gtbabel->start([
         }
         echo '</ul>';
     } ?>
-    <p><a href="http://gtbabel.local.vielhuber.de/some/sub/path/">Dies ist ein Link</a></p>
-    <p><a href="http://gtbabel.local.vielhuber.de/some/sub/path/datenschutz/">Dies ist ein Link</a></p>
+    <p><a href="<?php echo $settings['de']['url_base']; ?>/">Dies ist ein Link</a></p>
+    <p><a href="<?php echo $settings['de']['url_base']; ?>/<?php echo $test !== 6
+    ? 'datenschutz/'
+    : '?page_id=1337'; ?>">Dies ist ein Link</a></p>
 
 
     <div class="js">

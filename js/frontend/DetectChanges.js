@@ -99,7 +99,7 @@ export default class DetectChanges {
             if (!this.jobIsActive(id)) {
                 return;
             }
-            
+
             resp.data.input = resp.data.input.replace('notranslate_OFF', 'notranslate');
             resp.data.output = resp.data.output.replace('notranslate_OFF', 'notranslate');
 
@@ -274,7 +274,7 @@ export default class DetectChanges {
         return new Promise(resolve => {
             let data = new URLSearchParams();
             data.append('html', html);
-            let url = window.location.protocol + '//' + window.location.host + window.location.pathname;
+            let url = window.location.href;
             url += (url.indexOf('?') > -1 ? '&' : '?') + 'gtbabel_translate_part=1';
             fetch(url, {
                 method: 'POST',

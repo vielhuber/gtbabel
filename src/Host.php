@@ -334,13 +334,14 @@ class Host
 
     function shouldUseLangQueryArg()
     {
-        $count = 0;
+        $base_urls = [];
         foreach ($this->settings->getSelectedLanguageCodes() as $languages__value) {
             if ($this->getPrefixForLanguageCode($languages__value) == '') {
-                $count++;
-            }
-            if ($count >= 2) {
-                return true;
+                $base_url = $this->getBaseUrlForLanguageCode($languages__value);
+                if (in_array($base_url, $base_urls, true)) {
+                    return true;
+                }
+                $base_urls[] = $base_url;
             }
         }
         return false;
