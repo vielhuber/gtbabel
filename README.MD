@@ -1755,15 +1755,22 @@ gets transformed to
 
 `<a href="mailto:?subject=This%20is%20a%20test&amp;body=That%20work%27s">Send email</a>`
 
-### Contact forms
+### Mails
 
-Prepare your email templates only in your source language and before sending, translate them on the fly with something like:
+If you send mails from the backend, ensure to translate the subject and body properly:
 
 ```php
-$template = gtbabel__($template, gtbabel_referer_lng(), gtbabel_source_lng());
+$body = gtbabel__($body);
+$message = gtbabel__($message);
 ```
 
-In WordPress, Contact Form 7 is a popular contact form plugin. Gtbabel has built in support for translating its email templates.
+If the mails consist of personal data, make sure to send these emails as html and properly exclude dynamic content like personal data:
+
+```
+$message = 'Hello <span class="notranslate force-tokenize">John Doe</span>';
+```
+
+Gtbabel automatically translates all mails sent in WordPress and has built in support for popular plugins like [Contact Form 7](https://de.wordpress.org/plugins/contact-form-7/) and [WooCommerce](https://de.wordpress.org/plugins/woocommerce/) to ensure the above guidelines.
 
 ### Comments
 
