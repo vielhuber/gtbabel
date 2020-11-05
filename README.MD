@@ -1764,13 +1764,17 @@ $body = gtbabel__($body);
 $message = gtbabel__($message);
 ```
 
-If the mails consist of personal data, make sure to send these emails as html and properly exclude dynamic content like personal data:
+If the mails consist of personal data, make sure to send these emails as html and properly exclude dynamic content:
 
 ```
-$message = 'Hello <span class="notranslate force-tokenize">John Doe</span>';
+// before
+$message = 'Hello John Doe,';
+// after
+$message = 'Hello <span class="notranslate force-tokenize">John Doe</span>,';
 ```
 
-Gtbabel automatically translates all mails sent in WordPress and has built in support for popular plugins like [Contact Form 7](https://de.wordpress.org/plugins/contact-form-7/) and [WooCommerce](https://de.wordpress.org/plugins/woocommerce/) to ensure the above guidelines.
+Gtbabel automatically translates all mails sent in WordPress and has built in support for\
+popular plugins like [Contact Form 7](https://de.wordpress.org/plugins/contact-form-7/) and [WooCommerce](https://de.wordpress.org/plugins/woocommerce/) to ensure the above guidelines.
 
 ### Comments
 
