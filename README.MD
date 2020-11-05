@@ -1766,7 +1766,7 @@ $message = gtbabel__($message);
 
 If the mails consist of personal data, make sure to send these emails as html and properly exclude dynamic content:
 
-```
+```php
 // before
 $message = 'Hello John Doe,';
 // after
