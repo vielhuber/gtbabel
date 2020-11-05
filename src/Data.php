@@ -1115,6 +1115,9 @@ class Data
         if (mb_strpos(trim($link, '/'), '&') === 0) {
             return $link;
         }
+        if ($this->host->contentTranslationIsDisabledForUrl($link)) {
+            return $link;
+        }
         if ($this->host->urlIsStaticFile($link)) {
             return $link;
         }
@@ -1756,6 +1759,12 @@ class Data
         if ($url === null) {
             $url = $this->host->getCurrentUrlWithArgs();
         }
+        if ($this->host->contentTranslationIsDisabledForUrl($url)) {
+            return $url;
+        }
+        if ($this->host->urlIsStaticFile($url)) {
+            return $url;
+        }
         $path = $this->host->getPathWithoutPrefixFromUrl($url);
         return trim(
             trim($this->host->getBaseUrlWithPrefixForLanguageCode($to_lng), '/') .
@@ -1884,6 +1893,9 @@ class Data
             return $path;
         }
         if ($this->host->slugTranslationIsDisabledForUrl($path)) {
+            return $path;
+        }
+        if ($this->host->urlIsStaticFile($path)) {
             return $path;
         }
 

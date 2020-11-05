@@ -416,12 +416,12 @@ class Dom
             return $html;
         }
         $this->setupDomDocument($html);
+        $this->fixPluginSpecifics();
         if ($mode === 'buffer') {
             $this->setHtmlLangTags();
             $this->setRtlAttr();
             $this->setAltLngUrls();
             $this->detectDomChanges();
-            $this->fixWooCommerceCardCache();
             $this->localizeJsPrepare();
             $this->localizeJsInject();
             $this->injectMenuLanguagePicker();
@@ -1069,8 +1069,9 @@ class Dom
         $head->insertBefore($tag, $head->firstChild);
     }
 
-    function fixWooCommerceCardCache()
+    function fixPluginSpecifics()
     {
+        // woocommerce card cache
         // woocommerce uses a nasty cache in session storage
         // this causes the card on the top right of "storefront" to have a wrong language after switching languages
         // this fixes this behaviour
@@ -1084,6 +1085,13 @@ class Dom
                             window.sessionStorage.removeItem(wc_cart_fragments_params.fragment_name);
                         }
                     ";
+            }
+        }
+        // woocommerce personal data in emails
+        $wc_personal_intro_in_mail = $this->DOMXPath->query('/html/body//*[@id="body_content_inner"]/p[1]');
+        if ($wc_personal_intro_in_mail->length > 0) {
+            foreach ($wc_personal_intro_in_mail as $wc_personal_intro_in_mail__value) {
+                $wc_personal_intro_in_mail__value->parentNode->removeChild($wc_personal_intro_in_mail__value);
             }
         }
     }

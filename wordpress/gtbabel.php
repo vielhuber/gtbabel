@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 5.0.8
+ * Version: 5.0.9
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -39,8 +39,7 @@ class GtbabelWordPress
         $this->disableAutoRedirect();
         $this->initUpdateCapabilities();
         $this->filterSpecificUrls();
-        $this->autoTranslateContactForm7Mails();
-        $this->autoTranslateWPForms();
+        $this->autoTranslatePluginMails();
         $this->autoTranslateSearch();
         $this->startHook();
         $this->stopHook();
@@ -68,9 +67,6 @@ class GtbabelWordPress
             add_filter(
                 $names__value,
                 function ($url) {
-                    if ($this->gtbabel->host->contentTranslationIsDisabledForUrl($url)) {
-                        return $url;
-                    }
                     return $this->gtbabel->data->getUrlTranslationInLanguage(
                         $this->gtbabel->settings->getSourceLanguageCode(),
                         $this->gtbabel->data->getCurrentLanguageCode(),
@@ -80,6 +76,13 @@ class GtbabelWordPress
                 PHP_INT_MAX
             );
         }
+    }
+
+    private function autoTranslatePluginMails()
+    {
+        $this->autoTranslateContactForm7Mails();
+        $this->autoTranslateWPFormsFrontend();
+        $this->autoTranslateMails();
     }
 
     private function autoTranslateContactForm7Mails()
@@ -93,26 +96,20 @@ class GtbabelWordPress
                 $props = $form->get_properties();
                 foreach (['mail', 'mail_2'] as $mails__value) {
                     if (isset($props[$mails__value]) && !empty($props[$mails__value])) {
-                        foreach (['subject', 'body'] as $types__value) {
-                            $props[$mails__value][$types__value] = preg_replace(
-                                '/(\[.+?\])/',
-                                '<span class="notranslate">$1</span>',
-                                $props[$mails__value][$types__value]
-                            );
-                        }
-                        $props[$mails__value]['subject'] = $this->gtbabel->translate(
-                            $props[$mails__value]['subject'],
-                            $this->gtbabel->host->getRefererLanguageCode(),
-                            $this->gtbabel->settings->getSourceLanguageCode()
+                        $props[$mails__value]['subject'] = preg_replace(
+                            '/(\[.+?\])/',
+                            '',
+                            $props[$mails__value]['subject']
                         );
-                        $props[$mails__value]['body'] = __::trim_every_line(
-                            __::br2nl(
-                                $this->gtbabel->translate(
-                                    nl2br($props[$mails__value]['body']),
-                                    $this->gtbabel->host->getRefererLanguageCode(),
-                                    $this->gtbabel->settings->getSourceLanguageCode()
-                                )
-                            )
+                        $props[$mails__value]['body'] = preg_replace(
+                            '/(<)(\[.+?\])(>)/',
+                            '$2',
+                            $props[$mails__value]['body']
+                        );
+                        $props[$mails__value]['body'] = preg_replace(
+                            '/(\[.+?\])/',
+                            '<span class="notranslate force-tokenize">$1</span>',
+                            $props[$mails__value]['body']
                         );
                         $props[$mails__value]['use_html'] = true;
                     }
@@ -123,7 +120,7 @@ class GtbabelWordPress
         );
     }
 
-    private function autoTranslateWPForms()
+    private function autoTranslateWPFormsFrontend()
     {
         add_filter(
             'wpforms_frontend_strings',
@@ -134,6 +131,19 @@ class GtbabelWordPress
                     }
                 }
                 return $data;
+            },
+            PHP_INT_MAX
+        );
+    }
+
+    private function autoTranslateMails()
+    {
+        add_filter(
+            'wp_mail',
+            function ($atts) {
+                $atts['subject'] = $this->gtbabel->translate($atts['subject']);
+                $atts['message'] = $this->gtbabel->translate($atts['message']);
+                return $atts;
             },
             PHP_INT_MAX
         );
@@ -3906,7 +3916,9 @@ EOD;
                         ['selector' => '.lngpicker'],
                         ['selector' => '.xdebug-error'],
                         ['selector' => '#wpadminbar'],
-                        ['selector' => '#comments .comment-content']
+                        ['selector' => '#comments .comment-content'],
+                        ['selector' => '/html/body//address/br/parent::address'],
+                        ['selector' => '.woocommerce-order-overview__email']
                     ]
                 ])
             );

@@ -206,7 +206,7 @@ class Host
 
     function urlIsStaticFile($url)
     {
-        return preg_match('/\.(php|html)$/', rtrim($url, '/'));
+        return preg_match('/\.(php|html)(\?|#)?(.*)$/', rtrim($url, '/'));
     }
 
     function responseCodeIsSuccessful()
