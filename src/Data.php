@@ -723,6 +723,43 @@ class Data
         return true;
     }
 
+    function bulkEdit($action, $lng = null, $checked = null)
+    {
+        if (!in_array($action, ['delete', 'uncheck', 'check'])) {
+            die();
+        }
+        if ($lng !== null && !in_array($lng, $this->settings->getSelectedLanguageCodesWithoutSource())) {
+            die();
+        }
+        if (!in_array($checked, [null, true, false])) {
+            die();
+        }
+        $query = '';
+        $args = [];
+        if ($action === 'delete') {
+            $query .= 'DELETE FROM ' . $this->table;
+        } else {
+            $query .= 'UPDATE ' . $this->table . ' SET checked = ?';
+            $args[] = $action === 'uncheck' ? 0 : 1;
+        }
+        if ($lng !== null || $checked !== null) {
+            $query .= ' WHERE ';
+        }
+        if ($lng !== null) {
+            $query .= 'lng_target = ?';
+            $args[] = $lng;
+        }
+        if ($lng !== null && $checked !== null) {
+            $query .= ' AND ';
+        }
+        if ($checked !== null) {
+            $query .= 'checked = ?';
+            $args[] = $checked;
+        }
+        $this->db->query($query, $args);
+        return true;
+    }
+
     function editCheckedValue($str, $context = null, $lng_source, $lng_target, $checked)
     {
         $this->db->query(
@@ -1615,7 +1652,9 @@ class Data
         if (is_numeric($str)) {
             return true;
         }
-        if (preg_match('/[a-zA-Z]/', $str) !== 1) {
+        // if the string does not contain any char of a string of ANY language
+        // see https://stackoverflow.com/a/48902765/2068362
+        if (preg_match('/\p{L}/u', $str) !== 1) {
             return true;
         }
         if (preg_match('/^[a-z](\)|\])$/', $str)) {

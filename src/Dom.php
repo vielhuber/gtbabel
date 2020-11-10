@@ -494,6 +494,16 @@ class Dom
                     $tag->setAttribute('href', $data__value['url']);
                     $head_node->appendChild($tag);
                 }
+                foreach ($data as $data__value) {
+                    if ($data__value['code'] !== $this->settings->getSourceLanguageCode()) {
+                        continue;
+                    }
+                    $tag = $this->DOMDocument->createElement('link', '');
+                    $tag->setAttribute('rel', 'alternate');
+                    $tag->setAttribute('hreflang', 'x-default');
+                    $tag->setAttribute('href', $data__value['url']);
+                    $head_node->appendChild($tag);
+                }
             }
         }
     }

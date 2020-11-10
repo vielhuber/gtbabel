@@ -65,6 +65,39 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.addEventListener('click', e => {
+        let el = e.target.closest('.gtbabel__submit--auto-grab');
+        if (el) {
+            if (document.querySelector('.gtbabel__auto-grab') !== null) {
+                document.querySelector('.gtbabel__auto-grab').remove();
+            }
+            el.insertAdjacentHTML(
+                'afterend',
+                '<div class="gtbabel__auto-grab" data-error-text="' +
+                    el.getAttribute('data-error-text') +
+                    '">' +
+                    el.getAttribute('data-loading-text') +
+                    '</div>'
+            );
+            let href = el.getAttribute('data-href');
+            if (
+                document.querySelector('#gtbabel_auto_grab_url') !== null &&
+                document.querySelector('#gtbabel_auto_grab_url').value != ''
+            ) {
+                href += '&gtbabel_auto_grab_url=' + document.querySelector('#gtbabel_auto_grab_url').value;
+            }
+            if (
+                document.querySelector('#gtbabel_auto_grab_dry_run') !== null &&
+                document.querySelector('#gtbabel_auto_grab_dry_run').checked === true
+            ) {
+                href += '&gtbabel_auto_grab_dry_run=1';
+            }
+            el.remove();
+            fetchNextAutoGrab(href);
+            e.preventDefault();
+        }
+    });
+
+    document.addEventListener('click', e => {
         let el = e.target.closest('.gtbabel__submit--reset');
         if (el) {
             let answer = prompt(el.getAttribute('data-question'));
@@ -199,6 +232,52 @@ function fetchNextAutoTranslate(url, tries = 0) {
                 }
                 if (html.querySelector('.gtbabel__auto-translate-next') !== null) {
                     fetchNextAutoTranslate(html.querySelector('.gtbabel__auto-translate-next').getAttribute('href'));
+                }
+            }
+        });
+}
+
+function fetchNextAutoGrab(url, tries = 0) {
+    if (tries > 10) {
+        if (document.querySelector('.gtbabel__auto-grab') !== null) {
+            document.querySelector('.gtbabel__auto-grab').innerHTML =
+                '<span class="gtbabel__auto-grab-error">' +
+                document.querySelector('.gtbabel__auto-grab').getAttribute('data-error-text') +
+                '</span>';
+        }
+        return;
+    }
+    fetch(url)
+        .then(response => {
+            if (response.status == 200 || response.status == 304) {
+                return response.text();
+            }
+            return null;
+        })
+        .catch(() => {
+            return null;
+        })
+        .then(response => {
+            let html = null;
+            if (response !== null || response !== undefined || response != '') {
+                html = new DOMParser().parseFromString(response, 'text/html');
+            }
+            // something went wrong, try again
+            if (html === null || html.querySelector('.gtbabel__auto-grab') === null) {
+                setTimeout(() => {
+                    fetchNextAutoGrab(url, tries + 1);
+                }, 3000);
+            } else {
+                if (
+                    document.querySelector('.gtbabel__auto-grab') !== null &&
+                    html.querySelector('.gtbabel__auto-grab') !== null
+                ) {
+                    document.querySelector('.gtbabel__auto-grab').innerHTML = html.querySelector(
+                        '.gtbabel__auto-grab'
+                    ).innerHTML;
+                }
+                if (html.querySelector('.gtbabel__auto-grab-next') !== null) {
+                    fetchNextAutoGrab(html.querySelector('.gtbabel__auto-grab-next').getAttribute('href'));
                 }
             }
         });

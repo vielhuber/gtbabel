@@ -15,6 +15,7 @@ class Gtbabel
         Publish $publish = null,
         Data $data = null,
         Altlng $altlng = null,
+        Grabber $grabber = null,
         DomFactory $domfactory = null,
         Router $router = null,
         Gettext $gettext = null,
@@ -29,6 +30,7 @@ class Gtbabel
         $this->data =
             $data ?: new Data($this->utils, $this->host, $this->settings, $this->tags, $this->log, $this->publish);
         $this->altlng = $altlng ?: new Altlng($this->settings, $this->host);
+        $this->grabber = $grabber ?: new Grabber($this->settings, $this->utils, $this->log, $this->data);
         $this->domfactory =
             $domfactory ?:
             new DomFactory(
@@ -173,21 +175,48 @@ class Gtbabel
         return $data;
     }
 
-    function migrate($url)
+    function grab($main_url, $chunk = 0, $dry_run = false, $sitemap_cache = [])
     {
-        $tmp_folder = $this->utils->getDocRoot() . '/gtbabel-migrate';
-        if (1 == 0) {
-            $de = __curl('https://www.tld.com/de/')->result;
-            $en = __curl('https://www.tld.com/en/')->result;
-        } else {
-            $de = '<p>Dies ist ein Test</p>';
-            $en = '<p>This is a test!</p>';
-        }
-
         if ($this->configured === false) {
             $this->config();
         }
-        $settings = $this->settings->getSettings();
+
+        $languages = $this->settings->getSelectedLanguageCodesWithoutSource();
+
+        $lng = $languages[$chunk % count($languages)];
+
+        $chunk_page = floor($chunk / count($languages));
+
+        $return = ['replacements' => [], 'sitemap' => [], 'count' => 0, 'url' => null, 'foreign_url' => null];
+
+        [$return['url'], $return['sitemap']] = $this->grabber->parseSitemap($main_url, $chunk_page, $sitemap_cache);
+
+        $return['count'] = count($return['sitemap']) * count($languages);
+
+        if ($return['url'] === null) {
+            return $return;
+        }
+
+        $html = [];
+        $tokens = [];
+
+        $html_source = __curl($return['url'])->result;
+        $lng_source = $this->grabber->getLngFromHtml($html_source);
+        $html[$lng_source] = $html_source;
+
+        $return['foreign_url'] = $this->grabber->getForeignUrlFromHrefLang($html_source, $lng);
+
+        if ($return['foreign_url'] === null) {
+            return $this->grab($main_url, $chunk + 1, $dry_run, $sitemap_cache);
+        }
+
+        $html[$lng] = __curl($return['foreign_url'])->result;
+
+        $existing = $this->data->getGroupedTranslationsFromDatabase()['data'];
+        $existing_settings = $this->settings->getSettings();
+
+        $tmp_folder = $this->utils->getDocRoot() . '/gtbabel-migrate';
+        $settings = $existing_settings;
         $settings['exclude_urls_content'] = null;
         $settings['localize_js'] = false;
         $settings['discovery_log'] = true;
@@ -198,60 +227,40 @@ class Gtbabel
             'filename' => $tmp_folder . '/tmp.db',
             'table' => 'translations'
         ];
-
-        $settings['auto_translation'] = true;
-        $settings['lng_source'] = 'de';
-        $settings['lng_target'] = 'en';
-        $this->config($settings);
-        $time = $this->utils->getCurrentTime();
-        $this->domfactory->modifyContentFactory($de, 'tokenize');
-        $this->data->saveCacheToDatabase();
-        $de_tokens = $this->data->discoveryLogGetAfter($time, null, false);
-
         $settings['auto_translation'] = false;
-        $settings['lng_source'] = 'en';
-        $settings['lng_target'] = 'de'; // doesn't matter
+
+        $settings['lng_source'] = $lng_source;
+        $settings['lng_target'] = $lng;
         $this->config($settings);
         $time = $this->utils->getCurrentTime();
-        $this->domfactory->modifyContentFactory($en, 'tokenize');
+        $this->domfactory->modifyContentFactory($html[$lng_source], 'tokenize');
         $this->data->saveCacheToDatabase();
-        $en_tokens = $this->data->discoveryLogGetAfter($time, null, false);
+        $tokens['trans'][$lng] = $this->data->discoveryLogGetAfter($time, null, false);
 
-        $data = [];
+        $settings['lng_source'] = $lng;
+        $settings['lng_target'] = $lng_source; // doesn't matter (must be different)
+        $this->config($settings);
+        $time = $this->utils->getCurrentTime();
+        $this->domfactory->modifyContentFactory($html[$lng], 'tokenize');
+        $this->data->saveCacheToDatabase();
+        $tokens['live'][$lng] = $this->data->discoveryLogGetAfter($time, null, false);
 
-        foreach ($de_tokens as $de_tokens__value) {
-            if ($de_tokens__value['lng_source'] !== 'de') {
-                continue;
-            }
-            if ($de_tokens__value['lng_target'] !== 'en') {
-                continue;
-            }
-            $data[] = [
-                'de' => $de_tokens__value['str'],
-                'en_translated' => $de_tokens__value['trans'],
-                'en_real' => null,
-                'similarity' => 0
-            ];
-        }
-        foreach ($en_tokens as $en_tokens__value) {
-            if ($en_tokens__value['lng_source'] !== 'en') {
-                continue;
-            }
-            if ($en_tokens__value['lng_target'] !== 'de') {
-                continue;
-            }
-            foreach ($data as $data__key => $data__value) {
-                similar_text($en_tokens__value['str'], $data__value['en_translated'], $similarity);
-                $similarity = round($similarity);
-                if ($similarity > $data__value['similarity']) {
-                    $data[$data__key]['similarity'] = $similarity;
-                    $data[$data__key]['en_real'] = $en_tokens__value['str'];
-                }
-            }
-        }
-        $this->log->generalLog($data);
+        $compare = $this->grabber->buildCompareData($tokens, $existing, $lng_source);
+
         $this->reset();
         $this->utils->rrmdir($tmp_folder);
+
+        // reset to original instance
+        $this->config($existing_settings);
+
+        $return['replacements'] = $this->grabber->modifyAppropriateTranslations(
+            $compare,
+            $languages,
+            $lng_source,
+            $dry_run
+        );
+
+        return $return;
     }
 
     function detectDomChanges()

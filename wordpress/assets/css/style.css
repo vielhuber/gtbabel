@@ -207,11 +207,13 @@
     text-align: center;
 }
 
-.gtbabel__auto-translate-error {
+.gtbabel__auto-translate-error,
+.gtbabel__auto-grab-error {
     color: red;
     font-weight: bold;
 }
-.gtbabel__auto-translate-loading {
+.gtbabel__auto-translate-loading,
+.gtbabel__auto-grab-loading {
     display: block;
     margin: 10px 0;
 }

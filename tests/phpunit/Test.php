@@ -551,7 +551,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test_string_detection()
     {
-        $should_translate = ['Haus', 'Sending...'];
+        $should_translate = ['Haus', 'Sending...', 'ब्लॉग'];
         $should_not_translate = [
             '351',
             '351ADBU...',

@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 5.0.9
+ * Version: 5.1.3
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -610,7 +610,7 @@ class GtbabelWordPress
             function ($object) {
                 add_meta_box(
                     'custom-menu-metabox',
-                    __('Language picker', 'gtbabel-plugin'),
+                    __('Gtbabel language picker', 'gtbabel-plugin'),
                     function () {
                         global $nav_menu_selected_id;
                         echo '
@@ -624,7 +624,7 @@ class GtbabelWordPress
                                         'ID' => 1,
                                         'object_id' => 1,
                                         'type_label' => '',
-                                        'title' => __('Language picker', 'gtbabel-plugin'),
+                                        'title' => __('Gtbabel language picker', 'gtbabel-plugin'),
                                         'url' => '#gtbabel_languagepicker',
                                         'type' => 'custom',
                                         'object' => 'gtbabel-slug-slug',
@@ -1665,9 +1665,27 @@ class GtbabelWordPress
         }
         foreach ($settings['auto_translation_service'] as $auto_translation_service__value) {
             echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-2">';
-            echo '<input class="gtbabel__input" type="text" name="gtbabel[auto_translation_service][provider][]" value="' .
-                esc_attr($auto_translation_service__value['provider']) .
-                '" placeholder="google|microsoft|deepl" />';
+            echo '<select class="gtbabel__input gtbabel__input--select" name="gtbabel[auto_translation_service][provider][]">';
+            echo '<option value="">&ndash;&ndash;</option>';
+            foreach (
+                [
+                    'google' => __('Google', 'gtbabel-plugin'),
+                    'microsoft' => __('Microsoft', 'gtbabel-plugin'),
+                    'deepl' => __('DeepL', 'gtbabel-plugin')
+                ]
+                as $auto_translation_service_provider__key => $auto_translation_service_provider__value
+            ) {
+                echo '<option value="' .
+                    $auto_translation_service_provider__key .
+                    '"' .
+                    (esc_attr(@$auto_translation_service__value['provider']) == $auto_translation_service_provider__key
+                        ? ' selected="selected"'
+                        : '') .
+                    '>' .
+                    $auto_translation_service_provider__value .
+                    '</option>';
+            }
+            echo '</select>';
             echo '<input class="gtbabel__input" type="text" name="gtbabel[auto_translation_service][lng][]" value="' .
                 esc_attr(
                     @$auto_translation_service__value['lng'] != ''
@@ -2666,12 +2684,27 @@ class GtbabelWordPress
         $message = '';
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            if (isset($_POST['check_all_strings'])) {
-                $this->gtbabel->data->setAllStringsToChecked();
-            }
-
-            if (isset($_POST['delete_unchecked_strings'])) {
-                $this->gtbabel->data->deleteUncheckedStrings();
+            if (isset($_POST['bulk_change'])) {
+                if (
+                    isset($_POST['bulk_change_action']) &&
+                    $_POST['bulk_change_action'] != '' &&
+                    isset($_POST['bulk_change_language']) &&
+                    $_POST['bulk_change_language'] != '' &&
+                    isset($_POST['bulk_change_status']) &&
+                    $_POST['bulk_change_status'] != ''
+                ) {
+                    $this->gtbabel->data->bulkEdit(
+                        sanitize_text_field($_POST['bulk_change_action']),
+                        $_POST['bulk_change_language'] === '*'
+                            ? null
+                            : sanitize_text_field($_POST['bulk_change_language']),
+                        $_POST['bulk_change_status'] === '*'
+                            ? null
+                            : ($_POST['bulk_change_status'] === 'unchecked'
+                                ? 0
+                                : 1)
+                    );
+                }
             }
 
             if (isset($_POST['reset_settings'])) {
@@ -2724,13 +2757,92 @@ class GtbabelWordPress
         echo $this->showStatsLog();
         echo '</div>';
 
-        echo '<h2 class="gtbabel__subtitle">' . __('Set all strings to checked', 'gtbabel-plugin') . '</h2>';
-        echo '<input class="gtbabel__submit button button-secondary" name="check_all_strings" value="' .
-            __('Save', 'gtbabel-plugin') .
-            '" type="submit" />';
+        echo '<h2 class="gtbabel__subtitle">' . __('Correct translations', 'gtbabel-plugin') . '</h2>';
+        echo '<p class="gtbabel__paragraph">' .
+            __(
+                'Automatically corrects your (automatically) translated strings with publically available translations.',
+                'gtbabel-plugin'
+            ) .
+            '</p>';
+        echo '<ul class="gtbabel__fields">';
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_auto_grab_url" class="gtbabel__label">';
+        echo __('URL in source language', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input" id="gtbabel_auto_grab_url" type="text" value="" placeholder="https://" />';
+        echo '</div>';
+        echo '</li>';
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_auto_grab_dry_run" class="gtbabel__label">';
+        echo __('Dry run', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" id="gtbabel_auto_grab_dry_run" type="checkbox" checked="checked" value="1" />';
+        echo '</div>';
+        echo '</li>';
+        echo '</ul>';
 
-        echo '<h2 class="gtbabel__subtitle">' . __('Delete all unchecked strings', 'gtbabel-plugin') . '</h2>';
-        echo '<input class="gtbabel__submit button button-secondary" name="delete_unchecked_strings" value="' .
+        $this->initBackendAutoGrab('page=gtbabel-actions');
+
+        echo '<h2 class="gtbabel__subtitle">' . __('Bulk changes', 'gtbabel-plugin') . '</h2>';
+        echo '<ul class="gtbabel__fields">';
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_bulk_change_language" class="gtbabel__label">';
+        echo __('Language', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<select class="gtbabel__input gtbabel__input--select" id="gtbabel_bulk_change_language" name="bulk_change_language">';
+        echo '<option value="">&ndash;&ndash;</option>';
+        echo '<option value="*">' . __('All languages', 'gtbabel-plugin') . '</option>';
+        foreach (
+            $this->gtbabel->settings->getSelectedLanguageCodesLabelsWithoutSource()
+            as $languages__key => $languages__value
+        ) {
+            echo '<option value="' . $languages__key . '">' . $languages__value . '</option>';
+        }
+        echo '</select>';
+        echo '</div>';
+        echo '</li>';
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_bulk_change_status" class="gtbabel__label">';
+        echo __('Status', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<select class="gtbabel__input gtbabel__input--select" id="gtbabel_bulk_change_status" name="bulk_change_status">';
+        echo '<option value="">&ndash;&ndash;</option>';
+        echo '<option value="*">' . __('All statuses', 'gtbabel-plugin') . '</option>';
+        foreach (
+            ['checked' => __('Checked', 'gtbabel-plugin'), 'unchecked' => __('Unchecked', 'gtbabel-plugin')]
+            as $statuses__key => $statuses__value
+        ) {
+            echo '<option value="' . $statuses__key . '">' . $statuses__value . '</option>';
+        }
+        echo '</select>';
+        echo '</div>';
+        echo '</li>';
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_bulk_change_action" class="gtbabel__label">';
+        echo __('Action', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<select class="gtbabel__input gtbabel__input--select" id="gtbabel_bulk_change_action" name="bulk_change_action">';
+        echo '<option value="">&ndash;&ndash;</option>';
+        foreach (
+            [
+                'delete' => __('Delete', 'gtbabel-plugin'),
+                'uncheck' => __('Set to unchecked', 'gtbabel-plugin'),
+                'check' => __('Set to checked', 'gtbabel-plugin')
+            ]
+            as $actions__key => $actions__value
+        ) {
+            echo '<option value="' . $actions__key . '">' . $actions__value . '</option>';
+        }
+        echo '</select>';
+        echo '</div>';
+        echo '</li>';
+        echo '</ul>';
+        echo '<input class="gtbabel__submit button button-secondary" name="bulk_change" value="' .
             __('Save', 'gtbabel-plugin') .
             '" type="submit" />';
 
@@ -3510,7 +3622,7 @@ EOD;
             get_bloginfo('url') . '/sitemap_index.xml',
             true,
             false,
-            $auto_set_discovered_strings_checked = false,
+            false,
             false,
             'source'
         );
@@ -3522,7 +3634,7 @@ EOD;
                 get_bloginfo('url') . '/wp-sitemap.xml',
                 true,
                 false,
-                $auto_set_discovered_strings_checked = false,
+                false,
                 false,
                 'source'
             );
@@ -3772,7 +3884,127 @@ EOD;
             echo '<a href="' . $redirect_url . '" class="gtbabel__auto-translate-next"></a>';
             echo '<img class="gtbabel__auto-translate-loading" src="' .
                 plugin_dir_url(__FILE__) .
-                'assets/images/loading.gif" alt="" />';
+                'assets/images/loading.gif" width="64" height="64" alt="" />';
+        }
+
+        echo '</div>';
+    }
+
+    private function initBackendAutoGrab($page)
+    {
+        $chunk_size = 1;
+
+        echo '<a data-loading-text="' .
+            __('Loading', 'gtbabel-plugin') .
+            '..." data-error-text="' .
+            __('An error occurred', 'gtbabel-plugin') .
+            '" data-href="' .
+            admin_url('admin.php?' . $page . '&gtbabel_auto_grab=1') .
+            '" href="#" class="gtbabel__submit gtbabel__submit--auto-grab button button-secondary">' .
+            __('Correct', 'gtbabel-plugin') .
+            '</a>';
+
+        if (@$_GET['gtbabel_auto_grab'] != '1') {
+            return;
+        }
+
+        if (@$_GET['gtbabel_auto_grab_url'] == '') {
+            return;
+        }
+
+        $url = esc_url_raw($_GET['gtbabel_auto_grab_url']);
+
+        $chunk = 0;
+        if (@$_GET['gtbabel_auto_grab_chunk'] != '') {
+            $chunk = intval($_GET['gtbabel_auto_grab_chunk']);
+        }
+
+        $dry_run = false;
+        if (@$_GET['gtbabel_auto_grab_dry_run'] == '1') {
+            $dry_run = true;
+        }
+
+        $time = null;
+        if (__::x(@$_GET['gtbabel_auto_grab_time'])) {
+            $time = $_GET['gtbabel_auto_grab_time'];
+        } else {
+            $time = $this->gtbabel->utils->getCurrentTime();
+        }
+
+        echo '<div class="gtbabel__auto-grab">';
+
+        $sitemap_cache = get_transient('gtbabel_auto_grab_sitemap_cache');
+        if ($sitemap_cache === false) {
+            $sitemap_cache = [];
+        }
+
+        $return = $this->gtbabel->grab($url, $chunk, $dry_run, $sitemap_cache);
+
+        set_transient('gtbabel_auto_grab_sitemap_cache', $return['sitemap']);
+
+        echo $return['foreign_url'] . '<br/>';
+        if (!empty($return['replacements'])) {
+            foreach ($return['replacements'] as $replacements__value) {
+                echo sprintf(
+                    __('Replacing "%s" with "%s"...', 'gtbabel-plugin'),
+                    $replacements__value[0],
+                    $replacements__value[1]
+                ) . '<br/>';
+            }
+            echo sprintf(
+                _n(
+                    'Made %s replacement...',
+                    'Made %s replacements...',
+                    count($return['replacements']),
+                    'gtbabel-plugin'
+                ),
+                count($return['replacements'])
+            ) . '<br/>';
+        } else {
+            echo __('Made no replacements...', 'gtbabel-plugin') . '<br/>';
+        }
+
+        // progress
+        if ($return['count'] > 0) {
+            $progress = ($chunk_size * $chunk + $chunk_size) / $return['count'];
+            if ($progress > 1) {
+                $progress = 1;
+            }
+            $progress *= 100;
+            $progress = round($progress, 2);
+            echo '<strong>';
+            echo __('Duration', 'gtbabel-plugin');
+            echo ': ' . gmdate('H:i:s', strtotime('now') - strtotime($time));
+            echo '<br/>';
+            echo __('Estimated time remaining', 'gtbabel-plugin');
+            echo ': ' . gmdate('H:i:s', ((strtotime('now') - strtotime($time)) / $progress) * (100 - $progress));
+            echo '<br/>';
+            echo __('Progress', 'gtbabel-plugin');
+            echo ': ' . number_format($progress, 2, ',', '') . '%';
+            echo '</strong>';
+            echo '<br/>';
+        }
+
+        // if finished
+        if ($chunk_size * $chunk + $chunk_size > $return['count'] - 1) {
+            echo __('Finished', 'gtbabel-plugin');
+        }
+
+        // next
+        else {
+            $redirect_url = admin_url(
+                'admin.php?' .
+                    $page .
+                    '&gtbabel_auto_grab=1&gtbabel_auto_grab_chunk=' .
+                    ($chunk + 1) .
+                    (__::x($url) ? '&gtbabel_auto_grab_url=' . $url : '') .
+                    ($dry_run === true ? '&gtbabel_auto_grab_dry_run=1' : '') .
+                    (__::x($time) ? '&gtbabel_auto_grab_time=' . $time : '')
+            );
+            echo '<a href="' . $redirect_url . '" class="gtbabel__auto-grab-next"></a>';
+            echo '<img class="gtbabel__auto-grab-loading" src="' .
+                plugin_dir_url(__FILE__) .
+                'assets/images/loading.gif" width="64" height="64" alt="" />';
         }
 
         echo '</div>';
@@ -3904,6 +4136,7 @@ EOD;
                     'exclude_urls_content' => [
                         'wp-admin',
                         'feed',
+                        'embed',
                         'wp-login.php',
                         'wp-register.php',
                         'wp-cron.php',
@@ -3973,8 +4206,8 @@ class gtbabel_lngpicker_widget extends \WP_Widget
 {
     function __construct()
     {
-        parent::__construct('gtbabel_lngpicker_widget', __('Language picker', 'gtbabel-plugin'), [
-            'description' => __('A language picker of Gtbabel.', 'gtbabel-plugin')
+        parent::__construct('gtbabel_lngpicker_widget', __('Gtbabel language picker', 'gtbabel-plugin'), [
+            'description' => __('The language picker of Gtbabel.', 'gtbabel-plugin')
         ]);
     }
     public function widget($args, $instance)
