@@ -139,7 +139,8 @@ class Settings
             'google_throttle_chars_per_month' => 1000000,
             'microsoft_throttle_chars_per_month' => 1000000,
             'deepl_throttle_chars_per_month' => 1000000,
-            'discovery_log' => false
+            'discovery_log' => false,
+            'frontend_editor' => false
         ];
         if (!empty($args)) {
             foreach ($args as $args__key => $args__value) {

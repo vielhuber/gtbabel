@@ -2043,7 +2043,8 @@ EOD;
             'deepl_throttle_chars_per_month' => 1000000,
             'discovery_log' => false,
             'localize_js' => false,
-            'detect_dom_changes' => false
+            'detect_dom_changes' => false,
+            'frontend_editor' => false
         ];
     }
 

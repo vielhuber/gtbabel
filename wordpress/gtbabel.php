@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 5.1.3
+ * Version: 5.1.4
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -275,6 +275,9 @@ class GtbabelWordPress
 
         $settings['prevent_publish'] = !is_user_logged_in();
 
+        $settings['frontend_editor'] =
+            is_user_logged_in() && isset($_GET['gtbabel_frontend_editor']) && $_GET['gtbabel_frontend_editor'] == '1';
+
         // url settings are stored in the wordpress database for migration purposes
         $url_settings = get_option('gtbabel_url_settings');
         if ($url_settings !== null && is_array($url_settings) && !empty($url_settings)) {
@@ -489,9 +492,7 @@ class GtbabelWordPress
                 if (is_admin()) {
                     return;
                 }
-                echo '<style>#wpadminbar #wp-admin-bar-gtbabel-translate .ab-icon:before { content: "\f11f"; top: 3px; }</style>';
-                $html = '<span class="ab-icon"></span>' . __('Translate now', 'gtbabel-plugin');
-                $url = $this->gtbabel->host->getCurrentUrl();
+
                 $lng = $this->gtbabel->data->sourceLngIsCurrentLng()
                     ? null
                     : $this->gtbabel->data->getCurrentLanguageCode();
@@ -500,13 +501,27 @@ class GtbabelWordPress
                     return;
                 }
 
+                echo '<style>#wpadminbar #wp-admin-bar-gtbabel-backend-editor .ab-icon:before { content: "\f11f"; top: 3px; }</style>';
+                $html = '<span class="ab-icon"></span>' . __('Backend editor', 'gtbabel-plugin');
+                $url = $this->gtbabel->host->getCurrentUrl();
                 $admin_bar->add_menu([
-                    'id' => 'gtbabel-translate',
+                    'id' => 'gtbabel-backend-editor',
                     'parent' => null,
                     'group' => null,
                     'title' => $html,
                     'href' => admin_url('admin.php?page=gtbabel-trans&url=' . urlencode($url) . '&lng=' . $lng),
                     'meta' => ['target' => '_blank']
+                ]);
+
+                echo '<style>#wpadminbar #wp-admin-bar-gtbabel-frontend-editor .ab-icon:before { content: "\f11f"; top: 3px; }</style>';
+                $html = '<span class="ab-icon"></span>' . __('Frontend editor', 'gtbabel-plugin');
+                $admin_bar->add_menu([
+                    'id' => 'gtbabel-frontend-editor',
+                    'parent' => null,
+                    'group' => null,
+                    'title' => $html,
+                    'href' => $url . (strpos($url, '?') ? '&' : '?') . 'gtbabel_frontend_editor=1',
+                    'meta' => []
                 ]);
             },
             500
@@ -3696,7 +3711,6 @@ EOD;
             null,
             $with_current_session === true ? $_COOKIE : null
         );
-        //$this->gtbabel->log->generalLog($response);
         return $response;
     }
 

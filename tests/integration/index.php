@@ -168,6 +168,17 @@ $gtbabel->start();
             });
         });
     </script>
+    <style>
+        ._4 {
+            background-color:brown;
+        }
+        ._4:before {
+            content:"";
+            width:10px;
+            height:10px;
+            display:inline-block;
+        }
+    </style>
 </head>
 <body>
     <div class="notranslate" style="font-weight:bold;color:red;font-size:30px;">
@@ -189,6 +200,20 @@ $gtbabel->start();
         }
         echo '</ul>';
     } ?>
+    <div class="_1" style="padding:40px;background-color:grey;">
+        Dies
+        <div class="_2" style="padding:40px;background-color:blue;">
+            ist ein
+            <p class="_3" style="background-color:yellow;display:inline">
+                Es gibt im Moment in diese Mannschaft, oh, einige Spieler vergessen ihnen Profi was sie sind. Ich lese nicht sehr viele Zeitungen, aber ich habe gehört viele Situationen. Erstens: wir haben nicht offensiv gespielt. Es gibt keine deutsche Mannschaft spielt offensiv und die Name offensiv wie Bayern. Letzte Spiel hatten wir in Platz drei Spitzen: Elber, Jancka und dann Zickler. Wir müssen nicht vergessen Zickler. Zickler ist eine Spitzen mehr, Mehmet eh mehr Basler. Ist klar diese Wörter, ist möglich verstehen, was ich hab gesagt? Danke.
+            </p>
+        </div>
+    </div>
+
+    <div class="_4">
+        Das ist ein Test
+    </div>
+
     <p><a href="<?php echo $settings['de']['url_base']; ?>/">Dies ist ein Link</a></p>
     <p><a href="<?php echo $settings['de']['url_base']; ?>/<?php echo $test !== 6
     ? 'datenschutz/'

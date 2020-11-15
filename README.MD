@@ -30,7 +30,8 @@ Gtbabel automatically translates your HTML/PHP pages – server sided!
 -   Multiple source languages supported concurrently.
 -   DOM change detection: Observe specific page parts and translate dynamic content.
 -   Auto throttling api translation for cost control.
--   Custom domain support (path based, subdomain based, top level domain based)
+-   Custom domain support (path based, subdomain based, top level domain based).
+-   Frontend editor included.
 
 ## Requirements
 
@@ -1201,7 +1202,8 @@ The default configuration is:
     'google_throttle_chars_per_month' => 1000000,
     'microsoft_throttle_chars_per_month' => 1000000,
     'deepl_throttle_chars_per_month' => 1000000,
-    'discovery_log' => false
+    'discovery_log' => false,
+    'frontend_editor' => false // common configuration: 'frontend_editor' => user_is_logged_in()
 ];
 ```
 

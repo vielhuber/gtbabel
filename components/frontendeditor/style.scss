@@ -1,0 +1,134 @@
+html[lang][lang] {
+    .gtbabel-frontend-editor-edit-button {
+        box-sizing: border-box;
+        position: absolute;
+        z-index: 2147483646;
+        border: 0;
+        background-color: #9ad3bc;
+        box-shadow: 3px 4px 9px -1px #00000080;
+        opacity: 1;
+        width: 20px;
+        height: 20px;
+        margin-left: 0px;
+        text-indent: -9999px;
+        display: block;
+        text-decoration: none;
+        border-radius: 0px;
+        font-size: 0;
+        background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 348.882 348.882"><path d="M333.988 11.758l-.42-.383A43.363 43.363 0 00304.258 0a43.579 43.579 0 00-32.104 14.153L116.803 184.231a14.993 14.993 0 00-3.154 5.37l-18.267 54.762c-2.112 6.331-1.052 13.333 2.835 18.729 3.918 5.438 10.23 8.685 16.886 8.685h.001c2.879 0 5.693-.592 8.362-1.76l52.89-23.138a14.985 14.985 0 005.063-3.626L336.771 73.176c16.166-17.697 14.919-45.247-2.783-61.418zM130.381 234.247l10.719-32.134.904-.99 20.316 18.556-.904.99-31.035 13.578zm184.24-181.304L182.553 197.53l-20.316-18.556L294.305 34.386c2.583-2.828 6.118-4.386 9.954-4.386 3.365 0 6.588 1.252 9.082 3.53l.419.383c5.484 5.009 5.87 13.546.861 19.03z"/><path d="M303.85 138.388c-8.284 0-15 6.716-15 15v127.347c0 21.034-17.113 38.147-38.147 38.147H68.904c-21.035 0-38.147-17.113-38.147-38.147V100.413c0-21.034 17.113-38.147 38.147-38.147h131.587c8.284 0 15-6.716 15-15s-6.716-15-15-15H68.904C31.327 32.266.757 62.837.757 100.413v180.321c0 37.576 30.571 68.147 68.147 68.147h181.798c37.576 0 68.147-30.571 68.147-68.147V153.388c.001-8.284-6.715-15-14.999-15z"/></svg>');
+        background-size: 90%;
+        background-repeat: no-repeat;
+        background-position: center;
+        &:before,
+        &:after {
+            content: '';
+            width: 0;
+            height: 0;
+        }
+    }
+
+    .gtbabel-frontend-editor-container,
+    .gtbabel-frontend-editor-container * {
+        box-sizing: border-box;
+    }
+
+    .gtbabel-frontend-editor-container {
+        position: absolute;
+        z-index: 2147483647;
+        background-color: #fff;
+        box-shadow: 2px 6px 20px 6px #0000008a;
+        width: 450px;
+        height: auto;
+        padding: 10px;
+    }
+
+    .gtbabel-frontend-editor-container-close {
+        position: absolute;
+        top: 0;
+        left: 100%;
+        background-color: #9ad3bc;
+        box-shadow: 2px 6px 20px 6px #0000008a;
+        width: 20px;
+        height: 20px;
+        display: block;
+        background-position: center;
+        background-size: 70%;
+        background-repeat: no-repeat;
+        background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHhtbG5zOnN2Z2pzPSJodHRwOi8vc3ZnanMuY29tL3N2Z2pzIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgeD0iMCIgeT0iMCIgdmlld0JveD0iMCAwIDQ5MiA0OTIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDUxMiA1MTIiIHhtbDpzcGFjZT0icHJlc2VydmUiPjxnPgo8ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgoJPGc+CgkJPHBhdGggZD0iTTMwMC4xODgsMjQ2TDQ4NC4xNCw2Mi4wNGM1LjA2LTUuMDY0LDcuODUyLTExLjgyLDcuODYtMTkuMDI0YzAtNy4yMDgtMi43OTItMTMuOTcyLTcuODYtMTkuMDI4TDQ2OC4wMiw3Ljg3MiAgICBjLTUuMDY4LTUuMDc2LTExLjgyNC03Ljg1Ni0xOS4wMzYtNy44NTZjLTcuMiwwLTEzLjk1NiwyLjc4LTE5LjAyNCw3Ljg1NkwyNDYuMDA4LDE5MS44Mkw2Mi4wNDgsNy44NzIgICAgYy01LjA2LTUuMDc2LTExLjgyLTcuODU2LTE5LjAyOC03Ljg1NmMtNy4yLDAtMTMuOTYsMi43OC0xOS4wMiw3Ljg1Nkw3Ljg3MiwyMy45ODhjLTEwLjQ5NiwxMC40OTYtMTAuNDk2LDI3LjU2OCwwLDM4LjA1MiAgICBMMTkxLjgyOCwyNDZMNy44NzIsNDI5Ljk1MmMtNS4wNjQsNS4wNzItNy44NTIsMTEuODI4LTcuODUyLDE5LjAzMmMwLDcuMjA0LDIuNzg4LDEzLjk2LDcuODUyLDE5LjAyOGwxNi4xMjQsMTYuMTE2ICAgIGM1LjA2LDUuMDcyLDExLjgyNCw3Ljg1NiwxOS4wMiw3Ljg1NmM3LjIwOCwwLDEzLjk2OC0yLjc4NCwxOS4wMjgtNy44NTZsMTgzLjk2LTE4My45NTJsMTgzLjk1MiwxODMuOTUyICAgIGM1LjA2OCw1LjA3MiwxMS44MjQsNy44NTYsMTkuMDI0LDcuODU2aDAuMDA4YzcuMjA0LDAsMTMuOTYtMi43ODQsMTkuMDI4LTcuODU2bDE2LjEyLTE2LjExNiAgICBjNS4wNi01LjA2NCw3Ljg1Mi0xMS44MjQsNy44NTItMTkuMDI4YzAtNy4yMDQtMi43OTItMTMuOTYtNy44NTItMTkuMDI4TDMwMC4xODgsMjQ2eiIgZmlsbD0iIzAwMDAwMCIgZGF0YS1vcmlnaW5hbD0iIzAwMDAwMCIgc3R5bGU9IiI+PC9wYXRoPgoJPC9nPgo8L2c+CjxnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjwvZz4KPGcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPC9nPgo8ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8L2c+CjxnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjwvZz4KPGcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPC9nPgo8ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8L2c+CjxnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjwvZz4KPGcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPC9nPgo8ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8L2c+CjxnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjwvZz4KPGcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPC9nPgo8ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8L2c+CjxnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjwvZz4KPGcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPC9nPgo8ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8L2c+CjwvZz48L3N2Zz4=);
+    }
+
+    .gtbabel-frontend-editor-container-submit {
+        width: 100%;
+        height: 25px;
+        background-color: #9ad3bc;
+        display: block;
+        border: 0;
+        cursor: pointer;
+        background-repeat: no-repeat;
+        background-size: auto 70%;
+        background-position: center;
+        background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHhtbG5zOnN2Z2pzPSJodHRwOi8vc3ZnanMuY29tL3N2Z2pzIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgeD0iMCIgeT0iMCIgdmlld0JveD0iMCAwIDQzOC41MzMgNDM4LjUzMyIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgNTEyIDUxMiIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PGc+CjxnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+Cgk8cGF0aCBkPSJNNDMyLjgyMywxMjEuMDQ5Yy0zLjgwNi05LjEzMi04LjM3Ny0xNi4zNjctMTMuNzA5LTIxLjY5NWwtNzkuOTQxLTc5Ljk0MmMtNS4zMjUtNS4zMjUtMTIuNTYtOS44OTUtMjEuNjk2LTEzLjcwNCAgIEMzMDguMzQ2LDEuOTAzLDI5OS45NjksMCwyOTIuMzU3LDBIMjcuNDA5QzE5Ljc5OCwwLDEzLjMyNSwyLjY2Myw3Ljk5NSw3Ljk5M2MtNS4zMyw1LjMyNy03Ljk5MiwxMS43OTktNy45OTIsMTkuNDE0djM4My43MTkgICBjMCw3LjYxNywyLjY2MiwxNC4wODksNy45OTIsMTkuNDE3YzUuMzMsNS4zMjUsMTEuODAzLDcuOTkxLDE5LjQxNCw3Ljk5MWgzODMuNzE4YzcuNjE4LDAsMTQuMDg5LTIuNjY2LDE5LjQxNy03Ljk5MSAgIGM1LjMyNS01LjMyOCw3Ljk4Ny0xMS44LDcuOTg3LTE5LjQxN1YxNDYuMTc4QzQzOC41MzEsMTM4LjU2Miw0MzYuNjI5LDEzMC4xODgsNDMyLjgyMywxMjEuMDQ5eiBNMTgyLjcyNSw0NS42NzcgICBjMC0yLjQ3NCwwLjkwNS00LjYxMSwyLjcxNC02LjQyM2MxLjgwNy0xLjgwNCwzLjk0OS0yLjcwOCw2LjQyMy0yLjcwOGg1NC44MTljMi40NjgsMCw0LjYwOSwwLjkwMiw2LjQxNywyLjcwOCAgIGMxLjgxMywxLjgxMiwyLjcxNywzLjk0OSwyLjcxNyw2LjQyM3Y5MS4zNjJjMCwyLjQ3OC0wLjkxLDQuNjE4LTIuNzE3LDYuNDI3Yy0xLjgwOCwxLjgwMy0zLjk0OSwyLjcwOC02LjQxNywyLjcwOGgtNTQuODE5ICAgYy0yLjQ3NCwwLTQuNjE3LTAuOTAyLTYuNDIzLTIuNzA4Yy0xLjgwOS0xLjgxMi0yLjcxNC0zLjk0OS0yLjcxNC02LjQyN1Y0NS42Nzd6IE0zMjguOTA2LDQwMS45OTFIMTA5LjYzM1YyOTIuMzU1aDIxOS4yNzMgICBWNDAxLjk5MXogTTQwMiw0MDEuOTkxaC0zNi41NTJoLTAuMDA3VjI4My4yMThjMC03LjYxNy0yLjY2My0xNC4wODUtNy45OTEtMTkuNDE3Yy01LjMyOC01LjMyOC0xMS44LTcuOTk0LTE5LjQxLTcuOTk0SDEwMC40OTggICBjLTcuNjE0LDAtMTQuMDg3LDIuNjY2LTE5LjQxNyw3Ljk5NGMtNS4zMjcsNS4zMjgtNy45OTIsMTEuOC03Ljk5MiwxOS40MTd2MTE4Ljc3M0gzNi41NDRWMzYuNTQyaDM2LjU0NHYxMTguNzcxICAgYzAsNy42MTUsMi42NjIsMTQuMDg0LDcuOTkyLDE5LjQxNGM1LjMzLDUuMzI3LDExLjgwMyw3Ljk5MywxOS40MTcsNy45OTNoMTY0LjQ1NmM3LjYxLDAsMTQuMDg5LTIuNjY2LDE5LjQxLTcuOTkzICAgYzUuMzI1LTUuMzI3LDcuOTk0LTExLjc5OSw3Ljk5NC0xOS40MTRWMzYuNTQyYzIuODU0LDAsNi41NjMsMC45NSwxMS4xMzYsMi44NTNjNC41NzIsMS45MDIsNy44MDYsMy44MDUsOS43MDksNS43MDhsODAuMjMyLDgwLjIzICAgYzEuOTAyLDEuOTAzLDMuODA2LDUuMTksNS43MDgsOS44NTFjMS45MDksNC42NjUsMi44NTcsOC4zMywyLjg1NywxMC45OTRWNDAxLjk5MXoiIGZpbGw9IiMwMDAwMDAiIGRhdGEtb3JpZ2luYWw9IiMwMDAwMDAiIHN0eWxlPSIiPjwvcGF0aD4KPC9nPgo8ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8L2c+CjxnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjwvZz4KPGcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPC9nPgo8ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8L2c+CjxnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjwvZz4KPGcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPC9nPgo8ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8L2c+CjxnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjwvZz4KPGcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPC9nPgo8ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8L2c+CjxnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjwvZz4KPGcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPC9nPgo8ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8L2c+CjxnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjwvZz4KPGcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPC9nPgo8L2c+PC9zdmc+);
+    }
+
+    .gtbabel-frontend-editor-container-list {
+        padding: 0;
+        margin: 0;
+        list-style-type: none;
+    }
+
+    .gtbabel-frontend-editor-container-listitem {
+        margin-bottom: 10px;
+        position: relative;
+    }
+
+    .gtbabel-frontend-editor-container-listitem-trans {
+        margin-top: 10px;
+    }
+
+    .gtbabel-frontend-editor-container-listitem-context {
+        position: absolute;
+        top: 0;
+        right: -3px;
+        color: #fff;
+        transform: rotate(8deg);
+        font-family: 'Courier New', Courier, monospace;
+        font-weight: bold;
+        font-size: 12px;
+        background-color: red;
+        padding: 4px 10px;
+        display: block;
+    }
+
+    .gtbabel-frontend-editor-container-listitem-textarea[readonly] {
+        background-color: #e8e8e8;
+        color: #333333;
+    }
+    .gtbabel-frontend-editor-container-listitem-textarea {
+        width: 100%;
+        height: 50px;
+        border: 0;
+        font-size: 12px;
+        font-family: 'Courier New', Courier, monospace;
+        border-radius: 0;
+        resize: vertical;
+        padding: 10px;
+        display: block;
+        border: 1px solid #eee;
+        background-color: #fff;
+        color: #000;
+        outline: none;
+    }
+    .gtbabel-frontend-editor-container-listitem-textarea {
+        scrollbar-color: #a0a0a0 #f3f3f3;
+        scrollbar-width: thin;
+    }
+    .gtbabel-frontend-editor-container-listitem-textarea::-webkit-scrollbar {
+        width: 5px;
+    }
+    .gtbabel-frontend-editor-container-listitem-textarea::-webkit-scrollbar-track {
+        background-color: #f3f3f3;
+    }
+    .gtbabel-frontend-editor-container-listitem-textarea::-webkit-scrollbar-thumb {
+        background-color: #a0a0a0;
+    }
+}

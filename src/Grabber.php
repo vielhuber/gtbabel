@@ -166,8 +166,6 @@ class Grabber
                         $compare__value[$languages__value . '_trans'],
                         $compare__value[$languages__value . '_live']
                     ];
-                    $this->log->generalLog($compare__value[$languages__value . '_trans']);
-                    $this->log->generalLog($compare__value[$languages__value . '_live']);
                     if ($dry_run === false) {
                         $this->data->editTranslation(
                             $compare__value[$lng_source],

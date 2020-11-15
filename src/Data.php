@@ -292,9 +292,11 @@ class Data
         ];
     }
 
-    function getExistingTranslationFromCache($str, $lng_source, $lng_target, $context = null)
+    function getExistingTranslationFromCache($str, $lng_source, $lng_target, $context = null, &$meta = [])
     {
+        // track discovered strings
         $this->trackDiscovered($str, $lng_source, $lng_target, $context);
+        // lookup actual string
         if (
             $str === '' ||
             $str === null ||
@@ -307,9 +309,19 @@ class Data
             ) ||
             $this->data['cache'][$lng_source][$lng_target][$context ?? ''][html_entity_decode($str)] === ''
         ) {
-            return false;
+            $return = false;
+        } else {
+            $return = $this->data['cache'][$lng_source][$lng_target][$context ?? ''][html_entity_decode($str)];
         }
-        return $this->data['cache'][$lng_source][$lng_target][$context ?? ''][html_entity_decode($str)];
+        // enhance meta
+        $meta[] = [
+            'str' => $str,
+            'lng_source' => $lng_source,
+            'lng_target' => $lng_target,
+            'context' => $context,
+            'trans' => $return !== false ? $return : null
+        ];
+        return $return;
     }
 
     function getExistingTranslationReverseFromCache($str, $lng_source, $lng_target, $context = null)
@@ -806,10 +818,22 @@ class Data
         $lng_source,
         $lng_target,
         $context = null,
-        $translated_by_current_service = true
+        $translated_by_current_service = true,
+        &$meta = []
     ) {
         if ($lng_target === $lng_source) {
             return;
+        }
+        // enhance meta (only add translation to previously by lookup added string)
+        foreach ($meta as $meta__key => $meta__value) {
+            if (
+                $meta__value['str'] === $str &&
+                $meta__value['lng_source'] === $lng_source &&
+                $meta__value['lng_target'] === $lng_target &&
+                $meta__value['context'] === $context
+            ) {
+                $meta[$meta__key]['trans'] = $trans;
+            }
         }
         $this->data['save']['insert'][] = [
             'str' => $str,
@@ -828,14 +852,15 @@ class Data
         $this->data['cache_reverse'][$lng_source][$lng_target][$context ?? ''][html_entity_decode($trans)] = $str;
     }
 
-    function translateInlineLinks($data)
+    function translateInlineLinks($data, &$meta = [])
     {
         foreach ($data as $data__key => $data__value) {
             $data[$data__key] = $this->prepareTranslationAndAddDynamicallyIfNeeded(
                 $data__value,
                 $this->settings->getSourceLanguageCode(),
                 $this->getCurrentLanguageCode(),
-                'slug'
+                'slug',
+                $meta
             );
         }
         return $data;
@@ -1029,7 +1054,7 @@ class Data
         return false;
     }
 
-    function prepareTranslationAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, $context = null)
+    function prepareTranslationAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, $context = null, &$meta = [])
     {
         $context = $this->autoDetermineContext($orig, $context);
 
@@ -1045,27 +1070,27 @@ class Data
                     $this->host->getPrefixFromUrl($orig) != $this->host->getPrefixForLanguageCode($lng_source)) ||
                     $this->host->shouldUseLangQueryArg())
             ) {
-                return $this->modifyLink($orig, $lng_source, $lng_target);
+                return $this->modifyLink($orig, $lng_source, $lng_target, $meta);
             }
             return null;
         }
 
         if ($context === 'slug') {
-            $trans = $this->getTranslationOfLinkHrefAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target);
+            $trans = $this->getTranslationOfLinkHrefAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, $meta);
             if ($trans === null) {
                 return $orig;
             }
             return $trans;
         }
         if ($context === 'file') {
-            $trans = $this->getTranslationOfFileAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target);
+            $trans = $this->getTranslationOfFileAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, $meta);
             if ($trans === null) {
                 return $orig;
             }
             return $trans;
         }
         if ($context === 'email') {
-            $trans = $this->getTranslationOfEmailAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target);
+            $trans = $this->getTranslationOfEmailAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, $meta);
             if ($trans === null) {
                 return $orig;
             }
@@ -1076,7 +1101,8 @@ class Data
                 $orig,
                 $lng_source,
                 $lng_target,
-                $context
+                $context,
+                $meta
             );
             if ($trans === null) {
                 return $orig;
@@ -1087,11 +1113,16 @@ class Data
         if ($this->stringShouldNotBeTranslated($orig, $context)) {
             return null;
         }
-        return $this->getTranslationAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, $context);
+        return $this->getTranslationAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, $context, $meta);
     }
 
-    function getTranslationOfTitleDescriptionAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, $context)
-    {
+    function getTranslationOfTitleDescriptionAndAddDynamicallyIfNeeded(
+        $orig,
+        $lng_source,
+        $lng_target,
+        $context,
+        &$meta = []
+    ) {
         $orig = str_replace(' ', ' ', $orig); // replace hidden &nbsp; chars
         $delimiters = ['|', '·', '•', '>', '-', '–', '—', ':', '*', '⋆', '~', '«', '»', '<'];
         $delimiters_encoded = [];
@@ -1110,7 +1141,8 @@ class Data
                         $orig_parts__value,
                         $lng_source,
                         $lng_target,
-                        $context
+                        $context,
+                        $meta
                     );
                     $orig_parts[$orig_parts__key] = $trans;
                 }
@@ -1118,31 +1150,38 @@ class Data
                 return $trans;
             }
         }
-        return $this->getTranslationAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, $context);
+        return $this->getTranslationAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, $context, $meta);
     }
 
-    function modifyLink($link, $lng_source, $lng_target)
+    function modifyLink($link, $lng_source, $lng_target, &$meta = [])
     {
         return $this->modifyLinkAndGetTranslationOfLinkHrefAndAddDynamicallyIfNeeded(
             $link,
             $lng_source,
             $lng_target,
-            false
+            false,
+            $meta
         );
     }
 
-    function getTranslationOfLinkHrefAndAddDynamicallyIfNeeded($link, $lng_source, $lng_target)
+    function getTranslationOfLinkHrefAndAddDynamicallyIfNeeded($link, $lng_source, $lng_target, &$meta = [])
     {
         return $this->modifyLinkAndGetTranslationOfLinkHrefAndAddDynamicallyIfNeeded(
             $link,
             $lng_source,
             $lng_target,
-            true
+            true,
+            $meta
         );
     }
 
-    function modifyLinkAndGetTranslationOfLinkHrefAndAddDynamicallyIfNeeded($link, $lng_source, $lng_target, $translate)
-    {
+    function modifyLinkAndGetTranslationOfLinkHrefAndAddDynamicallyIfNeeded(
+        $link,
+        $lng_source,
+        $lng_target,
+        $translate,
+        &$meta = []
+    ) {
         if ($link === null || trim($link) === '') {
             return $link;
         }
@@ -1182,7 +1221,7 @@ class Data
 
         if ($translate === true) {
             if (!$this->host->slugTranslationIsDisabledForUrl($link)) {
-                [$link, $link_arguments] = $this->urlQueryArgsStripAndTranslate($link, $lng_source, $lng_target);
+                [$link, $link_arguments] = $this->urlQueryArgsStripAndTranslate($link, $lng_source, $lng_target, $meta);
                 $url_parts = explode('/', $link);
                 foreach ($url_parts as $url_parts__key => $url_parts__value) {
                     if ($this->stringShouldNotBeTranslated($url_parts__value, 'slug')) {
@@ -1192,7 +1231,8 @@ class Data
                         $url_parts__value,
                         $lng_source,
                         $lng_target,
-                        'slug'
+                        'slug',
+                        $meta
                     );
                 }
                 $link = implode('/', $url_parts);
@@ -1214,7 +1254,7 @@ class Data
         return $link;
     }
 
-    function getTranslationOfFileAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target)
+    function getTranslationOfFileAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, &$meta = [])
     {
         $urls = [];
         // extract urls from style tag
@@ -1247,7 +1287,7 @@ class Data
             if ($this->stringShouldNotBeTranslated($urls__value, 'file')) {
                 continue;
             }
-            $trans = $this->getExistingTranslationFromCache($urls__value, $lng_source, $lng_target, 'file');
+            $trans = $this->getExistingTranslationFromCache($urls__value, $lng_source, $lng_target, 'file', $meta);
             if ($trans === false) {
                 $this->addTranslationToDatabaseAndToCache(
                     $urls__value,
@@ -1255,7 +1295,8 @@ class Data
                     $lng_source,
                     $lng_target,
                     'file',
-                    false
+                    false,
+                    $meta
                 );
             } elseif ($this->stringIsChecked($urls__value, $lng_source, $lng_target, 'file')) {
                 $orig = str_replace($urls__value, $trans, $orig);
@@ -1264,7 +1305,7 @@ class Data
         return $orig;
     }
 
-    function getTranslationOfEmailAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target)
+    function getTranslationOfEmailAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, &$meta = [])
     {
         $is_link = strpos($orig, 'mailto:') === 0;
         if ($is_link) {
@@ -1287,7 +1328,8 @@ class Data
                     $args_array__value,
                     $lng_source,
                     $lng_target,
-                    null
+                    null,
+                    $meta
                 );
                 if ($args_array__key === 'body') {
                     $args_array__value = rawurlencode($args_array__value);
@@ -1298,9 +1340,17 @@ class Data
             $args = '?' . implode('&', $args_array_trans);
         }
         if (trim($orig) != '') {
-            $trans = $this->getExistingTranslationFromCache($orig, $lng_source, $lng_target, 'email');
+            $trans = $this->getExistingTranslationFromCache($orig, $lng_source, $lng_target, 'email', $meta);
             if ($trans === false) {
-                $this->addTranslationToDatabaseAndToCache($orig, $orig, $lng_source, $lng_target, 'email', false);
+                $this->addTranslationToDatabaseAndToCache(
+                    $orig,
+                    $orig,
+                    $lng_source,
+                    $lng_target,
+                    'email',
+                    false,
+                    $meta
+                );
             } elseif ($this->stringIsChecked($orig, $lng_source, $lng_target, 'email')) {
                 $trans = ($is_link ? 'mailto:' : '') . $trans;
                 $trans .= $args;
@@ -1312,7 +1362,7 @@ class Data
         return $orig;
     }
 
-    function getTranslationAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, $context = null)
+    function getTranslationAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, $context = null, &$meta = [])
     {
         /*
         $orig
@@ -1397,13 +1447,14 @@ class Data
             $mappingTableInlineLinks
         ] = $this->tags->removeInlineLinks($origWithoutPrefixSuffixWithoutAttributes);
 
-        $mappingTableInlineLinks = $this->translateInlineLinks($mappingTableInlineLinks);
+        $mappingTableInlineLinks = $this->translateInlineLinks($mappingTableInlineLinks, $meta);
 
         $transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks = $this->getExistingTranslationFromCache(
             $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks,
             $lng_source,
             $lng_target,
-            $context
+            $context,
+            $meta
         );
 
         if ($transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks === false) {
@@ -1426,7 +1477,8 @@ class Data
                     $lng_source,
                     $lng_target,
                     $context,
-                    true
+                    true,
+                    $meta
                 );
             } else {
                 $transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks = $this->tags->removeAttributesExceptIrregularIds(
@@ -1924,7 +1976,8 @@ class Data
     {
         /* this is a different approach than modifyLinkAndGetTranslationOfLinkHrefAndAddDynamicallyIfNeeded:
         if does not translate actively a link (which is generally in the source language)
-        but tries to convert an already translated link to its source language (or any other language) */
+        but tries to convert an already translated link to its source language (or any other language)
+        this approach is mainly used in the router */
         if ($path == '') {
             return $path;
         }
@@ -2019,7 +2072,7 @@ class Data
         }
     }
 
-    function urlQueryArgsStripAndTranslate($link, $lng_source, $lng_target)
+    function urlQueryArgsStripAndTranslate($link, $lng_source, $lng_target, &$meta = [])
     {
         $link_rules = $this->settings->get('url_query_args');
         if ($link_rules === null || empty($link_rules)) {
@@ -2068,7 +2121,8 @@ class Data
                                     $link_arguments_query[$link_arguments_query__key],
                                     $lng_source,
                                     $lng_target,
-                                    null
+                                    null,
+                                    $meta
                                 );
                             }
                         }

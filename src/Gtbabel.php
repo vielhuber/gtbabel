@@ -65,7 +65,8 @@ class Gtbabel
         if ($this->started === true) {
             return;
         }
-        $this->detectDomChanges();
+        $this->detectDomChangesBackend();
+        $this->frontendEditorBackend();
         if ($this->host->contentTranslationIsDisabledForCurrentUrl()) {
             return;
         }
@@ -263,7 +264,7 @@ class Gtbabel
         return $return;
     }
 
-    function detectDomChanges()
+    function detectDomChangesBackend()
     {
         if (isset($_GET['gtbabel_translate_part']) && $_GET['gtbabel_translate_part'] == '1' && isset($_POST['html'])) {
             $input = $_POST['html'];
@@ -273,6 +274,27 @@ class Gtbabel
             echo json_encode([
                 'success' => true,
                 'data' => ['input' => $input, 'output' => $output]
+            ]);
+            die();
+        }
+    }
+
+    function frontendEditorBackend()
+    {
+        if (
+            $this->settings->get('frontend_editor') === true &&
+            isset($_GET['gtbabel_frontend_editor_save']) &&
+            $_GET['gtbabel_frontend_editor_save'] == '1'
+        ) {
+            $str = trim(strip_tags(stripslashes(@$_POST['str'])));
+            $context = trim(strip_tags(stripslashes(@$_POST['context'])));
+            $lng_source = trim(strip_tags(stripslashes(@$_POST['lng_source'])));
+            $lng_target = trim(strip_tags(stripslashes(@$_POST['lng_target'])));
+            $trans = trim(strip_tags(stripslashes(@$_POST['trans'])));
+            $this->data->editTranslation($str, $context, $lng_source, $lng_target, $trans);
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true
             ]);
             die();
         }

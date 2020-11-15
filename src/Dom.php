@@ -194,7 +194,7 @@ class Dom
         return $groups;
     }
 
-    function modifyHtmlNodes()
+    function modifyHtmlNodes($mode)
     {
         $include = $this->settings->get('translate_html_include');
 
@@ -308,12 +308,16 @@ class Dom
 
                                 $str_without_lb = $this->data->removeLineBreaksAndPrepareString($str_with_lb);
 
+                                $meta = [];
+
                                 $trans = $this->data->prepareTranslationAndAddDynamicallyIfNeeded(
                                     $str_without_lb,
                                     $lng_source,
                                     $lng_target,
-                                    $context
+                                    $context,
+                                    $meta
                                 );
+
                                 if ($trans === null) {
                                     continue;
                                 }
@@ -342,6 +346,30 @@ class Dom
                                     } else {
                                         $this->setInnerHtml($nodes__value, $trans);
                                         $this->addToExcludedNodes($nodes__value, 'text()');
+                                    }
+                                }
+
+                                // populate meta data into dom (only in buffer mode!)
+                                if (
+                                    $this->settings->get('frontend_editor') === true &&
+                                    $mode === 'buffer' &&
+                                    !empty($meta)
+                                ) {
+                                    $meta_target = $this->isElementNode($nodes__value)
+                                        ? $nodes__value
+                                        : $nodes__value->parentNode;
+                                    if ($meta_target !== null) {
+                                        if ($meta_target->getAttribute('data-gtbabel-meta') != '') {
+                                            $meta_existing = $meta_target->getAttribute('data-gtbabel-meta');
+                                            $meta = array_merge($meta, unserialize(base64_decode($meta_existing)));
+                                            $meta = __::array_unique($meta);
+                                        }
+                                        $meta_encrypted = base64_encode(serialize($meta));
+                                        $meta_target->setAttribute('data-gtbabel-meta', $meta_encrypted);
+                                        $meta_target->setAttribute(
+                                            'data-gtbabel-meta-key',
+                                            base64_encode(serialize($this->getIdOfNode($meta_target)))
+                                        );
                                     }
                                 }
                             }
@@ -421,7 +449,8 @@ class Dom
             $this->setHtmlLangTags();
             $this->setRtlAttr();
             $this->setAltLngUrls();
-            $this->detectDomChanges();
+            $this->detectDomChangesFrontend();
+            $this->frontendEditorFrontend();
             $this->localizeJsPrepare();
             $this->localizeJsInject();
             $this->injectMenuLanguagePicker();
@@ -429,7 +458,7 @@ class Dom
         $this->preloadExcludedNodes();
         $this->preloadForceTokenize();
         $this->preloadLngAreas();
-        $this->modifyHtmlNodes();
+        $this->modifyHtmlNodes($mode);
         $html = $this->finishDomDocument();
         // DomDocument always encodes characters (meaning we receive plain text links with &amp; inside, which is bad for plain text)
         if ($content_type === 'plain') {
@@ -1029,7 +1058,7 @@ class Dom
         return $json;
     }
 
-    function detectDomChanges()
+    function detectDomChangesFrontend()
     {
         if ($this->settings->get('detect_dom_changes') !== true) {
             return;
@@ -1066,7 +1095,7 @@ class Dom
             'var gtbabel_detect_dom_changes_include = JSON.parse(\'' .
             json_encode($detect_dom_changes_include, JSON_HEX_APOS) .
             '\');';
-        $script .= file_get_contents(dirname(__DIR__) . '/js/frontend/build/bundle.js');
+        $script .= file_get_contents(dirname(__DIR__) . '/components/detectdomchanges/build/bundle.js');
         $tag->textContent = $script;
         $head->insertBefore($tag, $head->firstChild);
         $tag = $this->DOMDocument->createElement('style', '');
@@ -1077,6 +1106,31 @@ class Dom
             }
         ';
         $head->insertBefore($tag, $head->firstChild);
+    }
+
+    function frontendEditorFrontend()
+    {
+        if ($this->settings->get('frontend_editor') !== true) {
+            return;
+        }
+        if (!$this->host->responseCodeIsSuccessful()) {
+            return;
+        }
+        if ($this->data->sourceLngIsCurrentLng()) {
+            return;
+        }
+        $head = $this->DOMXPath->query('/html/head')[0];
+        if ($head === null) {
+            return;
+        }
+        $tag = $this->DOMDocument->createElement('script', '');
+        $tag->setAttribute('data-type', 'gtbabel-frontend-editor');
+        $tag->textContent = file_get_contents(dirname(__DIR__) . '/components/frontendeditor/build/bundle.js');
+        $head->appendChild($tag);
+        $tag = $this->DOMDocument->createElement('style', '');
+        $tag->setAttribute('data-type', 'gtbabel-frontend-editor');
+        $tag->textContent = file_get_contents(dirname(__DIR__) . '/components/frontendeditor/build/bundle.css');
+        $head->appendChild($tag);
     }
 
     function fixPluginSpecifics()
