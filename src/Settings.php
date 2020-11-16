@@ -125,7 +125,7 @@ class Settings
             'auto_add_translations' => true,
             'auto_set_new_strings_checked' => false,
             'auto_set_discovered_strings_checked' => false,
-            'only_show_checked_strings' => false,
+            'unchecked_strings' => 'trans',
             'auto_translation' => false,
             'auto_translation_service' => [
                 [

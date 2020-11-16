@@ -712,7 +712,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
         $settings['auto_translation'] = false;
         $settings['auto_add_translations'] = false;
-        $settings['only_show_checked_strings'] = false;
+        $settings['unchecked_strings'] = 'trans';
         ob_start();
         $this->gtbabel->config($settings);
         $this->gtbabel->start();
@@ -727,7 +727,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
         $settings['auto_translation'] = true;
         $settings['auto_add_translations'] = false;
-        $settings['only_show_checked_strings'] = false;
+        $settings['unchecked_strings'] = 'trans';
         ob_start();
         $this->gtbabel->config($settings);
         $this->gtbabel->start();
@@ -742,7 +742,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
         $settings['auto_translation'] = true;
         $settings['auto_add_translations'] = true;
-        $settings['only_show_checked_strings'] = false;
+        $settings['unchecked_strings'] = 'trans';
         ob_start();
         $this->gtbabel->config($settings);
         $this->gtbabel->start();
@@ -760,7 +760,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
         $settings['auto_translation'] = true;
         $settings['auto_add_translations'] = true;
-        $settings['only_show_checked_strings'] = true;
+        $settings['unchecked_strings'] = 'source';
         ob_start();
         $this->gtbabel->config($settings);
         $this->gtbabel->start();
@@ -769,6 +769,40 @@ class Test extends \PHPUnit\Framework\TestCase
         $output = ob_get_contents();
         ob_end_clean();
         $this->assertEquals($output, '<p>Haus</p>');
+        $this->assertEquals(
+            $this->gtbabel->data->getTranslationFromDatabase('Haus', null, 'de', 'en')['trans'] === 'House',
+            true
+        );
+        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase()['data'][0]['en'], 'House');
+
+        $this->gtbabel->data->editCheckedValue('Haus', null, 'de', 'en', true);
+
+        ob_start();
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
+        echo '<p>Haus</p>';
+        $this->gtbabel->stop();
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertEquals($output, '<p>House</p>');
+        $this->assertEquals(
+            $this->gtbabel->data->getTranslationFromDatabase('Haus', null, 'de', 'en')['checked'] == 1,
+            true
+        );
+        $this->assertEquals($this->gtbabel->data->getGroupedTranslationsFromDatabase()['data'][0]['en_checked'], 1);
+        $this->gtbabel->reset();
+
+        $settings['auto_translation'] = true;
+        $settings['auto_add_translations'] = true;
+        $settings['unchecked_strings'] = 'hide';
+        ob_start();
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
+        echo '<p>Haus</p>';
+        $this->gtbabel->stop();
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertEquals($output, '<p></p>');
         $this->assertEquals(
             $this->gtbabel->data->getTranslationFromDatabase('Haus', null, 'de', 'en')['trans'] === 'House',
             true
@@ -976,7 +1010,7 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['debug_translations'] = false;
         $settings['auto_translation'] = true;
         $settings['auto_add_translations'] = true;
-        $settings['only_show_checked_strings'] = false;
+        $settings['unchecked_strings'] = 'trans';
         $settings['url_query_args'] = [
             [
                 'type' => 'keep',
@@ -1070,7 +1104,7 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['debug_translations'] = false;
         $settings['auto_translation'] = true;
         $settings['auto_add_translations'] = true;
-        $settings['only_show_checked_strings'] = false;
+        $settings['unchecked_strings'] = 'trans';
 
         ob_start();
         $this->gtbabel->config($settings);
@@ -1119,7 +1153,7 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['debug_translations'] = false;
         $settings['auto_translation'] = true;
         $settings['auto_add_translations'] = true;
-        $settings['only_show_checked_strings'] = false;
+        $settings['unchecked_strings'] = 'trans';
 
         ob_start();
         $this->gtbabel->config($settings);
@@ -1172,7 +1206,7 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['debug_translations'] = false;
         $settings['auto_translation'] = true;
         $settings['auto_add_translations'] = true;
-        $settings['only_show_checked_strings'] = false;
+        $settings['unchecked_strings'] = 'trans';
 
         $settings['auto_translation_service'] = [
             [
@@ -1282,7 +1316,7 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['debug_translations'] = false;
         $settings['auto_translation'] = true;
         $settings['auto_add_translations'] = true;
-        $settings['only_show_checked_strings'] = false;
+        $settings['unchecked_strings'] = 'trans';
 
         $settings['auto_translation_service'] = [
             [
@@ -1343,7 +1377,7 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['debug_translations'] = false;
         $settings['auto_translation'] = true;
         $settings['auto_add_translations'] = true;
-        $settings['only_show_checked_strings'] = false;
+        $settings['unchecked_strings'] = 'trans';
 
         $input = <<<'EOD'
 <div style="background-image: url(http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei1.jpg);"></div>
@@ -1616,7 +1650,7 @@ EOD;
         $settings['debug_translations'] = false;
         $settings['auto_translation'] = true;
         $settings['auto_add_translations'] = true;
-        $settings['only_show_checked_strings'] = false;
+        $settings['unchecked_strings'] = 'trans';
         $settings['languages'] = $this->getLanguageSettings(
             [['code' => 'de', 'url_prefix' => ''], ['code' => 'en']],
             true
@@ -1712,7 +1746,7 @@ EOD;
         $settings['debug_translations'] = false;
         $settings['auto_translation'] = true;
         $settings['auto_add_translations'] = true;
-        $settings['only_show_checked_strings'] = false;
+        $settings['unchecked_strings'] = 'trans';
 
         $settings['languages'] = $this->getLanguageSettings(
             [['code' => 'de', 'url_prefix' => ''], ['code' => 'en']],
@@ -1764,7 +1798,7 @@ EOD;
         );
         $this->gtbabel->reset();
 
-        $settings['only_show_checked_strings'] = true;
+        $settings['unchecked_strings'] = 'source';
         $this->setHostTo('/de/impressum/');
         ob_start();
         $this->gtbabel->config($settings);
@@ -1786,7 +1820,7 @@ EOD;
         );
         $this->gtbabel->reset();
 
-        $settings['only_show_checked_strings'] = true;
+        $settings['unchecked_strings'] = 'source';
         $this->setHostTo('/en/impressum/');
         ob_start();
         $this->gtbabel->config($settings);
@@ -1812,7 +1846,7 @@ EOD;
             [['code' => 'de', 'url_prefix' => 'de'], ['code' => 'en'], ['code' => 'fr']],
             true
         );
-        $settings['only_show_checked_strings'] = false;
+        $settings['unchecked_strings'] = 'trans';
         $this->setHostTo('/de/impressum/');
         $this->gtbabel->config($settings);
         $this->gtbabel->start();
@@ -1859,7 +1893,7 @@ EOD;
         );
         $this->gtbabel->reset();
 
-        $settings['only_show_checked_strings'] = true;
+        $settings['unchecked_strings'] = 'source';
         $settings['languages'] = $this->getLanguageSettings(
             [['code' => 'de', 'url_prefix' => ''], ['code' => 'en'], ['code' => 'fr']],
             true
@@ -2012,7 +2046,7 @@ EOD;
             'auto_add_translations' => false,
             'auto_set_new_strings_checked' => false,
             'auto_set_discovered_strings_checked' => false,
-            'only_show_checked_strings' => false,
+            'unchecked_strings' => 'trans',
             'url_query_args' => [
                 [
                     'type' => 'keep',

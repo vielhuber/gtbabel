@@ -1187,7 +1187,7 @@ The default configuration is:
     'auto_add_translations' => true,
     'auto_set_new_strings_checked' => false,
     'auto_set_discovered_strings_checked' => false,
-    'only_show_checked_strings' => false,
+    'unchecked_strings' => 'trans', // trans|source|hide
     'auto_translation' => true,
     'auto_translation_service' => [
         [
@@ -1654,7 +1654,21 @@ If your json endpoint is not targeted via a language specific url, you can get t
 
 ## Translation management
 
-If `only_show_checked_strings` is set to `true`, only translations that are checked are shown. This way you can build an approval system in your backend, where translators can check strings before they are published.
+With the `unchecked_strings` option you can control what happens with unchecked strings:
+
+-   Show translation (which still needs to be checked)
+-   Show source (show the string in the source language)
+-   Hide string (completely hide string until its checked)
+
+This way you can build an approval system in your backend, where translators can check strings before they are published.
+
+One common approach is to dynamically override this setting if a user is logged in:
+
+```php
+/* ... */
+'unchecked_strings' => is_user_logged_in() ? 'trans' : 'hide'
+/* ... */
+```
 
 ## Flow diagram
 

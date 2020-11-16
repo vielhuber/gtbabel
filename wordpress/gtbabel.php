@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 5.1.4
+ * Version: 5.1.5
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -274,6 +274,10 @@ class GtbabelWordPress
         ];
 
         $settings['prevent_publish'] = !is_user_logged_in();
+
+        if (is_user_logged_in()) {
+            $settings['unchecked_strings'] = 'trans';
+        }
 
         $settings['frontend_editor'] =
             is_user_logged_in() && isset($_GET['gtbabel_frontend_editor']) && $_GET['gtbabel_frontend_editor'] == '1';
@@ -854,7 +858,7 @@ class GtbabelWordPress
                             'html_hreflang_tags',
                             'xml_hreflang_tags',
                             'auto_add_translations',
-                            'only_show_checked_strings',
+                            'unchecked_strings',
                             'auto_set_new_strings_checked',
                             'auto_translation',
                             'auto_translation_service',
@@ -895,7 +899,6 @@ class GtbabelWordPress
                             'xml_hreflang_tags',
                             'debug_translations',
                             'auto_add_translations',
-                            'only_show_checked_strings',
                             'auto_set_new_strings_checked',
                             'auto_translation',
                             'localize_js',
@@ -1636,13 +1639,27 @@ class GtbabelWordPress
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_only_show_checked_strings" class="gtbabel__label">';
-        echo __('Only show checked strings', 'gtbabel-plugin');
+        echo '<label for="gtbabel_unchecked_strings" class="gtbabel__label">';
+        echo __('Behaviour for unchecked strings', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_only_show_checked_strings" name="gtbabel[only_show_checked_strings]" value="1"' .
-            ($settings['only_show_checked_strings'] == '1' ? ' checked="checked"' : '') .
-            ' />';
+        echo '<select class="gtbabel__input gtbabel__input--select" id="gtbabel_unchecked_strings" name="gtbabel[unchecked_strings]">';
+        echo '<option value="trans"' .
+            ($settings['unchecked_strings'] == 'trans' ? ' selected="selected"' : '') .
+            '>' .
+            __('Show translations', 'gtbabel-plugin') .
+            '</option>';
+        echo '<option value="source"' .
+            ($settings['unchecked_strings'] == 'source' ? ' selected="selected"' : '') .
+            '>' .
+            __('Show sources', 'gtbabel-plugin') .
+            '</option>';
+        echo '<option value="hide"' .
+            ($settings['unchecked_strings'] == 'hide' ? ' selected="selected"' : '') .
+            '>' .
+            __('Hide strings', 'gtbabel-plugin') .
+            '</option>';
+        echo '</select>';
         echo '</div>';
         echo '</li>';
 

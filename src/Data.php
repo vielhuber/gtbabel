@@ -1298,8 +1298,15 @@ class Data
                     false,
                     $meta
                 );
-            } elseif ($this->stringIsChecked($urls__value, $lng_source, $lng_target, 'file')) {
-                $orig = str_replace($urls__value, $trans, $orig);
+            } else {
+                if (
+                    $this->settings->get('unchecked_strings') === 'trans' ||
+                    $this->stringIsChecked($urls__value, $lng_source, $lng_target, 'file')
+                ) {
+                    $orig = str_replace($urls__value, $trans, $orig);
+                } elseif ($this->settings->get('unchecked_strings') === 'hide') {
+                    $orig = str_replace($urls__value, '', $orig);
+                }
             }
         }
         return $orig;
@@ -1351,10 +1358,17 @@ class Data
                     false,
                     $meta
                 );
-            } elseif ($this->stringIsChecked($orig, $lng_source, $lng_target, 'email')) {
-                $trans = ($is_link ? 'mailto:' : '') . $trans;
-                $trans .= $args;
-                return $trans;
+            } else {
+                if (
+                    $this->settings->get('unchecked_strings') === 'trans' ||
+                    $this->stringIsChecked($orig, $lng_source, $lng_target, 'email')
+                ) {
+                    $trans = ($is_link ? 'mailto:' : '') . $trans;
+                    $trans .= $args;
+                    return $trans;
+                } elseif ($this->settings->get('unchecked_strings') === 'hide') {
+                    return '';
+                }
             }
         }
         $orig = ($is_link ? 'mailto:' : '') . $orig;
@@ -1500,17 +1514,19 @@ class Data
         $trans = $this->tags->addPrefixSuffix($transWithoutPrefixSuffix, $mappingTablePrefixSuffix);
 
         if (
-            !$this->stringIsChecked(
+            $this->settings->get('unchecked_strings') === 'trans' ||
+            $this->stringIsChecked(
                 $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks,
                 $lng_source,
                 $lng_target,
                 $context
             )
         ) {
-            return $orig;
+            return $trans;
+        } elseif ($this->settings->get('unchecked_strings') === 'hide') {
+            return '';
         }
-
-        return $trans;
+        return $orig;
     }
 
     function autoTranslateString($orig, $lng_source, $lng_target, $context = null)
@@ -1822,9 +1838,6 @@ class Data
 
     function stringIsChecked($str, $lng_source, $lng_target, $context = null)
     {
-        if ($this->settings->get('only_show_checked_strings') !== true) {
-            return true;
-        }
         if ($lng_target === $lng_source) {
             return true;
         }
@@ -1893,18 +1906,22 @@ class Data
             $data['trans'] = $data['str_in_lng_source'];
             return $data;
         }
-        $data['checked_from'] = $this->stringIsChecked(
-            $data['str_in_lng_source'],
-            $this->settings->getSourceLanguageCode(),
-            $from_lng,
-            $context
-        );
-        $data['checked_to'] = $this->stringIsChecked(
-            $data['str_in_lng_source'],
-            $this->settings->getSourceLanguageCode(),
-            $to_lng,
-            $context
-        );
+        $data['checked_from'] =
+            $this->settings->get('unchecked_strings') === 'trans' ||
+            $this->stringIsChecked(
+                $data['str_in_lng_source'],
+                $this->settings->getSourceLanguageCode(),
+                $from_lng,
+                $context
+            );
+        $data['checked_to'] =
+            $this->settings->get('unchecked_strings') === 'trans' ||
+            $this->stringIsChecked(
+                $data['str_in_lng_source'],
+                $this->settings->getSourceLanguageCode(),
+                $to_lng,
+                $context
+            );
         $data['trans'] = $this->getExistingTranslationFromCache(
             $data['str_in_lng_source'],
             $this->settings->getSourceLanguageCode(),
@@ -2009,7 +2026,7 @@ class Data
 
         foreach ($path_parts as $path_parts__key => $path_parts__value) {
             $data = $this->getTranslationInForeignLng($path_parts__value, $to_lng, $from_lng, 'slug');
-            if ($this->settings->get('only_show_checked_strings') === true) {
+            if ($this->settings->get('unchecked_strings') !== 'trans') {
                 // no string has been found in general (unchecked or checked)
                 // this is always the case, if you are on a unchecked url (like /en/impressum)
                 // and try to translate that e.g. from english to french
