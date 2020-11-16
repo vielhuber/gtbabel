@@ -393,7 +393,8 @@
     height: 30px;
     line-height: 30px;
     text-align: center;
-    font-size: 18px;
+    font-size: 12px;
+    overflow: hidden;
 }
 .gtbabel__transwizard-language-count--highlight {
     background-color: red;
@@ -420,6 +421,21 @@
     right: -20px;
     font-size: 17px;
     font-weight: bold;
+}
+.gtbabel__transwizard-card-discovered-last-url {
+    position: absolute;
+    top: 0;
+    left: 0px;
+    z-index: 0;
+    font-size: 17px;
+    line-height: 18px;
+    height: 18px;
+    width: 18px;
+    background-color: #ffffff;
+    color: #000;
+    display: block;
+    text-align: center;
+    text-decoration: none;
 }
 .gtbabel__transwizard-card-textarea {
     margin-bottom: 20px;

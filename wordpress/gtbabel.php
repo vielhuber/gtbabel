@@ -2653,8 +2653,20 @@ class GtbabelWordPress
                 echo '</p>';
 
                 echo '<div class="gtbabel__transwizard-card">';
-                if ($translation['context'] != '') {
+                if (@$translation['context'] != '') {
                     echo '<div class="gtbabel__transwizard-card-context">' . $translation['context'] . '</div>';
+                }
+
+                if (@$translation[$lng . '_discovered_last_url'] != '') {
+                    echo '<a class="gtbabel__transwizard-card-discovered-last-url" href="' .
+                        get_bloginfo('url') .
+                        '' .
+                        $translation[$lng . '_discovered_last_url'] .
+                        '" title="' .
+                        get_bloginfo('url') .
+                        '' .
+                        $translation[$lng . '_discovered_last_url'] .
+                        '" target="_blank">🔗</a>';
                 }
 
                 echo '<textarea class="gtbabel__input gtbabel__input--textarea gtbabel__transwizard-card-textarea gtbabel__transwizard-card-source">' .
