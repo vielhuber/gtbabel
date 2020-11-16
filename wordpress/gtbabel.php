@@ -3794,12 +3794,6 @@ EOD;
                     '<a href="' . admin_url('admin.php?page=gtbabel-settings') . '">',
                     '</a>'
                 );
-                echo '<br/>';
-                echo sprintf(
-                    __('If your site does not use pretty permalinks, %sactivate them%s.', 'gtbabel-plugin'),
-                    '<a href="' . admin_url('options-permalink.php') . '">',
-                    '</a>'
-                );
                 echo '</span>';
                 die();
             }
