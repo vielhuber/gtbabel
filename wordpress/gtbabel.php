@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 5.1.5
+ * Version: 5.1.6
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -335,6 +335,9 @@ class GtbabelWordPress
 
     private function reset()
     {
+        delete_option('gtbabel_token');
+        delete_option('gtbabel_url_settings');
+        delete_option('gtbabel_plugin_version');
         $this->gtbabel->reset();
     }
 
@@ -813,6 +816,8 @@ class GtbabelWordPress
 
     private function initBackendSettings()
     {
+        $this->checkToken();
+
         $message = '';
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -2142,6 +2147,8 @@ class GtbabelWordPress
 
     private function initBackendStringTranslation()
     {
+        $this->checkToken();
+
         $message = '';
 
         $url = null;
@@ -2586,6 +2593,8 @@ class GtbabelWordPress
 
     private function initBackendTranslationWizard()
     {
+        $this->checkToken();
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (isset($_POST['save_translation'])) {
                 check_admin_referer('gtbabel-transwizard');
@@ -2725,6 +2734,8 @@ class GtbabelWordPress
 
     private function initBackendActions()
     {
+        $this->checkToken();
+
         $message = '';
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -2910,6 +2921,8 @@ class GtbabelWordPress
 
     private function initBackendImportExport()
     {
+        $this->checkToken();
+
         $message = '';
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -3100,6 +3113,8 @@ class GtbabelWordPress
 
     private function initBackendPermissions()
     {
+        $this->checkToken();
+
         $message = '';
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -3185,6 +3200,8 @@ class GtbabelWordPress
 
     private function initBackendLanguagePicker()
     {
+        $this->checkToken();
+
         echo '<div class="gtbabel gtbabel--lngpicker wrap">';
         echo '<h1 class="gtbabel__title">🌐 Gtbabel 🌐</h1>';
         echo $this->initBackendLanguagePickerContent();
@@ -3263,6 +3280,8 @@ EOD;
 
     private function initBackendWizard()
     {
+        $this->checkToken();
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (isset($_POST['save_step'])) {
                 $settings = [];
@@ -4236,6 +4255,37 @@ EOD;
             );
         }
         return $caps;
+    }
+
+    private function checkToken()
+    {
+        // store
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (isset($_POST['save_token']) && @$_POST['token'] != '') {
+                check_admin_referer('gtbabel-token');
+                update_option('gtbabel_token', sanitize_text_field($_POST['token']));
+            }
+        }
+
+        // weak check
+        if (get_option('gtbabel_token') === base64_decode('bmltcm9k')) {
+            return true;
+        }
+
+        // input
+        echo '<div class="gtbabel gtbabel--token wrap">';
+        echo '<form class="gtbabel__form" method="post" action="' . admin_url('admin.php?page=gtbabel-settings') . '">';
+        wp_nonce_field('gtbabel-token');
+        echo '<input type="password" name="token" class="gtbabel__input" value="" placeholder="' .
+            __('Developer token', 'gtbabel-plugin') .
+            '" />';
+        echo '<input class="gtbabel__submit button button-primary" name="save_token" value="' .
+            __('Save', 'gtbabel-plugin') .
+            '" type="submit" />';
+
+        echo '</form>';
+        echo '</div>';
+        die();
     }
 }
 

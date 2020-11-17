@@ -484,3 +484,15 @@
     text-align: left;
     width: 200px;
 }
+
+.gtbabel--token {
+    text-align: center;
+}
+.gtbabel--token .gtbabel__input {
+    width: 100%;
+    font-size: 20px;
+    text-align: center;
+    display: block;
+    margin-top: 100px;
+    margin-bottom: 10px;
+}
