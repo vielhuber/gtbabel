@@ -140,7 +140,8 @@ class Settings
             'microsoft_throttle_chars_per_month' => 1000000,
             'deepl_throttle_chars_per_month' => 1000000,
             'discovery_log' => false,
-            'frontend_editor' => false
+            'frontend_editor' => false,
+            'wp_mail_notifications' => false
         ];
         if (!empty($args)) {
             foreach ($args as $args__key => $args__value) {

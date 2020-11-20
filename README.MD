@@ -1203,7 +1203,8 @@ The default configuration is:
     'microsoft_throttle_chars_per_month' => 1000000,
     'deepl_throttle_chars_per_month' => 1000000,
     'discovery_log' => false,
-    'frontend_editor' => false // common configuration: 'frontend_editor' => user_is_logged_in()
+    'frontend_editor' => false, // common configuration: 'frontend_editor' => user_is_logged_in()
+    'wp_mail_notifications' => false
 ];
 ```
 
@@ -1244,16 +1245,17 @@ The following features are included:
 -   Multisite support
 -   Flexible permission system based on capabilities
 
-### Permissions
+#### Permissions
 
 Gtbabel for WordPress uses the following capabilities:
 
 -   `gtbabel__edit_settings`: capability to edit settings
+-   `gtbabel__email_notifications`: capability to receive email notifications
 -   `gtbabel__translation_list`: capability to use the list of translations
 -   `gtbabel__translation_assistant`: capability to use the translation assistant
 -   `gtbabel__translate_xx`: capability to translate the language with code `xx`
 
-By default, administrators have all capabilities.\
+By default, administrators have all capabilities (except `gtbabel__email_notifications`).\
 You can add these capabilities to your WordPress user roles individually
 
 -   in your WordPress backend under Gtbabel > Permissions,
@@ -1270,6 +1272,18 @@ add_action('admin_init', function () {
     get_role('editor')->add_cap('gtbabel__translate_fr');
 });
 ```
+
+#### Email notifications
+
+With the `wp_mail_notifications` option you can instruct Gtbabel to send regular status e-mails to all translators (that have both the `gtbabel__translation_assistant` and `gtbabel__email_notifications` role):
+
+-   `false`: No status e-mails are sent
+-   `'hourly'`: Status e-mails are sent once every hour
+-   `'twicedaily'`: Status e-mails are sent twice a day
+-   `'daily'`: Status e-mails are sent once every day
+-   `'weekly'`: Status e-mails are sent once every week
+
+Make sure that [WP-Cron](https://developer.wordpress.org/plugins/cron/) is enabled and running regularly and mails can be sent properly from your server.
 
 ## Database and Gettext
 
@@ -1656,9 +1670,9 @@ If your json endpoint is not targeted via a language specific url, you can get t
 
 With the `unchecked_strings` option you can control what happens with unchecked strings:
 
--   Show translation (which still needs to be checked)
--   Show source (show the string in the source language)
--   Hide string (completely hide string until its checked)
+-   `trans`: Show translation (which still needs to be checked)
+-   `source`: Show source (show the string in the source language)
+-   `hide`: Hide string (completely hide string until its checked)
 
 This way you can build an approval system in your backend, where translators can check strings before they are published.
 
@@ -1744,7 +1758,7 @@ gtbabel__('/datenschutz'); // '/en/data-protection'
 Gtbabel translates your frontend, json responses and watches dom changes.\
 Nevertheless, one has to manually take care of how multilingual input data should be further processed.
 
-### Search
+#### Search
 
 If you need to translate queries to your source language (for example in searches),\
 translate the search term into the source language before actually querying your content:
@@ -1755,7 +1769,7 @@ $s = gtbabel__($s, gtbabel_source_lng(), gtbabel_current_lng());
 
 In WordPress this is done automatically for you.
 
-### URL query arguments
+#### URL query arguments
 
 As for url query arguments, you have fine grained control over whether arguments should be kept, translated or discarded via the `url_query_args`-option.
 
@@ -1771,7 +1785,7 @@ gets transformed to
 
 `<a href="mailto:?subject=This%20is%20a%20test&amp;body=That%20work%27s">Send email</a>`
 
-### Mails
+#### Mails
 
 If you send mails from the backend, ensure to translate the subject and body properly:
 
@@ -1792,7 +1806,7 @@ $message = 'Hello <span class="notranslate force-tokenize">John Doe</span>,';
 Gtbabel automatically translates all mails sent in WordPress and has built in support for\
 popular plugins like [Contact Form 7](https://de.wordpress.org/plugins/contact-form-7/) and [WooCommerce](https://de.wordpress.org/plugins/woocommerce/) to ensure the above guidelines.
 
-### Comments
+#### Comments
 
 If you offer a comment function on your website, just save the incoming comments in the input language (that can be determined via `gtbabel_current_lng()` or `gtbabel_referer_lng()`). Then output just those comments that match your current input language or even auto translate all of them using the `lang`-tag (see **Multiple source languages**).
 

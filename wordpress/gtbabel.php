@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 5.1.6
+ * Version: 5.1.7
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -29,6 +29,7 @@ class GtbabelWordPress
         $this->initBackend();
         $this->triggerPreventPublish();
         $this->triggerAltLngUrls();
+        $this->addLastmodToSitemap();
         $this->addTopBarItem();
         $this->modifyGutenbergSidebar();
         $this->showWizardNotice();
@@ -38,6 +39,7 @@ class GtbabelWordPress
         $this->languagePickerMenu();
         $this->disableAutoRedirect();
         $this->initUpdateCapabilities();
+        $this->sendMailNotificationsSetupCron();
         $this->filterSpecificUrls();
         $this->autoTranslatePluginMails();
         $this->autoTranslateSearch();
@@ -491,6 +493,19 @@ class GtbabelWordPress
         });
     }
 
+    private function addLastmodToSitemap()
+    {
+        add_filter(
+            'wp_sitemaps_posts_entry',
+            function ($entry, $post) {
+                $entry['lastmod'] = $post->post_modified_gmt;
+                return $entry;
+            },
+            10,
+            2
+        );
+    }
+
     private function addTopBarItem()
     {
         add_action(
@@ -864,6 +879,7 @@ class GtbabelWordPress
                             'xml_hreflang_tags',
                             'auto_add_translations',
                             'unchecked_strings',
+                            'wp_mail_notifications',
                             'auto_set_new_strings_checked',
                             'auto_translation',
                             'auto_translation_service',
@@ -943,6 +959,10 @@ class GtbabelWordPress
                                 $settings[$repeater__value][] = $post_data__value;
                             }
                         }
+                    }
+
+                    if (@$settings['wp_mail_notifications'] === 'false') {
+                        $settings['wp_mail_notifications'] = false;
                     }
 
                     $url_settings = [];
@@ -1663,6 +1683,41 @@ class GtbabelWordPress
             ($settings['unchecked_strings'] == 'hide' ? ' selected="selected"' : '') .
             '>' .
             __('Hide strings', 'gtbabel-plugin') .
+            '</option>';
+        echo '</select>';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_wp_mail_notifications" class="gtbabel__label">';
+        echo __('Email notifications', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<select class="gtbabel__input gtbabel__input--select" id="gtbabel_wp_mail_notifications" name="gtbabel[wp_mail_notifications]">';
+        echo '<option value="false"' .
+            ($settings['wp_mail_notifications'] === false ? ' selected="selected"' : '') .
+            '>' .
+            __('Disable notifications', 'gtbabel-plugin') .
+            '</option>';
+        echo '<option value="hourly"' .
+            ($settings['wp_mail_notifications'] == 'hourly' ? ' selected="selected"' : '') .
+            '>' .
+            __('Send hourly', 'gtbabel-plugin') .
+            '</option>';
+        echo '<option value="twicedaily"' .
+            ($settings['wp_mail_notifications'] == 'twicedaily' ? ' selected="selected"' : '') .
+            '>' .
+            __('Send twice a day', 'gtbabel-plugin') .
+            '</option>';
+        echo '<option value="daily"' .
+            ($settings['wp_mail_notifications'] == 'daily' ? ' selected="selected"' : '') .
+            '>' .
+            __('Send daily', 'gtbabel-plugin') .
+            '</option>';
+        echo '<option value="weekly"' .
+            ($settings['wp_mail_notifications'] == 'weekly' ? ' selected="selected"' : '') .
+            '>' .
+            __('Send weekly', 'gtbabel-plugin') .
             '</option>';
         echo '</select>';
         echo '</div>';
@@ -3175,11 +3230,12 @@ class GtbabelWordPress
                     '][' .
                     $capabilities__key .
                     ']" ' .
-                    ($roles__key === 'administrator' ? 'disabled="disabled"' : '') .
+                    ($roles__key === 'administrator' && $capabilities__key !== 'gtbabel__email_notifications'
+                        ? 'disabled="disabled"'
+                        : '') .
                     ' ' .
-                    ($roles__key === 'administrator' ||
                     (in_array($capabilities__key, $roles__value['capabilities']) &&
-                        $roles__value['capabilities'][$capabilities__key] == '1')
+                    $roles__value['capabilities'][$capabilities__key] == '1'
                         ? 'checked="checked"'
                         : '') .
                     ' value="1" />';
@@ -4235,6 +4291,9 @@ EOD;
                 // add all caps to admin role (so they are visible in plugins like User Role Editor)
                 if ($roles__key === 'administrator') {
                     foreach (array_diff($caps, array_keys($roles__value['capabilities'])) as $caps__value) {
+                        if ($caps__value === 'gtbabel__email_notifications') {
+                            continue;
+                        }
                         get_role($roles__key)->add_cap($caps__value);
                     }
                 }
@@ -4250,11 +4309,120 @@ EOD;
         $caps['gtbabel__translation_assistant'] = __('Use translation assistant', 'gtbabel-plugin');
         foreach ($this->gtbabel->settings->getSelectedLanguageCodesLabels() as $languages__key => $languages__value) {
             $caps['gtbabel__translate_' . $languages__key] = sprintf(
-                __('Translate %s', 'gtbabel-plugin'),
-                $languages__value
+                __('Translate language %s', 'gtbabel-plugin'),
+                '<strong>' . $languages__value . '</strong>'
             );
         }
+        $caps['gtbabel__email_notifications'] = __('Receive email notifications', 'gtbabel-plugin');
         return $caps;
+    }
+
+    private function sendMailNotificationsSetupCron()
+    {
+        add_action('init', function () {
+            $task = 'gtbabel_mail_notifications';
+            $scheduled = wp_next_scheduled($task);
+            $frequency = $this->gtbabel->settings->get('wp_mail_notifications');
+            if ($scheduled === false && $frequency === false) {
+                return;
+            }
+            // actual function
+            add_action($task, function () {
+                $this->sendMailNotificationsRun();
+            });
+            // on plugin disable
+            register_deactivation_hook(__FILE__, function () {
+                wp_clear_scheduled_hook($task);
+            });
+            // deregister (if settings changed)
+            if ($scheduled !== false && $scheduled !== $frequency) {
+                wp_unschedule_event($scheduled, $task);
+            }
+            // register
+            if ($frequency !== false && !wp_next_scheduled($task)) {
+                wp_schedule_event(strtotime(date('Y-m-d H:00:00', strtotime('now + 1 hour'))), $frequency, $task);
+            }
+        });
+    }
+
+    private function sendMailNotificationsRun()
+    {
+        $users = get_users();
+        if (!empty($users)) {
+            foreach ($users as $users__value) {
+                if (!$users__value->has_cap('gtbabel__email_notifications')) {
+                    continue;
+                }
+                // dynamically set users backend language
+                switch_to_locale(get_user_locale($users__value->ID));
+                // determine timestamp after which strings should be looked up
+                $gtbabel__email_notifications_discovered_last_time = get_user_meta(
+                    $users__value->ID,
+                    'gtbabel__email_notifications_discovered_last_time',
+                    true
+                );
+                if ($gtbabel__email_notifications_discovered_last_time != '') {
+                    $discovered_last_time = $gtbabel__email_notifications_discovered_last_time;
+                } else {
+                    $discovered_last_time = null;
+                }
+                update_user_meta(
+                    $users__value->ID,
+                    'gtbabel__email_notifications_discovered_last_time',
+                    date('Y-m-d H:i:s', strtotime('now'))
+                );
+                // true if mail should be send
+                $match = false;
+                // build body
+                $body = '';
+                $body .= '<p>';
+                $body .= sprintf(__('Hi %s!', 'gtbabel-plugin'), $users__value->display_name);
+                $body .= '</p>';
+                $body .= '<p>';
+                $body .= __('There are new unchecked translations available:', 'gtbabel-plugin');
+                $body .= '</p>';
+                $languages = $this->gtbabel->settings->getSelectedLanguageCodesLabels();
+                if (!empty($languages)) {
+                    $body .= '<ul>';
+                    foreach ($languages as $languages__key => $languages__value) {
+                        if (!$users__value->has_cap('gtbabel__translate_' . $languages__key)) {
+                            continue;
+                        }
+                        $count = $this->gtbabel->data->getTranslationCountFromDatabase(
+                            $languages__key,
+                            false,
+                            $discovered_last_time
+                        );
+                        if ($count > 0) {
+                            $match = true;
+                            $body .= '<li>';
+                            $body .= $languages__value . ': ' . $count . PHP_EOL;
+                            $body .= '</li>';
+                        }
+                    }
+                    $body .= '</ul>';
+                }
+                $body .= '<p>';
+                $body .= __('Please check and revise these translations.', 'gtbabel-plugin');
+                $body .= '</p>';
+                $body .= '<p>';
+                $body .=
+                    '<a href="' .
+                    admin_url('admin.php?page=gtbabel-transwizard') .
+                    '">' .
+                    __('Open translation wizard', 'gtbabel-plugin') .
+                    '</a>';
+                $body .= '</p>';
+                if ($match === true) {
+                    wp_mail(
+                        $users__value->user_email,
+                        __('Unchecked translations available', 'gtbabel-plugin'),
+                        $body,
+                        ['Content-Type: text/html; charset=UTF-8']
+                    );
+                }
+            }
+        }
     }
 
     private function checkToken()

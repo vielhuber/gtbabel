@@ -363,23 +363,26 @@ class Data
         return $this->db->fetch_all('SELECT * FROM ' . $this->table . ' ORDER BY id ASC');
     }
 
-    function getTranslationCountFromDatabase($lng_target = null, $checked = null)
+    function getTranslationCountFromDatabase($lng_target = null, $checked = null, $discovered_last_time = null)
     {
         $query = 'SELECT COUNT(*) FROM ' . $this->table;
         $args = [];
-        if ($lng_target !== null || $checked !== null) {
+        if ($lng_target !== null || $checked !== null || $discovered_last_time !== null) {
             $query .= ' WHERE ';
+            $query_and = [];
             if ($lng_target !== null) {
-                $query .= 'lng_target = ?';
+                $query_and[] = 'lng_target = ?';
                 $args[] = $lng_target;
             }
-            if ($lng_target !== null && $checked !== null) {
-                $query .= ' AND ';
-            }
             if ($checked !== null) {
-                $query .= 'checked = ?';
+                $query_and[] = 'checked = ?';
                 $args[] = $checked === true ? 1 : 0;
             }
+            if ($discovered_last_time !== null) {
+                $query_and[] = 'discovered_last_time >= ?';
+                $args[] = $discovered_last_time;
+            }
+            $query .= implode(' AND ', $query_and);
         }
         try {
             $count = $this->db->fetch_var($query, $args);
