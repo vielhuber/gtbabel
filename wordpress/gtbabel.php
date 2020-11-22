@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 5.1.7
+ * Version: 5.1.8
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -69,11 +69,14 @@ class GtbabelWordPress
             add_filter(
                 $names__value,
                 function ($url) {
-                    return $this->gtbabel->data->getUrlTranslationInLanguage(
-                        $this->gtbabel->settings->getSourceLanguageCode(),
-                        $this->gtbabel->data->getCurrentLanguageCode(),
-                        $url
-                    );
+                    if ($this->gtbabel->started === true) {
+                        $url = $this->gtbabel->data->getUrlTranslationInLanguage(
+                            $this->gtbabel->settings->getSourceLanguageCode(),
+                            $this->gtbabel->data->getCurrentLanguageCode(),
+                            $url
+                        );
+                    }
+                    return $url;
                 },
                 PHP_INT_MAX
             );
@@ -1184,7 +1187,7 @@ class GtbabelWordPress
         $settings = $this->getSettings();
 
         echo '<div class="gtbabel gtbabel--settings wrap">';
-        echo '<form class="gtbabel__form" method="post" action="' . admin_url('admin.php?page=gtbabel-settings') . '">';
+        echo '<form class="gtbabel__form" method="post">';
         wp_nonce_field('gtbabel-settings');
         echo '<input type="hidden" name="gtbabel[wizard_finished]" value="' .
             (isset($settings['wizard_finished']) && $settings['wizard_finished'] == 1 ? 1 : 0) .
@@ -3234,7 +3237,7 @@ class GtbabelWordPress
                         ? 'disabled="disabled"'
                         : '') .
                     ' ' .
-                    (in_array($capabilities__key, $roles__value['capabilities']) &&
+                    (array_key_exists($capabilities__key, $roles__value['capabilities']) &&
                     $roles__value['capabilities'][$capabilities__key] == '1'
                         ? 'checked="checked"'
                         : '') .

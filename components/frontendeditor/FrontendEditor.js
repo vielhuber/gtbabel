@@ -66,16 +66,21 @@ export default class FrontendEditor {
     }
 
     positionAtTopLeft(el) {
-        while (el.getBoundingClientRect().top - el.parentNode.getBoundingClientRect().top > 0) {
+        let max = null;
+        max = 10;
+        while (max > 0 && el.getBoundingClientRect().top - el.parentNode.getBoundingClientRect().top > 0) {
             let y = el.style.marginTop;
             if (y == '') {
                 y = 0;
             } else {
                 y = parseInt(y);
             }
-            el.style.setProperty('margin-top', y - 1 + 'px', 'important');
+            el.style.setProperty('margin-top', y - 10 + 'px', 'important');
+            max--;
         }
+        max = 10;
         while (
+            max > 0 &&
             el.getBoundingClientRect().left >= 0 &&
             el.getBoundingClientRect().left - el.parentNode.getBoundingClientRect().left > -20
         ) {
@@ -85,7 +90,8 @@ export default class FrontendEditor {
             } else {
                 x = parseInt(x);
             }
-            el.style.setProperty('margin-left', x - 1 + 'px', 'important');
+            el.style.setProperty('margin-left', x - 10 + 'px', 'important');
+            max--;
         }
     }
 
@@ -94,7 +100,8 @@ export default class FrontendEditor {
             document.querySelectorAll('.' + this.classNameButton).forEach(el2 => {
                 if (el2 !== el) {
                     if (this.elementsCollide(el2, el)) {
-                        while (this.elementsCollide(el2, el)) {
+                        let max = 10;
+                        while (max > 0 && this.elementsCollide(el2, el)) {
                             let x = el.style.marginLeft;
                             if (x == '') {
                                 x = 0;
@@ -102,6 +109,7 @@ export default class FrontendEditor {
                                 x = parseInt(x);
                             }
                             el.style.setProperty('margin-left', x + 10 + 'px', 'important');
+                            max--;
                         }
                         this.fixPosition(el);
                         return;
