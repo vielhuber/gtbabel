@@ -131,7 +131,7 @@ $gtbabel->config([
     'lng_target' => null,
     'database' => [
         'type' => 'sqlite',
-        'filename' => './../data.db',
+        'filename' => './data.db',
         'table' => 'translations'
     ],
     'log_folder' => './../logs',
@@ -147,7 +147,8 @@ $gtbabel->config([
     'deepl_translation_api_key' => @$_SERVER['DEEPL_TRANSLATION_API_KEY'],
     'localize_js' => false,
     'detect_dom_changes' => true,
-    'detect_dom_changes_include' => ['.js']
+    'detect_dom_changes_include' => ['.js'],
+    'frontend_editor' => true
 ]);
 
 $gtbabel->start();
