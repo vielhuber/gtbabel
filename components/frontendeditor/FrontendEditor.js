@@ -67,7 +67,7 @@ export default class FrontendEditor {
 
     positionAtTopLeft(el) {
         let max = null;
-        max = 10;
+        max = 50;
         while (max > 0 && el.getBoundingClientRect().top - el.parentNode.getBoundingClientRect().top > 0) {
             let y = el.style.marginTop;
             if (y == '') {
@@ -75,10 +75,10 @@ export default class FrontendEditor {
             } else {
                 y = parseInt(y);
             }
-            el.style.setProperty('margin-top', y - 10 + 'px', 'important');
+            el.style.setProperty('margin-top', y - 1 + 'px', 'important');
             max--;
         }
-        max = 10;
+        max = 50;
         while (
             max > 0 &&
             el.getBoundingClientRect().left >= 0 &&
@@ -90,7 +90,7 @@ export default class FrontendEditor {
             } else {
                 x = parseInt(x);
             }
-            el.style.setProperty('margin-left', x - 10 + 'px', 'important');
+            el.style.setProperty('margin-left', x - 1 + 'px', 'important');
             max--;
         }
     }
@@ -100,7 +100,7 @@ export default class FrontendEditor {
             document.querySelectorAll('.' + this.classNameButton).forEach(el2 => {
                 if (el2 !== el) {
                     if (this.elementsCollide(el2, el)) {
-                        let max = 10;
+                        let max = 50;
                         while (max > 0 && this.elementsCollide(el2, el)) {
                             let x = el.style.marginLeft;
                             if (x == '') {
@@ -108,7 +108,7 @@ export default class FrontendEditor {
                             } else {
                                 x = parseInt(x);
                             }
-                            el.style.setProperty('margin-left', x + 10 + 'px', 'important');
+                            el.style.setProperty('margin-left', x + 1 + 'px', 'important');
                             max--;
                         }
                         this.fixPosition(el);
