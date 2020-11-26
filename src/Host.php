@@ -1,6 +1,8 @@
 <?php
 namespace vielhuber\gtbabel;
 
+use vielhuber\stringhelper\__;
+
 class Host
 {
     public $original_path;
@@ -235,13 +237,27 @@ class Host
         return $url_args;
     }
 
+    function getArgFromUrl($url, $key)
+    {
+        $args = $this->getArgsFromUrl($url);
+        if (array_key_exists($key, $args) && $args[$key] != '') {
+            return $args[$key];
+        }
+        return null;
+    }
+
     function stripArgsFromUrl($url)
     {
-        $pos = mb_strrpos('?', $url);
+        $pos = mb_strrpos($url, '?');
         if ($pos !== false) {
             return mb_substr($url, 0, $pos);
         }
         return $url;
+    }
+
+    function stripNonArgsFromUrl($url)
+    {
+        return str_replace($this->stripArgsFromUrl($url), '', $url);
     }
 
     function appendArgToUrl($url, $key, $value)
@@ -279,19 +295,38 @@ class Host
         }
         // strip args
         $url = $this->stripArgsFromUrl($url);
+        // collect base urls
+        $base_urls = [];
         foreach ($this->settings->getSelectedLanguageCodes() as $languages__value) {
-            $base_urls[$languages__value] = $this->getBaseUrlWithPrefixForLanguageCode($languages__value);
+            $base_urls[$languages__value] = [
+                'with_prefix' => $this->getBaseUrlWithPrefixForLanguageCode($languages__value),
+                'without_prefix' => $this->getBaseUrlForLanguageCode($languages__value)
+            ];
         }
         uasort($base_urls, function ($a, $b) {
-            return strlen($b) - strlen($a) <=> 0;
+            return strlen($b['with_prefix']) - strlen($a['with_prefix']) <=> 0;
         });
-        foreach ($base_urls as $base_urls__key => $base_urls__value) {
-            if (trim($url, '/') === trim($base_urls__value, '/')) {
-                return $base_urls__key;
+        foreach (['with_prefix', 'without_prefix'] as $types__value) {
+            if ($types__value === 'without_prefix') {
+                // no matches have been found for "with_prefix"
+                // if distinct base urls without prefix are available, we also search over all them
+                $base_urls_without_prefix = array_values(
+                    array_map(function ($a) {
+                        return $a['without_prefix'];
+                    }, $base_urls)
+                );
+                if (count(array_unique($base_urls_without_prefix)) !== count($base_urls_without_prefix)) {
+                    continue;
+                }
             }
-
-            if (strpos(trim($url, '/') . '/', rtrim($base_urls__value, '/') . '/') === 0) {
-                return $base_urls__key;
+            foreach ($base_urls as $base_urls__key => $base_urls__value) {
+                if (trim($url, '/') === trim($base_urls__value[$types__value], '/')) {
+                    return $base_urls__key;
+                }
+                // nested subpath
+                if (strpos(trim($url, '/') . '/', rtrim($base_urls__value[$types__value], '/') . '/') === 0) {
+                    return $base_urls__key;
+                }
             }
         }
         return $this->settings->getSourceLanguageCode();
@@ -379,6 +414,10 @@ class Host
                 }
             }
         }
+        // if an unknown url was provided
+        if (strpos($url, 'http') === 0) {
+            return '';
+        }
         return $url;
     }
 
@@ -397,6 +436,24 @@ class Host
             foreach ($this->settings->getSelectedLanguageCodes() as $languages__value) {
                 if (mb_strpos($_SERVER['HTTP_ACCEPT_LANGUAGE'], $languages__value) === 0) {
                     return $languages__value;
+                }
+            }
+        }
+        return $this->settings->getSourceLanguageCode();
+    }
+
+    function getIpLanguageCode()
+    {
+        if (isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] != '') {
+            $response = __::curl('https://geolocation-db.com/json/' . $_SERVER['REMOTE_ADDR'], null, 'GET');
+            if ($response->status == '200') {
+                if (@$response->result->country_code != '') {
+                    $lng = $response->result->country_code;
+                    foreach ($this->settings->getSelectedLanguageCodes() as $languages__value) {
+                        if (mb_strtolower($lng) == mb_strtolower($languages__value)) {
+                            return $languages__value;
+                        }
+                    }
                 }
             }
         }

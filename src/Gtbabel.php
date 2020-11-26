@@ -73,9 +73,7 @@ class Gtbabel
         if ($this->host->contentTypeIsInappropriate()) {
             return;
         }
-        $this->router->redirectPrefixedUrls();
-        $this->router->addTrailingSlash();
-        $this->router->redirectUnpublished();
+        $this->router->handleRedirects();
         $this->router->initMagicRouter();
         $this->data->addCurrentUrlToTranslations();
         $this->started = true;

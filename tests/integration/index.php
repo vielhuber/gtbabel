@@ -46,7 +46,7 @@ if ($test === 4) {
         ],
         'en' => [
             'url_base' => 'http://gtbabel-en.local.vielhuber.de',
-            'url_prefix' => ''
+            'url_prefix' => 'en'
         ]
     ];
     if (
@@ -135,6 +135,7 @@ $gtbabel->config([
         'table' => 'translations'
     ],
     'log_folder' => './../logs',
+    'redirect_root_domain' => 'source',
     'auto_translation' => true,
     'auto_translation_service' => [
         [

@@ -14,11 +14,99 @@ class Test extends \PHPUnit\Framework\TestCase
             $dotenv = Dotenv::createImmutable(dirname(__DIR__, 2));
             $dotenv->load();
         }
+
         // mock response code
         http_response_code(200);
 
-        // start
-        $this->gtbabel = new Gtbabel();
+        // start (without mock)
+        if (1 == 0) {
+            $this->gtbabel = new Gtbabel();
+        } else {
+            $this->mock();
+        }
+    }
+
+    public function mock()
+    {
+        $settings = $this->getMockBuilder(vielhuber\gtbabel\Settings::class)
+            ->setConstructorArgs([])
+            ->onlyMethods([])
+            ->getMock();
+        $utils = $this->getMockBuilder(vielhuber\gtbabel\Utils::class)
+            ->setConstructorArgs([])
+            ->onlyMethods([])
+            ->getMock();
+        $log = $this->getMockBuilder(vielhuber\gtbabel\Log::class)
+            ->setConstructorArgs([$utils, $settings])
+            ->onlyMethods([])
+            ->getMock();
+        $tags = $this->getMockBuilder(vielhuber\gtbabel\Tags::class)
+            ->setConstructorArgs([$utils])
+            ->onlyMethods([])
+            ->getMock();
+        $host = $this->getMockBuilder(vielhuber\gtbabel\Host::class)
+            ->setConstructorArgs([$settings, $log])
+            ->onlyMethods([])
+            ->getMock();
+        $publish = $this->getMockBuilder(vielhuber\gtbabel\Publish::class)
+            ->setConstructorArgs([$settings, $host, $log])
+            ->onlyMethods([])
+            ->getMock();
+        $data = $this->getMockBuilder(vielhuber\gtbabel\Data::class)
+            ->setConstructorArgs([$utils, $host, $settings, $tags, $log, $publish])
+            ->onlyMethods([])
+            ->getMock();
+        $altlng = $this->getMockBuilder(vielhuber\gtbabel\Altlng::class)
+            ->setConstructorArgs([$settings, $host])
+            ->onlyMethods([])
+            ->getMock();
+        $grabber = $this->getMockBuilder(vielhuber\gtbabel\Grabber::class)
+            ->setConstructorArgs([$settings, $utils, $log, $data])
+            ->onlyMethods([])
+            ->getMock();
+        $domfactory = $this->getMockBuilder(vielhuber\gtbabel\DomFactory::class)
+            ->setConstructorArgs([$utils, $data, $host, $settings, $tags, $log, $altlng])
+            ->onlyMethods([])
+            ->getMock();
+        $router = $this->getMockBuilder(vielhuber\gtbabel\Router::class)
+            ->setConstructorArgs([$data, $host, $settings, $publish, $log])
+            ->onlyMethods(['redirect'])
+            ->getMock();
+        $router
+            ->expects($this->any())
+            ->method('redirect')
+            ->will(
+                $this->returnCallback(function ($url, $status_code) {
+                    throw new \Exception($url);
+                })
+            );
+        $gettext = $this->getMockBuilder(vielhuber\gtbabel\Gettext::class)
+            ->setConstructorArgs([$data, $settings])
+            ->onlyMethods([])
+            ->getMock();
+        $excel = $this->getMockBuilder(vielhuber\gtbabel\Excel::class)
+            ->setConstructorArgs([$data, $settings])
+            ->onlyMethods([])
+            ->getMock();
+
+        $this->gtbabel = $this->getMockBuilder(vielhuber\gtbabel\Gtbabel::class)
+            ->setConstructorArgs([
+                $settings,
+                $utils,
+                $log,
+                $tags,
+                $host,
+                $publish,
+                $data,
+                $altlng,
+                $grabber,
+                $domfactory,
+                $router,
+                $gettext,
+                $excel
+            ])
+            ->onlyMethods([])
+            ->getMock();
     }
 
     public function test001()
@@ -1730,6 +1818,143 @@ EOD;
         $this->assertEquals($path, '/house');
     }
 
+    public function test_redirects()
+    {
+        $data = [
+            [
+                'http://gtbabel.local.vielhuber.de/',
+                'http://gtbabel.local.vielhuber.de/de/',
+                ['de', ['de', null, 'en', null], 'source', false, null, []]
+            ],
+            [
+                'http://gtbabel.local.vielhuber.de/',
+                'http://gtbabel.local.vielhuber.de/german/',
+                ['de', ['german', null, 'english', null], 'source', false, null, []]
+            ],
+            ['http://gtbabel.local.vielhuber.de/', null, ['de', ['', null, 'en', null], 'source', false, null, []]],
+            [
+                'http://gtbabel.local.vielhuber.de/',
+                'http://gtbabel.local.vielhuber.de/en/',
+                ['en', ['de', null, 'en', null], 'source', false, null, []]
+            ],
+            [
+                'http://gtbabel.local.vielhuber.de/dies/ist/ein/test/',
+                'http://gtbabel.local.vielhuber.de/de/dies/ist/ein/test/',
+                ['de', ['de', null, 'en', null], 'source', false, null, []]
+            ],
+            [
+                'http://gtbabel-de.local.vielhuber.de/',
+                'http://gtbabel-en.local.vielhuber.de/en/',
+                [
+                    'en',
+                    ['de', 'http://gtbabel-de.local.vielhuber.de', 'en', 'http://gtbabel-en.local.vielhuber.de'],
+                    'source',
+                    false,
+                    null,
+                    []
+                ]
+            ],
+            [
+                'http://gtbabel.local.vielhuber.de/',
+                'http://gtbabel.local.vielhuber.de/?lang=en',
+                [
+                    'en',
+                    ['', 'http://gtbabel.local.vielhuber.de', '', 'http://gtbabel.local.vielhuber.de'],
+                    'source',
+                    false,
+                    null,
+                    []
+                ]
+            ],
+            [
+                'http://gtbabel.local.vielhuber.de/test/',
+                'http://gtbabel.local.vielhuber.de/test/?lang=en',
+                [
+                    'en',
+                    ['', 'http://gtbabel.local.vielhuber.de', '', 'http://gtbabel.local.vielhuber.de'],
+                    'source',
+                    false,
+                    null,
+                    []
+                ]
+            ],
+            [
+                'http://gtbabel.local.vielhuber.de/?ajax=foo',
+                'http://gtbabel.local.vielhuber.de/en/?ajax=foo',
+                ['en', ['de', null, 'en', null], 'source', true, 'http://gtbabel.local.vielhuber.de/en/', []]
+            ],
+            [
+                'http://gtbabel.local.vielhuber.de/test',
+                'http://gtbabel.local.vielhuber.de/test/',
+                ['de', ['', null, 'en', null], 'source', false, null, []]
+            ],
+            [
+                'http://gtbabel.local.vielhuber.de/test',
+                'http://gtbabel.local.vielhuber.de/test/',
+                ['de', ['', null, 'en', null], 'source', false, null, []]
+            ],
+            [
+                'http://gtbabel.local.vielhuber.de/test',
+                'http://gtbabel.local.vielhuber.de/de/test/',
+                ['de', ['de', null, 'en', null], 'source', false, null, []]
+            ],
+            [
+                'http://gtbabel.local.vielhuber.de/de/unpublished/page/',
+                'http://gtbabel.local.vielhuber.de/de/',
+                ['de', ['de', null, 'en', null], 'source', false, null, ['/unpublished/page' => ['de']]]
+            ],
+            [
+                'http://gtbabel.local.vielhuber.de/en/',
+                'http://gtbabel.local.vielhuber.de/de/',
+                ['de', ['de', null, 'en', null], 'source', false, null, ['/*' => ['en']]]
+            ],
+            [
+                'http://gtbabel.local.vielhuber.de/en/foo/bar/baz/',
+                'http://gtbabel.local.vielhuber.de/de/',
+                ['de', ['de', null, 'en', null], 'source', false, null, ['/*' => ['en']]]
+            ]
+        ];
+
+        foreach ($data as $data__value) {
+            try {
+                $this->setUrlTo($data__value[0]);
+                $settings = $this->getDefaultSettings();
+                $settings['lng_target'] = null;
+                $settings['debug_translations'] = true;
+                $settings['auto_translation'] = false;
+                $settings['auto_add_translations'] = true;
+                $settings['lng_source'] = $data__value[2][0];
+                $settings['languages'] = $this->getLanguageSettings(
+                    [
+                        ['code' => 'de', 'url_prefix' => $data__value[2][1][0], 'url_base' => $data__value[2][1][1]],
+                        ['code' => 'en', 'url_prefix' => $data__value[2][1][2], 'url_base' => $data__value[2][1][3]]
+                    ],
+                    true
+                );
+                $settings['redirect_root_domain'] = $data__value[2][2];
+                $this->setAjaxRequest($data__value[2][3]);
+                if ($data__value[2][4] !== null) {
+                    $this->setRefererTo($data__value[2][4]);
+                }
+                if (!empty($data__value[2][5])) {
+                    $settings['prevent_publish'] = true;
+                    $settings['prevent_publish_urls'] = $data__value[2][5];
+                }
+                $this->gtbabel->config($settings);
+                $this->gtbabel->start();
+                $this->gtbabel->stop();
+                $this->gtbabel->reset();
+                if ($data__value[1] === null) {
+                    $this->assertEquals(true, true);
+                } else {
+                    $this->assertEquals(true, false);
+                }
+            } catch (\Exception $e) {
+                $this->assertEquals($e->getMessage(), $data__value[1]);
+            }
+        }
+    }
+
     public function test_router()
     {
         $settings = $this->getDefaultSettings();
@@ -2160,8 +2385,40 @@ EOD;
 
     public function setHostTo($lng_target)
     {
-        if ($lng_target !== null) {
+        if ($lng_target === '' || $lng_target === '/') {
+            $_SERVER['REQUEST_URI'] = '/';
+        } elseif ($lng_target !== null) {
             $_SERVER['REQUEST_URI'] = '/' . trim($lng_target, '/') . '/';
+        }
+    }
+
+    public function setUrlTo($url)
+    {
+        $url = str_replace(['http://', 'https://'], '', $url);
+        if (strpos($url, '/') !== false) {
+            $path = substr($url, strpos($url, '/'));
+            $domain = substr($url, 0, strpos($url, '/'));
+        } else {
+            $domain = $url;
+            $path = '';
+        }
+        $_SERVER['HTTP_HOST'] = $domain;
+        $_SERVER['REQUEST_URI'] = $path;
+    }
+
+    public function setRefererTo($url)
+    {
+        $_SERVER['HTTP_REFERER'] = $url;
+    }
+
+    public function setAjaxRequest($bool)
+    {
+        if ($bool === true) {
+            $_SERVER['HTTP_X_REQUESTED_WITH'] = 'xmlhttprequest';
+        } else {
+            if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
+                unset($_SERVER['HTTP_X_REQUESTED_WITH']);
+            }
         }
     }
 }

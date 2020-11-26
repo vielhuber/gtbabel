@@ -17,72 +17,94 @@ class Router
         $this->log = $log ?: new Log();
     }
 
-    function redirectPrefixedUrls()
+    function handleRedirects()
     {
         if ($this->host->currentUrlIsStaticFile()) {
             return;
         }
 
-        if (
-            $this->host->shouldUseLangQueryArg() === false &&
-            $this->host->getCurrentPrefix() ==
-                $this->host->getPrefixForLanguageCode($this->data->getCurrentLanguageCode())
-        ) {
-            return;
-        }
-
+        $url = $this->host->getCurrentUrlWithArgs();
         $lng = $this->data->getCurrentLanguageCode();
-        if ($this->data->sourceLngIsCurrentLng()) {
-            if ($this->host->isAjaxRequest() && $this->host->getReferer() !== null) {
-                $lng = $this->host->getLanguageCodeFromUrl($this->host->getReferer());
-            } elseif ($this->settings->get('redirect_root_domain') === 'browser') {
+
+        // this only works if path prefixes are provided in the domain settings
+        // and a root domain is opened without a path
+        // we don't want to use a cookie based approach to redirect domains
+        // (on setups without prefixes) without prefixes to other domains for the first time
+        if (
+            ($this->host->shouldUseLangQueryArg() === true &&
+                $this->host->getArgFromUrl($this->host->getCurrentUrlWithArgs(), 'lang') === null) ||
+            ($this->host->shouldUseLangQueryArg() === false &&
+                $this->host->getPrefixForLanguageCode($this->data->getCurrentLanguageCode()) != '' &&
+                $this->host->getCurrentPrefix() == '')
+        ) {
+            if ($this->settings->get('redirect_root_domain') === 'browser') {
                 $lng = $this->host->getBrowserLanguageCode();
+            }
+            if ($this->settings->get('redirect_root_domain') === 'source') {
+                $lng = $this->settings->getSourceLanguageCode();
+            }
+            if ($this->settings->get('redirect_root_domain') === 'ip') {
+                $lng = $this->host->getIpLanguageCode();
+            }
+            if (
+                $this->data->sourceLngIsCurrentLng() &&
+                $this->host->isAjaxRequest() &&
+                $this->host->getReferer() !== null
+            ) {
+                $lng = $this->host->getLanguageCodeFromUrl($this->host->getReferer());
+            }
+
+            $url =
+                rtrim($this->host->getBaseUrlWithPrefixForLanguageCode($lng), '/') .
+                '/' .
+                ltrim($this->host->getPathWithoutPrefixFromUrl($this->host->getCurrentUrlWithArgs()), '/');
+
+            if ($this->host->shouldUseLangQueryArg()) {
+                $url = $this->host->appendArgToUrl($url, 'lang', $lng);
             }
         }
 
-        $url =
-            rtrim($this->host->getBaseUrlWithPrefixForLanguageCode($lng), '/') .
-            '/' .
-            ltrim($this->host->getPathWithoutPrefixFromUrl($this->host->getCurrentUrlWithArgs()), '/');
+        // redirect unpublished
+        if ($this->publish->isActive()) {
+            if ($this->settings->getSourceLanguageCode() !== $lng) {
+                $source_url = $this->data->getUrlTranslationInLanguage(
+                    $lng,
+                    $this->settings->getSourceLanguageCode(),
+                    $url
+                );
+            } else {
+                $source_url = $url;
+            }
+            if ($this->publish->isPrevented($source_url, $lng)) {
+                $target_url = $this->host->getBaseUrlWithPrefixForLanguageCode($lng);
+                // if whole languages are disabled
+                if ($this->publish->isPrevented($target_url, $lng)) {
+                    $url = $this->host->getBaseUrlWithPrefixForLanguageCode($this->settings->getSourceLanguageCode());
+                } else {
+                    $url = $target_url;
+                }
+            }
+        }
 
-        if ($this->host->shouldUseLangQueryArg()) {
-            $url = $this->host->appendArgToUrl($url, 'lang', $lng);
+        // add trailing slash
+        if (
+            mb_strrpos($this->host->stripArgsFromUrl($url), '/') !==
+            mb_strlen($this->host->stripArgsFromUrl($url)) - 1
+        ) {
+            // exclude pseudo filenames like automatically generated urls like /sitemap.xml
+            $path_last_part = $this->host->stripArgsFromUrl($url);
+            $path_last_part = explode('/', $path_last_part);
+            $path_last_part = $path_last_part[count($path_last_part) - 1];
+            if (mb_strpos($path_last_part, '.') === false) {
+                $url = $this->host->stripArgsFromUrl($url) . '/' . $this->host->stripNonArgsFromUrl($url);
+            }
         }
 
         if ($this->host->getCurrentUrlWithArgs() === $url) {
             return;
         }
 
-        header('Location: ' . $url, true, @$_SERVER['REQUEST_METHOD'] === 'POST' ? 307 : 302); // 307 forces the browser to repost to the new url
-        die();
-    }
-
-    function addTrailingSlash()
-    {
-        if ($this->host->currentUrlIsStaticFile()) {
-            return;
-        }
-        $url = $this->host->getCurrentUrl();
-        $args = $this->host->getCurrentArgs();
-        if ($args != '') {
-            $url = str_replace($args, '', $url);
-        }
-        if (mb_strrpos($url, '/') === mb_strlen($url) - 1) {
-            return;
-        }
-        // also exclude pseudo filenames like automatically generated urls like /sitemap.xml
-        $path_last_part = $this->host->getCurrentPath();
-        $path_last_part = explode('/', $path_last_part);
-        $path_last_part = $path_last_part[count($path_last_part) - 1];
-        if (mb_strpos($path_last_part, '.') !== false) {
-            return;
-        }
-        $url = $url . '/';
-        if ($args != '') {
-            $url .= $args;
-        }
-        header('Location: ' . $url, true, @$_SERVER['REQUEST_METHOD'] === 'POST' ? 307 : 301); // 307 forces the browser to repost to the new url
-        die();
+        $this->redirect($url, @$_SERVER['REQUEST_METHOD'] === 'POST' ? 307 : 302); // 307 forces the browser to repost to the new url
     }
 
     function initMagicRouter()
@@ -108,27 +130,9 @@ class Router
         $_SERVER['REQUEST_URI'] = $this->host->getCurrentPathWithArgs();
     }
 
-    function redirectUnpublished()
+    function redirect($url, $status_code)
     {
-        if ($this->host->currentUrlIsStaticFile()) {
-            return;
-        }
-        if ($this->data->sourceLngIsCurrentLng()) {
-            return;
-        }
-        $url = $this->host->getCurrentUrl();
-        $source_url = $this->data->getUrlTranslationInLanguage(
-            $this->data->getCurrentLanguageCode(),
-            $this->settings->getSourceLanguageCode(),
-            $url
-        );
-        if (
-            !$this->publish->isActive() ||
-            !$this->publish->isPrevented($source_url, $this->data->getCurrentLanguageCode())
-        ) {
-            return;
-        }
-        header('Location: ' . $source_url, true, 302);
+        header('Location: ' . $url, true, $status_code);
         die();
     }
 }

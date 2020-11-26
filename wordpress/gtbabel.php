@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 5.2.1
+ * Version: 5.2.2
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -1186,7 +1186,9 @@ class GtbabelWordPress
 
         $settings = $this->getSettings();
 
-        echo '<div class="gtbabel gtbabel--settings wrap" action="' . admin_url('admin.php?page=gtbabel-settings') . '">';
+        echo '<div class="gtbabel gtbabel--settings wrap" action="' .
+            admin_url('admin.php?page=gtbabel-settings') .
+            '">';
         echo '<form class="gtbabel__form" method="post">';
         wp_nonce_field('gtbabel-settings');
         echo '<input type="hidden" name="gtbabel[wizard_finished]" value="' .
@@ -1323,6 +1325,11 @@ class GtbabelWordPress
             ($settings['redirect_root_domain'] == 'source' ? ' selected="selected"' : '') .
             '>' .
             __('Source language', 'gtbabel-plugin') .
+            '</option>';
+        echo '<option value="ip"' .
+            ($settings['redirect_root_domain'] == 'ip' ? ' selected="selected"' : '') .
+            '>' .
+            __('IP based', 'gtbabel-plugin') .
             '</option>';
         echo '</select>';
         echo '</div>';
