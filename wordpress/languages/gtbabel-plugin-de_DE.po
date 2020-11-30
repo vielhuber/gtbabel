@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gtbabel-plugin\n"
-"POT-Creation-Date: 2020-11-24 00:34+0100\n"
+"POT-Creation-Date: 2020-11-26 12:44+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -109,8 +109,8 @@ msgid "Browser language"
 msgstr "Browsersprache"
 
 #: gtbabel.php:1332
-msgid "Location based (using GeoIP2)"
-msgstr "Standortbasierend (nutzt GeoIP2)"
+msgid "IP based"
+msgstr "IP-basierend"
 
 #: gtbabel.php:1340
 msgid "Basic auth"
@@ -836,3 +836,6 @@ msgstr "Die Sprachauswahl von Gtbabel."
 #: gtbabel.php:4509
 msgid "Title"
 msgstr "Titel"
+
+#~ msgid "Location based (using GeoIP2)"
+#~ msgstr "Standortbasierend (nutzt GeoIP2)"

@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 5.2.2
+ * Version: 5.2.3
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -820,10 +820,10 @@ class GtbabelWordPress
 
             foreach ($menus as $menus__value) {
                 add_action('admin_print_styles-' . $menus__value, function () {
-                    wp_enqueue_style('gtbabel-css', plugins_url('assets/css/style.css', __FILE__));
+                    wp_enqueue_style('gtbabel-css', plugins_url('assets/build/bundle.css', __FILE__));
                 });
                 add_action('admin_print_scripts-' . $menus__value, function () {
-                    wp_enqueue_script('gtbabel-js', plugins_url('assets/js/script.js', __FILE__));
+                    wp_enqueue_script('gtbabel-js', plugins_url('assets/build/bundle.js', __FILE__));
                 });
             }
         });
@@ -2760,11 +2760,11 @@ class GtbabelWordPress
                         '" target="_blank">🔗</a>';
                 }
 
-                echo '<textarea class="gtbabel__input gtbabel__input--textarea gtbabel__transwizard-card-textarea gtbabel__transwizard-card-source">' .
+                echo '<textarea readonly="readonly" class="gtbabel__input gtbabel__input--textarea gtbabel__transwizard-card-textarea gtbabel__transwizard-card-source gtbabel__wysiwyg-textarea">' .
                     $translation[$translation['lng_source']] .
                     '</textarea>';
 
-                echo '<textarea required="required" class="gtbabel__input gtbabel__input--textarea gtbabel__transwizard-card-textarea gtbabel__transwizard-card-target" name="gtbabel[' .
+                echo '<textarea required="required" class="gtbabel__input gtbabel__input--textarea gtbabel__transwizard-card-textarea gtbabel__transwizard-card-target gtbabel__wysiwyg-textarea" name="gtbabel[' .
                     __::encode_data([
                         'str' => $translation[$translation['lng_source']],
                         'context' => $translation['context'],

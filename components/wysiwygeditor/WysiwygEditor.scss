@@ -1,0 +1,107 @@
+.gtbabel__wysiwyg {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+.gtbabel__wysiwyg:last-child {
+    margin-bottom: 0;
+}
+.gtbabel__wysiwyg,
+.gtbabel__wysiwyg * {
+    box-sizing: border-box;
+}
+.gtbabel__wysiwyg--mode-visual .gtbabel__wysiwyg-textarea,
+.gtbabel__wysiwyg--mode-html .gtbabel__wysiwyg-editor {
+    display: none;
+}
+.gtbabel__wysiwyg--mode-visual .gtbabel__wysiwyg-editor,
+.gtbabel__wysiwyg--mode-html .gtbabel__wysiwyg-textarea {
+    display: block;
+}
+.gtbabel__wysiwyg--mode-visual .gtbabel__wysiwyg-button--visual,
+.gtbabel__wysiwyg--mode-html .gtbabel__wysiwyg-button--html {
+    font-weight: bold;
+}
+.gtbabel__wysiwyg-editor {
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 4px 0 4px 4px;
+    border: 1px solid #7e8993;
+    color: #000;
+}
+.gtbabel__wysiwyg-editor--readonly {
+    background-color: #eee;
+}
+.gtbabel__wysiwyg-textarea {
+    border-radius: 4px 0 4px 4px;
+    border: 1px solid #7e8993;
+    overflow-y: hidden;
+    resize: none;
+    width: 100%;
+    font-size: 11px;
+    font-family: 'Courier New', Courier, monospace;
+    padding: 10px;
+    display: none;
+    background-color: #fff;
+    color: #000;
+    outline: none;
+}
+.gtbabel__wysiwyg-textarea[readonly] {
+    background-color: #e8e8e8;
+    color: #333333;
+}
+.gtbabel__wysiwyg-buttons {
+    text-align: right;
+}
+.gtbabel__wysiwyg-button {
+    display: inline-block;
+    margin-left: 5px;
+    padding: 4px 10px;
+    text-decoration: none;
+    border-radius: 10px 10px 0 0;
+    background-color: #fff;
+    border: 1px solid #7e8993;
+    border-bottom-color: transparent;
+    position: relative;
+    top: 1px;
+    font-size: 13px;
+    width: 90px;
+    text-align: center;
+    text-transform: uppercase;
+    color: #000;
+}
+.gtbabel__wysiwyg-button:hover,
+.gtbabel__wysiwyg-button:focus,
+.gtbabel__wysiwyg-button:active {
+    outline: none;
+    box-shadow: none;
+    color: inherit;
+}
+.gtbabel__wysiwyg .pell-actionbar {
+    margin-bottom: 5px;
+}
+.gtbabel__wysiwyg-editor--readonly .pell-actionbar {
+    display: none;
+}
+.gtbabel__wysiwyg .pell-button {
+    width: 20%;
+    cursor: pointer;
+    color: #000;
+}
+.gtbabel__wysiwyg .pell-content {
+    p {
+        margin: 0;
+        padding: 0;
+    }
+    ul,
+    ol {
+        margin: 10px 20px;
+    }
+    ul li {
+        list-style-type: disc;
+    }
+    a {
+        font-weight: bold;
+        text-decoration: underline;
+    }
+}

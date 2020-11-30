@@ -3,10 +3,12 @@ var base64_encode = require('locutus/php/url/base64_encode');
 var base64_decode = require('locutus/php/url/base64_decode');
 var serialize = require('locutus/php/var/serialize');
 var unserialize = require('locutus/php/var/unserialize');
+import WysiwygEditor from './../wysiwygeditor/WysiwygEditor';
 
 export default class FrontendEditor {
     constructor() {
         this.dd = new DiffDOM();
+        this.editor = new WysiwygEditor();
         this.attrName = 'data-gtbabel-meta';
         this.attrNameKey = 'data-gtbabel-meta-key';
         this.classNameEdit = 'gtbabel-frontend-editor-edit-active';
@@ -195,6 +197,10 @@ export default class FrontendEditor {
                         y += button.offsetHeight;
                         container.style.left = x + 'px';
                         container.style.top = y + 'px';
+
+                        document.querySelectorAll('.' + this.classNameContainerListitemTextarea).forEach(el => {
+                            this.editor.init(el);
+                        });
                     }
                 }
                 e.preventDefault();
@@ -264,7 +270,6 @@ export default class FrontendEditor {
                 });
             }
             if (modified === true) {
-                console.log(data);
                 el.setAttribute(this.attrName, this.encodeData(data));
             }
         });
@@ -299,7 +304,6 @@ export default class FrontendEditor {
     }
 
     reloadPage(keys) {
-        console.log(keys);
         if (keys.length > 0) {
             fetch(window.location.href)
                 .then(v => v.text())

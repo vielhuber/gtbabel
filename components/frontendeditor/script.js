@@ -1,4 +1,3 @@
 import FrontendEditor from './FrontendEditor';
-const d = new FrontendEditor();
-
-d.init();
+const f = new FrontendEditor();
+f.init();

@@ -284,11 +284,11 @@ class Gtbabel
             isset($_GET['gtbabel_frontend_editor_save']) &&
             $_GET['gtbabel_frontend_editor_save'] == '1'
         ) {
-            $str = trim(strip_tags(stripslashes(@$_POST['str'])));
+            $str = stripslashes(@$_POST['str']);
             $context = trim(strip_tags(stripslashes(@$_POST['context'])));
             $lng_source = trim(strip_tags(stripslashes(@$_POST['lng_source'])));
             $lng_target = trim(strip_tags(stripslashes(@$_POST['lng_target'])));
-            $trans = trim(strip_tags(stripslashes(@$_POST['trans'])));
+            $trans = stripslashes(@$_POST['trans']);
             $this->data->editTranslation($str, $context, $lng_source, $lng_target, $trans);
             header('Content-Type: application/json');
             echo json_encode([

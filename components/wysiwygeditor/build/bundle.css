@@ -1,0 +1,66 @@
+.gtbabel__wysiwyg--mode-visual .gtbabel__wysiwyg-textarea,
+.gtbabel__wysiwyg--mode-html .gtbabel__wysiwyg-editor {
+  display: none; }
+
+.gtbabel__wysiwyg--mode-visual .gtbabel__wysiwyg-button--visual,
+.gtbabel__wysiwyg--mode-html .gtbabel__wysiwyg-button--html {
+  font-weight: bold; }
+
+.gtbabel__wysiwyg .pell-content p {
+  margin: 0;
+  padding: 0; }
+
+.gtbabel__wysiwyg .pell-content ul,
+.gtbabel__wysiwyg .pell-content ol {
+  margin: 10px 20px; }
+
+.gtbabel__wysiwyg .pell-content ul li {
+  list-style-type: disc; }
+
+.gtbabel__wysiwyg .pell-content a {
+  font-weight: bold;
+  text-decoration: underline; }
+
+.gtbabel__wysiwyg-editor {
+  padding: 10px;
+  background-color: #fff;
+  margin-bottom: 20px;
+  border-radius: 4px 0 4px 4px;
+  border: 1px solid #7e8993;
+  color: #000; }
+
+.gtbabel__wysiwyg-editor--readonly {
+  background-color: #eee; }
+
+.gtbabel__wysiwyg-editor--readonly .pell-actionbar {
+  display: none; }
+
+.gtbabel__wysiwyg .pell-actionbar {
+  margin-bottom: 5px; }
+
+.gtbabel__wysiwyg .pell-button {
+  width: 20%;
+  cursor: pointer;
+  color: #000; }
+
+.gtbabel__wysiwyg-buttons {
+  text-align: right; }
+
+.gtbabel__wysiwyg-button {
+  display: inline-block;
+  margin-left: 5px;
+  padding: 4px 10px;
+  text-decoration: none;
+  border-radius: 10px 10px 0 0;
+  background-color: #fff;
+  border: 1px solid #7e8993;
+  border-bottom-color: transparent;
+  position: relative;
+  top: 1px;
+  font-size: 13px;
+  min-width: 80px;
+  text-align: center;
+  text-transform: uppercase;
+  color: #000; }
+
+/*# sourceMappingURL=bundle.css.map */
