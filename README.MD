@@ -1429,7 +1429,11 @@ where "2" stands for the second tag of the original string.
 
 The string then finally gets correctly translated to
 
-`I <a href="https://2.com">miss</a> German <a href="https://1.com">bread</a> the most.`
+`I <a href="https://2.com">miss</a> German <a href="https://1.com">bread</a> the most.`.
+
+Note that in the following example, these hints are not necessary (Gtbabel can match the tags despite a different order):
+
+`Das deutsche <a href="https://1.com">Brot</a> <span>vermisse</span> ich am meisten.`
 
 ## Ambiguous translations and plural forms
 

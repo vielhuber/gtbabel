@@ -1025,6 +1025,86 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->gtbabel->reset();
     }
 
+    public function test_inline_html_tags()
+    {
+        $settings = $this->getDefaultSettings();
+        $settings['languages'] = $this->getLanguageSettings([['code' => 'de'], ['code' => 'en']]);
+        $settings['debug_translations'] = false;
+        $settings['auto_translation'] = true;
+        $settings['auto_add_translations'] = true;
+
+        $data = [
+            ['<p>Dies ist ein Test</p>', '<p>This is a test</p>', 'Dies ist ein Test', 'This is a test'],
+            [
+                '<p>Dies ist ein <strong>Test</strong></p>',
+                '<p>This is a <strong>test</strong></p>',
+                'Dies ist ein <strong>Test</strong>',
+                'This is a <strong>test</strong>'
+            ],
+            [
+                '<p>Dies ist ein <strong data-foo="bar" data-bar="baz">Test</strong></p>',
+                '<p>This is a <strong data-foo="bar" data-bar="baz">test</strong></p>',
+                'Dies ist ein <strong>Test</strong>',
+                'This is a <strong>test</strong>'
+            ],
+            [
+                '<p>Das deutsche <a href="https://test1.tld" target="_self">Brot</a> <a href="https://test2.tld" target="_blank">vermisse</a> ich am meisten.</p>',
+                '<p>I <a href="https://test2.tld" target="_blank">miss</a> German <a href="https://test1.tld" target="_self">bread</a> the most.</p>',
+                'Das deutsche <a>Brot</a> <a>vermisse</a> ich am meisten.',
+                'I <a p="2">miss</a> German <a p="1">bread</a> the most.'
+            ],
+            [
+                '<p>Das deutsche <strong data-foo="bar">Brot</strong> <a href="https://test2.tld" target="_blank">vermisse</a> ich am meisten.</p>',
+                '<p>I <a href="https://test2.tld" target="_blank">miss</a> German <strong data-foo="bar">bread</strong> the most.</p>',
+                'Das deutsche <strong>Brot</strong> <a>vermisse</a> ich am meisten.',
+                'I <a>miss</a> German <strong>bread</strong> the most.'
+            ],
+            [
+                '<p>Das deutsche <strong data-foo="bar">Brot</strong> <a href="https://test1.tld" target="_blank">vermisse</a> <a href="https://test2.tld" target="_self">ich</a> am <small style="font-size:bold;">meisten</small></p>',
+                '<p><a href="https://test2.tld" target="_self">I</a> <a href="https://test1.tld" target="_blank">miss</a> German <strong data-foo="bar">bread</strong> the <small style="font-size:bold;">most</small></p>',
+                'Das deutsche <strong>Brot</strong> <a>vermisse</a> <a>ich</a> am <small>meisten</small>',
+                '<a p="2">I</a> <a p="1">miss</a> German <strong>bread</strong> the <small>most</small>'
+            ],
+            [
+                '<p><small class="_1">Haus</small> <span class="_2">Maus</span> Haus <u class="_4">Maus</u> <em class="_5">Haus</em></p>',
+                '<p><small class="_1">House</small> <span class="_2">mouse</span> house <u class="_4">mouse</u> <em class="_5">house</em></p>',
+                '<small>Haus</small> <span>Maus</span> Haus <u>Maus</u> <em>Haus</em>',
+                '<small>House</small> <span>mouse</span> house <u>mouse</u> <em>house</em>'
+            ],
+            [
+                '<p><small class="_1">Haus</small> <span class="_2">Maus</span> Haus <small class="_4">Maus</small> <span class="_5">Haus</span></p>',
+                '<p><small class="_1">House</small> <span class="_2">mouse</span> house <small class="_4">mouse</small> <span class="_5">house</span></p>',
+                '<small>Haus</small> <span>Maus</span> Haus <small>Maus</small> <span>Haus</span>',
+                '<small>House</small> <span>mouse</span> house <small>mouse</small> <span>house</span>'
+            ],
+            [
+                '<p>Das deutsche <strong data-foo="bar" class="notranslate">Brot</strong> <a href="https://test1.tld" target="_blank">vermisse</a> <a href="https://test2.tld" target="_self">ich</a> am <small style="font-size:bold;">meisten</small></p>',
+                '<p><a href="https://test2.tld" target="_self">I</a> <a href="https://test1.tld" target="_blank">miss</a> German <strong data-foo="bar" class="notranslate">Brot</strong> the <small style="font-size:bold;">most</small></p>',
+                'Das deutsche <strong class="notranslate">Brot</strong> <a>vermisse</a> <a>ich</a> am <small>meisten</small>',
+                '<a p="2">I</a> <a p="1">miss</a> German <strong class="notranslate">Brot</strong> the <small>most</small>'
+            ]
+        ];
+
+        foreach ($data as $data__value) {
+            ob_start();
+            $this->gtbabel->config($settings);
+            $this->gtbabel->start();
+            echo $data__value[0];
+            $this->gtbabel->stop();
+            $output = ob_get_contents();
+            ob_end_clean();
+            $translations = $this->gtbabel->data->getTranslationsFromDatabase();
+            $this->gtbabel->reset();
+            $this->assertEquals($output, $data__value[1]);
+            if (count($translations) > 1) {
+                __d($translations);
+            }
+            $this->assertEquals(count($translations), 1);
+            $this->assertEquals($translations[0]['str'], $data__value[2]);
+            $this->assertEquals($translations[0]['trans'], $data__value[3]);
+        }
+    }
+
     public function test_encoding()
     {
         $settings = $this->getDefaultSettings();

@@ -46,6 +46,21 @@
     color: #000;
     outline: none;
 }
+.gtbabel__wysiwyg-textarea::selection,
+.gtbabel__wysiwyg-editor *::selection {
+    background: #000;
+    color: #fff;
+}
+.gtbabel__wysiwyg-textarea::-moz-selection,
+.gtbabel__wysiwyg-editor *::-moz-selection {
+    background: #000;
+    color: #fff;
+}
+.gtbabel__wysiwyg-textarea::-webkit-selection,
+.gtbabel__wysiwyg-editor *::-webkit-selection {
+    background: #000;
+    color: #fff;
+}
 .gtbabel__wysiwyg-textarea[readonly] {
     background-color: #e8e8e8;
     color: #333333;
@@ -75,7 +90,7 @@
 .gtbabel__wysiwyg-button:active {
     outline: none;
     box-shadow: none;
-    color: inherit;
+    color: #000;
 }
 .gtbabel__wysiwyg .pell-actionbar {
     margin-bottom: 5px;

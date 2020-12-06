@@ -1385,6 +1385,7 @@ class Data
         $orig
         - <a href="https://tld.com" class="foo" data-bar="baz">Hallo</a> Welt!
         - Das deutsche <a href="https://1.com">Brot</a> <a href="https://2.com">vermisse</a> ich am meisten.
+        - Das deutsche <strong>Brot</strong> <a href="https://1.com">vermisse</a> ich am meisten.
         - <a class="notranslate foo">Hallo</a> Welt!
         - Das ist ein Link https://tld.com im Text.
         - <span class="logo"></span> Hallo Welt.
@@ -1392,6 +1393,7 @@ class Data
         $origWithoutPrefixSuffix
         - <a href="https://tld.com" class="foo" data-bar="baz">Hallo</a> Welt!
         - Das deutsche <a href="https://1.com">Brot</a> <a href="https://2.com">vermisse</a> ich am meisten.
+        - Das deutsche <strong>Brot</strong> <a href="https://1.com">vermisse</a> ich am meisten.
         - <a class="notranslate foo">Hallo</a> Welt!
         - Das ist ein Link https://tld.com im Text.
         - Hallo Welt.
@@ -1399,6 +1401,7 @@ class Data
         $origWithoutPrefixSuffixWithoutAttributes
         - <a>Hallo</a> Welt!
         - Das deutsche <a>Brot</a> <a>vermisse</a> ich am meisten.
+        - Das deutsche <strong>Brot</strong> <a>vermisse</a> ich am meisten.
         - <a class="notranslate">Hallo</a> Welt!
         - Das ist ein Link https://tld.com im Text.
         - Hallo Welt.
@@ -1406,6 +1409,7 @@ class Data
         $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks
         - <a>Hallo</a> Welt!
         - Das deutsche <a>Brot</a> <a>vermisse</a> ich am meisten.
+        - Das deutsche <strong>Brot</strong> <a>vermisse</a> ich am meisten.
         - <a class="notranslate">Hallo</a> Welt!
         - Das ist ein Link {1} im Text.
         - Hallo Welt.
@@ -1413,6 +1417,7 @@ class Data
         $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinksWithIds
         - <a p="1">Hallo</a> Welt!
         - Das deutsche <a p="1">Brot</a> <a p="2">vermisse</a> ich am meisten.
+        - Das deutsche <strong p="1">Brot</strong> <a p="1">vermisse</a> ich am meisten.
         - <a class="notranslate" p="1">Hallo</a> Welt!
         - Das ist ein Link {1} im Text.
         - Hallo Welt.
@@ -1420,6 +1425,7 @@ class Data
         $transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinksWithIds
         - <a p="1">Hello</a> world!
         - I <a p="2">miss</a> German <a p="1">bread</a> the most.
+        - I <a p="1">miss</a> German <strong p="1">bread</strong> the most.
         - <a class="notranslate" p="1">Hallo</a> world!
         - This is a link {1} in the text
         - Hallo Welt.
@@ -1427,6 +1433,7 @@ class Data
         $transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks
         - <a>Hello</a> world!
         - I <a p="2">miss</a> German <a p="1">bread</a> the most.
+        - I <a>miss</a> German <strong>bread</strong> the most.
         - <a class="notranslate">Hallo</a> world!
         - This is a link {1} in the text
         - Hello world.
@@ -1434,6 +1441,7 @@ class Data
         $transWithoutPrefixSuffixWithoutInlineLinks
         - <a href="https://tld.com" class="foo" data-bar="baz">Hello</a> world!
         - I <a href="https://2.com">miss</a> German <a href="https://1.com">bread</a> the most.
+        - I <a href="https://1.com">miss</a> German <strong>bread</strong> the most.
         - <a class="notranslate foo">Hallo</a> world!
         - This is a link {1} in the text
         - Hello world.
@@ -1441,6 +1449,7 @@ class Data
         $transWithoutPrefixSuffix
         - <a href="https://tld.com" class="foo" data-bar="baz">Hello</a> world!
         - I <a href="https://2.com">miss</a> German <a href="https://1.com">bread</a> the most.
+        - I <a href="https://1.com">miss</a> German <a href="strong>bread</strong> the most.
         - <a class="notranslate foo">Hallo</a> world!
         - This is a link https://tld.com/en/ in the text
         - Hello world.
@@ -1448,6 +1457,7 @@ class Data
         $trans
         - <a href="https://tld.com" class="foo" data-bar="baz">Hello</a> world!
         - I <a href="https://2.com">miss</a> German <a href="https://1.com">bread</a> the most.
+        - I <a href="https://1.com">miss</a> German <strong>bread</strong> the most.
         - <a class="notranslate foo">Hallo</a> world!
         - This is a link https://tld.com/en/ in the text
         - <span class="logo"></span> Hello world.

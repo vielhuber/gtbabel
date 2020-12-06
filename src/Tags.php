@@ -19,7 +19,28 @@ class Tags
         if (empty($matches[0])) {
             return [];
         }
-        return $matches[0];
+        $return = [];
+        $ids_count = [];
+        foreach ($matches[0] as $matches__value) {
+            $tag = mb_substr(
+                $matches__value,
+                1,
+                mb_strpos($matches__value, ' ') !== false
+                    ? mb_strpos($matches__value, ' ') - 1
+                    : mb_strpos($matches__value, '>') - 1
+            );
+            if (!array_key_exists($tag, $ids_count)) {
+                $ids_count[$tag] = 0;
+            }
+            $ids_count[$tag]++;
+            $id = $ids_count[$tag];
+            $return[] = [
+                'value' => $matches__value,
+                'tag' => $tag,
+                'id' => $id
+            ];
+        }
+        return $return;
     }
 
     function catchInlineLinks($str)
@@ -46,38 +67,36 @@ class Tags
 
     function addIds($str)
     {
-        foreach ($this->catchOpeningTags($str) as $matches__key => $matches__value) {
-            $id = $matches__key + 1;
+        foreach ($this->catchOpeningTags($str) as $matches__value) {
             // consider tags like <br/>
-            $pos = mb_strrpos($matches__value, '/>');
+            $pos = mb_strrpos($matches__value['value'], '/>');
             $shift = true;
             if ($pos === false) {
-                $pos = mb_strrpos($matches__value, '>');
+                $pos = mb_strrpos($matches__value['value'], '>');
                 $shift = false;
             }
             $new =
-                mb_substr($matches__value, 0, $pos) .
+                mb_substr($matches__value['value'], 0, $pos) .
                 ' p="' .
-                $id .
+                $matches__value['id'] .
                 '"' .
                 ($shift === true ? ' ' : '') .
-                mb_substr($matches__value, $pos);
-            $str = __::str_replace_first($matches__value, $new, $str);
+                mb_substr($matches__value['value'], $pos);
+            $str = __::str_replace_first($matches__value['value'], $new, $str);
         }
         return $str;
     }
 
     function removeAttributesExceptIrregularIds($str)
     {
-        foreach ($this->catchOpeningTags($str) as $matches__key => $matches__value) {
-            $id = $matches__key + 1;
-            $pos_end = mb_strrpos($matches__value, '>');
-            if (mb_strpos($matches__value, ' ') !== false) {
-                $pos_begin = mb_strpos($matches__value, ' ');
+        foreach ($this->catchOpeningTags($str) as $matches__value) {
+            $pos_end = mb_strrpos($matches__value['value'], '>');
+            if (mb_strpos($matches__value['value'], ' ') !== false) {
+                $pos_begin = mb_strpos($matches__value['value'], ' ');
             } else {
                 $pos_begin = $pos_end;
             }
-            $attributes_cur = mb_substr($matches__value, $pos_begin, $pos_end - $pos_begin);
+            $attributes_cur = mb_substr($matches__value['value'], $pos_begin, $pos_end - $pos_begin);
             $has_notranslate_attribute = false;
             $attributes = explode(' ', trim($attributes_cur));
             foreach ($attributes as $attributes__key => $attributes__value) {
@@ -87,7 +106,10 @@ class Tags
                 ) {
                     $has_notranslate_attribute = true;
                 }
-                if (strpos($attributes__value, 'p="') === 0 && $attributes__value !== 'p="' . $id . '"') {
+                if (
+                    strpos($attributes__value, 'p="') === 0 &&
+                    $attributes__value !== 'p="' . $matches__value['id'] . '"'
+                ) {
                     continue;
                 }
                 unset($attributes[$attributes__key]);
@@ -100,8 +122,8 @@ class Tags
             } else {
                 $attributes = '';
             }
-            $new = str_replace($attributes_cur, $attributes, $matches__value);
-            $str = __::str_replace_first($matches__value, $new, $str);
+            $new = str_replace($attributes_cur, $attributes, $matches__value['value']);
+            $str = __::str_replace_first($matches__value['value'], $new, $str);
         }
         return $str;
     }
@@ -109,16 +131,15 @@ class Tags
     function removeAttributes($str)
     {
         $mappingTableTags = [];
-        foreach ($this->catchOpeningTags($str) as $matches__key => $matches__value) {
-            $id = $matches__key + 1;
-            $pos_end = mb_strrpos($matches__value, '>');
-            if (mb_strpos($matches__value, ' ') !== false) {
-                $pos_begin = mb_strpos($matches__value, ' ');
+        foreach ($this->catchOpeningTags($str) as $matches__value) {
+            $pos_end = mb_strrpos($matches__value['value'], '>');
+            if (mb_strpos($matches__value['value'], ' ') !== false) {
+                $pos_begin = mb_strpos($matches__value['value'], ' ');
             } else {
                 $pos_begin = $pos_end;
             }
-            $attributes = mb_substr($matches__value, $pos_begin, $pos_end - $pos_begin);
-            $mappingTableTags[$id] = trim($attributes);
+            $attributes = mb_substr($matches__value['value'], $pos_begin, $pos_end - $pos_begin);
+            $mappingTableTags[$matches__value['tag']][$matches__value['id']] = trim($attributes);
             $has_notranslate_attribute = false;
             if (preg_match('/class="[^"]*?notranslate[^"]*?"/', $attributes)) {
                 $has_notranslate_attribute = true;
@@ -127,8 +148,8 @@ class Tags
             if ($has_notranslate_attribute === true) {
                 $replacement = ' class="notranslate"';
             }
-            $new = str_replace($attributes, $replacement, $matches__value);
-            $str = __::str_replace_first($matches__value, $new, $str);
+            $new = str_replace($attributes, $replacement, $matches__value['value']);
+            $str = __::str_replace_first($matches__value['value'], $new, $str);
         }
         return [$str, $mappingTableTags];
     }
@@ -215,21 +236,18 @@ class Tags
 
     function addAttributesAndRemoveIds($str, $mappingTableTags)
     {
-        foreach ($this->catchOpeningTags($str) as $matches__key => $matches__value) {
-            $new = $matches__value;
-
-            // get id
-            $id = $matches__key + 1;
-            $pos_end = mb_strrpos($matches__value, '>');
-            if (mb_strpos($matches__value, ' ') !== false) {
-                $pos_begin = mb_strpos($matches__value, ' ');
+        foreach ($this->catchOpeningTags($str) as $matches__value) {
+            $new = $matches__value['value'];
+            $pos_end = mb_strrpos($matches__value['value'], '>');
+            if (mb_strpos($matches__value['value'], ' ') !== false) {
+                $pos_begin = mb_strpos($matches__value['value'], ' ');
             } else {
                 $pos_begin = $pos_end;
             }
-            $attributes = mb_substr($matches__value, $pos_begin, $pos_end - $pos_begin);
+            $attributes = mb_substr($matches__value['value'], $pos_begin, $pos_end - $pos_begin);
             foreach (explode(' ', $attributes) as $attributes__value) {
                 if (mb_strpos($attributes__value, 'p="') !== false) {
-                    $id = str_replace(['p="', '"'], '', $attributes__value);
+                    $matches__value['id'] = str_replace(['p="', '"'], '', $attributes__value);
                 }
             }
 
@@ -237,13 +255,16 @@ class Tags
             $new = str_replace($attributes, '', $new);
 
             // restore attributes
-            if (array_key_exists($id, $mappingTableTags)) {
-                $attributes_restored = $mappingTableTags[$id];
+            if (
+                array_key_exists($matches__value['tag'], $mappingTableTags) &&
+                array_key_exists($matches__value['id'], $mappingTableTags[$matches__value['tag']])
+            ) {
+                $attributes_restored = $mappingTableTags[$matches__value['tag']][$matches__value['id']];
                 $pos = mb_strrpos($new, '>');
                 $new = mb_substr($new, 0, $pos) . ' ' . $attributes_restored . mb_substr($new, $pos);
             }
 
-            $str = __::str_replace_first($matches__value, $new, $str);
+            $str = __::str_replace_first($matches__value['value'], $new, $str);
         }
         return $str;
     }

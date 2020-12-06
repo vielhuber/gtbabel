@@ -684,7 +684,7 @@ class Dom
         if (@$node->tagName == '') {
             return false;
         }
-        return in_array($node->tagName, ['a', 'br', 'strong', 'b', 'small', 'i', 'em', 'span', 'sup', 'sub']);
+        return in_array($node->tagName, ['a', 'br', 'strong', 'b', 'u', 'small', 'i', 'em', 'span', 'sup', 'sub']);
     }
 
     function getOuterHtml($node)
