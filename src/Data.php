@@ -1542,6 +1542,35 @@ class Data
         return $orig;
     }
 
+    function translateMissing()
+    {
+        $translations = $this->getGroupedTranslationsFromDatabase()['data'];
+        foreach ($translations as $translations__value) {
+            foreach ($this->settings->getSelectedLanguageCodes() as $languages__value) {
+                if (isset($translations__value[$languages__value]) && $translations__value[$languages__value] != '') {
+                    continue;
+                }
+                $trans = $this->autoTranslateString(
+                    $this->tags->addIds($translations__value[$translations__value['lng_source']]),
+                    $translations__value['lng_source'],
+                    $languages__value,
+                    $translations__value['context']
+                );
+                if ($trans !== null) {
+                    $this->addTranslationToDatabaseAndToCache(
+                        $translations__value[$translations__value['lng_source']],
+                        $this->tags->removeAttributesExceptIrregularIds($trans),
+                        $translations__value['lng_source'],
+                        $languages__value,
+                        $translations__value['context'],
+                        true
+                    );
+                }
+            }
+        }
+        $this->saveCacheToDatabase();
+    }
+
     function autoTranslateString($orig, $lng_source, $lng_target, $context = null)
     {
         if ($lng_source === null) {

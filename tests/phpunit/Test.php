@@ -724,10 +724,10 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->gtbabel->translate('Hund', 'en', 'de'), 'Dog');
         $this->assertEquals(
             $this->gtbabel->translate('<p>Hallo <a href="/datenschutz">Datenschutz</a>!</p>'),
-            '<p>Hello <a href="/en/data-protection">data protection</a> !</p>'
+            '<p>Hello <a href="/en/privacy">data protection</a> !</p>'
         );
-        $this->assertEquals($this->gtbabel->translate('Datenschutz'), 'Data protection');
-        $this->assertEquals($this->gtbabel->translate('/datenschutz'), '/en/data-protection');
+        $this->assertEquals($this->gtbabel->translate('Datenschutz'), 'Privacy');
+        $this->assertEquals($this->gtbabel->translate('/datenschutz'), '/en/privacy');
         $this->assertEquals($this->gtbabel->translate('/hund/haus/eimer'), '/en/dog/house/bucket');
         $this->assertEquals(
             $this->gtbabel->translate('http://gtbabel.local.vielhuber.de/katze/mund'),
@@ -1311,6 +1311,35 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->gtbabel->reset();
     }
 
+    public function test_translate_missing()
+    {
+        $settings = $this->getDefaultSettings();
+        $settings['languages'] = $this->getLanguageSettings([['code' => 'de'], ['code' => 'en'], ['code' => 'fr']]);
+        $settings['lng_source'] = 'de';
+        $settings['lng_target'] = 'en';
+        $this->setHostTo($settings['lng_target']);
+        $settings['debug_translations'] = false;
+        $settings['auto_translation'] = true;
+        $settings['auto_add_translations'] = true;
+        $settings['unchecked_strings'] = 'trans';
+
+        ob_start();
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
+        echo 'Dies ist ein Test';
+        $this->gtbabel->stop();
+        ob_end_clean();
+
+        $data1 = $this->gtbabel->data->getGroupedTranslationsFromDatabase();
+        $this->gtbabel->data->translateMissing();
+        $data2 = $this->gtbabel->data->getGroupedTranslationsFromDatabase();
+
+        $this->assertEquals(isset($data1['data'][0]['fr']), false);
+        $this->assertEquals(isset($data2['data'][0]['fr']), true);
+
+        $this->gtbabel->reset();
+    }
+
     public function test_exportimport()
     {
         $settings = $this->getDefaultSettings();
@@ -1605,12 +1634,12 @@ EOD;
 <a href="mailto:"></a>
 <a href="mailto:david@vielhuber.de_EN"></a>
 <a href="mailto:david@vielhuber.de_EN?subject=House&amp;body=This%20is%20a%20test"></a>
-<a href="mailto:david@vielhuber.de_EN?subject=House&amp;body=This%20is%20a%20link%20http://gtbabel.local.vielhuber.de/en/data-protection"></a>
-<a href="mailto:?subject=House&amp;body=http://gtbabel.local.vielhuber.de/en/data-protection/"></a>
+<a href="mailto:david@vielhuber.de_EN?subject=House&amp;body=This%20is%20a%20link%20http://gtbabel.local.vielhuber.de/en/privacy"></a>
+<a href="mailto:?subject=House&amp;body=http://gtbabel.local.vielhuber.de/en/privacy/"></a>
 <a href="tel:+4989111312113"></a>
 <a href="http://test.de/beispiel-bilddatei9.jpg"></a>
 <a href="http://test.de/beispiel-pfad10"></a>
-<a href="http://gtbabel.local.vielhuber.de/en/data-protection/example-path11"></a>
+<a href="http://gtbabel.local.vielhuber.de/en/privacy/example-path11"></a>
 <a href="http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei12_EN.jpg"></a>
 <a href="http://gtbabel.local.vielhuber.de/en/"></a>
 <a href="http://gtbabel.local.vielhuber.de/en/"></a>
@@ -1625,7 +1654,7 @@ EOD;
 EOD;
 
         $expected_data = [
-            ['datenschutz', 'slug', 'de', 'en', 'data-protection', 0],
+            ['datenschutz', 'slug', 'de', 'en', 'privacy', 0],
             ['beispiel-pfad11', 'slug', 'de', 'en', 'example-path11', 0],
             ['beispiel', 'slug', 'de', 'en', 'example', 0],
             ['pfad', 'slug', 'de', 'en', 'path', 0],

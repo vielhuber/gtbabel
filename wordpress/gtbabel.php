@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 5.2.4
+ * Version: 5.2.5
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -2827,6 +2827,10 @@ class GtbabelWordPress
                 }
             }
 
+            if (isset($_POST['translate_missing'])) {
+                $this->gtbabel->data->translateMissing();
+            }
+
             if (isset($_POST['reset_settings'])) {
                 $this->deleteSettings();
                 $this->setDefaultSettingsToOption();
@@ -2904,6 +2908,17 @@ class GtbabelWordPress
         echo '</ul>';
 
         $this->initBackendAutoGrab('page=gtbabel-actions');
+
+        echo '<h2 class="gtbabel__subtitle">' . __('Complete missing translations', 'gtbabel-plugin') . '</h2>';
+        echo '<p class="gtbabel__paragraph">' .
+            __(
+                'Translates already discovered strings, where the translation is not yet done.',
+                'gtbabel-plugin'
+            ) .
+            '</p>';
+        echo '<input class="gtbabel__submit button button-secondary" name="translate_missing" value="' .
+            __('Translate', 'gtbabel-plugin') .
+            '" type="submit" />';
 
         echo '<h2 class="gtbabel__subtitle">' . __('Bulk changes', 'gtbabel-plugin') . '</h2>';
         echo '<ul class="gtbabel__fields">';
