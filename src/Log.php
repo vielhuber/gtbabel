@@ -1,8 +1,6 @@
 <?php
 namespace vielhuber\gtbabel;
 
-use vielhuber\stringhelper\__;
-
 class Log
 {
     function __construct(Utils $utils = null, Settings $settings = null)

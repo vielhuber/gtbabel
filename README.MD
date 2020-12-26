@@ -1244,6 +1244,7 @@ The following features are included:
 -   Possibility to replace files per language via the media library
 -   Multisite support
 -   Flexible permission system based on capabilities
+-   Prevents multiple entries of different thumbnail sizes
 
 #### Permissions
 
@@ -1253,6 +1254,7 @@ Gtbabel for WordPress uses the following capabilities:
 -   `gtbabel__email_notifications`: capability to receive email notifications
 -   `gtbabel__translation_list`: capability to use the list of translations
 -   `gtbabel__translation_assistant`: capability to use the translation assistant
+-   `gtbabel__translation_frontendeditor`: capability to use the frontend editor
 -   `gtbabel__translate_xx`: capability to translate the language with code `xx`
 
 By default, administrators have all capabilities (except `gtbabel__email_notifications`).\

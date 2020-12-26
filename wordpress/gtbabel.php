@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 5.2.5
+ * Version: 5.2.6
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -285,7 +285,10 @@ class GtbabelWordPress
         }
 
         $settings['frontend_editor'] =
-            is_user_logged_in() && isset($_GET['gtbabel_frontend_editor']) && $_GET['gtbabel_frontend_editor'] == '1';
+            is_user_logged_in() &&
+            current_user_can('gtbabel__translation_frontendeditor') &&
+            isset($_GET['gtbabel_frontend_editor']) &&
+            $_GET['gtbabel_frontend_editor'] == '1';
 
         // url settings are stored in the wordpress database for migration purposes
         $url_settings = get_option('gtbabel_url_settings');
@@ -538,16 +541,25 @@ class GtbabelWordPress
                     'meta' => ['target' => '_blank']
                 ]);
 
-                echo '<style>#wpadminbar #wp-admin-bar-gtbabel-frontend-editor .ab-icon:before { content: "\f11f"; top: 3px; }</style>';
-                $html = '<span class="ab-icon"></span>' . __('Frontend editor', 'gtbabel-plugin');
-                $admin_bar->add_menu([
-                    'id' => 'gtbabel-frontend-editor',
-                    'parent' => null,
-                    'group' => null,
-                    'title' => $html,
-                    'href' => $url . (strpos($url, '?') ? '&' : '?') . 'gtbabel_frontend_editor=1',
-                    'meta' => []
-                ]);
+                if (
+                    !$this->gtbabel->data->sourceLngIsCurrentLng() &&
+                    current_user_can('gtbabel__translation_frontendeditor')
+                ) {
+                    echo '<style>#wpadminbar #wp-admin-bar-gtbabel-frontend-editor .ab-icon:before { content: "\f11f"; top: 3px; }</style>';
+                    $html = '<span class="ab-icon"></span>' . __('Frontend editor', 'gtbabel-plugin');
+                    $admin_bar->add_menu([
+                        'id' => 'gtbabel-frontend-editor',
+                        'parent' => null,
+                        'group' => null,
+                        'title' => $html,
+                        'href' =>
+                            $url .
+                            (isset($_GET['gtbabel_frontend_editor']) && $_GET['gtbabel_frontend_editor'] == '1'
+                                ? ''
+                                : (strpos($url, '?') ? '&' : '?') . 'gtbabel_frontend_editor=1'),
+                        'meta' => []
+                    ]);
+                }
             },
             500
         );
@@ -2911,10 +2923,7 @@ class GtbabelWordPress
 
         echo '<h2 class="gtbabel__subtitle">' . __('Complete missing translations', 'gtbabel-plugin') . '</h2>';
         echo '<p class="gtbabel__paragraph">' .
-            __(
-                'Translates already discovered strings, where the translation is not yet done.',
-                'gtbabel-plugin'
-            ) .
+            __('Translates already discovered strings, where the translation is not yet done.', 'gtbabel-plugin') .
             '</p>';
         echo '<input class="gtbabel__submit button button-secondary" name="translate_missing" value="' .
             __('Translate', 'gtbabel-plugin') .
@@ -4332,6 +4341,7 @@ EOD;
         $caps['gtbabel__edit_settings'] = __('Edit settings', 'gtbabel-plugin');
         $caps['gtbabel__translation_list'] = __('Use translation list', 'gtbabel-plugin');
         $caps['gtbabel__translation_assistant'] = __('Use translation assistant', 'gtbabel-plugin');
+        $caps['gtbabel__translation_frontendeditor'] = __('Use translation frontend editor', 'gtbabel-plugin');
         foreach ($this->gtbabel->settings->getSelectedLanguageCodesLabels() as $languages__key => $languages__value) {
             $caps['gtbabel__translate_' . $languages__key] = sprintf(
                 __('Translate language %s', 'gtbabel-plugin'),

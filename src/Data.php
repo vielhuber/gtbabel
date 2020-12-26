@@ -1206,6 +1206,11 @@ class Data
             $link = $this->host->appendArgToUrl($link, 'lang', $lng_target);
         }
 
+        // append frontend editor parameter
+        if ($this->settings->get('frontend_editor') === true) {
+            $link = $this->host->appendArgToUrl($link, 'gtbabel_frontend_editor', '1');
+        }
+
         if (mb_strpos(trim($link, '/'), '?') === 0) {
             return $link;
         }
@@ -1290,6 +1295,35 @@ class Data
             if ($this->stringShouldNotBeTranslated($urls__value, 'file')) {
                 continue;
             }
+
+            // detect wordpress thumbnails and prevent adding multiple entries
+            $thumbnail_data = [];
+            if ($this->utils->isWordPress()) {
+                if (function_exists('wp_get_registered_image_subsizes')) {
+                    $thumbnail_sizes = wp_get_registered_image_subsizes();
+                    if (!empty($thumbnail_sizes)) {
+                        foreach ($thumbnail_sizes as $thumbanil_sizes__key => $thumbnail_sizes__value) {
+                            foreach (
+                                [
+                                    '/.+(-' . $thumbnail_sizes__value['width'] . 'x[0-9]+)\.(jpg|png|gif)$/',
+                                    '/.+(-[0-9]+x' . $thumbnail_sizes__value['height'] . ')\.(jpg|png|gif)$/'
+                                ]
+                                as $regex_patterns__value
+                            ) {
+                                if (preg_match($regex_patterns__value, $urls__value, $matches)) {
+                                    if (!empty($matches) && isset($matches[1]) && isset($matches[2])) {
+                                        $thumbnail_data['orig'] = $urls__value;
+                                        $thumbnail_data['size'] = $thumbanil_sizes__key;
+                                        $urls__value = str_replace($matches[1], '', $urls__value);
+                                        break 2;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             $trans = $this->getExistingTranslationFromCache($urls__value, $lng_source, $lng_target, 'file', $meta);
             if ($trans === false) {
                 $this->addTranslationToDatabaseAndToCache(
@@ -1306,6 +1340,29 @@ class Data
                     $this->settings->get('unchecked_strings') === 'trans' ||
                     $this->stringIsChecked($urls__value, $lng_source, $lng_target, 'file')
                 ) {
+                    if ($this->utils->isWordPress()) {
+                        if (!empty($thumbnail_data)) {
+                            if (function_exists('attachment_url_to_postid')) {
+                                $attachment_id = attachment_url_to_postid(
+                                    $this->host->getBaseUrlForSourceLanguage() . '/' . $trans
+                                );
+                                if ($attachment_id > 0) {
+                                    if (function_exists('get_the_post_thumbnail_url')) {
+                                        $attachment_url = wp_get_attachment_image_url(
+                                            $attachment_id,
+                                            $thumbnail_data['size']
+                                        );
+                                        if ($attachment_url !== false) {
+                                            $attachment_url = $this->host->getPathWithoutPrefixFromUrl($attachment_url);
+                                            $attachment_url = trim($attachment_url, '/');
+                                            $trans = $attachment_url;
+                                            $urls__value = $thumbnail_data['orig'];
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                     $orig = str_replace($urls__value, $trans, $orig);
                 } elseif ($this->settings->get('unchecked_strings') === 'hide') {
                     $orig = str_replace($urls__value, '', $orig);
@@ -2053,6 +2110,11 @@ class Data
         // append lang parameter
         if ($this->host->shouldUseLangQueryArg()) {
             $path = $this->host->appendArgToUrl($path, 'lang', $to_lng);
+        }
+
+        // append frontend editor parameter
+        if ($this->settings->get('frontend_editor') === true) {
+            $path = $this->host->appendArgToUrl($path, 'gtbabel_frontend_editor', '1');
         }
 
         [$path, $link_arguments] = $this->urlQueryArgsStripAndTranslate($path, $from_lng, $to_lng);

@@ -146,9 +146,6 @@ class Gtbabel
 
     function tokenize($content)
     {
-        if ($this->configured === false) {
-            $this->config();
-        }
         $tmp_folder = $this->utils->getDocRoot() . '/gtbabel-tokenize';
         $settings = $this->settings->getSettings();
         // set fixed source and target (important: they just need to be different)
