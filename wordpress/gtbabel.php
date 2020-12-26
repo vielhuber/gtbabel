@@ -3770,31 +3770,22 @@ EOD;
     {
         $urls = [];
 
-        // approach 1 (parse yoast sitemap)
-        $sitemap_url = $this->buildFetchUrl(
-            get_bloginfo('url') . '/sitemap_index.xml',
-            true,
-            false,
-            false,
-            false,
-            'source'
-        );
-        $urls = __::extract_urls_from_sitemap($sitemap_url);
-
-        // approach 2 (parse wp default sitemap)
-        if (empty($urls)) {
-            $sitemap_url = $this->buildFetchUrl(
-                get_bloginfo('url') . '/wp-sitemap.xml',
-                true,
-                false,
-                false,
-                false,
-                'source'
-            );
-            $urls = __::extract_urls_from_sitemap($sitemap_url);
+        // try yoast, native, plugin
+        foreach (['sitemap_index.xml', 'wp-sitemap.xml', 'sitemap.xml'] as $targets__value) {
+            if (empty($urls)) {
+                $sitemap_url = $this->buildFetchUrl(
+                    get_bloginfo('url') . '/' . $targets__value,
+                    true,
+                    false,
+                    false,
+                    false,
+                    'source'
+                );
+                $urls = __::extract_urls_from_sitemap($sitemap_url);
+            }
         }
 
-        // approach 3 (get all posts; this is disabled, because every wp installation should provide a sitemap by default now)
+        // another approach (get all posts; this is disabled, because every wp installation should provide a sitemap by default now)
         /*
         if (empty($urls)) {
             $urls[] = get_bloginfo('url');
