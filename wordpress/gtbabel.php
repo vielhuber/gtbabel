@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 5.2.7
+ * Version: 5.2.8
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -2199,17 +2199,16 @@ class GtbabelWordPress
     {
         echo '<div class="gtbabel__file-info">';
         if ($str != '') {
+            $url = '';
+            if (mb_strpos($str, 'http') !== 0) {
+                $url .= $this->gtbabel->host->getCurrentHost() . '/';
+            }
+            $url .= $str;
             if (preg_match('/.+\.(jpg|jpeg|png|gif|svg)$/i', $str)) {
-                echo '<img class="gtbabel__file-info-img" src="' .
-                    $this->gtbabel->host->getCurrentHost() .
-                    '/' .
-                    $str .
-                    '" alt="" />';
+                echo '<img class="gtbabel__file-info-img" src="' . $url . '" alt="" />';
             }
             echo '<a class="button button-secondary button-small gtbabel__file-info-link" target="_blank" href="' .
-                $this->gtbabel->host->getCurrentHost() .
-                '/' .
-                $str .
+                $url .
                 '">' .
                 __('Open file', 'gtbabel-plugin') .
                 '</a>';
@@ -2586,7 +2585,11 @@ class GtbabelWordPress
                     if ($translations__value['context'] === 'file') {
                         $this->initBackendStringTranslationShowFile(
                             $translations__value[$languages__key],
-                            $languages__key !== $translations__value['lng_source']
+                            $languages__key !== $translations__value['lng_source'] &&
+                                preg_match(
+                                    '/.+\.(jpg|jpeg|png|gif|svg)$/i',
+                                    $translations__value[$translations__value['lng_source']]
+                                )
                         );
                     }
                     $discovered_url = null;

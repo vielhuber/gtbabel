@@ -128,7 +128,8 @@ export default class WpBackend {
                         let url = null,
                             selection = image_frame.state().get('selection'),
                             preview = el.closest('.gtbabel__table-cell').querySelector('.gtbabel__file-info-img'),
-                            textarea = el.closest('.gtbabel__table-cell').querySelector('.gtbabel__input--textarea');
+                            textarea = el.closest('.gtbabel__table-cell').querySelector('.gtbabel__input--textarea'),
+                            abs = preview.getAttribute('src').indexOf('http') === 0;
                         if (selection.length > 0) {
                             selection.forEach(attachment => {
                                 url = attachment.attributes.url;
@@ -136,8 +137,10 @@ export default class WpBackend {
                         }
                         if (url !== null) {
                             preview.setAttribute('src', url);
-                            url = url.replace(window.location.protocol + '//' + window.location.host, '');
-                            url = url.replace(/^\/+|\/+$/g, '');
+                            if (abs === false) {
+                                url = url.replace(window.location.protocol + '//' + window.location.host, '');
+                                url = url.replace(/^\/+|\/+$/g, '');
+                            }
                             textarea.value = url;
                             textarea.dispatchEvent(new Event('change', { bubbles: true }));
                         }

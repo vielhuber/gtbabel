@@ -1658,12 +1658,16 @@ class Data
                 if (isset($translations__value[$languages__value]) && $translations__value[$languages__value] != '') {
                     continue;
                 }
-                $trans = $this->autoTranslateString(
-                    $this->tags->addIds($translations__value[$translations__value['lng_source']]),
-                    $translations__value['lng_source'],
-                    $languages__value,
-                    $translations__value['context']
-                );
+                if (in_array($translations__value['context'], ['', 'slug', 'title', 'description'])) {
+                    $trans = $this->autoTranslateString(
+                        $this->tags->addIds($translations__value[$translations__value['lng_source']]),
+                        $translations__value['lng_source'],
+                        $languages__value,
+                        $translations__value['context']
+                    );
+                } else {
+                    $trans = $translations__value[$translations__value['lng_source']];
+                }
                 if ($trans !== null) {
                     $this->addTranslationToDatabaseAndToCache(
                         $translations__value[$translations__value['lng_source']],
@@ -1987,7 +1991,12 @@ class Data
             }
 
             $value_to_check_for_file = str_replace('://', '', $value_to_check_for_file);
-            if (preg_match('/\/.+\.[a-zA-Z\d]+$/', $value_to_check_for_file)) {
+            if (
+                preg_match(
+                    '/\/.+\.(3g2|3gp|7z|aac|abw|arc|avi|azw|bin|bmp|bz|bz2|csh|css|csv|doc|docx|eot|epub|gif|gz|htm|html|ico|ics|jar|jpeg|jpg|js|json|jsonld|mid|midi|mjs|mp3|mpeg|mpkg|odp|ods|odt|oga|ogv|ogx|opus|otf|pdf|php|png|ppt|pptx|rar|rtf|sh|svg|swf|tar|tif|tiff|ts|ttf|txt|vsd|wav|weba|webm|webp|woff|woff2|xhtml|xls|xlsx|xml|xul|zip)$/',
+                    $value_to_check_for_file
+                )
+            ) {
                 return 'file';
             }
 

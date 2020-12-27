@@ -1047,7 +1047,7 @@ The default configuration is:
             'context' => 'slug|file|url'
         ],
         [
-            'selector' => 'iframe',
+            'selector' => '/html/body//iframe[@src]',
             'attribute' => 'src',
             'context' => 'slug|file|url'
         ],
