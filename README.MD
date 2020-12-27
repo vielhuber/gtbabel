@@ -1039,12 +1039,17 @@ The default configuration is:
         [
             'selector' => '/html/body//a[@href]',
             'attribute' => 'href',
-            'context' => 'slug|file'
+            'context' => 'slug|file|url'
         ],
         [
             'selector' => '/html/body//form[@action]',
             'attribute' => 'action',
-            'context' => 'slug'
+            'context' => 'slug|file|url'
+        ],
+        [
+            'selector' => 'iframe',
+            'attribute' => 'src',
+            'context' => 'slug|file|url'
         ],
         [
             'selector' => '/html/body//img[@alt]',
@@ -1119,7 +1124,7 @@ The default configuration is:
         [
             'selector' => '.example-link', // css selectors are also supported
             'attribute' => 'alt-href|*foo*', // wildcards and | supported
-            'context' => 'slug'
+            'context' => 'slug|file|url'
         ]
     ],
     'translate_html_exclude' => [
@@ -1326,25 +1331,26 @@ Another way of doing this is using the `translate_wp_localize_script` option: Po
 
 By default Gtbabel translates all text and tag nodes with the following reasonable default rules:
 
-| css selector                    | text | attribute        | context          |
-| ------------------------------- | ---- | ---------------- | ---------------- |
-| `body *`                        | ✓    | ✗                | `auto`           |
-| `body a`                        | ✗    | `href^="mailto"` | `email`          |
-| `body a`                        | ✗    | `href`           | `'slug'\|'file'` |
-| `body form`                     | ✗    | `action`         | `'slug'`         |
-| `body img`                      | ✗    | `alt`            | `auto`           |
-| `body *`                        | ✗    | `title`          | `auto`           |
-| `body *`                        | ✗    | `placeholder`    | `auto`           |
-| `body input[type="submit"]`     | ✗    | `value`          | `auto`           |
-| `body input[type="reset"]`      | ✗    | `value`          | `auto`           |
-| `head title`                    | ✓    | ✗                | `'title'`        |
-| `head meta[name="description"]` | ✗    | `content`        | `'description'`  |
-| `head link[rel="canonical"]`    | ✗    | `href`           | `'slug'`         |
-| `body img`                      | ✗    | `src`            | `'file'`         |
-| `body img`                      | ✗    | `srcset`         | `'file'`         |
-| `body *`                        | ✗    | `style`          | `'file'`         |
-| `body *`                        | ✗    | `label`          | `auto`           |
-| `body *`                        | ✗    | `*text*`         | `auto`           |
+| css selector                    | text | attribute        | context                 |
+| ------------------------------- | ---- | ---------------- | ----------------------- |
+| `body *`                        | ✓    | ✗                | `auto`                  |
+| `body a`                        | ✗    | `href^="mailto"` | `email`                 |
+| `body a`                        | ✗    | `href`           | `'slug'\|'file'\|'url'` |
+| `body form`                     | ✗    | `action`         | `'slug'\|'file'\|'url'` |
+| `iframe`                        | ✗    | `src`            | `'slug'\|'file'\|'url'` |
+| `body img`                      | ✗    | `alt`            | `auto`                  |
+| `body *`                        | ✗    | `title`          | `auto`                  |
+| `body *`                        | ✗    | `placeholder`    | `auto`                  |
+| `body input[type="submit"]`     | ✗    | `value`          | `auto`                  |
+| `body input[type="reset"]`      | ✗    | `value`          | `auto`                  |
+| `head title`                    | ✓    | ✗                | `'title'`               |
+| `head meta[name="description"]` | ✗    | `content`        | `'description'`         |
+| `head link[rel="canonical"]`    | ✗    | `href`           | `'slug'`                |
+| `body img`                      | ✗    | `src`            | `'file'`                |
+| `body img`                      | ✗    | `srcset`         | `'file'`                |
+| `body *`                        | ✗    | `style`          | `'file'`                |
+| `body *`                        | ✗    | `label`          | `auto`                  |
+| `body *`                        | ✗    | `*text*`         | `auto`                  |
 
 You can modify or add new tag node transformations via the `translate_html_include` option.
 

@@ -1010,8 +1010,9 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->gtbabel->stop();
         ob_end_clean();
         $translations = $this->gtbabel->data->getTranslationsFromDatabase();
-        $this->assertEquals(count($translations), 1);
-        $this->assertEquals($translations[0]['str'], 'Dies ist ein Link: {1}');
+        $this->assertEquals(count($translations), 2);
+        $this->assertEquals($translations[0]['str'], 'https://test.de');
+        $this->assertEquals($translations[1]['str'], 'Dies ist ein Link: {1}');
         $this->gtbabel->reset();
 
         ob_start();
@@ -1021,7 +1022,8 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->gtbabel->stop();
         ob_end_clean();
         $translations = $this->gtbabel->data->getTranslationsFromDatabase();
-        $this->assertEquals(count($translations), 0);
+        $this->assertEquals(count($translations), 1);
+        $this->assertEquals($translations[0]['str'], 'https://test.de');
         $this->gtbabel->reset();
     }
 
@@ -1048,20 +1050,20 @@ class Test extends \PHPUnit\Framework\TestCase
                 'This is a <strong>test</strong>'
             ],
             [
-                '<p>Das deutsche <a href="https://test1.tld" target="_self">Brot</a> <a href="https://test2.tld" target="_blank">vermisse</a> ich am meisten.</p>',
-                '<p>I <a href="https://test2.tld" target="_blank">miss</a> German <a href="https://test1.tld" target="_self">bread</a> the most.</p>',
+                '<p>Das deutsche <a href="#test1" target="_self">Brot</a> <a href="#test2" target="_blank">vermisse</a> ich am meisten.</p>',
+                '<p>I <a href="#test2" target="_blank">miss</a> German <a href="#test1" target="_self">bread</a> the most.</p>',
                 'Das deutsche <a>Brot</a> <a>vermisse</a> ich am meisten.',
                 'I <a p="2">miss</a> German <a p="1">bread</a> the most.'
             ],
             [
-                '<p>Das deutsche <strong data-foo="bar">Brot</strong> <a href="https://test2.tld" target="_blank">vermisse</a> ich am meisten.</p>',
-                '<p>I <a href="https://test2.tld" target="_blank">miss</a> German <strong data-foo="bar">bread</strong> the most.</p>',
+                '<p>Das deutsche <strong data-foo="bar">Brot</strong> <a href="#test2" target="_blank">vermisse</a> ich am meisten.</p>',
+                '<p>I <a href="#test2" target="_blank">miss</a> German <strong data-foo="bar">bread</strong> the most.</p>',
                 'Das deutsche <strong>Brot</strong> <a>vermisse</a> ich am meisten.',
                 'I <a>miss</a> German <strong>bread</strong> the most.'
             ],
             [
-                '<p>Das deutsche <strong data-foo="bar">Brot</strong> <a href="https://test1.tld" target="_blank">vermisse</a> <a href="https://test2.tld" target="_self">ich</a> am <small style="font-size:bold;">meisten</small></p>',
-                '<p><a href="https://test2.tld" target="_self">I</a> <a href="https://test1.tld" target="_blank">miss</a> German <strong data-foo="bar">bread</strong> the <small style="font-size:bold;">most</small></p>',
+                '<p>Das deutsche <strong data-foo="bar">Brot</strong> <a href="#test1" target="_blank">vermisse</a> <a href="#test2" target="_self">ich</a> am <small style="font-size:bold;">meisten</small></p>',
+                '<p><a href="#test2" target="_self">I</a> <a href="#test1" target="_blank">miss</a> German <strong data-foo="bar">bread</strong> the <small style="font-size:bold;">most</small></p>',
                 'Das deutsche <strong>Brot</strong> <a>vermisse</a> <a>ich</a> am <small>meisten</small>',
                 '<a p="2">I</a> <a p="1">miss</a> German <strong>bread</strong> the <small>most</small>'
             ],
@@ -1078,8 +1080,8 @@ class Test extends \PHPUnit\Framework\TestCase
                 '<small>House</small> <span>mouse</span> house <small>mouse</small> <span>house</span>'
             ],
             [
-                '<p>Das deutsche <strong data-foo="bar" class="notranslate">Brot</strong> <a href="https://test1.tld" target="_blank">vermisse</a> <a href="https://test2.tld" target="_self">ich</a> am <small style="font-size:bold;">meisten</small></p>',
-                '<p><a href="https://test2.tld" target="_self">I</a> <a href="https://test1.tld" target="_blank">miss</a> German <strong data-foo="bar" class="notranslate">Brot</strong> the <small style="font-size:bold;">most</small></p>',
+                '<p>Das deutsche <strong data-foo="bar" class="notranslate">Brot</strong> <a href="#test1" target="_blank">vermisse</a> <a href="#test2" target="_self">ich</a> am <small style="font-size:bold;">meisten</small></p>',
+                '<p><a href="#test2" target="_self">I</a> <a href="#test1" target="_blank">miss</a> German <strong data-foo="bar" class="notranslate">Brot</strong> the <small style="font-size:bold;">most</small></p>',
                 'Das deutsche <strong class="notranslate">Brot</strong> <a>vermisse</a> <a>ich</a> am <small>meisten</small>',
                 '<a p="2">I</a> <a p="1">miss</a> German <strong class="notranslate">Brot</strong> the <small>most</small>'
             ]
@@ -1097,7 +1099,7 @@ class Test extends \PHPUnit\Framework\TestCase
             $this->gtbabel->reset();
             $this->assertEquals($output, $data__value[1]);
             if (count($translations) > 1) {
-                __d($translations);
+                __o($translations);
             }
             $this->assertEquals(count($translations), 1);
             $this->assertEquals($translations[0]['str'], $data__value[2]);
@@ -1140,12 +1142,13 @@ class Test extends \PHPUnit\Framework\TestCase
                 '<img src="" alt="First &amp; test" data-text="Second &amp; test">' .
                 '<img src="" alt="First &amp; test" data-text="Second &amp; test">'
         );
-        $this->assertEquals(count($translations), 5);
+        $this->assertEquals(count($translations), 6);
         $this->assertEquals($translations[0]['str'], '#allesfürdich');
         $this->assertEquals($translations[1]['str'], 'foo &amp; bar<br>baz');
-        $this->assertEquals($translations[2]['str'], 'Erster &amp; Test');
-        $this->assertEquals($translations[3]['str'], '"gnarr" &amp; gnazz');
-        $this->assertEquals($translations[4]['str'], 'Zweiter &amp; Test');
+        $this->assertEquals($translations[2]['str'], 'https://www.url.com/foo.php?lang=de&amp;foo=bar');
+        $this->assertEquals($translations[3]['str'], 'Erster &amp; Test');
+        $this->assertEquals($translations[4]['str'], '"gnarr" &amp; gnazz');
+        $this->assertEquals($translations[5]['str'], 'Zweiter &amp; Test');
     }
 
     public function test_referer_lng()
@@ -1564,7 +1567,7 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->gtbabel->reset();
     }
 
-    public function test_file()
+    public function test_file_url()
     {
         $settings = $this->getDefaultSettings();
         $settings['languages'] = $this->getLanguageSettings([['code' => 'de'], ['code' => 'en']]);
@@ -1595,6 +1598,12 @@ class Test extends \PHPUnit\Framework\TestCase
     src="http://gtbabel.local.vielhuber.de/900x200.png?text=fallback"
     alt=""
 />
+<img srcset="http://gtbabel.local.vielhuber.de/320x100.png?text=small,
+             http://test.de/600x100.png?text=medium 600w,
+             http://gtbabel.local.vielhuber.de/900x100.png?text=large 2x"
+    src="http://test.de/900x200.png?text=fallback"
+    alt=""
+/>
 <a href="mailto:"></a>
 <a href="mailto:david@vielhuber.de"></a>
 <a href="mailto:david@vielhuber.de?subject=Haus&amp;body=Dies%20ist%20ein%20Test"></a>
@@ -1615,6 +1624,7 @@ class Test extends \PHPUnit\Framework\TestCase
 <a href="beispiel/pfad/1._Buch_Moses?Hund=Haus"></a>
 <a href="beispiel/pfad/1._Buch_Moses/?Hund=Haus"></a>
 <a href="https://lighthouse-dot-webdotdevsite.appspot.com/lh/html?url=http://gtbabel.local.vielhuber.de"></a>
+<iframe src="https://www.youtube.com/watch?v=4t1mgEBx1nQ"></iframe>
 EOD;
 
         $expected_html = <<<'EOD'
@@ -1631,6 +1641,7 @@ EOD;
 <img src="/beispiel-bilddatei7_EN.jpg" alt="">
 <img src="beispiel-bilddatei8_EN.jpg" alt="">
 <img srcset="http://gtbabel.local.vielhuber.de/320x100_EN.png?text=small, http://gtbabel.local.vielhuber.de/600x100_EN.png?text=medium 600w, http://gtbabel.local.vielhuber.de/900x100_EN.png?text=large 2x" src="http://gtbabel.local.vielhuber.de/900x200_EN.png?text=fallback" alt="" />
+<img srcset="http://gtbabel.local.vielhuber.de/320x100_EN.png?text=small, http://test.de/600x100.png?text=medium 600w, http://gtbabel.local.vielhuber.de/900x100_EN.png?text=large 2x" src="http://test.de/900x200.png?text=fallback" alt="" />
 <a href="mailto:"></a>
 <a href="mailto:david@vielhuber.de_EN"></a>
 <a href="mailto:david@vielhuber.de_EN?subject=House&amp;body=This%20is%20a%20test"></a>
@@ -1651,6 +1662,7 @@ EOD;
 <a href="en/example/path/1-book-moses?Hund=Haus"></a>
 <a href="en/example/path/1-book-moses/?Hund=Haus"></a>
 <a href="https://lighthouse-dot-webdotdevsite.appspot.com/lh/html?url=http://gtbabel.local.vielhuber.de"></a>
+<iframe src="https://www.youtube.com/watch?v=sZhl6PyTflw"></iframe>
 EOD;
 
         $expected_data = [
@@ -1676,7 +1688,37 @@ EOD;
             ['Dies ist ein Link {1}', null, 'de', 'en', 'This is a link {1}', 0],
             ['datenschutz/beispiel-bilddatei12.jpg', 'file', 'de', 'en', 'datenschutz/beispiel-bilddatei12_EN.jpg', 1],
             ['beispiel-bilddatei13.jpg', 'file', 'de', 'en', 'beispiel-bilddatei13_EN.jpg', 1],
-            ['beispiel-bilddatei14.jpg', 'file', 'de', 'en', 'beispiel-bilddatei14_EN.jpg', 1]
+            ['beispiel-bilddatei14.jpg', 'file', 'de', 'en', 'beispiel-bilddatei14_EN.jpg', 1],
+            ['http://test.de/beispiel-pfad10', 'url', 'de', 'en', 'http://test.de/beispiel-pfad10', 0],
+            ['http://test.de/beispiel-bilddatei4.jpg', 'file', 'de', 'en', 'http://test.de/beispiel-bilddatei4.jpg', 0],
+            ['http://test.de/beispiel-bilddatei5.jpg', 'file', 'de', 'en', 'http://test.de/beispiel-bilddatei5.jpg', 0],
+            ['http://test.de/beispiel-bilddatei9.jpg', 'file', 'de', 'en', 'http://test.de/beispiel-bilddatei9.jpg', 0],
+            ['tel:+4989111312113', 'url', 'de', 'en', 'tel:+4989111312113', 0],
+            [
+                'https://lighthouse-dot-webdotdevsite.appspot.com/lh/html?url=http://gtbabel.local.vielhuber.de',
+                'url',
+                'de',
+                'en',
+                'https://lighthouse-dot-webdotdevsite.appspot.com/lh/html?url=http://gtbabel.local.vielhuber.de',
+                0
+            ],
+            ['http://test.de/600x100.png?text=medium', 'file', 'de', 'en', 'http://test.de/600x100.png?text=medium', 0],
+            [
+                'http://test.de/900x200.png?text=fallback',
+                'file',
+                'de',
+                'en',
+                'http://test.de/900x200.png?text=fallback',
+                0
+            ],
+            [
+                'https://www.youtube.com/watch?v=4t1mgEBx1nQ',
+                'url',
+                'de',
+                'en',
+                'https://www.youtube.com/watch?v=sZhl6PyTflw',
+                1
+            ]
         ];
 
         ob_start();
@@ -1798,6 +1840,14 @@ EOD;
             'de',
             'en',
             'beispiel-bilddatei14_EN.jpg',
+            true
+        );
+        $this->gtbabel->data->editTranslation(
+            'https://www.youtube.com/watch?v=4t1mgEBx1nQ',
+            'url',
+            'de',
+            'en',
+            'https://www.youtube.com/watch?v=sZhl6PyTflw',
             true
         );
 

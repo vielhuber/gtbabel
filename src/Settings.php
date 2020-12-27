@@ -185,12 +185,17 @@ class Settings
             [
                 'selector' => '/html/body//a[@href]',
                 'attribute' => 'href',
-                'context' => 'slug|file'
+                'context' => 'slug|file|url'
             ],
             [
                 'selector' => '/html/body//form[@action]',
                 'attribute' => 'action',
-                'context' => 'slug'
+                'context' => 'slug|file|url'
+            ],
+            [
+                'selector' => '/html/body//iframe[@src]',
+                'attribute' => 'src',
+                'context' => 'slug|file|url'
             ],
             [
                 'selector' => '/html/body//img[@alt]',
@@ -265,7 +270,7 @@ class Settings
             [
                 'selector' => '.example-link',
                 'attribute' => 'alt-href|*foo*',
-                'context' => 'slug'
+                'context' => 'slug|file|url'
             ]
         ];
     }

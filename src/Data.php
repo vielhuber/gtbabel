@@ -862,7 +862,7 @@ class Data
                 $data__value,
                 $this->settings->getSourceLanguageCode(),
                 $this->getCurrentLanguageCode(),
-                'slug',
+                $this->autoDetermineContext($data__value),
                 $meta
             );
         }
@@ -1092,6 +1092,13 @@ class Data
             }
             return $trans;
         }
+        if ($context === 'url') {
+            $trans = $this->getTranslationOfUrlAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, $meta);
+            if ($trans === null) {
+                return $orig;
+            }
+            return $trans;
+        }
         if ($context === 'email') {
             $trans = $this->getTranslationOfEmailAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, $meta);
             if ($trans === null) {
@@ -1264,34 +1271,27 @@ class Data
 
     function getTranslationOfFileAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, &$meta = [])
     {
-        $urls = [];
-        // extract urls from style tag
-        if (strpos($orig, 'url(') !== false) {
-            preg_match_all('/url\((.+?)\)/', $orig, $matches);
-            foreach ($matches[1] as $matches__value) {
-                $urls[] = trim(trim(trim(trim($matches__value), '\''), '"'));
-            }
-        }
-        // extract urls from srcset
-        elseif (strpos($orig, ',') !== false) {
-            $urls = explode(',', $orig);
-            foreach ($urls as $urls__key => $urls__value) {
-                $urls[$urls__key] = trim(explode(' ', trim($urls__value))[0]);
-            }
-        } else {
-            $urls[] = $orig;
-        }
+        $urls = $this->extractUrlsFromString($orig);
         foreach ($urls as $urls__value) {
-            // always submit relative urls
-            $urls__value = $this->host->getPathWithoutPrefixFromUrl($urls__value);
-            $urls__value = trim($urls__value, '/');
-            // skip external files
+            if (
+                strpos($urls__value, 'http') !== 0 ||
+                strpos($urls__value, $this->host->getBaseUrlForSourceLanguage()) !== false
+            ) {
+                // always submit relative urls
+                $urls__value = $this->host->getPathWithoutPrefixFromUrl($urls__value);
+                // trim first/last slash
+                $urls__value = trim($urls__value, '/');
+            }
+
+            // skip external files (disabled!)
+            /*
             if (
                 strpos($urls__value, 'http') === 0 &&
                 strpos($urls__value, $this->host->getBaseUrlForSourceLanguage()) === false
             ) {
                 continue;
             }
+            */
             if ($this->stringShouldNotBeTranslated($urls__value, 'file')) {
                 continue;
             }
@@ -1434,6 +1434,57 @@ class Data
         $orig = ($is_link ? 'mailto:' : '') . $orig;
         $orig .= $args;
         return $orig;
+    }
+
+    function getTranslationOfUrlAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, &$meta = [])
+    {
+        $urls = $this->extractUrlsFromString($orig);
+        foreach ($urls as $urls__value) {
+            $trans = $this->getExistingTranslationFromCache($urls__value, $lng_source, $lng_target, 'url', $meta);
+            if ($trans === false) {
+                $this->addTranslationToDatabaseAndToCache(
+                    $urls__value,
+                    $urls__value,
+                    $lng_source,
+                    $lng_target,
+                    'url',
+                    false,
+                    $meta
+                );
+            } else {
+                if (
+                    $this->settings->get('unchecked_strings') === 'trans' ||
+                    $this->stringIsChecked($orig, $lng_source, $lng_target, 'url')
+                ) {
+                    $orig = str_replace($urls__value, $trans, $orig);
+                } elseif ($this->settings->get('unchecked_strings') === 'hide') {
+                    $orig = str_replace($urls__value, '', $orig);
+                }
+            }
+        }
+        return $orig;
+    }
+
+    function extractUrlsFromString($str)
+    {
+        $urls = [];
+        // extract urls from style tag
+        if (strpos($str, 'url(') !== false) {
+            preg_match_all('/url\((.+?)\)/', $str, $matches);
+            foreach ($matches[1] as $matches__value) {
+                $urls[] = trim(trim(trim(trim($matches__value), '\''), '"'));
+            }
+        }
+        // extract urls from srcset
+        elseif (strpos($str, ',') !== false) {
+            $urls = explode(',', $str);
+            foreach ($urls as $urls__key => $urls__value) {
+                $urls[$urls__key] = trim(explode(' ', trim($urls__value))[0]);
+            }
+        } else {
+            $urls[] = $str;
+        }
+        return $urls;
     }
 
     function getTranslationAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, $context = null, &$meta = [])
@@ -1740,7 +1791,7 @@ class Data
         }
 
         if ($this->settings->get('debug_translations') === true) {
-            if ($context !== 'slug') {
+            if ($context !== 'slug' && $context !== 'url') {
                 $trans = '%|%' . $trans . '%|%';
             }
         }
@@ -1792,7 +1843,7 @@ class Data
         if ($lng_source === null) {
             $lng_source = $this->settings->getSourceLanguageCode();
         }
-        if ($context === 'slug') {
+        if ($context === 'slug' || $context === 'url') {
             $pos = mb_strlen($str) - mb_strlen('-' . $lng_source);
             if (mb_strrpos($str, '-' . $lng_source) === $pos) {
                 $str = mb_substr($str, 0, $pos);
@@ -1874,7 +1925,7 @@ class Data
         if (preg_match('/^(\.)[a-z][a-z0-9- \.]*$/', $str)) {
             return true;
         }
-        if ($context !== 'email' && $context !== 'slug' && $context !== 'file') {
+        if ($context !== 'email' && $context !== 'slug' && $context !== 'file' && $context !== 'url') {
             // don't ignore root relative links beginning with "/"
             if (strpos($str, ' ') === false && strpos($str, '/') === false) {
                 if (strpos($str, '_') !== false) {
@@ -1902,35 +1953,52 @@ class Data
                 $context = 'email';
             } elseif (mb_strpos($value, $this->host->getBaseUrlForSourceLanguage()) === 0) {
                 // absolute internal links
-                $context = 'slug|file';
+                $context = 'slug|file|url';
             } elseif (
                 // values beginning with external http
                 mb_strpos($value, 'http') === 0 &&
                 mb_strpos($value, ' ') === false
             ) {
-                $context = 'slug';
+                $context = 'url';
             } elseif (preg_match('/^[a-z-\/]+(\.[a-z]{1,4})$/', $value)) {
                 // foo.html
-                $context = 'slug|file';
+                $context = 'slug|file|url';
             } elseif (preg_match('/^\/[a-z-_\/\.]+$/', $value)) {
                 // /foo/bar
-                $context = 'slug|file';
+                $context = 'slug|file|url';
             }
         }
-        if ($context === 'slug|file') {
-            $value_modified = $value;
-            if (!preg_match('/^[a-zA-Z]+?:.+$/', $value_modified)) {
-                $value_modified = $this->host->getBaseUrlForSourceLanguage() . '/' . $value_modified;
+        if ($context === 'slug|file|url') {
+            $value_to_check_for_file = $value;
+            $value_to_check_for_file = trim($value_to_check_for_file);
+            // if no protocol/domain is provided
+            if (!preg_match('/^[a-zA-Z]+?:.+$/', $value_to_check_for_file)) {
+                $value_to_check_for_file = $this->host->getBaseUrlForSourceLanguage() . '/' . $value_to_check_for_file;
             }
-            $value_modified = str_replace(['.php', '.html'], '', $value_modified);
-            if (mb_strpos($value_modified, '?') !== false) {
-                $value_modified = mb_substr($value_modified, 0, mb_strpos($value_modified, '?'));
+            // .php/.html are considered non static
+            $value_to_check_for_file = str_replace(['.php', '.html'], '', $value_to_check_for_file);
+            // strip away args
+            if (mb_strpos($value_to_check_for_file, '?') !== false) {
+                $value_to_check_for_file = mb_substr(
+                    $value_to_check_for_file,
+                    0,
+                    mb_strpos($value_to_check_for_file, '?')
+                );
             }
-            if (preg_match('/\/.+\.[a-zA-Z\d]+$/', str_replace('://', '', $value_modified))) {
-                $context = 'file';
-            } else {
-                $context = 'slug';
+
+            $value_to_check_for_file = str_replace('://', '', $value_to_check_for_file);
+            if (preg_match('/\/.+\.[a-zA-Z\d]+$/', $value_to_check_for_file)) {
+                return 'file';
             }
+
+            if (
+                preg_match('/^[a-zA-Z]+?:.+$/', $value) &&
+                mb_strpos($value, $this->host->getBaseUrlForSourceLanguage()) !== 0
+            ) {
+                return 'url';
+            }
+
+            return 'slug';
         }
         return $context;
     }
