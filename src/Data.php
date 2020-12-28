@@ -1438,28 +1438,17 @@ class Data
 
     function getTranslationOfUrlAndAddDynamicallyIfNeeded($orig, $lng_source, $lng_target, &$meta = [])
     {
-        $urls = $this->extractUrlsFromString($orig);
-        foreach ($urls as $urls__value) {
-            $trans = $this->getExistingTranslationFromCache($urls__value, $lng_source, $lng_target, 'url', $meta);
-            if ($trans === false) {
-                $this->addTranslationToDatabaseAndToCache(
-                    $urls__value,
-                    $urls__value,
-                    $lng_source,
-                    $lng_target,
-                    'url',
-                    false,
-                    $meta
-                );
-            } else {
-                if (
-                    $this->settings->get('unchecked_strings') === 'trans' ||
-                    $this->stringIsChecked($orig, $lng_source, $lng_target, 'url')
-                ) {
-                    $orig = str_replace($urls__value, $trans, $orig);
-                } elseif ($this->settings->get('unchecked_strings') === 'hide') {
-                    $orig = str_replace($urls__value, '', $orig);
-                }
+        $trans = $this->getExistingTranslationFromCache($orig, $lng_source, $lng_target, 'url', $meta);
+        if ($trans === false) {
+            $this->addTranslationToDatabaseAndToCache($orig, $orig, $lng_source, $lng_target, 'url', false, $meta);
+        } else {
+            if (
+                $this->settings->get('unchecked_strings') === 'trans' ||
+                $this->stringIsChecked($orig, $lng_source, $lng_target, 'url')
+            ) {
+                return $trans;
+            } elseif ($this->settings->get('unchecked_strings') === 'hide') {
+                return '';
             }
         }
         return $orig;

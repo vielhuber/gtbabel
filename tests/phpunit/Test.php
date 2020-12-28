@@ -1625,6 +1625,7 @@ class Test extends \PHPUnit\Framework\TestCase
 <a href="beispiel/pfad/1._Buch_Moses/?Hund=Haus"></a>
 <a href="https://lighthouse-dot-webdotdevsite.appspot.com/lh/html?url=http://gtbabel.local.vielhuber.de"></a>
 <iframe src="https://www.youtube.com/watch?v=4t1mgEBx1nQ"></iframe>
+<a href="https://www.google.de/maps/dir//foo,bar,baz/gnarr,gnaz,gnab/data=!3m1!4b1!4m9!4m8!1m0!1m5!1m1!1s0x479de2be93111c6d:0x2bac2afe506c9fa9!2m2!1d11.8208515!2d48.0923082!3e0">#</a>
 EOD;
 
         $expected_html = <<<'EOD'
@@ -1663,6 +1664,7 @@ EOD;
 <a href="en/example/path/1-book-moses/?Hund=Haus"></a>
 <a href="https://lighthouse-dot-webdotdevsite.appspot.com/lh/html?url=http://gtbabel.local.vielhuber.de"></a>
 <iframe src="https://www.youtube.com/watch?v=sZhl6PyTflw"></iframe>
+<a href="https://www.google.de/maps/dir//foo,bar,baz/gnarr,gnaz,gnab/data=!3m1!4b1!4m9!4m8!1m0!1m5!1m1!1s0x479de2be93111c6d:0x2bac2afe506c9fa9!2m2!1d11.8208515!2d48.0923082!3e0">#</a>
 EOD;
 
         $expected_data = [
@@ -1718,6 +1720,14 @@ EOD;
                 'en',
                 'https://www.youtube.com/watch?v=sZhl6PyTflw',
                 1
+            ],
+            [
+                'https://www.google.de/maps/dir//foo,bar,baz/gnarr,gnaz,gnab/data=!3m1!4b1!4m9!4m8!1m0!1m5!1m1!1s0x479de2be93111c6d:0x2bac2afe506c9fa9!2m2!1d11.8208515!2d48.0923082!3e0',
+                'url',
+                'de',
+                'en',
+                'https://www.google.de/maps/dir//foo,bar,baz/gnarr,gnaz,gnab/data=!3m1!4b1!4m9!4m8!1m0!1m5!1m1!1s0x479de2be93111c6d:0x2bac2afe506c9fa9!2m2!1d11.8208515!2d48.0923082!3e0',
+                0
             ]
         ];
 

@@ -129,7 +129,7 @@ export default class WpBackend {
                             selection = image_frame.state().get('selection'),
                             preview = el.closest('.gtbabel__table-cell').querySelector('.gtbabel__file-info-img'),
                             textarea = el.closest('.gtbabel__table-cell').querySelector('.gtbabel__input--textarea'),
-                            abs = preview.getAttribute('src').indexOf('http') === 0;
+                            abs = textarea !== null && textarea.value.indexOf('http') === 0;
                         if (selection.length > 0) {
                             selection.forEach(attachment => {
                                 url = attachment.attributes.url;
