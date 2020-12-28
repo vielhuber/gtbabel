@@ -174,7 +174,7 @@ class Tags
         $prefix_pattern .= '|';
         $prefix_pattern .= '^<br+\b[^>]*\/?>( | )*'; // <br/> etc.
         $prefix_pattern .= '|';
-        $prefix_pattern .= '^(\*|-|–|\||:|\+|•|●|\/|,)( | )+'; // * and space etc.
+        $prefix_pattern .= '^(\*|-|–|\||:|\+|•|●|\/|,|\.)( | )+'; // * and space etc.
         $prefix_pattern .= '|';
         $prefix_pattern .= '^(\*|–|:|•|●)'; // * etc.
         $prefix_pattern .= '|';
