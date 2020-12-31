@@ -1196,9 +1196,9 @@ The default configuration is:
     'auto_translation' => true,
     'auto_translation_service' => [
         [
-            'provider' => 'google', // google|microsoft|deepl
-            'lng' => null
-            //'lng' => ['en', 'fr'] // populate if provider should act only on a specific language
+            'provider' => 'google', // google|microsoft|deepl or any other custom name
+            'lng' => null, // ['en', 'fr'] populate if provider should act only on one or multiple specific languages
+            'api_url' => null // if you use your own custom translation provider, add here a custom GET api endpoint (example: https://tld.com/api/?str=%str%&from=%lng_source%&to=%lng_target%)
         ]
     ],
     'google_translation_api_key' => [], // use a string or array of strings to provide multiple keys at once

@@ -130,7 +130,8 @@ class Settings
             'auto_translation_service' => [
                 [
                     'provider' => 'google',
-                    'lng' => null
+                    'lng' => null,
+                    'api_url' => null
                 ]
             ],
             'google_translation_api_key' => [],
@@ -1260,6 +1261,19 @@ class Settings
                         (in_array($lng, $service__value['lng']) || in_array('*', $service__value['lng'])))
                 ) {
                     return $service__value['provider'];
+                }
+            }
+        }
+        return null;
+    }
+
+    function getApiUrlForService($service)
+    {
+        $services = $this->get('auto_translation_service');
+        if (is_array($services)) {
+            foreach ($services as $services__value) {
+                if ($services__value['provider'] === $service) {
+                    return $services__value['api_url'];
                 }
             }
         }

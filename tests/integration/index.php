@@ -140,7 +140,8 @@ $gtbabel->config([
     'auto_translation_service' => [
         [
             'provider' => 'google',
-            'lng' => null
+            'lng' => null,
+            'api_url' => null
         ]
     ],
     'google_translation_api_key' => @$_SERVER['GOOGLE_TRANSLATION_API_KEY'],

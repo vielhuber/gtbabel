@@ -1683,56 +1683,108 @@ class Data
         $service = $this->settings->getAutoTranslationService($lng_target);
 
         if ($this->settings->get('auto_translation') === true) {
-            // determine lng codes
-            $lng_source_service = $this->settings->getApiLngCodeForService($service, $lng_source);
-            $lng_target_service = $this->settings->getApiLngCodeForService($service, $lng_target);
-            if ($lng_source_service === null || $lng_target_service === null) {
-                return null;
-            }
-            // check for throttling
-            if ($this->statsThrottlingIsActive($service)) {
-                return null;
-            }
-            if ($service === 'google') {
-                $api_key = $this->settings->get('google_translation_api_key');
-                if (is_array($api_key)) {
-                    $api_key = $api_key[array_rand($api_key)];
-                }
-                if ($api_key == '') {
+            if (in_array($service, ['google', 'microsoft', 'deepl'])) {
+                // determine lng codes
+                $lng_source_service = $this->settings->getApiLngCodeForService($service, $lng_source);
+                $lng_target_service = $this->settings->getApiLngCodeForService($service, $lng_target);
+                if ($lng_source_service === null || $lng_target_service === null) {
                     return null;
                 }
-                $trans = null;
-                // sometimes google translation api has some hickups (especially in latin); we overcome this by trying it again
-                $tries = 0;
-                while ($tries < 10) {
-                    try {
-                        $trans = __::translate_google($orig, $lng_source_service, $lng_target_service, $api_key);
-                        //$this->log->generalLog(['SUCCESSFUL TRANSLATION', $orig, $lng_source, $lng_target, $api_key, $trans]);
-                        break;
-                    } catch (\Throwable $t) {
-                        //$this->log->generalLog(['FAILED TRANSLATION (TRIES: ' . $tries . ')',$t->getMessage(),$orig,$lng_source,$lng_target,$api_key,$trans]);
-                        if (strpos($t->getMessage(), 'PERMISSION_DENIED') !== false) {
+
+                // check for throttling
+                if ($this->statsThrottlingIsActive($service)) {
+                    return null;
+                }
+
+                if ($service === 'google') {
+                    $api_key = $this->settings->get('google_translation_api_key');
+                    if (is_array($api_key)) {
+                        $api_key = $api_key[array_rand($api_key)];
+                    }
+                    if ($api_key == '') {
+                        return null;
+                    }
+                    $trans = null;
+                    // sometimes google translation api has some hickups (especially in latin); we overcome this by trying it again
+                    $tries = 0;
+                    while ($tries < 10) {
+                        try {
+                            $trans = __::translate_google($orig, $lng_source_service, $lng_target_service, $api_key);
+                            //$this->log->generalLog(['SUCCESSFUL TRANSLATION', $orig, $lng_source, $lng_target, $api_key, $trans]);
                             break;
+                        } catch (\Throwable $t) {
+                            //$this->log->generalLog(['FAILED TRANSLATION (TRIES: ' . $tries . ')',$t->getMessage(),$orig,$lng_source,$lng_target,$api_key,$trans]);
+                            if (strpos($t->getMessage(), 'PERMISSION_DENIED') !== false) {
+                                break;
+                            }
+                            sleep(1);
+                            $tries++;
                         }
-                        sleep(1);
-                        $tries++;
+                    }
+                    if ($trans === null || $trans === '') {
+                        return null;
                     }
                 }
-                if ($trans === null || $trans === '') {
-                    return null;
-                }
-            }
 
-            if ($service === 'microsoft') {
-                $api_key = $this->settings->get('microsoft_translation_api_key');
-                if (is_array($api_key)) {
-                    $api_key = $api_key[array_rand($api_key)];
+                if ($service === 'microsoft') {
+                    $api_key = $this->settings->get('microsoft_translation_api_key');
+                    if (is_array($api_key)) {
+                        $api_key = $api_key[array_rand($api_key)];
+                    }
+                    if ($api_key == '') {
+                        return null;
+                    }
+                    try {
+                        $trans = __::translate_microsoft($orig, $lng_source_service, $lng_target_service, $api_key);
+                    } catch (\Throwable $t) {
+                        $trans = null;
+                    }
+                    if ($trans === null || $trans === '') {
+                        return null;
+                    }
                 }
-                if ($api_key == '') {
-                    return null;
+
+                if ($service === 'deepl') {
+                    $api_key = $this->settings->get('deepl_translation_api_key');
+                    if (is_array($api_key)) {
+                        $api_key = $api_key[array_rand($api_key)];
+                    }
+                    if ($api_key == '') {
+                        return null;
+                    }
+                    try {
+                        $trans = __::translate_deepl($orig, $lng_source_service, $lng_target_service, $api_key);
+                    } catch (\Throwable $t) {
+                        $trans = null;
+                    }
+                    if ($trans === null || $trans === '') {
+                        return null;
+                    }
                 }
+
+                // increase stats
+                $this->statsIncreaseCharLengthForService($service, mb_strlen($orig));
+            } else {
                 try {
-                    $trans = __::translate_microsoft($orig, $lng_source_service, $lng_target_service, $api_key);
+                    $api_url = $this->settings->getApiUrlForService($service);
+                    if ($api_url == '') {
+                        return null;
+                    }
+                    $api_url = str_replace('%str%', urlencode($orig), $api_url);
+                    $api_url = str_replace('%lng_source%', $lng_source, $api_url);
+                    $api_url = str_replace('%lng_target%', $lng_target, $api_url);
+                    $response = __::curl($api_url);
+                    if (
+                        empty($response) ||
+                        !isset($response->result) ||
+                        empty($response->result) ||
+                        !isset($response->result->data) ||
+                        empty($response->result->data) ||
+                        $response->result->data == ''
+                    ) {
+                        return null;
+                    }
+                    $trans = $response->result->data;
                 } catch (\Throwable $t) {
                     $trans = null;
                 }
@@ -1740,27 +1792,6 @@ class Data
                     return null;
                 }
             }
-
-            if ($service === 'deepl') {
-                $api_key = $this->settings->get('deepl_translation_api_key');
-                if (is_array($api_key)) {
-                    $api_key = $api_key[array_rand($api_key)];
-                }
-                if ($api_key == '') {
-                    return null;
-                }
-                try {
-                    $trans = __::translate_deepl($orig, $lng_source_service, $lng_target_service, $api_key);
-                } catch (\Throwable $t) {
-                    $trans = null;
-                }
-                if ($trans === null || $trans === '') {
-                    return null;
-                }
-            }
-
-            // increase stats
-            $this->statsIncreaseCharLengthForService($service, mb_strlen($orig));
 
             if ($context === 'slug') {
                 $trans = $this->utils->slugify($trans, $orig, $lng_target);

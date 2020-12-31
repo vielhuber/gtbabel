@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 5.3.0
+ * Version: 5.3.1
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -1048,9 +1048,14 @@ class GtbabelWordPress
                             if (@$post_data['lng'][$post_data__key] != '') {
                                 $auto_translation_service_lng = explode(',', $post_data['lng'][$post_data__key]);
                             }
+                            $auto_translation_service_api_url = null;
+                            if (@$post_data['api_url'][$post_data__key] != '') {
+                                $auto_translation_service_api_url = $post_data['api_url'][$post_data__key];
+                            }
                             $settings['auto_translation_service'][] = [
                                 'provider' => $post_data['provider'][$post_data__key],
-                                'lng' => $auto_translation_service_lng
+                                'lng' => $auto_translation_service_lng,
+                                'api_url' => $auto_translation_service_api_url
                             ];
                         }
                     }
@@ -1775,17 +1780,18 @@ class GtbabelWordPress
         echo '<div class="gtbabel__repeater">';
         echo '<ul class="gtbabel__repeater-list">';
         if (empty(@$settings['auto_translation_service'])) {
-            $settings['auto_translation_service'] = [['provider' => '', 'lng' => '']];
+            $settings['auto_translation_service'] = [['provider' => '', 'lng' => '', 'api_url' => '']];
         }
         foreach ($settings['auto_translation_service'] as $auto_translation_service__value) {
-            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-2">';
+            echo '<li class="gtbabel__repeater-listitem gtbabel__repeater-listitem--count-3">';
             echo '<select class="gtbabel__input gtbabel__input--select" name="gtbabel[auto_translation_service][provider][]">';
             echo '<option value="">&ndash;&ndash;</option>';
             foreach (
                 [
                     'google' => __('Google', 'gtbabel-plugin'),
                     'microsoft' => __('Microsoft', 'gtbabel-plugin'),
-                    'deepl' => __('DeepL', 'gtbabel-plugin')
+                    'deepl' => __('DeepL', 'gtbabel-plugin'),
+                    'custom' => __('Custom', 'gtbabel-plugin')
                 ]
                 as $auto_translation_service_provider__key => $auto_translation_service_provider__value
             ) {
@@ -1807,6 +1813,13 @@ class GtbabelWordPress
                         : ''
                 ) .
                 '" placeholder="lng" />';
+            echo '<input class="gtbabel__input" type="text" name="gtbabel[auto_translation_service][api_url][]" value="' .
+                esc_attr(
+                    @$auto_translation_service__value['api_url'] != ''
+                        ? $auto_translation_service__value['api_url']
+                        : ''
+                ) .
+                '" placeholder="api_url" />';
             echo '<a href="#" class="gtbabel__repeater-remove button button-secondary">' .
                 __('Remove', 'gtbabel-plugin') .
                 '</a>';

@@ -1411,7 +1411,8 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['auto_translation_service'] = [
             [
                 'provider' => 'google',
-                'lng' => null
+                'lng' => null,
+                'api_url' => null
             ]
         ];
         ob_start();
@@ -1428,7 +1429,8 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['auto_translation_service'] = [
             [
                 'provider' => 'google',
-                'lng' => null
+                'lng' => null,
+                'api_url' => null
             ]
         ];
         ob_start();
@@ -1444,7 +1446,8 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['auto_translation_service'] = [
             [
                 'provider' => 'microsoft',
-                'lng' => null
+                'lng' => null,
+                'api_url' => null
             ]
         ];
         ob_start();
@@ -1460,7 +1463,8 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['auto_translation_service'] = [
             [
                 'provider' => 'microsoft',
-                'lng' => null
+                'lng' => null,
+                'api_url' => null
             ]
         ];
         ob_start();
@@ -1476,7 +1480,8 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['auto_translation_service'] = [
             [
                 'provider' => 'deepl',
-                'lng' => null
+                'lng' => null,
+                'api_url' => null
             ]
         ];
         ob_start();
@@ -1490,7 +1495,8 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['auto_translation_service'] = [
             [
                 'provider' => 'google',
-                'lng' => null
+                'lng' => null,
+                'api_url' => null
             ]
         ];
         ob_start();
@@ -1521,7 +1527,8 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['auto_translation_service'] = [
             [
                 'provider' => 'google',
-                'lng' => null
+                'lng' => null,
+                'api_url' => null
             ]
         ];
         $settings['google_throttle_chars_per_month'] = 30;
@@ -1545,7 +1552,8 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['auto_translation_service'] = [
             [
                 'provider' => 'google',
-                'lng' => null
+                'lng' => null,
+                'api_url' => null
             ]
         ];
         $settings['google_throttle_chars_per_month'] = 20;
@@ -2460,7 +2468,8 @@ EOD;
             'auto_translation_service' => [
                 [
                     'provider' => 'google',
-                    'lng' => null
+                    'lng' => null,
+                    'api_url' => null
                 ]
             ],
             'google_translation_api_key' => @$_SERVER['GOOGLE_TRANSLATION_API_KEY'],
