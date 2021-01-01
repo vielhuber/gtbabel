@@ -1770,6 +1770,7 @@ class Data
                     if ($api_url == '') {
                         return null;
                     }
+                    $api_url = str_replace('&amp;', '&', $api_url);
                     $api_url = str_replace('%str%', urlencode($orig), $api_url);
                     $api_url = str_replace('%lng_source%', $lng_source, $api_url);
                     $api_url = str_replace('%lng_target%', $lng_target, $api_url);
@@ -2388,6 +2389,9 @@ class Data
             );
             if (!empty($data_raw)) {
                 foreach ($data_raw as $data_raw__value) {
+                    if (!array_key_exists($data_raw__value['translated_by'], $this->statsGetServices())) {
+                        continue;
+                    }
                     $data[] = [
                         'service' => $data_raw__value['translated_by'],
                         'label' => $this->statsGetLabelForService($data_raw__value['translated_by']),
