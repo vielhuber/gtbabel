@@ -148,7 +148,7 @@ class Data
         }
     }
 
-    function saveCacheToDatabase()
+    function saveCacheToDatabase($set_discovered_last_url = true)
     {
         if ($this->settings->get('auto_add_translations') === false) {
             return;
@@ -156,27 +156,33 @@ class Data
 
         // prepare args
         $date = $this->utils->getCurrentTime();
-        $discovered_last_url_orig = $this->host->getCurrentUrlWithArgsConverted();
-        $discovered_last_url = $this->host->getCurrentUrlWithArgs();
-        foreach (['discovered_last_url_orig', 'discovered_last_url'] as $url__value) {
-            // extract path
-            ${$url__value} = $this->host->getPathWithPrefixFromUrl(${$url__value});
-            // strip server sided requests initiated by auto translation
-            $pos = strpos(${$url__value}, '?');
-            if ($pos !== false) {
-                $args = explode('&', substr(${$url__value}, $pos + 1));
-                foreach ($args as $args__key => $args__value) {
-                    if (strpos($args__value, 'gtbabel_') === 0) {
-                        unset($args[$args__key]);
+
+        if ($set_discovered_last_url === true) {
+            $discovered_last_url_orig = $this->host->getCurrentUrlWithArgsConverted();
+            $discovered_last_url = $this->host->getCurrentUrlWithArgs();
+            foreach (['discovered_last_url_orig', 'discovered_last_url'] as $url__value) {
+                // extract path
+                ${$url__value} = $this->host->getPathWithPrefixFromUrl(${$url__value});
+                // strip server sided requests initiated by auto translation
+                $pos = strpos(${$url__value}, '?');
+                if ($pos !== false) {
+                    $args = explode('&', substr(${$url__value}, $pos + 1));
+                    foreach ($args as $args__key => $args__value) {
+                        if (strpos($args__value, 'gtbabel_') === 0) {
+                            unset($args[$args__key]);
+                        }
+                    }
+                    ${$url__value} = substr(${$url__value}, 0, $pos);
+                    if (!empty($args)) {
+                        ${$url__value} .= '?' . implode('&', $args);
                     }
                 }
-                ${$url__value} = substr(${$url__value}, 0, $pos);
-                if (!empty($args)) {
-                    ${$url__value} .= '?' . implode('&', $args);
-                }
+                // trim
+                ${$url__value} = '/' . trim(${$url__value}, '/');
             }
-            // trim
-            ${$url__value} = '/' . trim(${$url__value}, '/');
+        } else {
+            $discovered_last_url_orig = null;
+            $discovered_last_url = null;
         }
 
         // insert batch wise (because sqlite has limits)
@@ -545,7 +551,9 @@ class Data
                 foreach ($this->settings->getSelectedLanguageCodes() as $languages__value) {
                     if (
                         @$data__value[$languages__value] != '' &&
-                        mb_stripos($data__value[$languages__value], $search_term) !== false
+                        (mb_stripos($data__value[$languages__value], $search_term) !== false ||
+                            mb_stripos(htmlspecialchars_decode($data__value[$languages__value]), $search_term) !==
+                                false)
                     ) {
                         $found = true;
                         break;
@@ -1647,7 +1655,8 @@ class Data
                 if (isset($translations__value[$languages__value]) && $translations__value[$languages__value] != '') {
                     continue;
                 }
-                if (in_array($translations__value['context'], ['', 'slug', 'title', 'description'])) {
+                $auto_translate = in_array($translations__value['context'], ['', 'slug', 'title', 'description']);
+                if ($auto_translate === true) {
                     $trans = $this->autoTranslateString(
                         $this->tags->addIds($translations__value[$translations__value['lng_source']]),
                         $translations__value['lng_source'],
@@ -1664,12 +1673,12 @@ class Data
                         $translations__value['lng_source'],
                         $languages__value,
                         $translations__value['context'],
-                        true
+                        $auto_translate
                     );
                 }
             }
         }
-        $this->saveCacheToDatabase();
+        $this->saveCacheToDatabase(false);
     }
 
     function autoTranslateString($orig, $lng_source, $lng_target, $context = null)
