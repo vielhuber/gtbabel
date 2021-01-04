@@ -17,6 +17,7 @@ Gtbabel automatically translates your HTML/PHP pages – server sided!
 -   Framework agnostic: works with nearly any PHP based cms or static site.
 -   Fast: once all translations are available, Gtbabel reaches a throughput of ~4000 words/s.
 -   Auto translation: use the power of [Google Translation API](https://cloud.google.com/translate/docs), [Microsoft Translation API](https://azure.microsoft.com/de-de/services/cognitive-services/translator-text-api/) or [DeepL](https://www.deepl.com) to auto translate your pages and links into any language.
+-   Custom providers: Connect custom translation APIs
 -   Router included: spoof your request uri and let the magic happen, links are automatically converted (with slug collission detection).
 -   Helper functions for current language and all languages available.
 -   Basic seo considered: title tags, seo descriptions, html lang attribute, hreflang tags included.
@@ -1197,16 +1198,14 @@ The default configuration is:
     'auto_translation_service' => [
         [
             'provider' => 'google', // google|microsoft|deepl or any other custom name
+            'label' => null, // custom label
+            'api_keys' => [], // use a string or array of strings to provide multiple keys at once
+            'throttle_chars_per_month' => 1000000,
             'lng' => null, // ['en', 'fr'] populate if provider should act only on one or multiple specific languages
-            'api_url' => null // if you use your own custom translation provider, add here a custom GET api endpoint (example: https://tld.com/api/?str=%str%&from=%lng_source%&to=%lng_target%)
+            'api_url' => null, // if you use your own custom translation provider, add here a custom GET api endpoint
+            'disabled' => false
         ]
     ],
-    'google_translation_api_key' => [], // use a string or array of strings to provide multiple keys at once
-    'microsoft_translation_api_key' => [], // use a string or array of strings to provide multiple keys at once
-    'deepl_translation_api_key' => [], // use a string or array of strings to provide multiple keys at once
-    'google_throttle_chars_per_month' => 1000000,
-    'microsoft_throttle_chars_per_month' => 1000000,
-    'deepl_throttle_chars_per_month' => 1000000,
     'discovery_log' => false,
     'frontend_editor' => false, // common configuration: 'frontend_editor' => user_is_logged_in()
     'wp_mail_notifications' => false
@@ -1841,7 +1840,26 @@ Hreflang codes must be in [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_
 
 The translation apis of Google, Microsoft or DeepL can be costly. Try to keep track of your current usage stats. Gtbabel helps you by tracking the total amount of translated chars. You can also provide multiple api keys, Gtbabel then distributes the calls uniformly.
 
-You can throttle the amount of chars with the options `google_throttle_chars_per_month`, `microsoft_throttle_chars_per_month` and `deepl_throttle_chars_per_month`.
+You can throttle the amount of chars with the option `throttle_chars_per_month`.
+
+## Custom translation providers
+
+If you don't want to use the big three in translation, you can specify a special API URL in the `auto_translation_service` field instead. An example entry would look like this:
+
+```php
+[
+    'provider' => 'custom_provider',
+    'label' => 'My custom provider',
+    'api_keys' => ['1337'],
+    'throttle_chars_per_month' => 1000000,
+    'lng' => null,
+    'api_url' => 'https://tld.com/api/?str=%str%&from=%lng_source%&to=%lng_target%&api_key=%api_key%'
+    'disabled' => false
+]
+```
+
+Gtbabel then fires a GET-request to that url and fills in the placeholders automatically.\
+It can then accept and process common JSON request responses.
 
 ## Caveats
 

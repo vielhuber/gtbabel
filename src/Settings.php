@@ -130,16 +130,14 @@ class Settings
             'auto_translation_service' => [
                 [
                     'provider' => 'google',
+                    'label' => null,
+                    'api_keys' => null,
+                    'throttle_chars_per_month' => 1000000,
                     'lng' => null,
-                    'api_url' => null
+                    'api_url' => null,
+                    'disabled' => false
                 ]
             ],
-            'google_translation_api_key' => [],
-            'microsoft_translation_api_key' => [],
-            'deepl_translation_api_key' => [],
-            'google_throttle_chars_per_month' => 1000000,
-            'microsoft_throttle_chars_per_month' => 1000000,
-            'deepl_throttle_chars_per_month' => 1000000,
             'discovery_log' => false,
             'frontend_editor' => false,
             'wp_mail_notifications' => false
@@ -1241,39 +1239,35 @@ class Settings
 
     function getAutoTranslationService($lng)
     {
-        $service = $this->get('auto_translation_service');
-        if (is_string($service)) {
-            if ($service != '') {
-                return $service;
-            }
-        }
-        if (is_array($service)) {
-            shuffle($service);
-            foreach ($service as $service__value) {
+        $services = $this->get('auto_translation_service');
+        if (is_array($services) && !empty($services)) {
+            shuffle($services);
+            foreach ($services as $services__value) {
                 if (
-                    !isset($service__value['lng']) ||
-                    (is_string($service__value['lng']) &&
-                        ($service__value['lng'] === null ||
-                            $service__value['lng'] === '' ||
-                            $service__value['lng'] === '*' ||
-                            $service__value['lng'] === $lng)) ||
-                    (is_array($service__value['lng']) &&
-                        (in_array($lng, $service__value['lng']) || in_array('*', $service__value['lng'])))
+                    (!isset($services__value['disabled']) || $services__value['disabled'] != '1') &&
+                    (!isset($services__value['lng']) ||
+                        (is_string($services__value['lng']) &&
+                            ($services__value['lng'] === null ||
+                                $services__value['lng'] === '' ||
+                                $services__value['lng'] === '*' ||
+                                $services__value['lng'] === $lng)) ||
+                        (is_array($services__value['lng']) &&
+                            (in_array($lng, $services__value['lng']) || in_array('*', $services__value['lng']))))
                 ) {
-                    return $service__value['provider'];
+                    return $services__value['provider'];
                 }
             }
         }
         return null;
     }
 
-    function getApiUrlForService($service)
+    function getAutoTranslationServiceData($service)
     {
         $services = $this->get('auto_translation_service');
-        if (is_array($services)) {
+        if (is_array($services) && !empty($services)) {
             foreach ($services as $services__value) {
                 if ($services__value['provider'] === $service) {
-                    return $services__value['api_url'];
+                    return $services__value;
                 }
             }
         }

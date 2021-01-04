@@ -1683,24 +1683,31 @@ class Data
         $service = $this->settings->getAutoTranslationService($lng_target);
 
         if ($this->settings->get('auto_translation') === true) {
+            // determine lng codes
+            $lng_source_service = $this->settings->getApiLngCodeForService($service, $lng_source);
+            $lng_target_service = $this->settings->getApiLngCodeForService($service, $lng_target);
+            if ($lng_source_service === null || $lng_target_service === null) {
+                return null;
+            }
+
+            // check for throttling
+            if ($this->statsThrottlingIsActive($service)) {
+                return null;
+            }
+
+            // obtain (random) api key
+            $api_key = null;
+            $service_data = $this->settings->getAutoTranslationServiceData($service);
+            if (@$service_data['api_keys'] != '') {
+                if (is_array($service_data['api_keys'])) {
+                    $api_key = $service_data['api_keys'][array_rand($service_data['api_keys'])];
+                } else {
+                    $api_key = $service_data['api_keys'];
+                }
+            }
+
             if (in_array($service, ['google', 'microsoft', 'deepl'])) {
-                // determine lng codes
-                $lng_source_service = $this->settings->getApiLngCodeForService($service, $lng_source);
-                $lng_target_service = $this->settings->getApiLngCodeForService($service, $lng_target);
-                if ($lng_source_service === null || $lng_target_service === null) {
-                    return null;
-                }
-
-                // check for throttling
-                if ($this->statsThrottlingIsActive($service)) {
-                    return null;
-                }
-
                 if ($service === 'google') {
-                    $api_key = $this->settings->get('google_translation_api_key');
-                    if (is_array($api_key)) {
-                        $api_key = $api_key[array_rand($api_key)];
-                    }
                     if ($api_key == '') {
                         return null;
                     }
@@ -1727,10 +1734,6 @@ class Data
                 }
 
                 if ($service === 'microsoft') {
-                    $api_key = $this->settings->get('microsoft_translation_api_key');
-                    if (is_array($api_key)) {
-                        $api_key = $api_key[array_rand($api_key)];
-                    }
                     if ($api_key == '') {
                         return null;
                     }
@@ -1745,10 +1748,6 @@ class Data
                 }
 
                 if ($service === 'deepl') {
-                    $api_key = $this->settings->get('deepl_translation_api_key');
-                    if (is_array($api_key)) {
-                        $api_key = $api_key[array_rand($api_key)];
-                    }
                     if ($api_key == '') {
                         return null;
                     }
@@ -1761,12 +1760,12 @@ class Data
                         return null;
                     }
                 }
-
-                // increase stats
-                $this->statsIncreaseCharLengthForService($service, mb_strlen($orig));
             } else {
                 try {
-                    $api_url = $this->settings->getApiUrlForService($service);
+                    $api_url = null;
+                    if (@$service_data['api_url'] != '') {
+                        $api_url = $service_data['api_url'];
+                    }
                     if ($api_url == '') {
                         return null;
                     }
@@ -1774,6 +1773,9 @@ class Data
                     $api_url = str_replace('%str%', urlencode($orig), $api_url);
                     $api_url = str_replace('%lng_source%', $lng_source, $api_url);
                     $api_url = str_replace('%lng_target%', $lng_target, $api_url);
+                    if ($api_key != '') {
+                        $api_url = str_replace('%api_key%', $api_key, $api_url);
+                    }
                     $response = __::curl($api_url);
                     if (
                         empty($response) ||
@@ -1781,11 +1783,12 @@ class Data
                         empty($response->result) ||
                         !isset($response->result->data) ||
                         empty($response->result->data) ||
-                        $response->result->data == ''
+                        !isset($response->result->data->trans) ||
+                        $response->result->data->trans == ''
                     ) {
                         return null;
                     }
-                    $trans = $response->result->data;
+                    $trans = $response->result->data->trans;
                 } catch (\Throwable $t) {
                     $trans = null;
                 }
@@ -1793,6 +1796,9 @@ class Data
                     return null;
                 }
             }
+
+            // increase stats
+            $this->statsIncreaseCharLengthForService($service, mb_strlen($orig));
 
             if ($context === 'slug') {
                 $trans = $this->utils->slugify($trans, $orig, $lng_target);
@@ -2067,12 +2073,13 @@ class Data
             return $url;
         }
         $path = $this->host->getPathWithoutPrefixFromUrl($url);
-        return trim(
+        $path = trim(
             trim($this->host->getBaseUrlWithPrefixForLanguageCode($to_lng), '/') .
                 '/' .
                 trim($this->getPathTranslationInLanguage($from_lng, $to_lng, $path), '/'),
             '/'
-        ) . (mb_strpos($path, '?') === false ? '/' : '');
+        );
+        return $path . (mb_strpos($path, '?') === false ? '/' : '');
     }
 
     function getTranslationInForeignLng($str, $to_lng, $from_lng = null, $context = null)
@@ -2389,9 +2396,6 @@ class Data
             );
             if (!empty($data_raw)) {
                 foreach ($data_raw as $data_raw__value) {
-                    if (!array_key_exists($data_raw__value['translated_by'], $this->statsGetServices())) {
-                        continue;
-                    }
                     $data[] = [
                         'service' => $data_raw__value['translated_by'],
                         'label' => $this->statsGetLabelForService($data_raw__value['translated_by']),
@@ -2408,8 +2412,17 @@ class Data
     function statsGetTranslatedCharsByServiceCompact($since = null)
     {
         $data = [];
-        foreach ($this->statsGetServices() as $services__key => $services__value) {
-            $data[$services__key] = 0;
+        $services = $this->statsGetDefaultServices();
+        if (is_array($services) && !empty($services)) {
+            foreach ($services as $services__key => $services__value) {
+                $data[$services__key] = 0;
+            }
+        }
+        $services = $this->settings->get('auto_translation_service');
+        if (is_array($services) && !empty($services)) {
+            foreach ($services as $services__key => $services__value) {
+                $data[$services__value['provider']] = 0;
+            }
         }
         $data_raw = $this->statsGetTranslatedCharsByService($since);
         foreach ($data_raw as $data_raw__value) {
@@ -2432,7 +2445,7 @@ class Data
         return 0;
     }
 
-    function statsGetServices()
+    function statsGetDefaultServices()
     {
         return [
             'google' => 'Google Translation API',
@@ -2443,7 +2456,15 @@ class Data
 
     function statsGetLabelForService($service)
     {
-        return $this->statsGetServices()[$service];
+        $services = $this->statsGetDefaultServices();
+        if (array_key_exists($service, $services)) {
+            return $services[$service];
+        }
+        $service_data = $this->settings->getAutoTranslationServiceData($service);
+        if ($service_data !== null && @$service_data['label'] != '') {
+            return $service_data['label'];
+        }
+        return $service;
     }
 
     function statsLoadOnce()
@@ -2457,11 +2478,11 @@ class Data
     function statsThrottlingIsActive($service)
     {
         $this->statsLoadOnce();
-        $length = $this->settings->get($service . '_throttle_chars_per_month');
-        if ($length == '') {
+        $data = $this->settings->getAutoTranslationServiceData($service);
+        if ($data === null || @$data['throttle_chars_per_month'] == '') {
             return false;
         }
-        return $this->stats[$service] > $length;
+        return $this->stats[$service] > $data['throttle_chars_per_month'];
     }
 
     function statsIncreaseCharLengthForService($service, $length)
