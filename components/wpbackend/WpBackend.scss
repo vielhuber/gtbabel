@@ -6,13 +6,16 @@
     border-bottom: 1px solid #dadada;
     padding: 2px 5px;
 }
+.gtbabel__field:last-child {
+    border-bottom: 0;
+}
 .gtbabel__label {
-    flex: 0 1 370px;
+    flex: 0 1 320px;
     line-height: 30px;
     min-height: 30px;
 }
 .gtbabel__inputbox {
-    flex: 0 1 calc(100% - 370px);
+    flex: 0 1 calc(100% - 320px);
 }
 .gtbabel__input {
     width: 100%;
@@ -35,16 +38,53 @@
     align-content: flex-start;
     margin-bottom: 3px;
 }
+$button_width: 105px;
+.gtbabel__repeater-listitem--count-1 .gtbabel__input {
+    flex: 0 1 calc((100% - #{$button_width}) / 1);
+}
 .gtbabel__repeater-listitem--count-2 .gtbabel__input {
-    flex: 0 1 calc((100% - 80px) / 2);
+    flex: 0 1 calc((100% - #{$button_width}) / 2);
 }
 .gtbabel__repeater-listitem--count-3 .gtbabel__input {
-    flex: 0 1 calc((100% - 80px) / 3);
+    flex: 0 1 calc((100% - #{$button_width}) / 3);
 }
-.gtbabel__repeater-listitem .gtbabel__repeater-remove {
-    flex: 0 1 80px;
+.gtbabel__repeater-listitem--count-4 .gtbabel__input {
+    flex: 0 1 calc((100% - #{$button_width}) / 4);
+}
+.gtbabel__repeater-listitem--count-5 .gtbabel__input {
+    flex: 0 1 calc((100% - #{$button_width}) / 5);
+}
+.gtbabel__repeater-listitem--count-6 .gtbabel__input {
+    flex: 0 1 calc((100% - #{$button_width}) / 6);
+}
+.gtbabel__repeater-listitem--count-7 .gtbabel__input {
+    flex: 0 1 calc((100% - #{$button_width}) / 7);
+}
+.gtbabel__repeater-listitem--count-8 .gtbabel__input {
+    flex: 0 1 calc((100% - #{$button_width}) / 8);
+}
+.gtbabel__repeater-listitem--count-9 .gtbabel__input {
+    flex: 0 1 calc((100% - #{$button_width}) / 9);
+}
+.gtbabel__repeater-action {
+    flex: 0 1 $button_width;
     text-align: center;
 }
+.gtbabel__repeater-add {
+    width: $button_width;
+    text-align: center;
+}
+.gtbabel__repeater-listitem--missing {
+    opacity: 0.5;
+}
+.gtbabel__repeater-listitem--missing .gtbabel__repeater-action--disable,
+.gtbabel__repeater-listitem--missing .gtbabel__repeater-action--remove,
+.gtbabel__repeater-listitem:not(.gtbabel__repeater-listitem--missing) .gtbabel__repeater-action--enable,
+.gtbabel__repeater-listitem--default .gtbabel__repeater-action--remove,
+.gtbabel__repeater-listitem:not(.gtbabel__repeater-listitem--default) .gtbabel__repeater-action--disable {
+    display: none;
+}
+
 .gtbabel__languagelist {
     column-count: 20;
     column-width: 140px;
@@ -69,6 +109,11 @@
     vertical-align: top;
     line-height: 1rem;
 }
+
+.gtbabel--settings .gtbabel__submit + .gtbabel__subtitle {
+    margin-top: 50px;
+}
+
 .gtbabel--trans .gtbabel__table {
     width: 100%;
     margin-bottom: 20px;

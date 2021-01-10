@@ -7,8 +7,8 @@ class Gtbabel
     public $started = false;
 
     function __construct(
-        Settings $settings = null,
         Utils $utils = null,
+        Settings $settings = null,
         Log $log = null,
         Tags $tags = null,
         Host $host = null,
@@ -21,8 +21,8 @@ class Gtbabel
         Gettext $gettext = null,
         Excel $excel = null
     ) {
-        $this->settings = $settings ?: new Settings();
         $this->utils = $utils ?: new Utils();
+        $this->settings = $settings ?: new Settings($this->utils);
         $this->log = $log ?: new Log($this->utils, $this->settings);
         $this->tags = $tags ?: new Tags($this->utils);
         $this->host = $host ?: new Host($this->settings, $this->log);

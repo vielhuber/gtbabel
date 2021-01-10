@@ -5,6 +5,11 @@ class Settings
 {
     public $args;
 
+    function __construct(Utils $utils = null)
+    {
+        $this->utils = $utils ?: new Utils();
+    }
+
     function setup($args = [])
     {
         $args = $this->setupArgs($args);
@@ -52,9 +57,9 @@ class Settings
         return $this->args;
     }
 
-    function setupSettings($args = [])
+    function getDefaultSettings()
     {
-        $default_args = [
+        $default_settings = [
             'languages' => $this->getDefaultLanguages(),
             'lng_source' => 'de',
             'lng_target' => null,
@@ -77,7 +82,7 @@ class Settings
                 ['selector' => '.example2', 'attribute' => 'data-*']
             ],
             'translate_html_force_tokenize' => ['.force-tokenize'],
-            'localize_js' => true,
+            'localize_js' => false,
             'localize_js_strings' => ['Schließen', '/blog'],
             'detect_dom_changes' => false,
             'detect_dom_changes_include' => ['.top-button', '.swal-overlay'],
@@ -91,21 +96,19 @@ class Settings
             ],
             'translate_json' => true,
             'translate_json_include' => [
-                '/path/in/source/lng/to/specific/page' => ['key'],
-                'wp-json/v1/*/endpoint' => ['key', 'nested.key', 'key.with.*.wildcard']
+                ['url' => '/path/in/source/lng/to/specific/page', 'selector' => ['key']],
+                ['url' => 'wp-json/v1/*/endpoint', 'selector' => ['key', 'nested.key', 'key.with.*.wildcard']]
             ],
             'translate_wp_localize_script' => true,
-            'translate_wp_localize_script_include' => ['wc_*.locale.*', 'wc_*.i18n_*', 'wc_*.cart_url'],
+            'translate_wp_localize_script_include' => ['key1_*.key2.*', 'key3_*.key4'],
             'prevent_publish' => true,
             'prevent_publish_urls' => [
-                '/path/in/source/lng/to/specific/page' => ['en', 'fr'],
-                '/slug1/*' => ['en'],
-                '/slug1/*/slug2' => ['fr']
+                ['url' => '/path/in/source/lng/to/specific/page', 'lng' => ['en', 'fr']],
+                ['url' => '/slug1/*', 'lng' => ['en']],
+                ['url' => '/slug1/*/slug2', 'lng' => ['fr']]
             ],
             'prevent_publish_wp_new_posts' => false,
-            'alt_lng_urls' => [
-                '/path/in/source/lng/to/specific/page' => 'en'
-            ],
+            'alt_lng_urls' => [['url' => '/path/in/source/lng/to/specific/page', 'lng' => 'en']],
             'url_query_args' => [
                 [
                     'type' => 'keep',
@@ -130,10 +133,10 @@ class Settings
             'auto_translation_service' => [
                 [
                     'provider' => 'google',
-                    'label' => null,
                     'api_keys' => null,
                     'throttle_chars_per_month' => 1000000,
                     'lng' => null,
+                    'label' => null,
                     'api_url' => null,
                     'disabled' => false
                 ]
@@ -142,6 +145,161 @@ class Settings
             'frontend_editor' => false,
             'wp_mail_notifications' => false
         ];
+
+        if ($this->utils->isWordPress()) {
+            $default_settings['lng_source'] = mb_strtolower(mb_substr(get_locale(), 0, 2));
+            $default_settings['languages'] = [
+                [
+                    'code' => 'de',
+                    'label' => 'Deutsch',
+                    'hreflang_code' => 'de',
+                    'google_translation_code' => 'de',
+                    'microsoft_translation_code' => 'de',
+                    'deepl_translation_code' => 'de'
+                ],
+                [
+                    'code' => 'en',
+                    'label' => 'English',
+                    'hreflang_code' => 'en',
+                    'google_translation_code' => 'en',
+                    'microsoft_translation_code' => 'en',
+                    'deepl_translation_code' => 'en'
+                ]
+            ];
+            if (!in_array($default_settings['lng_source'], ['de', 'en'])) {
+                $default_settings['languages'][] = $this->gtbabel->settings->getLanguageDataForCode(
+                    $default_settings['lng_source']
+                ) ?? [
+                    'code' => $default_settings['lng_source'],
+                    'label' => $default_settings['lng_source'],
+                    'hreflang_code' => $default_settings['lng_source'],
+                    'google_translation_code' => $default_settings['lng_source'],
+                    'microsoft_translation_code' => $default_settings['lng_source'],
+                    'deepl_translation_code' => $default_settings['lng_source']
+                ];
+            }
+            $default_settings['log_folder'] = $this->utils->getWordPressPluginFileStorePathRelative() . '/logs';
+            $default_settings['localize_js_strings'] = [];
+            $default_settings['detect_dom_changes_include'] = [];
+            $default_settings['translate_json_include'] = [
+                ['url' => '?wc-ajax=*', 'selector' => ['fragments.*', 'messages', 'redirect']], // woocommerce
+                ['url' => 'wp-json', 'selector' => ['message']] // contact form 7
+            ];
+            $default_settings['translate_wp_localize_script_include'] = [
+                'wc_*.locale.*',
+                'wc_*.i18n_*',
+                'wc_*.cart_url'
+            ]; // woocommerce
+            $default_settings['exclude_urls_content'] = [
+                'wp-admin',
+                'feed',
+                'embed',
+                'wp-login.php',
+                'wp-register.php',
+                'wp-cron.php',
+                'wp-comments-post.php'
+            ];
+            $default_settings['exclude_urls_slugs'] = ['wp-json'];
+            $default_settings['translate_html_exclude'] = [
+                ['selector' => '.notranslate'],
+                ['selector' => '[data-context]', 'attribute' => 'data-context'],
+                ['selector' => '.lngpicker'],
+                ['selector' => '.xdebug-error'],
+                ['selector' => '#wpadminbar'],
+                ['selector' => '#comments .comment-content'],
+                ['selector' => '/html/body//address/br/parent::address'],
+                ['selector' => '.woocommerce-order-overview__email']
+            ];
+            $default_settings['auto_translation_service'] = [];
+        }
+        return $default_settings;
+    }
+
+    function isDefaultSettingForKey($key, $value)
+    {
+        $default_settings = $this->getDefaultSettings();
+        foreach ($default_settings as $default_settings__key => $default_settings__value) {
+            if ($default_settings__key !== $key) {
+                continue;
+            }
+            foreach ($default_settings__value as $default_settings__value__value) {
+                if ($this->valuesAreEqual($default_settings__value__value, $value)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    function valuesAreEqual($a1, $a2)
+    {
+        if (is_array($a1)) {
+            if (
+                json_encode(
+                    array_filter(
+                        call_user_func(function ($a) {
+                            ksort($a);
+                            return $a;
+                        }, $a1),
+                        function ($a) {
+                            return $a != '';
+                        }
+                    )
+                ) ==
+                json_encode(
+                    array_filter(
+                        call_user_func(function ($a) {
+                            ksort($a);
+                            return $a;
+                        }, $a2),
+                        function ($a) {
+                            return $a != '';
+                        }
+                    )
+                )
+            ) {
+                return true;
+            }
+        } else {
+            if ($a1 == $a2) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function getMissingDefaultSettingsForKey($key, $settings)
+    {
+        $return = [];
+        $default_settings = $this->getDefaultSettings();
+        foreach ($default_settings as $default_settings__key => $default_settings__value) {
+            if ($default_settings__key !== $key) {
+                continue;
+            }
+            foreach ($default_settings__value as $default_settings__value__value) {
+                $found = false;
+                foreach ($settings as $settings__key => $settings__value) {
+                    if ($settings__key !== $key) {
+                        continue;
+                    }
+                    foreach ($settings__value as $settings__value__value) {
+                        if ($this->valuesAreEqual($default_settings__value__value, $settings__value__value)) {
+                            $found = true;
+                            break 2;
+                        }
+                    }
+                }
+                if ($found === false) {
+                    $return[] = $default_settings__value__value;
+                }
+            }
+        }
+        return $return;
+    }
+
+    function setupSettings($args = [])
+    {
+        $default_settings = $this->getDefaultSettings();
         if (!empty($args)) {
             foreach ($args as $args__key => $args__value) {
                 if ($args__value === '1') {
@@ -150,10 +308,10 @@ class Settings
                 if ($args__value === '0') {
                     $args__value = false;
                 }
-                $default_args[$args__key] = $args__value;
+                $default_settings[$args__key] = $args__value;
             }
         }
-        return $default_args;
+        return $default_settings;
     }
 
     function setupCachedSettings($args)

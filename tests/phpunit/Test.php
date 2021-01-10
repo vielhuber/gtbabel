@@ -28,12 +28,12 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function mock()
     {
-        $settings = $this->getMockBuilder(vielhuber\gtbabel\Settings::class)
+        $utils = $this->getMockBuilder(vielhuber\gtbabel\Utils::class)
             ->setConstructorArgs([])
             ->onlyMethods([])
             ->getMock();
-        $utils = $this->getMockBuilder(vielhuber\gtbabel\Utils::class)
-            ->setConstructorArgs([])
+        $settings = $this->getMockBuilder(vielhuber\gtbabel\Settings::class)
+            ->setConstructorArgs([$utils])
             ->onlyMethods([])
             ->getMock();
         $log = $this->getMockBuilder(vielhuber\gtbabel\Log::class)
@@ -91,8 +91,8 @@ class Test extends \PHPUnit\Framework\TestCase
 
         $this->gtbabel = $this->getMockBuilder(vielhuber\gtbabel\Gtbabel::class)
             ->setConstructorArgs([
-                $settings,
                 $utils,
+                $settings,
                 $log,
                 $tags,
                 $host,
@@ -294,7 +294,7 @@ class Test extends \PHPUnit\Framework\TestCase
             200,
             [
                 'translate_json' => true,
-                'translate_json_include' => ['/blog' => ['das.ist.*.ein']]
+                'translate_json_include' => [['url' => '/blog', 'selector' => ['das.ist.*.ein']]]
             ],
             '/en/blog'
         );
@@ -369,10 +369,10 @@ class Test extends \PHPUnit\Framework\TestCase
             'auto_translation_service' => [
                 [
                     'provider' => 'google',
-                    'label' => null,
                     'api_keys' => null,
                     'throttle_chars_per_month' => 1000000,
                     'lng' => null,
+                    'label' => null,
                     'api_url' => null,
                     'disabled' => false
                 ]
@@ -388,10 +388,10 @@ class Test extends \PHPUnit\Framework\TestCase
             'auto_translation_service' => [
                 [
                     'provider' => 'google',
-                    'label' => null,
                     'api_keys' => 'free',
                     'throttle_chars_per_month' => 1000000,
                     'lng' => null,
+                    'label' => null,
                     'api_url' => null,
                     'disabled' => false
                 ]
@@ -500,10 +500,10 @@ class Test extends \PHPUnit\Framework\TestCase
             'auto_translation_service' => [
                 [
                     'provider' => 'google',
-                    'label' => null,
                     'api_keys' => 'free',
                     'throttle_chars_per_month' => 1000000,
                     'lng' => null,
+                    'label' => null,
                     'api_url' => null,
                     'disabled' => false
                 ]
@@ -526,10 +526,10 @@ class Test extends \PHPUnit\Framework\TestCase
             'auto_translation_service' => [
                 [
                     'provider' => 'google',
-                    'label' => null,
                     'api_keys' => 'free',
                     'throttle_chars_per_month' => 1000000,
                     'lng' => null,
+                    'label' => null,
                     'api_url' => null,
                     'disabled' => false
                 ]
@@ -544,7 +544,7 @@ class Test extends \PHPUnit\Framework\TestCase
             200,
             [
                 'translate_json' => true,
-                'translate_json_include' => ['/blog' => ['data.html']]
+                'translate_json_include' => [['url' => '/blog', 'selector' => ['data.html']]]
             ],
             '/en/blog'
         );
@@ -591,10 +591,10 @@ class Test extends \PHPUnit\Framework\TestCase
             'auto_translation_service' => [
                 [
                     'provider' => 'google',
-                    'label' => null,
                     'api_keys' => 'free',
                     'throttle_chars_per_month' => 1000000,
                     'lng' => null,
+                    'label' => null,
                     'api_url' => null,
                     'disabled' => false
                 ]
@@ -632,10 +632,10 @@ class Test extends \PHPUnit\Framework\TestCase
             'auto_translation_service' => [
                 [
                     'provider' => 'google',
-                    'label' => null,
                     'api_keys' => 'free',
                     'throttle_chars_per_month' => 1000000,
                     'lng' => null,
+                    'label' => null,
                     'api_url' => null,
                     'disabled' => false
                 ]
@@ -691,7 +691,7 @@ class Test extends \PHPUnit\Framework\TestCase
             200,
             [
                 'translate_json' => true,
-                'translate_json_include' => ['/' => ['link']]
+                'translate_json_include' => [['url' => '/', 'selector' => ['link']]]
             ],
             '/en/'
         );
@@ -1471,10 +1471,10 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['auto_translation_service'] = [
             [
                 'provider' => 'google',
-                'label' => null,
                 'api_keys' => @$_SERVER['GOOGLE_TRANSLATION_API_KEY'],
                 'throttle_chars_per_month' => 1000000,
                 'lng' => null,
+                'label' => null,
                 'api_url' => null,
                 'disabled' => false
             ]
@@ -1493,10 +1493,10 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['auto_translation_service'] = [
             [
                 'provider' => 'google',
-                'label' => null,
                 'api_keys' => @$_SERVER['GOOGLE_TRANSLATION_API_KEY'],
                 'throttle_chars_per_month' => 1000000,
                 'lng' => null,
+                'label' => null,
                 'api_url' => null,
                 'disabled' => false
             ]
@@ -1514,10 +1514,10 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['auto_translation_service'] = [
             [
                 'provider' => 'microsoft',
-                'label' => null,
                 'api_keys' => @$_SERVER['MICROSOFT_TRANSLATION_API_KEY'],
                 'throttle_chars_per_month' => 1000000,
                 'lng' => null,
+                'label' => null,
                 'api_url' => null,
                 'disabled' => false
             ]
@@ -1535,10 +1535,10 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['auto_translation_service'] = [
             [
                 'provider' => 'microsoft',
-                'label' => null,
                 'api_keys' => @$_SERVER['MICROSOFT_TRANSLATION_API_KEY'],
                 'throttle_chars_per_month' => 1000000,
                 'lng' => null,
+                'label' => null,
                 'api_url' => null,
                 'disabled' => false
             ]
@@ -1556,10 +1556,10 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['auto_translation_service'] = [
             [
                 'provider' => 'deepl',
-                'label' => null,
                 'api_keys' => @$_SERVER['DEEPL_TRANSLATION_API_KEY'],
                 'throttle_chars_per_month' => 1000000,
                 'lng' => null,
+                'label' => null,
                 'api_url' => null,
                 'disabled' => false
             ]
@@ -1575,10 +1575,10 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['auto_translation_service'] = [
             [
                 'provider' => 'google',
-                'label' => null,
                 'api_keys' => @$_SERVER['GOOGLE_TRANSLATION_API_KEY'],
                 'throttle_chars_per_month' => 1000000,
                 'lng' => null,
+                'label' => null,
                 'api_url' => null,
                 'disabled' => false
             ]
@@ -1611,10 +1611,10 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['auto_translation_service'] = [
             [
                 'provider' => 'google',
-                'label' => null,
                 'api_keys' => @$_SERVER['GOOGLE_TRANSLATION_API_KEY'],
                 'throttle_chars_per_month' => 30,
                 'lng' => null,
+                'label' => null,
                 'api_url' => null,
                 'disabled' => false
             ]
@@ -1639,10 +1639,10 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['auto_translation_service'] = [
             [
                 'provider' => 'google',
-                'label' => null,
                 'api_keys' => @$_SERVER['GOOGLE_TRANSLATION_API_KEY'],
                 'throttle_chars_per_month' => 20,
                 'lng' => null,
+                'label' => null,
                 'api_url' => null,
                 'disabled' => false
             ]
@@ -2168,17 +2168,24 @@ EOD;
             [
                 'http://gtbabel.local.vielhuber.de/de/unpublished/page/',
                 'http://gtbabel.local.vielhuber.de/de/',
-                ['de', ['de', null, 'en', null], 'source', false, null, ['/unpublished/page' => ['de']]]
+                [
+                    'de',
+                    ['de', null, 'en', null],
+                    'source',
+                    false,
+                    null,
+                    [['url' => '/unpublished/page', 'lng' => ['de']]]
+                ]
             ],
             [
                 'http://gtbabel.local.vielhuber.de/en/',
                 'http://gtbabel.local.vielhuber.de/de/',
-                ['de', ['de', null, 'en', null], 'source', false, null, ['/*' => ['en']]]
+                ['de', ['de', null, 'en', null], 'source', false, null, [['url' => '/*', 'lng' => ['en']]]]
             ],
             [
                 'http://gtbabel.local.vielhuber.de/en/foo/bar/baz/',
                 'http://gtbabel.local.vielhuber.de/de/',
-                ['de', ['de', null, 'en', null], 'source', false, null, ['/*' => ['en']]]
+                ['de', ['de', null, 'en', null], 'source', false, null, [['url' => '/*', 'lng' => ['en']]]]
             ]
         ];
 
@@ -2529,11 +2536,11 @@ EOD;
             ],
             'translate_json' => true,
             'translate_json_include' => [
-                '/path/in/source/lng/to/specific/page' => ['key'],
-                'wp-json/v1/*/endpoint' => ['key', 'nested.key', 'key.with.*.wildcard']
+                ['url' => '/path/in/source/lng/to/specific/page', 'selector' => ['key']],
+                ['url' => 'wp-json/v1/*/endpoint', 'selector' => ['key', 'nested.key', 'key.with.*.wildcard']]
             ],
             'translate_wp_localize_script' => true,
-            'translate_wp_localize_script_include' => ['wc_*.locale.*', 'wc_*.i18n_*', 'wc_*.cart_url'],
+            'translate_wp_localize_script_include' => ['key1_*.key2.*', 'key3_*.key4'],
             'debug_translations' => true,
             'auto_add_translations' => false,
             'auto_set_new_strings_checked' => false,
@@ -2558,10 +2565,10 @@ EOD;
             'auto_translation_service' => [
                 [
                     'provider' => 'google',
-                    'label' => null,
                     'api_keys' => @$_SERVER['GOOGLE_TRANSLATION_API_KEY'],
                     'throttle_chars_per_month' => 1000000,
                     'lng' => null,
+                    'label' => null,
                     'api_url' => null,
                     'disabled' => false
                 ]

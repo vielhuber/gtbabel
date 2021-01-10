@@ -1020,16 +1020,13 @@ class Dom
         }
         $keys = [];
         $url = $this->host->getCurrentUrlWithArgsConverted();
-        foreach (
-            $this->settings->get('translate_json_include')
-            as $translate_json_include__key => $translate_json_include__value
-        ) {
+        foreach ($this->settings->get('translate_json_include') as $translate_json_include__value) {
             $regex =
                 '/^(.+\/)?' .
-                str_replace('\*', '.*', preg_quote(trim($translate_json_include__key, '/'), '/')) .
+                str_replace('\*', '.*', preg_quote(trim($translate_json_include__value['url'], '/'), '/')) .
                 '(\/.+)?$/';
             if (preg_match($regex, trim($url, '/'))) {
-                $keys = $translate_json_include__value;
+                $keys = $translate_json_include__value['selector'];
                 break;
             }
         }

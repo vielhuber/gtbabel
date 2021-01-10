@@ -1137,7 +1137,7 @@ The default configuration is:
         ['selector' => '.example2', 'attribute' => 'data-*']
     ],
     'translate_html_force_tokenize' => ['.force-tokenize'],
-    'localize_js' => true,
+    'localize_js' => false,
     'localize_js_strings' => ['Schließen', '/blog'],
     'detect_dom_changes' => false,
     'detect_dom_changes_include' => ['.top-button', '.swal-overlay'],
@@ -1151,22 +1151,20 @@ The default configuration is:
     ],
     'translate_json' => true,
     'translate_json_include' => [
-        '/path/in/source/lng/to/specific/page' => ['key'],
-        'wp-json/v1/*/endpoint' => ['key', 'nested.key', 'key.with.*.wildcard']
+        ['url' => '/path/in/source/lng/to/specific/page', 'selector' => ['key']],
+        ['url' => 'wp-json/v1/*/endpoint', 'selector' => ['key', 'nested.key', 'key.with.*.wildcard']]
     ],
     'translate_wp_localize_script' => true,
-    'translate_wp_localize_script_include' => ['wc_*.locale.*', 'wc_*.i18n_*', 'wc_*.cart_url'],
+    'translate_wp_localize_script_include' => ['key1_*.key2.*', 'key3_*.key4'],
     'prevent_publish' => true,
-    'prevent_publish_urls' => [
-        '/path/in/source/lng/to/specific/page' => ['en', 'fr'],
-        '/slug1/*' => ['en'], // you can also use wildcards here
-        '/slug1/*/slug2' => ['fr']
-        //'/*' => ['en', 'fr'] // disable whole languages
+    '' => [
+        ['url' => '/path/in/source/lng/to/specific/page', 'lng' => ['en', 'fr']],
+        ['url' => '/slug1/*', 'lng' => ['en']], // you can also use wildcards here
+        ['url' => '/slug1/*/slug2', 'lng' => ['fr']]
+        //['url' => '/*', 'lng' => ['en', 'fr']] // disable whole languages
     ],
     'prevent_publish_wp_new_posts' => false,
-    'alt_lng_urls' => [
-        '/path/in/source/lng/to/specific/page' => 'en'
-    ],
+    'alt_lng_urls' => [['url' => '/path/in/source/lng/to/specific/page', 'lng' => 'en']],
     'url_query_args' => [
         [
             'type' => 'keep',
@@ -1198,10 +1196,10 @@ The default configuration is:
     'auto_translation_service' => [
         [
             'provider' => 'google', // google|microsoft|deepl or any other custom name
-            'label' => null, // custom label
             'api_keys' => [], // use a string or array of strings to provide multiple keys at once
             'throttle_chars_per_month' => 1000000,
             'lng' => null, // ['en', 'fr'] populate if provider should act only on one or multiple specific languages
+            'label' => null, // custom label
             'api_url' => null, // if you use your own custom translation provider, add here a custom GET api endpoint
             'disabled' => false
         ]
@@ -1849,10 +1847,10 @@ If you don't want to use the big three in translation, you can specify a special
 ```php
 [
     'provider' => 'custom_provider',
-    'label' => 'My custom provider',
     'api_keys' => ['1337'],
     'throttle_chars_per_month' => 1000000,
     'lng' => null,
+    'label' => 'My custom provider',
     'api_url' => 'https://tld.com/api/?str=%str%&from=%lng_source%&to=%lng_target%&api_key=%api_key%'
     'disabled' => false
 ]

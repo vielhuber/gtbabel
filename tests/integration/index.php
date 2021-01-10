@@ -140,28 +140,28 @@ $gtbabel->config([
     'auto_translation_service' => [
         [
             'provider' => 'google',
-            'label' => null,
             'api_keys' => @$_SERVER['GOOGLE_TRANSLATION_API_KEY'],
             'throttle_chars_per_month' => 1000000,
             'lng' => null,
+            'label' => null,
             'api_url' => null,
             'disabled' => false
         ],
         [
             'provider' => 'microsoft',
-            'label' => null,
             'api_keys' => @$_SERVER['MICROSOFT_TRANSLATION_API_KEY'],
             'throttle_chars_per_month' => 1000000,
             'lng' => null,
+            'label' => null,
             'api_url' => null,
             'disabled' => false
         ],
         [
             'provider' => 'deepl',
-            'label' => null,
             'api_keys' => @$_SERVER['DEEPL_TRANSLATION_API_KEY'],
             'throttle_chars_per_month' => 1000000,
             'lng' => null,
+            'label' => null,
             'api_url' => null,
             'disabled' => false
         ]

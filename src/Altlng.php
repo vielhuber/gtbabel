@@ -13,9 +13,11 @@ class Altlng
     {
         $alt_lng_urls = $this->settings->get('alt_lng_urls');
         $url = '/' . trim($this->host->getPathWithoutPrefixFromUrl($url), '/');
-        $alt_lng_urls[$url] = $lng;
-        if ($lng === null || $lng === $this->settings->getSourceLanguageCode()) {
-            unset($alt_lng_urls[$url]);
+        $alt_lng_urls = array_filter($alt_lng_urls, function ($a) use ($url) {
+            return $a['url'] !== $url;
+        });
+        if ($lng !== null && $lng !== $this->settings->getSourceLanguageCode()) {
+            $alt_lng_urls[] = ['url' => $url, 'lng' => $lng];
         }
         $this->settings->set('alt_lng_urls', $alt_lng_urls);
     }
@@ -25,12 +27,11 @@ class Altlng
         $alt_lng_urls = $this->settings->get('alt_lng_urls');
         $old_url = '/' . trim($this->host->getPathWithoutPrefixFromUrl($old_url), '/');
         $new_url = '/' . trim($this->host->getPathWithoutPrefixFromUrl($new_url), '/');
-        if (!array_key_exists($old_url, $alt_lng_urls)) {
-            return;
-        } else {
-            $lng = $alt_lng_urls[$old_url];
-            unset($alt_lng_urls[$old_url]);
-            $alt_lng_urls[$new_url] = $lng;
+        foreach ($alt_lng_urls as $alt_lng_urls__key => $alt_lng_urls__value) {
+            if ($alt_lng_urls__value['url'] !== $old_url) {
+                continue;
+            }
+            $alt_lng_urls[$alt_lng_urls__key]['url'] = $new_url;
         }
         $this->settings->set('alt_lng_urls', $alt_lng_urls);
     }
@@ -45,6 +46,12 @@ class Altlng
         if ($alt_lng_urls === null) {
             return null;
         }
-        return @$alt_lng_urls[$url] ?? $this->settings->getSourceLanguageCode();
+        foreach ($alt_lng_urls as $alt_lng_urls__value) {
+            if ($alt_lng_urls__value['url'] !== $url) {
+                continue;
+            }
+            return $alt_lng_urls__value['lng'];
+        }
+        return $this->settings->getSourceLanguageCode();
     }
 }

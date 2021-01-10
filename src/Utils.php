@@ -69,6 +69,11 @@ class Utils
         return function_exists('get_bloginfo');
     }
 
+    function getWordPressPluginFileStorePathRelative()
+    {
+        return '/' . trim(str_replace($this->getDocRoot(), '', wp_upload_dir()['basedir']), '/') . '/gtbabel';
+    }
+
     function rrmdir($folder)
     {
         __::rrmdir($folder);

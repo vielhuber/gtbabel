@@ -14,16 +14,27 @@ export default class WpBackend {
                                 .outerHTML
                         );
                     el.closest('.gtbabel__repeater')
+                        .querySelector('.gtbabel__repeater-listitem:last-child')
+                        .classList.remove('gtbabel__repeater-listitem--default');
+                    el.closest('.gtbabel__repeater')
+                        .querySelector('.gtbabel__repeater-listitem:last-child')
+                        .classList.remove('gtbabel__repeater-listitem--missing');
+                    el.closest('.gtbabel__repeater')
                         .querySelectorAll('.gtbabel__repeater-listitem:last-child input')
                         .forEach(el__value => {
                             el__value.value = '';
+                            el__value.removeAttribute('readonly');
+                            if (el__value.hasAttribute('data-name')) {
+                                el__value.setAttribute('name', el__value.getAttribute('data-name'));
+                                el__value.removeAttribute('data-name');
+                            }
                         });
                     e.preventDefault();
                 }
             });
 
             document.addEventListener('click', e => {
-                let el = e.target.closest('.gtbabel__repeater-remove');
+                let el = e.target.closest('.gtbabel__repeater-action--remove');
                 if (el) {
                     if (el.closest('.gtbabel__repeater').querySelectorAll('.gtbabel__repeater-listitem').length > 1) {
                         el.parentNode.remove();
@@ -32,6 +43,30 @@ export default class WpBackend {
                             el__value.value = '';
                         });
                     }
+                    e.preventDefault();
+                }
+            });
+
+            document.addEventListener('click', e => {
+                let el = e.target.closest('.gtbabel__repeater-action--enable, .gtbabel__repeater-action--disable');
+                if (el) {
+                    el.closest('.gtbabel__repeater-listitem')
+                        .querySelectorAll('.gtbabel__input')
+                        .forEach(el2 => {
+                            if (el.classList.contains('gtbabel__repeater-action--enable')) {
+                                el.closest('.gtbabel__repeater-listitem').classList.remove(
+                                    'gtbabel__repeater-listitem--missing'
+                                );
+                                el2.setAttribute('name', el2.getAttribute('data-name'));
+                                el2.removeAttribute('data-name');
+                            } else {
+                                el.closest('.gtbabel__repeater-listitem').classList.add(
+                                    'gtbabel__repeater-listitem--missing'
+                                );
+                                el2.setAttribute('data-name', el2.getAttribute('name'));
+                                el2.removeAttribute('name');
+                            }
+                        });
                     e.preventDefault();
                 }
             });
