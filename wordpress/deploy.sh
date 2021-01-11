@@ -41,7 +41,7 @@ composer dump-autoload
 cd $SCRIPT_DIR
 sleep 3
 
-# rename and zip the build directory
+# rename and cleanup the build directory
 mv ./build/ ./gtbabel/
 rm -f ./gtbabel/composer.lock
 rm -f ./gtbabel/php-scoper.phar
@@ -50,7 +50,16 @@ rm -f ./gtbabel/composer.json
 rm -f ./gtbabel/scoper.inc.php
 rm -rf ./gtbabel/locales/
 rm -rf ./gtbabel/logs/
+
+# make an official zip (plugin repo)
 zip -r ./gtbabel.zip ./gtbabel
+
+# make an official zip (manual deploy)
+sed -i -e 's/Plugin Name: Gtbabel/Plugin Name: close2translate/' ./gtbabel/wordpress/gtbabel.php
+sed -i -e "s/'Gtbabel'/'close2translate'/" ./gtbabel/wordpress/gtbabel.php
+zip -r ./close2translate.zip ./gtbabel
+sed -i -e 's/Plugin Name: close2translate/Plugin Name: Gtbabel/' ./gtbabel/wordpress/gtbabel.php
+sed -i -e "s/'close2translate'/'Gtbabel'/" ./gtbabel/wordpress/gtbabel.php
 
 # add to subversion
 mkdir svn

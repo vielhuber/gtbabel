@@ -6,6 +6,7 @@ log.txt
 /wordpress/locales/*
 /wordpress/vendor
 /wordpress/vendor/
+/wordpress/close2translate.zip
 /.phpunit.result.cache
 /tests/phpunit/files/**/*_expected
 /tests/phpunit/data.db
