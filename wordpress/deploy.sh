@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# switch to composer 1 (https://github.com/humbug/php-scoper/issues/452)
+composer self-update --1
+
 # output commands
 set -x
 
@@ -97,3 +100,6 @@ ln -s ../vendor ./vendor
 # git push + tag
 cd ./../
 git add -A . && git commit -m "$v_new" && git push origin HEAD && git tag -a $v_new -m "$v_new" && git push --tags
+
+# switch back to composer 2
+composer self-update --2
