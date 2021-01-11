@@ -16,7 +16,8 @@
         "cocur/slugify": "*",
         "vielhuber/stringhelper": "*",
         "vielhuber/dbhelper": "*",
-        "vielhuber/excelhelper": "*"
+        "vielhuber/excelhelper": "*",
+        "symfony/polyfill-mbstring": "1.20.0"
     },
     "require-dev": {
         "phpunit/phpunit": "*"
