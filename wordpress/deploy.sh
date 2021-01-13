@@ -66,6 +66,7 @@ sed -i -e 's/Plugin Name: close2translate/Plugin Name: Gtbabel/g' ./gtbabel/gtba
 sed -i -e "s/\$name = 'close2translate'/\$name = 'Gtbabel'/g" ./gtbabel/gtbabel.php
 
 # add to subversion
+if [[ ( -z "$1" ) || ( $1 != "--no-deploy" ) ]]; then
 mkdir svn
 cd ./svn
 svn co https://plugins.svn.wordpress.org/gtbabel . --quiet
@@ -82,6 +83,7 @@ svn add ./assets/* --quiet
 svn cp ./trunk ./tags/$v_new --quiet
 svn ci -m "$v_new" --username vielhuber --quiet
 cd $SCRIPT_DIR
+fi
 
 # remove obsolete files
 rm -rf ./svn/
