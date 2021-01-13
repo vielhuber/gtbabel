@@ -453,7 +453,8 @@ class Dom
             $this->frontendEditorFrontend();
             $this->localizeJsPrepare();
             $this->localizeJsInject();
-            $this->injectMenuLanguagePicker();
+            $this->injectLanguagePickerIntoMenu();
+            $this->showSimpleLanguagePicker();
         }
         $this->preloadExcludedNodes();
         $this->preloadForceTokenize();
@@ -1217,7 +1218,7 @@ class Dom
         $head->insertBefore($tag, $head->firstChild);
     }
 
-    function injectMenuLanguagePicker()
+    function injectLanguagePickerIntoMenu()
     {
         $nodes = $this->DOMXPath->query('/html/body//a[@href="#gtbabel_languagepicker"]');
         if (count($nodes) > 0) {
@@ -1232,5 +1233,29 @@ class Dom
                 );
             }
         }
+    }
+
+    function showSimpleLanguagePicker()
+    {
+        if ($this->settings->get('show_language_picker') !== true) {
+            return;
+        }
+        if (!$this->host->responseCodeIsSuccessful()) {
+            return;
+        }
+        $head = $this->DOMXPath->query('/html/head')[0];
+        $body = $this->DOMXPath->query('/html/body')[0];
+        if ($head === null || $body === null) {
+            return;
+        }
+        $body->appendChild(
+            $this->stringToNode(
+                $this->data->getLanguagePickerHtml(true, null, false, 'gtbabel-simple-lngpicker lngpicker', true, true)
+            )
+        );
+        $tag = $this->DOMDocument->createElement('style', '');
+        $tag->setAttribute('data-type', 'gtbabel-simple-lngpicker');
+        $tag->textContent = file_get_contents(dirname(__DIR__) . '/components/languagepicker/build/bundle.css');
+        $head->appendChild($tag);
     }
 }

@@ -124,6 +124,7 @@ class Settings
             'html_lang_attribute' => true,
             'html_hreflang_tags' => true,
             'xml_hreflang_tags' => true,
+            'show_language_picker' => false,
             'debug_translations' => false,
             'auto_add_translations' => true,
             'auto_set_new_strings_checked' => false,

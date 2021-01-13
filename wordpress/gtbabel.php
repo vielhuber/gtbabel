@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 5.4.2
+ * Version: 5.4.3
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -885,6 +885,7 @@ class GtbabelWordPress
                             'html_lang_attribute',
                             'html_hreflang_tags',
                             'xml_hreflang_tags',
+                            'show_language_picker',
                             'auto_add_translations',
                             'unchecked_strings',
                             'wp_mail_notifications',
@@ -920,6 +921,7 @@ class GtbabelWordPress
                             'html_lang_attribute',
                             'html_hreflang_tags',
                             'xml_hreflang_tags',
+                            'show_language_picker',
                             'debug_translations',
                             'auto_add_translations',
                             'auto_set_new_strings_checked',
@@ -1368,6 +1370,17 @@ class GtbabelWordPress
         echo '<div class="gtbabel__inputbox">';
         echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_auto_translation" name="gtbabel[auto_translation]" value="1"' .
             ($settings['auto_translation'] == '1' ? ' checked="checked"' : '') .
+            ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_show_language_picker" class="gtbabel__label">';
+        echo __('Show simple language picker', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_show_language_picker" name="gtbabel[show_language_picker]" value="1"' .
+            ($settings['show_language_picker'] == '1' ? ' checked="checked"' : '') .
             ' />';
         echo '</div>';
         echo '</li>';

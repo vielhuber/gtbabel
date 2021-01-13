@@ -1,0 +1,4 @@
+/* increase specificity */
+html[lang][lang] {
+    @import './LanguagePicker';
+}

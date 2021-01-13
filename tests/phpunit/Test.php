@@ -2561,6 +2561,7 @@ EOD;
             'html_lang_attribute' => false,
             'html_hreflang_tags' => false,
             'xml_hreflang_tags' => false,
+            'show_language_picker' => false,
             'auto_translation' => false,
             'auto_translation_service' => [
                 [

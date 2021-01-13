@@ -1033,15 +1033,45 @@ class Data
         return $data;
     }
 
-    function getLanguagePickerHtml($with_args = true, $cur_url = null, $hide_active = false, $class = 'lngpicker')
-    {
+    function getLanguagePickerHtml(
+        $with_args = true,
+        $cur_url = null,
+        $hide_active = false,
+        $class = 'lngpicker',
+        $only_show_codes = false,
+        $add_bem_classes = false
+    ) {
         $data = $this->getLanguagePickerData($with_args, $cur_url, $hide_active);
         $html = '';
         $html .= '<ul class="' . $class . '">';
+        $bem_class_prefix = null;
+        if ($add_bem_classes === true) {
+            $bem_class_prefix = explode(' ', $class)[0];
+        }
         foreach ($data as $data__value) {
-            $html .= '<li>';
-            $html .= '<a href="' . $data__value['url'] . '"' . ($data__value['active'] ? ' class="active"' : '') . '>';
-            $html .= $data__value['label'];
+            $html .= '<li' . ($add_bem_classes ? ' class="' . $bem_class_prefix . '__item"' : '') . '>';
+            $link_class = [];
+            if ($data__value['active']) {
+                $link_class[] = 'active';
+            }
+            if ($add_bem_classes === true) {
+                $link_class[] = $bem_class_prefix . '__link';
+                if ($data__value['active']) {
+                    $link_class[] = $bem_class_prefix . '__link--active';
+                }
+            }
+            $html .=
+                '<a href="' .
+                $data__value['url'] .
+                '"' .
+                (!empty($link_class) ? ' class="' . implode(' ', $link_class) . '"' : '') .
+                ($only_show_codes === true ? ' title="' . $data__value['label'] . '"' : '') .
+                '>';
+            if ($only_show_codes === true) {
+                $html .= mb_strtoupper($data__value['code']);
+            } else {
+                $html .= $data__value['label'];
+            }
             $html .= '</a>';
             $html .= '</li>';
         }
