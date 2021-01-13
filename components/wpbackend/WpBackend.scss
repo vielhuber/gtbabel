@@ -338,10 +338,10 @@ $button_width: 105px;
     height: 100%;
 }
 
-.gtbabel_page_gtbabel-wizard #wpcontent {
+body[class*='_page_gtbabel-wizard'] #wpcontent {
     height: calc(100vh - 32px - 40px);
 }
-.gtbabel_page_gtbabel-wizard #wpbody {
+body[class*='_page_gtbabel-wizard'] #wpbody {
     height: 100%;
 }
 

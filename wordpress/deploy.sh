@@ -60,10 +60,10 @@ zip -r ./gtbabel.zip ./gtbabel
 
 # make an official zip (manual deploy)
 sed -i -e 's/Plugin Name: Gtbabel/Plugin Name: close2translate/g' ./gtbabel/gtbabel.php
-sed -i -e "s/'Gtbabel'/'close2translate'/g" ./gtbabel/gtbabel.php
+sed -i -e "s/\$name = 'Gtbabel'/\$name = 'close2translate'/g" ./gtbabel/gtbabel.php
 zip -r ./close2translate.zip ./gtbabel
 sed -i -e 's/Plugin Name: close2translate/Plugin Name: Gtbabel/g' ./gtbabel/gtbabel.php
-sed -i -e "s/'close2translate'/'Gtbabel'/g" ./gtbabel/gtbabel.php
+sed -i -e "s/\$name = 'close2translate'/\$name = 'Gtbabel'/g" ./gtbabel/gtbabel.php
 
 # add to subversion
 mkdir svn
