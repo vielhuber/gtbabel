@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 5.4.9
+ * Version: 5.5.0
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -2957,7 +2957,7 @@ class GtbabelWordPress
     {
         echo '<p class="gtbabel__paragraph">';
         echo __(
-            'Essentially, there are 3 different ways of adding a language picker to your website.',
+            'Essentially, there are 5 different ways of adding a language picker to your website.',
             'gtbabel-plugin'
         );
         echo '</p>';
@@ -2988,6 +2988,15 @@ class GtbabelWordPress
         echo sprintf(
             __('Simply add the %sLanguage picker menu item%s to one of your menus.', 'gtbabel-plugin'),
             '<a target="_blank" href="' . admin_url('nav-menus.php') . '">',
+            '</a>'
+        );
+        echo '</p>';
+
+        echo '<h2 class="gtbabel__subtitle">' . __('Simple', 'gtbabel-plugin') . '</h2>';
+        echo '<p class="gtbabel__paragraph">';
+        echo sprintf(
+            __('Just enable the simple language picker in the %ssettings%s and you are good to go.', 'gtbabel-plugin'),
+            '<a target="_blank" href="' . admin_url('admin.php?page=gtbabel-settings') . '">',
             '</a>'
         );
         echo '</p>';
@@ -3359,14 +3368,13 @@ EOD;
                 'assets/images/finish.gif" alt="" />';
             echo '<div class="gtbabel__wizard-buttons">';
             if ($this->gtbabel->data->getTranslationCountFromDatabase() > 0) {
-                echo '<a class="button button-primary" href="' . admin_url('admin.php?page=gtbabel-trans') . '">';
+                echo '<a class="button button-secondary" href="' . admin_url('admin.php?page=gtbabel-trans') . '">';
                 echo __('Translated strings', 'gtbabel-plugin');
                 echo '</a>';
-            } else {
-                echo '<a class="button button-primary" href="' . admin_url('admin.php?page=gtbabel-settings') . '">';
-                echo __('To the settings', 'gtbabel-plugin');
-                echo '</a>';
             }
+            echo '<a class="button button-primary" href="' . get_bloginfo('url') . '" target="_blank">';
+            echo __('To the website', 'gtbabel-plugin');
+            echo '</a>';
             echo '</div>';
             echo '</div>';
         }
