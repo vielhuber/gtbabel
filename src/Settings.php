@@ -211,6 +211,7 @@ class Settings
                 ['selector' => '/html/body//address/br/parent::address'],
                 ['selector' => '.woocommerce-order-overview__email']
             ];
+            $default_settings['auto_translation'] = null; // undefined
             $default_settings['auto_translation_service'] = [];
         }
         return $default_settings;

@@ -38,7 +38,7 @@ sed -i -e "s/ \* Version: [0-9]\.[0-9]\.[0-9]/ * Version: $v_new/" ./gtbabel.php
 # do the prefixing with php-scoper
 wget https://github.com/humbug/php-scoper/releases/download/0.13.1/php-scoper.phar
 rm -f ./gtbabel.zip
-rm -f ./close2translate.zip
+rm -f ./close2.zip
 php ./php-scoper.phar add-prefix --config scoper.inc.php
 cd ./build
 composer dump-autoload
@@ -59,11 +59,11 @@ rm -rf ./gtbabel/logs/
 zip -r ./gtbabel.zip ./gtbabel
 
 # make an official zip (manual deploy)
-sed -i -e 's/Plugin Name: Gtbabel/Plugin Name: close2translate/g' ./gtbabel/gtbabel.php
-sed -i -e "s/\$name = 'Gtbabel'/\$name = 'close2translate'/g" ./gtbabel/gtbabel.php
-zip -r ./close2translate.zip ./gtbabel
-sed -i -e 's/Plugin Name: close2translate/Plugin Name: Gtbabel/g' ./gtbabel/gtbabel.php
-sed -i -e "s/\$name = 'close2translate'/\$name = 'Gtbabel'/g" ./gtbabel/gtbabel.php
+sed -i -e 's/Plugin Name: Gtbabel/Plugin Name: close2/g' ./gtbabel/gtbabel.php
+sed -i -e "s/\$name = 'Gtbabel'/\$name = 'close2'/g" ./gtbabel/gtbabel.php
+zip -r ./close2.zip ./gtbabel
+sed -i -e 's/Plugin Name: close2/Plugin Name: Gtbabel/g' ./gtbabel/gtbabel.php
+sed -i -e "s/\$name = 'close2'/\$name = 'Gtbabel'/g" ./gtbabel/gtbabel.php
 
 # add to subversion
 if [[ ( -z "$1" ) || ( $1 != "--no-deploy" ) ]]; then

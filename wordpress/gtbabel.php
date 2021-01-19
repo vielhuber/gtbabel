@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 5.4.7
+ * Version: 5.4.8
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -21,7 +21,7 @@ class GtbabelWordPress
 {
     private $gtbabel;
 
-    private $name = 'Gtbabel';
+    private $name = 'Gtbabel'; // Gtbabel|close2
 
     public function __construct($gtbabel)
     {
@@ -722,7 +722,7 @@ class GtbabelWordPress
 
             $menu = add_menu_page(
                 $this->name,
-                $this->name !== 'Gtbabel' ? __('Languages', 'gtbabel-plugin') : 'Gtbabel',
+                $this->getPluginTitle(),
                 'gtbabel__edit_settings',
                 'gtbabel-settings',
                 function () {
@@ -1228,7 +1228,7 @@ class GtbabelWordPress
         echo '<input type="hidden" name="gtbabel[wizard_finished]" value="' .
             (isset($settings['wizard_finished']) && $settings['wizard_finished'] == 1 ? 1 : 0) .
             '" />';
-        echo '<h1 class="gtbabel__title">🌐 ' . $this->name . ' 🌐</h1>';
+        echo '<h1 class="gtbabel__title">🌐 ' . $this->getPluginTitle() . ' 🌐</h1>';
         echo $message;
         echo '<h2 class="gtbabel__subtitle">' . __('Settings', 'gtbabel-plugin') . '</h2>';
         echo '<ul class="gtbabel__fields">';
@@ -1990,7 +1990,7 @@ class GtbabelWordPress
         $pagination = $this->initBackendPagination($data['count'], $lng);
 
         echo '<div class="gtbabel gtbabel--trans wrap">';
-        echo '<h1 class="gtbabel__title">🌐 ' . $this->name . ' 🌐</h1>';
+        echo '<h1 class="gtbabel__title">🌐 ' . $this->getPluginTitle() . ' 🌐</h1>';
         echo $message;
         echo '<h2 class="gtbabel__subtitle">' . __('String translations', 'gtbabel-plugin') . '</h2>';
 
@@ -2337,7 +2337,7 @@ class GtbabelWordPress
         $lng = isset($_GET['lng']) && $_GET['lng'] != '' ? sanitize_textarea_field($_GET['lng']) : null;
 
         echo '<div class="gtbabel gtbabel--transwizard wrap">';
-        echo '<h1 class="gtbabel__title">🌐 ' . $this->name . ' 🌐</h1>';
+        echo '<h1 class="gtbabel__title">🌐 ' . $this->getPluginTitle() . ' 🌐</h1>';
         echo '<h2 class="gtbabel__subtitle">' . __('Translation wizard', 'gtbabel-plugin') . '</h2>';
         if ($lng === null) {
             $languages = $this->gtbabel->settings->getSelectedLanguageCodesLabels();
@@ -2499,7 +2499,7 @@ class GtbabelWordPress
         echo '<div class="gtbabel gtbabel--actions wrap">';
         echo '<form class="gtbabel__form" method="post" action="' . admin_url('admin.php?page=gtbabel-actions') . '">';
         wp_nonce_field('gtbabel-actions');
-        echo '<h1 class="gtbabel__title">🌐 ' . $this->name . ' 🌐</h1>';
+        echo '<h1 class="gtbabel__title">🌐 ' . $this->getPluginTitle() . ' 🌐</h1>';
         echo $message;
 
         echo '<h2 class="gtbabel__subtitle">' . __('Translate complete website', 'gtbabel-plugin') . '</h2>';
@@ -2699,7 +2699,7 @@ class GtbabelWordPress
         }
 
         echo '<div class="gtbabel gtbabel--exportimport wrap">';
-        echo '<h1 class="gtbabel__title">🌐 ' . $this->name . ' 🌐</h1>';
+        echo '<h1 class="gtbabel__title">🌐 ' . $this->getPluginTitle() . ' 🌐</h1>';
         echo $message;
 
         echo '<h2 class="gtbabel__subtitle">' . __('Export', 'gtbabel-plugin') . '</h2>';
@@ -2870,7 +2870,7 @@ class GtbabelWordPress
             admin_url('admin.php?page=gtbabel-permissions') .
             '">';
         wp_nonce_field('gtbabel-permissions');
-        echo '<h1 class="gtbabel__title">🌐 ' . $this->name . ' 🌐</h1>';
+        echo '<h1 class="gtbabel__title">🌐 ' . $this->getPluginTitle() . ' 🌐</h1>';
         echo $message;
         echo '<h2 class="gtbabel__subtitle">' . __('Permissions', 'gtbabel-plugin') . '</h2>';
 
@@ -2930,7 +2930,7 @@ class GtbabelWordPress
         $this->checkToken();
 
         echo '<div class="gtbabel gtbabel--lngpicker wrap">';
-        echo '<h1 class="gtbabel__title">🌐 ' . $this->name . ' 🌐</h1>';
+        echo '<h1 class="gtbabel__title">🌐 ' . $this->getPluginTitle() . ' 🌐</h1>';
         echo $this->initBackendLanguagePickerContent();
         echo '</div>';
     }
@@ -3018,7 +3018,10 @@ EOD;
                     $_POST['gtbabel'] = stripslashes_deep($_POST['gtbabel']);
 
                     // whitelist
-                    foreach (['languages', 'auto_translation_service_google_api_key'] as $fields__value) {
+                    foreach (
+                        ['languages', 'auto_translation_service_provider', 'auto_translation_service_api_key']
+                        as $fields__value
+                    ) {
                         if (!isset($_POST['gtbabel'][$fields__value])) {
                             continue;
                         }
@@ -3048,50 +3051,63 @@ EOD;
                 }
                 if ($this->getBackendWizardStep() === 3) {
                     check_admin_referer('gtbabel-wizard-step-2');
-                    $auto_translation_service = $this->getSetting('auto_translation_service');
-                    if ($auto_translation_service === null || $auto_translation_service === '') {
-                        $auto_translation_service = [];
-                    }
-                    $exists = false;
-                    foreach (
-                        $auto_translation_service
-                        as $auto_translation_service__key => $auto_translation_service__value
-                    ) {
-                        if ($auto_translation_service__value['provider'] === 'google') {
-                            $exists = true;
+                    if ($settings['auto_translation_service_provider'] !== 'manual') {
+                        $auto_translation_service = $this->getSetting('auto_translation_service');
+                        if ($auto_translation_service === null || $auto_translation_service === '') {
+                            $auto_translation_service = [];
+                        }
+                        $exists = false;
+                        foreach (
+                            $auto_translation_service
+                            as $auto_translation_service__key => $auto_translation_service__value
+                        ) {
                             if (
-                                $auto_translation_service__value['api_keys'] === null ||
-                                $auto_translation_service__value['api_keys'] === ''
+                                $auto_translation_service__value['provider'] ===
+                                $settings['auto_translation_service_provider']
                             ) {
-                                $auto_translation_service__value['api_keys'] = [
-                                    $settings['auto_translation_service_google_api_key']
-                                ];
-                            } elseif (is_string($auto_translation_service__value['api_keys'])) {
-                                $auto_translation_service__value['api_keys'] = [
-                                    $settings['auto_translation_service_google_api_key']
-                                ];
-                            } elseif (is_array($auto_translation_service__value['api_keys'])) {
-                                $auto_translation_service__value['api_keys'][0] =
-                                    $settings['auto_translation_service_google_api_key'];
+                                $exists = true;
+                                if (
+                                    $auto_translation_service__value['api_keys'] === null ||
+                                    $auto_translation_service__value['api_keys'] === '' ||
+                                    is_string($auto_translation_service__value['api_keys'])
+                                ) {
+                                    $auto_translation_service__value['api_keys'] = [
+                                        $settings['auto_translation_service_api_key']
+                                    ];
+                                } elseif (is_array($auto_translation_service__value['api_keys'])) {
+                                    $auto_translation_service__value['api_keys'][0] =
+                                        $settings['auto_translation_service_api_key'];
+                                }
+                                $auto_translation_service__value['disabled'] = false;
+                            } else {
+                                $auto_translation_service__value['disabled'] = true;
                             }
                             $auto_translation_service[
                                 $auto_translation_service__key
                             ] = $auto_translation_service__value;
                         }
+                        if ($exists === false) {
+                            $auto_translation_service[] = [
+                                'provider' => $settings['auto_translation_service_provider'],
+                                'api_keys' => [$settings['auto_translation_service_api_key']],
+                                'throttle_chars_per_month' => 1000000,
+                                'lng' => null,
+                                'label' =>
+                                    $settings['auto_translation_service_provider'] !== 'close2'
+                                        ? null
+                                        : 'close2 Translation API',
+                                'api_url' =>
+                                    $settings['auto_translation_service_provider'] !== 'close2'
+                                        ? null
+                                        : 'https://translate.close2dev.de/?str=%str%&lng_source=%lng_source%&lng_target=%lng_target%&api_key=%api_key%&service=google',
+                                'disabled' => false
+                            ];
+                        }
+                        $this->saveSetting('auto_translation_service', $auto_translation_service);
+                        $this->saveSetting('auto_translation', true);
+                    } else {
+                        $this->saveSetting('auto_translation', false);
                     }
-                    if ($exists === false) {
-                        $auto_translation_service[] = [
-                            'provider' => 'google',
-                            'api_keys' => [$settings['auto_translation_service_google_api_key']],
-                            'throttle_chars_per_month' => 1000000,
-                            'lng' => null,
-                            'label' => null,
-                            'api_url' => null,
-                            'disabled' => false
-                        ];
-                    }
-                    $this->saveSetting('auto_translation_service', $auto_translation_service);
-                    $this->saveSetting('auto_translation', true);
                 }
                 if ($this->getBackendWizardStep() === 5) {
                     check_admin_referer('gtbabel-wizard-step-4');
@@ -3104,19 +3120,25 @@ EOD;
 
         $settings = $this->getSettings();
 
-        $api_key = null;
-        $service_data = $this->gtbabel->settings->getAutoTranslationServiceData('google');
-        if (@$service_data['api_keys'] != '') {
-            if (is_array($service_data['api_keys'])) {
-                $api_key = $service_data['api_keys'][0];
-            } else {
-                $api_key = $service_data['api_keys'];
-            }
+        $auto_translation = $this->gtbabel->settings->get('auto_translation');
+        $auto_translation_service = $this->gtbabel->settings->get('auto_translation_service');
+        // provide sensible defaults (only in wizard!)
+        if ($auto_translation === null) {
+            $auto_translation = true;
+            $auto_translation_service[] = [
+                'provider' => 'google',
+                'api_keys' => null,
+                'throttle_chars_per_month' => 1000000,
+                'lng' => null,
+                'label' => null,
+                'api_url' => null,
+                'disabled' => false
+            ];
         }
 
         echo '<div class="gtbabel gtbabel--wizard">';
 
-        echo '<h1 class="gtbabel__title">🌐 ' . $this->name . ' 🌐</h1>';
+        echo '<h1 class="gtbabel__title">🌐 ' . $this->getPluginTitle() . ' 🌐</h1>';
 
         // progressbar
         echo '<div class="gtbabel__progress">';
@@ -3172,34 +3194,72 @@ EOD;
                 admin_url('admin.php?page=gtbabel-wizard&step=3') .
                 '">';
             wp_nonce_field('gtbabel-wizard-step-2');
-            echo '<div class="gtbabel__wizard-step">';
-            echo '<h2 class="gtbabel__wizard-steptitle">' . __('Connect Google Translate', 'gtbabel-plugin') . '</h2>';
-            echo '<ol class="gtbabel__list">';
-            echo '<li class="gtbabel__listitem">';
-            echo sprintf(
-                __('Go to %sGoogle API Console%s', 'gtbabel-plugin'),
-                '<a href="https://console.cloud.google.com/apis" target="_blank">',
-                '</a>'
-            );
-            echo '</li>';
-            echo '<li class="gtbabel__listitem">';
-            echo __('Create a new project', 'gtbabel-plugin');
-            echo '</li>';
-            echo '<li class="gtbabel__listitem">';
+            echo '<div class="gtbabel__wizard-step gtbabel__wizard-step--center">';
+            echo '<h2 class="gtbabel__wizard-steptitle">' .
+                __('Connect translation service', 'gtbabel-plugin') .
+                '</h2>';
+            echo '<p class="gtbabel__paragraph">';
             echo __(
-                'Marketplace > Enable "Cloud Translation API" (this requires you to setup a billing account)',
+                'Now integrate a translation service that automatically translates existing and, in the future, all new website content.',
                 'gtbabel-plugin'
             );
-            echo '</li>';
-            echo '<li class="gtbabel__listitem">';
-            echo __('APIs and services > API credentials > Add a new api key', 'gtbabel-plugin');
-            echo '</li>';
-            echo '</ol>';
+            echo '<br/>';
+            echo __(
+                'Please note that costs may be charged directly to the provider. You can always change and refine this configuration later.',
+                'gtbabel-plugin'
+            );
+            echo '<br/>';
+            echo __(
+                'If you do not want to use such a service, you can also choose manual translation.',
+                'gtbabel-plugin'
+            );
+            echo '</p>';
+
+            echo '<select class="gtbabel__input gtbabel__input--select gtbabel__input--wizard-auto-translation-service-provider" name="gtbabel[auto_translation_service_provider]">';
+            foreach (
+                array_merge(
+                    [
+                        'manual' => __('Manual translation')
+                    ],
+                    $this->gtbabel->data->statsGetDefaultServices(),
+                    $this->name !== 'Gtbabel'
+                        ? [
+                            'close2' => 'close2 Translation API'
+                        ]
+                        : []
+                )
+                as $services__key => $services__value
+            ) {
+                $selected = false;
+                $api_key = '';
+                foreach ($auto_translation_service as $auto_translation_service__value) {
+                    if ($auto_translation === true && $auto_translation_service__value['provider'] === $services__key) {
+                        $api_key = is_array($auto_translation_service__value['api_keys'])
+                            ? $auto_translation_service__value['api_keys'][0]
+                            : $auto_translation_service__value['api_keys'];
+                        if ($auto_translation_service__value['disabled'] !== true) {
+                            $selected = true;
+                        }
+                    }
+                }
+                echo '<option data-api-key="' .
+                    $api_key .
+                    '" value="' .
+                    $services__key .
+                    '"' .
+                    ($selected === true ? ' selected="selected"' : '') .
+                    '>' .
+                    $services__value .
+                    '</option>';
+            }
+            echo '</select>';
+
             echo '<input required="required" placeholder="' .
-                __('Your Google Translation API Key', 'gtbabel-plugin') .
-                '" class="gtbabel__input gtbabel__input--big" type="text" name="gtbabel[auto_translation_service_google_api_key]" value="' .
+                __('API key', 'gtbabel-plugin') .
+                '" class="gtbabel__input gtbabel__input--big gtbabel__input--wizard-auto-translation-service-api-key" type="text" name="gtbabel[auto_translation_service_api_key]" value="' .
                 ($api_key !== null ? $api_key : '') .
                 '" />';
+
             echo '<div class="gtbabel__wizard-buttons">';
             echo '<a class="button button-secondary" href="' .
                 admin_url('admin.php?page=gtbabel-wizard&step=1') .
@@ -4189,6 +4249,11 @@ EOD;
                 }
             }
         }
+    }
+
+    private function getPluginTitle()
+    {
+        return $this->name !== 'Gtbabel' ? __('Languages', 'gtbabel-plugin') : $this->name;
     }
 
     private function checkToken()
