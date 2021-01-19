@@ -1188,6 +1188,7 @@ The default configuration is:
     'html_hreflang_tags' => true,
     'xml_hreflang_tags' => true,
     'show_language_picker' => false,
+    'show_frontend_editor_links' => false, // common wordpress configuration: 'show_frontend_editor_links' => user_is_logged_in()
     'debug_translations' => false, // surround outputted translations with "%|%" to see borders
     'auto_add_translations' => true,
     'auto_set_new_strings_checked' => false,
@@ -1206,7 +1207,7 @@ The default configuration is:
         ]
     ],
     'discovery_log' => false,
-    'frontend_editor' => false, // common configuration: 'frontend_editor' => user_is_logged_in()
+    'frontend_editor' => false, // common wordpress configuration: 'frontend_editor' => user_is_logged_in()
     'wp_mail_notifications' => false
 ];
 ```

@@ -125,6 +125,7 @@ class Settings
             'html_hreflang_tags' => true,
             'xml_hreflang_tags' => true,
             'show_language_picker' => false,
+            'show_frontend_editor_links' => false,
             'debug_translations' => false,
             'auto_add_translations' => true,
             'auto_set_new_strings_checked' => false,
@@ -213,6 +214,7 @@ class Settings
             ];
             $default_settings['auto_translation'] = null; // undefined
             $default_settings['auto_translation_service'] = [];
+            $default_settings['show_frontend_editor_links'] = true;
         }
         return $default_settings;
     }

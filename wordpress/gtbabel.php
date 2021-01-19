@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 5.4.8
+ * Version: 5.4.9
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -291,6 +291,11 @@ class GtbabelWordPress
             current_user_can('gtbabel__translation_frontendeditor') &&
             isset($_GET['gtbabel_frontend_editor']) &&
             $_GET['gtbabel_frontend_editor'] == '1';
+
+        $settings['show_frontend_editor_links'] =
+            is_user_logged_in() &&
+            current_user_can('gtbabel__translation_frontendeditor') &&
+            $settings['show_frontend_editor_links'];
 
         // url settings are stored in the wordpress database for migration purposes
         $url_settings = get_option('gtbabel_url_settings');
@@ -888,6 +893,7 @@ class GtbabelWordPress
                             'html_hreflang_tags',
                             'xml_hreflang_tags',
                             'show_language_picker',
+                            'show_frontend_editor_links',
                             'auto_add_translations',
                             'unchecked_strings',
                             'wp_mail_notifications',
@@ -924,6 +930,7 @@ class GtbabelWordPress
                             'html_hreflang_tags',
                             'xml_hreflang_tags',
                             'show_language_picker',
+                            'show_frontend_editor_links',
                             'debug_translations',
                             'auto_add_translations',
                             'auto_set_new_strings_checked',
@@ -1383,6 +1390,17 @@ class GtbabelWordPress
         echo '<div class="gtbabel__inputbox">';
         echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_show_language_picker" name="gtbabel[show_language_picker]" value="1"' .
             ($settings['show_language_picker'] == '1' ? ' checked="checked"' : '') .
+            ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_show_frontend_editor_links" class="gtbabel__label">';
+        echo __('Show frontend editor links', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_show_frontend_editor_links" name="gtbabel[show_frontend_editor_links]" value="1"' .
+            ($settings['show_frontend_editor_links'] == '1' ? ' checked="checked"' : '') .
             ' />';
         echo '</div>';
         echo '</li>';

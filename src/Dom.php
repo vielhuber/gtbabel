@@ -455,6 +455,7 @@ class Dom
             $this->localizeJsInject();
             $this->injectLanguagePickerIntoMenu();
             $this->showSimpleLanguagePicker();
+            $this->showFrontendEditorLinks();
         }
         $this->preloadExcludedNodes();
         $this->preloadForceTokenize();
@@ -1250,12 +1251,66 @@ class Dom
         }
         $body->appendChild(
             $this->stringToNode(
-                $this->data->getLanguagePickerHtml(true, null, false, 'gtbabel-simple-lngpicker lngpicker', true, true)
+                $this->data->getLanguagePickerHtml(
+                    true,
+                    null,
+                    false,
+                    'gtbabel-simple-lngpicker notranslate',
+                    true,
+                    true
+                )
             )
         );
         $tag = $this->DOMDocument->createElement('style', '');
         $tag->setAttribute('data-type', 'gtbabel-simple-lngpicker');
         $tag->textContent = file_get_contents(dirname(__DIR__) . '/components/languagepicker/build/bundle.css');
+        $head->appendChild($tag);
+    }
+
+    function showFrontendEditorLinks()
+    {
+        if ($this->settings->get('show_frontend_editor_links') !== true) {
+            return;
+        }
+        if (!$this->host->responseCodeIsSuccessful()) {
+            return;
+        }
+        $head = $this->DOMXPath->query('/html/head')[0];
+        $body = $this->DOMXPath->query('/html/body')[0];
+        if ($head === null || $body === null) {
+            return;
+        }
+        $lng = $this->data->sourceLngIsCurrentLng() ? null : $this->data->getCurrentLanguageCode();
+        if ($lng !== null && $this->utils->isWordPress() && !current_user_can('gtbabel__translate_' . $lng)) {
+            return;
+        }
+        $url = $this->host->getCurrentUrl();
+        $html = '';
+        $html .= '<ul class="gtbabel-frontend-editor-links notranslate">';
+        $html .= '<li class="gtbabel-frontend-editor-links__item">';
+        $html .=
+            '<a class="gtbabel-frontend-editor-links__link" href="' .
+            $url .
+            ($this->settings->get('frontend_editor') === true
+                ? ''
+                : (strpos($url, '?') ? '&' : '?') . 'gtbabel_frontend_editor=1') .
+            '">' .
+            ($this->settings->get('frontend_editor') === false ? '✏️' : '❌') .
+            '</a>';
+        $html .= '</li>';
+        if ($this->utils->isWordPress()) {
+            $html .= '<li class="gtbabel-frontend-editor-links__item">';
+            $html .=
+                '<a class="gtbabel-frontend-editor-links__link" href="' .
+                admin_url('admin.php?page=gtbabel-trans&url=' . urlencode($url) . '&lng=' . $lng) .
+                '" target="_blank">🌐</a>';
+            $html .= '</li>';
+        }
+        $html .= '</ul>';
+        $body->appendChild($this->stringToNode($html));
+        $tag = $this->DOMDocument->createElement('style', '');
+        $tag->setAttribute('data-type', 'gtbabel-frontend-editor-links');
+        $tag->textContent = file_get_contents(dirname(__DIR__) . '/components/frontendeditorlinks/build/bundle.css');
         $head->appendChild($tag);
     }
 }

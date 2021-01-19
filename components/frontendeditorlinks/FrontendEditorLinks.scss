@@ -1,0 +1,37 @@
+.gtbabel-frontend-editor-links {
+    position: fixed;
+    bottom: 30px;
+    right: 0;
+    z-index: 2147483647;
+    float: none;
+    background-color: #2b2b2b;
+    box-shadow: -4px 4px 10px -1px rgba(0, 0, 0, 0.5);
+    border-radius: 10px 0 0px 10px;
+    border: 1px solid #000;
+    border-right: 0;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+}
+.gtbabel-frontend-editor-links__item {
+    border-top: 1px solid #4c4c4c;
+}
+.gtbabel-frontend-editor-links__item:first-child {
+    border-top: 0;
+}
+.gtbabel-frontend-editor-links__link {
+    font-size: 10px;
+    color: #fff;
+    width: 40px;
+    height: 21px;
+    line-height: 21px;
+    display: block;
+    text-align: center;
+    font-weight: bold;
+    text-decoration: none;
+}
+.gtbabel-frontend-editor-links__link--active {
+    color: #000;
+    background-color: #fff;
+}

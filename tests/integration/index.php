@@ -169,7 +169,9 @@ $gtbabel->config([
     'localize_js' => false,
     'detect_dom_changes' => true,
     'detect_dom_changes_include' => ['.js'],
-    'frontend_editor' => true
+    'show_language_picker' => true,
+    'frontend_editor' => @$_GET['gtbabel_frontend_editor'] == '1',
+    'show_frontend_editor_links' => true
 ]);
 
 $gtbabel->start();
