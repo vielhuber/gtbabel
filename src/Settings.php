@@ -149,6 +149,12 @@ class Settings
         ];
 
         if ($this->utils->isWordPress()) {
+            $default_settings['translate_html_include'] = array_filter(
+                $default_settings['translate_html_include'],
+                function ($a) {
+                    return $a['selector'] != '.example-link';
+                }
+            );
             $default_settings['lng_source'] = mb_strtolower(mb_substr(get_locale(), 0, 2));
             $default_settings['languages'] = [
                 [
@@ -183,6 +189,8 @@ class Settings
             $default_settings['log_folder'] = $this->utils->getWordPressPluginFileStorePathRelative() . '/logs';
             $default_settings['localize_js_strings'] = [];
             $default_settings['detect_dom_changes_include'] = [];
+            $default_settings['prevent_publish_urls'] = [];
+            $default_settings['alt_lng_urls'] = [];
             $default_settings['translate_json_include'] = [
                 ['url' => '?wc-ajax=*', 'selector' => ['fragments.*', 'messages', 'redirect']], // woocommerce
                 ['url' => 'wp-json', 'selector' => ['message']] // contact form 7
@@ -217,22 +225,6 @@ class Settings
             $default_settings['show_frontend_editor_links'] = true;
         }
         return $default_settings;
-    }
-
-    function isDefaultSettingForKey($key, $value)
-    {
-        $default_settings = $this->getDefaultSettings();
-        foreach ($default_settings as $default_settings__key => $default_settings__value) {
-            if ($default_settings__key !== $key) {
-                continue;
-            }
-            foreach ($default_settings__value as $default_settings__value__value) {
-                if ($this->valuesAreEqual($default_settings__value__value, $value)) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     function valuesAreEqual($a1, $a2)
@@ -272,7 +264,7 @@ class Settings
         return false;
     }
 
-    function getMissingDefaultSettingsForKey($key, $settings)
+    function getAllSettingsIncludingDefaultForKey($key, $settings)
     {
         $return = [];
         $default_settings = $this->getDefaultSettings();
@@ -281,21 +273,42 @@ class Settings
                 continue;
             }
             foreach ($default_settings__value as $default_settings__value__value) {
-                $found = false;
+                $missing = true;
                 foreach ($settings as $settings__key => $settings__value) {
                     if ($settings__key !== $key) {
                         continue;
                     }
                     foreach ($settings__value as $settings__value__value) {
                         if ($this->valuesAreEqual($default_settings__value__value, $settings__value__value)) {
-                            $found = true;
+                            $missing = false;
                             break 2;
                         }
                     }
                 }
-                if ($found === false) {
-                    $return[] = $default_settings__value__value;
+                $return[] = ['value' => $default_settings__value__value, 'missing' => $missing, 'default' => true];
+            }
+        }
+        foreach ($settings as $settings__key => $settings__value) {
+            if ($settings__key !== $key) {
+                continue;
+            }
+            foreach ($settings__value as $settings__value__value) {
+                $default = false;
+                foreach ($default_settings as $default_settings__key => $default_settings__value) {
+                    if ($default_settings__key !== $key) {
+                        continue;
+                    }
+                    foreach ($default_settings__value as $default_settings__value__value) {
+                        if ($this->valuesAreEqual($settings__value__value, $default_settings__value__value)) {
+                            $default = true;
+                            break 2;
+                        }
+                    }
                 }
+                if ($default === true) {
+                    continue;
+                }
+                $return[] = ['value' => $settings__value__value, 'missing' => false, 'default' => false];
             }
         }
         return $return;

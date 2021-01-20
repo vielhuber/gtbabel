@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 5.5.0
+ * Version: 5.5.1
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -1702,34 +1702,6 @@ class GtbabelWordPress
 
         echo '<li class="gtbabel__field">';
         echo '<label class="gtbabel__label">';
-        echo __('Prevent publish of pages', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        $this->renderRepeater('prevent_publish_urls', [
-            ['key' => 'url', 'type' => 'string', 'placeholder' => __('URL', 'gtbabel-plugin')],
-            [
-                'key' => 'lng',
-                'type' => 'array',
-                'placeholder' => __('Language codes (comma separated)', 'gtbabel-plugin')
-            ]
-        ]);
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label class="gtbabel__label">';
-        echo __('Alternate language for main content', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        $this->renderRepeater('alt_lng_urls', [
-            ['key' => 'url', 'type' => 'string', 'placeholder' => __('URL', 'gtbabel-plugin')],
-            ['key' => 'lng', 'type' => 'string', 'placeholder' => __('Language code', 'gtbabel-plugin')]
-        ]);
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label class="gtbabel__label">';
         echo __('URL query arguments', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
@@ -1780,14 +1752,14 @@ class GtbabelWordPress
         echo '<div class="gtbabel__inputbox">';
         $url_settings = [];
         foreach ($this->gtbabel->settings->getSelectedLanguages() as $languages__value) {
-            if (!isset($languages__value['url_base']) && !isset($languages__value['url_prefix'])) {
-                continue;
+            if (!empty(get_option('gtbabel_url_settings'))) {
+                foreach (get_option('gtbabel_url_settings') as $settings__value) {
+                    if ($settings__value['code'] === $languages__value['code']) {
+                        $url_settings[] = $settings__value;
+                        break;
+                    }
+                }
             }
-            $url_settings[] = [
-                'code' => $languages__value['code'],
-                'url_base' => $languages__value['url_base'],
-                'url_prefix' => $languages__value['url_prefix']
-            ];
         }
         $this->renderRepeater(
             'url_settings',
@@ -1810,6 +1782,34 @@ class GtbabelWordPress
             ],
             $url_settings
         );
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label class="gtbabel__label">';
+        echo __('Prevent publish of pages', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        $this->renderRepeater('prevent_publish_urls', [
+            ['key' => 'url', 'type' => 'string', 'placeholder' => __('URL', 'gtbabel-plugin')],
+            [
+                'key' => 'lng',
+                'type' => 'array',
+                'placeholder' => __('Language codes (comma separated)', 'gtbabel-plugin')
+            ]
+        ]);
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label class="gtbabel__label">';
+        echo __('Alternate language for main content', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        $this->renderRepeater('alt_lng_urls', [
+            ['key' => 'url', 'type' => 'string', 'placeholder' => __('URL', 'gtbabel-plugin')],
+            ['key' => 'lng', 'type' => 'string', 'placeholder' => __('Language code', 'gtbabel-plugin')]
+        ]);
         echo '</div>';
         echo '</li>';
 
@@ -3988,111 +3988,119 @@ EOD;
 
     private function renderRepeater($key, $prototype, $tmp_value = null)
     {
-        $settings = $this->getSettings();
-        echo '<div class="gtbabel__repeater">';
-        echo '<ul class="gtbabel__repeater-list">';
-        $missing = $this->gtbabel->settings->getMissingDefaultSettingsForKey($key, $settings);
+        $settings = $this->gtbabel->settings->getAllSettingsIncludingDefaultForKey($key, $this->getSettings());
+
         if ($tmp_value !== null) {
-            $settings[$key] = $tmp_value;
+            if (is_array($tmp_value)) {
+                foreach ($tmp_value as $tmp_value__value) {
+                    $settings[] = [
+                        'value' => $tmp_value__value,
+                        'missing' => false,
+                        'default' => false
+                    ];
+                }
+            } else {
+                $settings[] = [
+                    'value' => $tmp_value,
+                    'missing' => false,
+                    'default' => false
+                ];
+            }
         }
-        if (empty($missing) && empty(@$settings[$key])) {
-            $settings[$key] = [];
-            $settings[$key][] = [];
+
+        if (empty($settings)) {
+            $settings[] = [
+                'value' => null,
+                'missing' => false,
+                'default' => false
+            ];
             foreach ($prototype as $prototype__value) {
                 if (@$prototype__value['key'] != '') {
-                    $settings[$key][count($settings[$key]) - 1][$prototype__value['key']] =
-                        $prototype__value['type'] === 'array' ? [] : '';
+                    $settings[0]['value'][$prototype__value['key']] = $prototype__value['type'] === 'array' ? [] : '';
                 } else {
-                    $settings[$key][count($settings[$key]) - 1] = $prototype__value['type'] === 'array' ? [] : '';
+                    $settings[0]['value'] = $prototype__value['type'] === 'array' ? [] : '';
                 }
             }
         }
-        foreach (
-            [
-                'missing' => $missing,
-                'config' => $settings[$key]
-            ]
-            as $parts__key => $parts__value
-        ) {
-            foreach ($parts__value as $parts__value__value) {
-                $is_default = $this->gtbabel->settings->isDefaultSettingForKey($key, $parts__value__value);
-                $is_missing = $parts__key === 'missing';
-                echo '<li class="gtbabel__repeater-listitem' .
-                    ($is_default ? ' gtbabel__repeater-listitem--default' : '') .
-                    ($is_missing ? ' gtbabel__repeater-listitem--missing' : '') .
-                    ' gtbabel__repeater-listitem--count-' .
-                    count($prototype) .
-                    '">';
-                foreach ($prototype as $prototype__value) {
-                    $placeholder =
-                        @$prototype__value['placeholder'] != ''
-                            ? $prototype__value['placeholder']
-                            : (@$prototype__value['key'] != ''
-                                ? $prototype__value['key']
-                                : '');
-                    if ($prototype__value['type'] === 'select') {
-                        echo '<select' .
-                            ($is_default ? ' readonly="readonly"' : '') .
-                            ' class="gtbabel__input gtbabel__input--select" ' .
-                            ($is_missing ? 'data-' : '') .
-                            ' name="gtbabel[' .
-                            $key .
-                            '][' .
-                            $prototype__value['key'] .
-                            '][]">';
-                        foreach ($prototype__value['options'] as $options__key => $options__value) {
-                            echo '<option value="' .
-                                $options__key .
-                                '"' .
-                                (esc_attr(@$parts__value__value[$prototype__value['key']]) == $options__key
-                                    ? ' selected="selected"'
-                                    : '') .
-                                '>' .
-                                $options__value .
-                                '</option>';
-                        }
-                        echo '</select>';
-                    } else {
-                        echo '<input' .
-                            ($is_default ? ' readonly="readonly"' : '') .
-                            ' class="gtbabel__input" type="text" ' .
-                            ($is_missing ? 'data-' : '') .
-                            'name="gtbabel[' .
-                            $key .
-                            ']' .
-                            (@$prototype__value['key'] != '' ? '[' . $prototype__value['key'] . ']' : '') .
-                            '[]" value="' .
-                            (is_array($parts__value__value)
-                                ? ($parts__value__value[@$prototype__value['key']] != ''
-                                    ? esc_attr(
-                                        $prototype__value['type'] === 'string'
-                                            ? $parts__value__value[$prototype__value['key']]
-                                            : implode(',', $parts__value__value[$prototype__value['key']])
-                                    )
-                                    : '')
-                                : $parts__value__value) .
-                            '" placeholder="' .
-                            $placeholder .
-                            '" title="' .
-                            $placeholder .
-                            '" />';
+
+        echo '<div class="gtbabel__repeater">';
+        echo '<ul class="gtbabel__repeater-list">';
+        foreach ($settings as $settings__value) {
+            echo '<li class="gtbabel__repeater-listitem' .
+                ($settings__value['default'] === true ? ' gtbabel__repeater-listitem--default' : '') .
+                ($settings__value['missing'] === true ? ' gtbabel__repeater-listitem--missing' : '') .
+                ' gtbabel__repeater-listitem--count-' .
+                count($prototype) .
+                '">';
+            foreach ($prototype as $prototype__value) {
+                $placeholder =
+                    @$prototype__value['placeholder'] != ''
+                        ? $prototype__value['placeholder']
+                        : (@$prototype__value['key'] != ''
+                            ? $prototype__value['key']
+                            : '');
+                if ($prototype__value['type'] === 'select') {
+                    echo '<select' .
+                        ($settings__value['default'] === true ? ' readonly="readonly"' : '') .
+                        ' class="gtbabel__input gtbabel__input--select" ' .
+                        ($settings__value['missing'] === true ? 'data-' : '') .
+                        ' name="gtbabel[' .
+                        $key .
+                        '][' .
+                        $prototype__value['key'] .
+                        '][]">';
+                    foreach ($prototype__value['options'] as $options__key => $options__value) {
+                        echo '<option value="' .
+                            $options__key .
+                            '"' .
+                            (esc_attr(@$settings__value['value'][$prototype__value['key']]) == $options__key
+                                ? ' selected="selected"'
+                                : '') .
+                            '>' .
+                            $options__value .
+                            '</option>';
                     }
+                    echo '</select>';
+                } else {
+                    echo '<input' .
+                        ($settings__value['default'] === true ? ' readonly="readonly"' : '') .
+                        ' class="gtbabel__input" type="text" ' .
+                        ($settings__value['missing'] === true ? 'data-' : '') .
+                        'name="gtbabel[' .
+                        $key .
+                        ']' .
+                        (@$prototype__value['key'] != '' ? '[' . $prototype__value['key'] . ']' : '') .
+                        '[]" value="' .
+                        (is_array($settings__value['value'])
+                            ? ($settings__value['value'][@$prototype__value['key']] != ''
+                                ? esc_attr(
+                                    $prototype__value['type'] === 'string'
+                                        ? $settings__value['value'][$prototype__value['key']]
+                                        : implode(',', $settings__value['value'][$prototype__value['key']])
+                                )
+                                : '')
+                            : $settings__value['value']) .
+                        '" placeholder="' .
+                        $placeholder .
+                        '" title="' .
+                        $placeholder .
+                        '" />';
                 }
-                echo '<a href="#" class="gtbabel__repeater-action gtbabel__repeater-action--enable button button-secondary" data-text="' .
-                    __('Disable', 'gtbabel-plugin') .
-                    '">' .
-                    __('Enable', 'gtbabel-plugin') .
-                    '</a>';
-                echo '<a href="#" class="gtbabel__repeater-action gtbabel__repeater-action--disable button button-secondary" data-text="' .
-                    __('Enable', 'gtbabel-plugin') .
-                    '">' .
-                    __('Disable', 'gtbabel-plugin') .
-                    '</a>';
-                echo '<a href="#" class="gtbabel__repeater-action gtbabel__repeater-action--remove button button-secondary">' .
-                    __('Remove', 'gtbabel-plugin') .
-                    '</a>';
-                echo '</li>';
             }
+            echo '<a href="#" class="gtbabel__repeater-action gtbabel__repeater-action--enable button button-secondary" data-text="' .
+                __('Disable', 'gtbabel-plugin') .
+                '">' .
+                __('Enable', 'gtbabel-plugin') .
+                '</a>';
+            echo '<a href="#" class="gtbabel__repeater-action gtbabel__repeater-action--disable button button-secondary" data-text="' .
+                __('Enable', 'gtbabel-plugin') .
+                '">' .
+                __('Disable', 'gtbabel-plugin') .
+                '</a>';
+            echo '<a href="#" class="gtbabel__repeater-action gtbabel__repeater-action--remove button button-secondary">' .
+                __('Remove', 'gtbabel-plugin') .
+                '</a>';
+            echo '</li>';
         }
         echo '</ul>';
         echo '<a href="#" class="gtbabel__repeater-add button button-secondary">' .
