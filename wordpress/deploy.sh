@@ -69,6 +69,7 @@ find . -type f -name "*" -print0 | xargs -0 rename 's/Gtbabel/close2/g' {}
 find . -type f -name "*" -print0 | xargs -0 rename 's/gtbabel/close2/g' {}
 find . -type f -name "*" -print0 | xargs -0 sed -i -e 's/Gtbabel/close2/g'
 find . -type f -name "*" -print0 | xargs -0 sed -i -e 's/gtbabel/close2/g'
+msgfmt ./languages/close2-plugin-de_DE.po -o ./languages/close2-plugin-de_DE.mo
 cd ..
 zip -r ./close2.zip ./close2
 rm -rf ./close2/
