@@ -59,15 +59,24 @@ rm -rf ./gtbabel/logs/
 zip -r ./gtbabel.zip ./gtbabel
 
 # make an official zip (manual deploy)
-sed -i -e 's/Plugin Name: Gtbabel/Plugin Name: close2/g' ./gtbabel/gtbabel.php
-sed -i -e "s/\$name = 'Gtbabel'/\$name = 'close2'/g" ./gtbabel/gtbabel.php
-mv ./gtbabel/gtbabel.php ./gtbabel/close2.php
-mv ./gtbabel ./close2
+cp -r ./gtbabel ./close2/
+cd ./close2/
+find . -type d -name "*" -print0 | xargs -0 rename 's/Gtbabel/close2/g' {}
+find . -type d -name "*" -print0 | xargs -0 rename 's/gtbabel/close2/g' {}
+find . -type f -name "*" -print0 | xargs -0 rename 's/Gtbabel/close2/g' {}
+find . -type f -name "*" -print0 | xargs -0 rename 's/gtbabel/close2/g' {}
+find . -type f -name "*" -print0 | xargs -0 sed -i -e 's/Gtbabel/close2/g'
+find . -type f -name "*" -print0 | xargs -0 sed -i -e 's/gtbabel/close2/g'
+cd ..
 zip -r ./close2.zip ./close2
-mv ./close2 ./gtbabel
-mv ./gtbabel/close2.php ./gtbabel/gtbabel.php
-sed -i -e "s/\$name = 'close2'/\$name = 'Gtbabel'/g" ./gtbabel/gtbabel.php
-sed -i -e 's/Plugin Name: close2/Plugin Name: Gtbabel/g' ./gtbabel/gtbabel.php
+rm -rf ./close2/
+#sed -i -e 's/Plugin Name: Gtbabel/Plugin Name: close2/g' ./gtbabel/gtbabel.php
+#sed -i -e "s/\$name = 'Gtbabel'/\$name = 'close2'/g" ./gtbabel/gtbabel.php
+#zip -r ./close2.zip ./close2
+#mv ./close2 ./gtbabel
+#mv ./gtbabel/close2.php ./gtbabel/gtbabel.php
+#sed -i -e "s/\$name = 'close2'/\$name = 'Gtbabel'/g" ./gtbabel/gtbabel.php
+#sed -i -e 's/Plugin Name: close2/Plugin Name: Gtbabel/g' ./gtbabel/gtbabel.php
 
 # add to subversion
 if [[ ( -z "$1" ) || ( $1 != "--no-deploy" ) ]]; then
