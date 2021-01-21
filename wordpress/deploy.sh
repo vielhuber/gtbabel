@@ -61,9 +61,13 @@ zip -r ./gtbabel.zip ./gtbabel
 # make an official zip (manual deploy)
 sed -i -e 's/Plugin Name: Gtbabel/Plugin Name: close2/g' ./gtbabel/gtbabel.php
 sed -i -e "s/\$name = 'Gtbabel'/\$name = 'close2'/g" ./gtbabel/gtbabel.php
-zip -r ./close2.zip ./gtbabel
-sed -i -e 's/Plugin Name: close2/Plugin Name: Gtbabel/g' ./gtbabel/gtbabel.php
+mv ./gtbabel/gtbabel.php ./gtbabel/close2.php
+mv ./gtbabel ./close2
+zip -r ./close2.zip ./close2
+mv ./close2 ./gtbabel
+mv ./gtbabel/close2.php ./gtbabel/gtbabel.php
 sed -i -e "s/\$name = 'close2'/\$name = 'Gtbabel'/g" ./gtbabel/gtbabel.php
+sed -i -e 's/Plugin Name: close2/Plugin Name: Gtbabel/g' ./gtbabel/gtbabel.php
 
 # add to subversion
 if [[ ( -z "$1" ) || ( $1 != "--no-deploy" ) ]]; then
