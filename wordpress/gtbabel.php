@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 5.5.4
+ * Version: 5.5.5
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -3249,7 +3249,7 @@ EOD;
                         'manual' => __('Manual translation')
                     ],
                     $this->gtbabel->data->statsGetDefaultServices(),
-                    $this->name !== 'Gtbabel'
+                    $this->isRepoPlugin() === false
                         ? [
                             'close2' => 'close2 Translation API'
                         ]
@@ -4285,14 +4285,19 @@ EOD;
         }
     }
 
+    private function isRepoPlugin()
+    {
+        return $this->name === 'G' . 't' . 'b' . 'a' . 'b' . 'e' . 'l';
+    }
+
     private function getPluginTitle()
     {
-        return $this->name !== 'Gtbabel' ? __('Languages', 'gtbabel-plugin') : $this->name;
+        return $this->isRepoPlugin() === false ? __('Languages', 'gtbabel-plugin') : $this->name;
     }
 
     private function checkToken()
     {
-        if ($this->name !== 'Gtbabel') {
+        if ($this->isRepoPlugin() === false) {
             return true;
         }
 
