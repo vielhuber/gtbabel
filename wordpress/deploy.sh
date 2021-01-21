@@ -62,7 +62,7 @@ zip -r ./gtbabel.zip ./gtbabel
 cp -r ./gtbabel ./close2/
 cd ./close2/
 sed -i -e "s/Author: David Vielhuber/Author: close2 new media GmbH/g" ./gtbabel.php
-sed -i -e "s/Author URI: https:\/\/vielhuber\.de/Author URI: https://close2.de/g" ./gtbabel.php
+sed -i -e "s/Author URI: https:\/\/vielhuber\.de/Author URI: https:\/\/close2\.de/g" ./gtbabel.php
 find . -type d -name "*" -print0 | xargs -0 rename 's/Gtbabel/close2/g' {}
 find . -type d -name "*" -print0 | xargs -0 rename 's/gtbabel/close2/g' {}
 find . -type f -name "*" -print0 | xargs -0 rename 's/Gtbabel/close2/g' {}
