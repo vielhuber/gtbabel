@@ -38,7 +38,7 @@ sed -i -e "s/ \* Version: [0-9]\.[0-9]\.[0-9]/ * Version: $v_new/" ./gtbabel.php
 # do the prefixing with php-scoper
 wget https://github.com/humbug/php-scoper/releases/download/0.13.1/php-scoper.phar
 rm -f ./gtbabel.zip
-rm -f ./close2.zip
+rm -f ./close2translate.zip
 php ./php-scoper.phar add-prefix --config scoper.inc.php
 cd ./build
 composer dump-autoload
@@ -59,20 +59,21 @@ rm -rf ./gtbabel/logs/
 zip -r ./gtbabel.zip ./gtbabel
 
 # make an official zip (manual deploy)
-cp -r ./gtbabel ./close2/
-cd ./close2/
+cp -r ./gtbabel ./close2translate/
+cd ./close2translate/
+sed -i -e "s/Plugin URI: https:\/\/github\.com\/vielhuber\/gtbabel/Plugin URI: https:\/\/close2\.de/g" ./gtbabel.php
 sed -i -e "s/Author: David Vielhuber/Author: close2 new media GmbH/g" ./gtbabel.php
 sed -i -e "s/Author URI: https:\/\/vielhuber\.de/Author URI: https:\/\/close2\.de/g" ./gtbabel.php
-find . -type d -name "*" -print0 | xargs -0 rename 's/Gtbabel/close2/g' {}
-find . -type d -name "*" -print0 | xargs -0 rename 's/gtbabel/close2/g' {}
-find . -type f -name "*" -print0 | xargs -0 rename 's/Gtbabel/close2/g' {}
-find . -type f -name "*" -print0 | xargs -0 rename 's/gtbabel/close2/g' {}
-find . -type f -name "*" -print0 | xargs -0 sed -i -e 's/Gtbabel/close2/g'
-find . -type f -name "*" -print0 | xargs -0 sed -i -e 's/gtbabel/close2/g'
-msgfmt ./languages/close2-plugin-de_DE.po -o ./languages/close2-plugin-de_DE.mo
+find . -type d -name "*" -print0 | xargs -0 rename 's/Gtbabel/close2translate/g' {}
+find . -type d -name "*" -print0 | xargs -0 rename 's/gtbabel/close2translate/g' {}
+find . -type f -name "*" -print0 | xargs -0 rename 's/Gtbabel/close2translate/g' {}
+find . -type f -name "*" -print0 | xargs -0 rename 's/gtbabel/close2translate/g' {}
+find . -type f -name "*" -print0 | xargs -0 sed -i -e 's/Gtbabel/close2translate/g'
+find . -type f -name "*" -print0 | xargs -0 sed -i -e 's/gtbabel/close2translate/g'
+msgfmt ./languages/close2translate-plugin-de_DE.po -o ./languages/close2translate-plugin-de_DE.mo
 cd ..
-zip -r ./close2.zip ./close2
-rm -rf ./close2/
+zip -r ./close2translate.zip ./close2translate
+rm -rf ./close2translate/
 
 # add to subversion
 if [[ ( -z "$1" ) || ( $1 != "--no-deploy" ) ]]; then

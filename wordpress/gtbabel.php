@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 5.5.9
+ * Version: 5.6.0
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -21,7 +21,7 @@ class GtbabelWordPress
 {
     private $gtbabel;
 
-    private $name = 'Gtbabel'; // Gtbabel|close2
+    private $name = 'Gtbabel'; // Gtbabel|close2translate
 
     public function __construct($gtbabel)
     {
@@ -3120,11 +3120,11 @@ EOD;
                                 'throttle_chars_per_month' => 1000000,
                                 'lng' => null,
                                 'label' =>
-                                    $settings['auto_translation_service_provider'] !== 'close2'
+                                    $settings['auto_translation_service_provider'] !== 'close2translate'
                                         ? null
                                         : 'close2 Translation API',
                                 'api_url' =>
-                                    $settings['auto_translation_service_provider'] !== 'close2'
+                                    $settings['auto_translation_service_provider'] !== 'close2translate'
                                         ? null
                                         : 'https://translate.close2dev.de/?str=%str%&lng_source=%lng_source%&lng_target=%lng_target%&api_key=%api_key%&service=google',
                                 'disabled' => false
@@ -3251,7 +3251,7 @@ EOD;
                     $this->gtbabel->data->statsGetDefaultServices(),
                     $this->isRepoPlugin() === false
                         ? [
-                            'close2' => 'close2 Translation API'
+                            'close2translate' => 'close2 Translation API'
                         ]
                         : []
                 )
