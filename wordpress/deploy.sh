@@ -47,10 +47,10 @@ sleep 3
 
 # rename and cleanup the build directory
 mv ./build/ ./gtbabel/
+rm -f ./gtbabel/composer.json
 rm -f ./gtbabel/composer.lock
 rm -f ./gtbabel/php-scoper.phar
 rm -f ./gtbabel/deploy.sh
-rm -f ./gtbabel/composer.json
 rm -f ./gtbabel/scoper.inc.php
 rm -rf ./gtbabel/locales/
 rm -rf ./gtbabel/logs/
@@ -70,6 +70,10 @@ find . -type f -name "*" -print0 | xargs -0 rename 's/Gtbabel/close2translate/g'
 find . -type f -name "*" -print0 | xargs -0 rename 's/gtbabel/close2translate/g' {}
 find . -type f -name "*" -print0 | xargs -0 sed -i -e 's/Gtbabel/close2translate/g'
 find . -type f -name "*" -print0 | xargs -0 sed -i -e 's/gtbabel/close2translate/g'
+cp ../composer.json ./composer.json
+composer dump-autoload
+rm -f ./composer.json
+rm -f ./composer.lock
 msgfmt ./languages/close2translate-plugin-de_DE.po -o ./languages/close2translate-plugin-de_DE.mo
 cd ..
 zip -r ./close2translate.zip ./close2translate
