@@ -61,6 +61,7 @@ zip -r ./gtbabel.zip ./gtbabel
 # make an official zip (manual deploy)
 cp -r ./gtbabel ./close2translate/
 cd ./close2translate/
+cp ../composer.json ./composer.json
 sed -i -e "s/Plugin URI: https:\/\/github\.com\/vielhuber\/gtbabel/Plugin URI: https:\/\/close2\.de/g" ./gtbabel.php
 sed -i -e "s/Author: David Vielhuber/Author: close2 new media GmbH/g" ./gtbabel.php
 sed -i -e "s/Author URI: https:\/\/vielhuber\.de/Author URI: https:\/\/close2\.de/g" ./gtbabel.php
@@ -70,9 +71,8 @@ find . -type f -name "*" -print0 | xargs -0 rename 's/Gtbabel/close2translate/g'
 find . -type f -name "*" -print0 | xargs -0 rename 's/gtbabel/close2translate/g' {}
 find . -type f -name "*" -print0 | xargs -0 sed -i -e 's/Gtbabel/close2translate/g'
 find . -type f -name "*" -print0 | xargs -0 sed -i -e 's/gtbabel/close2translate/g'
-cp ../composer.json ./composer.json
 composer dump-autoload
-rm -f ./composer.json
+#rm -f ./composer.json
 rm -f ./composer.lock
 msgfmt ./languages/close2translate-plugin-de_DE.po -o ./languages/close2translate-plugin-de_DE.mo
 cd ..
