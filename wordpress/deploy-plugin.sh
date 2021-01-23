@@ -50,34 +50,14 @@ mv ./build/ ./gtbabel/
 rm -f ./gtbabel/composer.json
 rm -f ./gtbabel/composer.lock
 rm -f ./gtbabel/php-scoper.phar
-rm -f ./gtbabel/deploy.sh
+rm -f ./gtbabel/deploy-plugin.sh
+rm -f ./gtbabel/deploy-zip.sh
 rm -f ./gtbabel/scoper.inc.php
 rm -rf ./gtbabel/locales/
 rm -rf ./gtbabel/logs/
 
 # make an official zip (plugin repo)
 zip -r ./gtbabel.zip ./gtbabel
-
-# make an official zip (manual deploy)
-cp -r ./gtbabel ./close2translate/
-cd ./close2translate/
-cp ../composer.json ./composer.json
-sed -i -e "s/Plugin URI: https:\/\/github\.com\/vielhuber\/gtbabel/Plugin URI: https:\/\/close2\.de/g" ./gtbabel.php
-sed -i -e "s/Author: David Vielhuber/Author: close2 new media GmbH/g" ./gtbabel.php
-sed -i -e "s/Author URI: https:\/\/vielhuber\.de/Author URI: https:\/\/close2\.de/g" ./gtbabel.php
-find . -type d -name "*" -print0 | xargs -0 rename 's/Gtbabel/close2translate/g' {}
-find . -type d -name "*" -print0 | xargs -0 rename 's/gtbabel/close2translate/g' {}
-find . -type f -name "*" -print0 | xargs -0 rename 's/Gtbabel/close2translate/g' {}
-find . -type f -name "*" -print0 | xargs -0 rename 's/gtbabel/close2translate/g' {}
-find . -type f -name "*" -print0 | xargs -0 sed -i -e 's/Gtbabel/close2translate/g'
-find . -type f -name "*" -print0 | xargs -0 sed -i -e 's/gtbabel/close2translate/g'
-composer dump-autoload
-#rm -f ./composer.json
-rm -f ./composer.lock
-msgfmt ./languages/close2translate-plugin-de_DE.po -o ./languages/close2translate-plugin-de_DE.mo
-cd ..
-zip -r ./close2translate.zip ./close2translate
-rm -rf ./close2translate/
 
 # add to subversion
 if [[ ( -z "$1" ) || ( $1 != "--no-deploy" ) ]]; then
