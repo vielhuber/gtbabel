@@ -1037,16 +1037,17 @@ class Data
         $with_args = true,
         $cur_url = null,
         $hide_active = false,
-        $class = 'lngpicker',
+        $parent_classes = 'lngpicker',
         $only_show_codes = false,
-        $add_bem_classes = false
+        $add_bem_classes = false,
+        $child_classes = null
     ) {
         $data = $this->getLanguagePickerData($with_args, $cur_url, $hide_active);
         $html = '';
-        $html .= '<ul class="' . $class . '">';
+        $html .= '<ul class="' . $parent_classes . '">';
         $bem_class_prefix = null;
         if ($add_bem_classes === true) {
-            $bem_class_prefix = explode(' ', $class)[0];
+            $bem_class_prefix = explode(' ', $parent_classes)[0];
         }
         foreach ($data as $data__value) {
             $html .= '<li' . ($add_bem_classes ? ' class="' . $bem_class_prefix . '__item"' : '') . '>';
@@ -1059,6 +1060,9 @@ class Data
                 if ($data__value['active']) {
                     $link_class[] = $bem_class_prefix . '__link--active';
                 }
+            }
+            if ($child_classes !== null) {
+                $link_class[] = $child_classes;
             }
             $html .=
                 '<a href="' .

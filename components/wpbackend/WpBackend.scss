@@ -385,7 +385,8 @@ body[class*='_page_gtbabel-wizard'] #wpbody {
 }
 
 .gtbabel__finish-image {
-    width: 50%;
+    width: auto;
+    max-width: 100%;
     margin: 0 auto;
     display: block;
     border-radius: 3px;
@@ -498,7 +499,7 @@ body[class*='_page_gtbabel-wizard'] #wpbody {
     text-align: center;
 }
 .gtbabel__transwizard-done-image {
-    width: 370px;
+    width: auto;
     max-width: 100%;
     margin: 0 auto;
     display: block;
