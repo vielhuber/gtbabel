@@ -49,7 +49,10 @@ export default class FrontendEditor {
                         });
                     }
                     e.target.classList.add(this.classNameEdit);
-                    if (e.target.querySelectorAll(':scope > .' + this.classNameButton).length === 0) {
+                    if (
+                        e.target.querySelectorAll(':scope > .' + this.classNameButton).length === 0 &&
+                        !['TEXTAREA', 'INPUT', 'SELECT'].includes(e.target.tagName)
+                    ) {
                         let html = `
                             <a href="#" class="${this.classNameButton}"></a>
                         `;
@@ -59,7 +62,7 @@ export default class FrontendEditor {
                             el.style.setProperty('display', 'inline', 'important');
                         }
                         this.positionAtTopLeft(el);
-                        this.fixPosition(el);
+                        this.fixAllPositions(el);
                     }
                 }
             },
@@ -83,7 +86,7 @@ export default class FrontendEditor {
         max = 50;
         while (
             max > 0 &&
-            el.getBoundingClientRect().left >= 0 &&
+            el.getBoundingClientRect().left > 0 &&
             el.getBoundingClientRect().left - el.parentNode.getBoundingClientRect().left > -20
         ) {
             let x = el.style.marginLeft;
@@ -97,7 +100,7 @@ export default class FrontendEditor {
         }
     }
 
-    fixPosition(el) {
+    fixAllPositions(el) {
         if (document.querySelectorAll('.' + this.classNameButton).length > 0) {
             document.querySelectorAll('.' + this.classNameButton).forEach(el2 => {
                 if (el2 !== el) {
@@ -113,7 +116,7 @@ export default class FrontendEditor {
                             el.style.setProperty('margin-left', x + 1 + 'px', 'important');
                             max--;
                         }
-                        this.fixPosition(el);
+                        this.fixAllPositions(el);
                         return;
                     }
                 }
