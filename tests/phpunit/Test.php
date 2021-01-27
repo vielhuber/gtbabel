@@ -795,7 +795,6 @@ class Test extends \PHPUnit\Framework\TestCase
         );
 
         $translations = $this->gtbabel->data->getTranslationsFromDatabase();
-
         $this->assertEquals(count($translations), 9);
         $this->assertEquals($translations[0]['str'], 'Hund');
         $this->assertEquals($translations[0]['context'], '');
@@ -815,6 +814,17 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->assertEquals($translations[7]['context'], 'slug');
         $this->assertEquals($translations[8]['str'], 'mund');
         $this->assertEquals($translations[8]['context'], 'slug');
+        $this->gtbabel->reset();
+
+        $this->gtbabel->config($settings);
+        $this->assertEquals($this->gtbabel->translate('datenschutz'), 'privacy');
+        $this->assertEquals($this->gtbabel->translate('datenschutz', null, null, 'slug'), 'en/privacy');
+        $translations = $this->gtbabel->data->getTranslationsFromDatabase();
+        $this->assertEquals(count($translations), 2);
+        $this->assertEquals($translations[0]['str'], 'datenschutz');
+        $this->assertEquals($translations[0]['context'], '');
+        $this->assertEquals($translations[1]['str'], 'datenschutz');
+        $this->assertEquals($translations[1]['context'], 'slug');
     }
 
     public function test_tokenize()

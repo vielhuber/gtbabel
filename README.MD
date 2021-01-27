@@ -4,42 +4,42 @@
 
 Gtbabel automatically translates your HTML/PHP pages – server sided!
 
-- [Basic idea](#basic-idea)
-- [Features](#features)
-- [Requirements](#requirements)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Configuration](#configuration)
-- [Other usage](#other-usage)
-- [WordPress plugin](#wordpress-plugin)
-    + [Permissions](#permissions)
-    + [Email notifications](#email-notifications)
-- [Database and Gettext](#database-and-gettext)
-- [JavaScript](#javascript)
-- [Modified nodes](#modified-nodes)
-- [HTML](#html)
-- [Ambiguous translations and plural forms](#ambiguous-translations-and-plural-forms)
-- [Multiple source languages](#multiple-source-languages)
-- [Router](#router)
-- [Domain schema](#domain-schema)
-- [Dealing with assets](#dealing-with-assets)
-- [JSON Responses](#json-responses)
-- [Translation management](#translation-management)
-- [Flow diagram](#flow-diagram)
-- [Language picker](#language-picker)
-- [Helper functions](#helper-functions)
-- [Echoing strings](#echoing-strings)
-- [Dealing with dynamic data](#dealing-with-dynamic-data)
-    + [Search](#search)
-    + [URL query arguments](#url-query-arguments)
-    + [Mails](#mails)
-    + [Comments](#comments)
-- [Language codes](#language-codes)
-- [Google Translation API](#google-translation-api)
-- [API usage costs](#api-usage-costs)
-- [Custom translation providers](#custom-translation-providers)
-- [Caveats](#caveats)
-- [Credits](#credits)
+-   [Basic idea](#basic-idea)
+-   [Features](#features)
+-   [Requirements](#requirements)
+-   [Installation](#installation)
+-   [Usage](#usage)
+-   [Configuration](#configuration)
+-   [Other usage](#other-usage)
+-   [WordPress plugin](#wordpress-plugin)
+    -   [Permissions](#permissions)
+    -   [Email notifications](#email-notifications)
+-   [Database and Gettext](#database-and-gettext)
+-   [JavaScript](#javascript)
+-   [Modified nodes](#modified-nodes)
+-   [HTML](#html)
+-   [Ambiguous translations and plural forms](#ambiguous-translations-and-plural-forms)
+-   [Multiple source languages](#multiple-source-languages)
+-   [Router](#router)
+-   [Domain schema](#domain-schema)
+-   [Dealing with assets](#dealing-with-assets)
+-   [JSON Responses](#json-responses)
+-   [Translation management](#translation-management)
+-   [Flow diagram](#flow-diagram)
+-   [Language picker](#language-picker)
+-   [Helper functions](#helper-functions)
+-   [Echoing strings](#echoing-strings)
+-   [Dealing with dynamic data](#dealing-with-dynamic-data)
+    -   [Search](#search)
+    -   [URL query arguments](#url-query-arguments)
+    -   [Mails](#mails)
+    -   [Comments](#comments)
+-   [Language codes](#language-codes)
+-   [Google Translation API](#google-translation-api)
+-   [API usage costs](#api-usage-costs)
+-   [Custom translation providers](#custom-translation-providers)
+-   [Caveats](#caveats)
+-   [Credits](#credits)
 
 ## Basic idea
 
@@ -1260,6 +1260,7 @@ $gtbabel = new Gtbabel();
 $gtbabel->config([...]);
 
 $gtbabel->translate('<p>Dies ist ein Test!</p>'); // <p>This is a test!</p>
+$gtbabel->translate('datenschutz', 'en', 'de', 'slug'); // data-protection
 
 $gtbabel->tokenize('<p>Dies ist ein Test!</p>'); // [['string' => 'This is a test!', 'context' => null]]
 ```
@@ -1801,6 +1802,12 @@ The function is smart enough to detect urls or even root relative urls and retur
 gtbabel__('/datenschutz'); // '/en/data-protection'
 ```
 
+However, you can also get a translation in a specific context:
+
+```php
+gtbabel__('datenschutz', null, null, 'slug'); // 'data-protection'
+```
+
 ## Dealing with dynamic data
 
 Gtbabel translates your frontend, json responses and watches dom changes.\
@@ -1808,15 +1815,32 @@ Nevertheless, one has to manually take care of how multilingual input data shoul
 
 ### Search
 
-Doing search on translated content can be done in three ways:
+Doing search on translated content can be done in various ways:
 
-#### Approach 1: Manually searching in translations
+#### Approach 1: Translate search terms
 
-One approach is to use the search term (not in source language) and
-search inside the translated content instead.
+A quite effective and easy approach is to translate all incoming search queries into your source language\
+before actually querying your content (provided in source language):
+
+```php
+$s = gtbabel__($s, gtbabel_source_lng(), gtbabel_current_lng(), 'search_term');
+```
+
+As you can see, such search queries get the special context `search_term`
+so they can be filtered out or garbage collected later on.
+
+In WordPress this is done automatically for you.
+
+The caveat here is that you essentially translate all incoming queries,
+so be aware of that and use the `throttle_chars_per_month` option.
+
+#### Approach 2: Manually searching in translations
+
+One approach is to use the search term (not in source language) and search inside the translated content instead.\
 You have to modify your search queries manually – in SQL this could look like this:
 
 Before:
+
 ```sql
 SELECT posts.id, posts.col1, posts.col2
 FROM posts
@@ -1824,6 +1848,7 @@ WHERE posts.col1 = 'English search term' OR posts.col2 = 'English search term';
 ```
 
 After:
+
 ```sql
 SELECT posts.id, posts.col1, posts.col2
 FROM posts
@@ -1834,26 +1859,19 @@ HAVING FIND_IN_SET('English search term', GROUP_CONCAT(translations.trans));
 
 One caveat is that this only works for short single columns, which are translated directly by Gtbabel.
 
-#### Approach 2: Translate search terms
-
-Another approach is to translate all incoming queries to your source language\
-before actually querying your content (provided in source language):
-
-```php
-$s = gtbabel__($s, gtbabel_source_lng(), gtbabel_current_lng());
-```
-
-In WordPress this is done automatically for you.
-
-The caveat here is that you essentially translate all incoming queries,
-so be aware of that and use the `throttle_chars_per_month` option.
-
-#### Approach 3 Searching parsed html
+#### Approach 3: Searching parsed html
 
 Another approach is to search generated cached html pages.\
 Since Gtbabel does not cache pages, you have to have your caching system running.\
-Translated pages can be basically treated like pages in source language, since they are both just html, which can be searched.\
+Translated pages can be basically treated like pages in source language,\
+since they are both just html, which can be searched.\
 Also evaluate if you can try to use the [Google Programmable Search Engine](https://developers.google.com/custom-search), which follows the same idea.
+
+#### Approach 4: Build your own search index
+
+In this approach you build a search index for every object you want to include into the search results.\
+You collect and permanently store all strings in the source language, translate them (once) by Gtbabel and store these translations also.\
+This way you can combine the best of the above approaches, although it involves the largest integration effort.
 
 ### URL query arguments
 

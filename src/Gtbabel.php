@@ -109,7 +109,7 @@ class Gtbabel
         $this->log->generalLogReset();
     }
 
-    function translate($html, $lng_target = null, $lng_source = null)
+    function translate($str, $lng_target = null, $lng_source = null, $context = null)
     {
         if ($this->configured === false) {
             $this->config();
@@ -130,7 +130,16 @@ class Gtbabel
             }
         }
 
-        $trans = $this->domfactory->modifyContentFactory($html, 'translate');
+        /* if a specific context is provided, use this trick here */
+        if ($context !== null) {
+            $str = '<template data-context="' . $context . '">' . $str . '</template>';
+        }
+
+        $trans = $this->domfactory->modifyContentFactory($str, 'translate');
+
+        if ($context !== null) {
+            $trans = str_replace(['<template data-context="' . $context . '">', '</template>'], '', $trans);
+        }
 
         if ($lng_source_prev !== false) {
             $this->settings->set('lng_source', $lng_source_prev);
