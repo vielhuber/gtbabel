@@ -1287,7 +1287,7 @@ The following features are included:
 -   Flexible permission system based on capabilities
 -   Prevents multiple entries of different thumbnail sizes
 
-#### Permissions
+### Permissions
 
 Gtbabel for WordPress uses the following capabilities:
 
@@ -1316,7 +1316,7 @@ add_action('admin_init', function () {
 });
 ```
 
-#### Email notifications
+### Email notifications
 
 With the `wp_mail_notifications` option you can instruct Gtbabel to send regular status e-mails to all translators (that have both the `gtbabel__translation_assistant` and `gtbabel__email_notifications` role):
 
@@ -1806,25 +1806,25 @@ gtbabel__('/datenschutz'); // '/en/data-protection'
 Gtbabel translates your frontend, json responses and watches dom changes.\
 Nevertheless, one has to manually take care of how multilingual input data should be further processed.
 
-#### Search
+### Search
 
 Doing search on translated content can be done in three ways:
 
-##### Manually searching in translations
+#### Manually searching in translations
 
 One approach is to use the search term (not in source language) and
 search inside the translated content instead.
 You have to modify your search queries manually – in SQL this could look like this:
 
 Before:
-```
+```sql
 SELECT posts.id, posts.col1, posts.col2
 FROM posts
 WHERE posts.col1 = 'English search term' OR posts.col2 = 'English search term';
 ```
 
 After:
-```
+```sql
 SELECT posts.id, posts.col1, posts.col2
 FROM posts
 LEFT JOIN translations ON translations.lng_target = 'en' AND (translations.str = wp_posts.col1 OR translations.str = wp_posts.col2)
@@ -1834,7 +1834,7 @@ HAVING FIND_IN_SET('English search term', GROUP_CONCAT(translations.trans));
 
 One caveat is that this only works for short single columns, which are translated directly by Gtbabel.
 
-##### Translate search terms
+#### Translate search terms
 
 Another approach is to translate all incoming queries to your source language\
 before actually querying your content (provided in source language):
@@ -1848,13 +1848,14 @@ In WordPress this is done automatically for you.
 The caveat here is that you essentially translate all incoming queries,
 so be aware of that and use the `throttle_chars_per_month` option.
 
-##### Searching parsed html
+#### Searching parsed html
 
-Another approach is to search generated cached html pages. Since Gtbabel does not cache pages, you have to have your caching system running.
-Translated pages can be basically treated like pages in source language, since they are both just html, which can be searched.
+Another approach is to search generated cached html pages.\
+Since Gtbabel does not cache pages, you have to have your caching system running.\
+Translated pages can be basically treated like pages in source language, since they are both just html, which can be searched.\
 Also evaluate if you can try to use the [Google Programmable Search Engine](https://developers.google.com/custom-search), which follows the same idea.
 
-#### URL query arguments
+### URL query arguments
 
 As for url query arguments, you have fine grained control over whether arguments should be kept, translated or discarded via the `url_query_args`-option.
 
@@ -1870,7 +1871,7 @@ gets transformed to
 
 `<a href="mailto:?subject=This%20is%20a%20test&amp;body=That%20work%27s">Send email</a>`
 
-#### Mails
+### Mails
 
 If you send mails from the backend, ensure to translate the subject and body properly:
 
@@ -1891,7 +1892,7 @@ $message = 'Hello <span class="notranslate force-tokenize">John Doe</span>,';
 Gtbabel automatically translates all mails sent in WordPress and has built in support for\
 popular plugins like [Contact Form 7](https://de.wordpress.org/plugins/contact-form-7/) and [WooCommerce](https://de.wordpress.org/plugins/woocommerce/) to ensure the above guidelines.
 
-#### Comments
+### Comments
 
 If you offer a comment function on your website, just save the incoming comments in the input language (that can be determined via `gtbabel_current_lng()` or `gtbabel_referer_lng()`). Then output just those comments that match your current input language or even auto translate all of them using the `lang`-tag (see **Multiple source languages**).
 
