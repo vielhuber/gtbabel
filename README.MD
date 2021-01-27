@@ -4,6 +4,43 @@
 
 Gtbabel automatically translates your HTML/PHP pages – server sided!
 
+- [Basic idea](#basic-idea)
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Other usage](#other-usage)
+- [WordPress plugin](#wordpress-plugin)
+    + [Permissions](#permissions)
+    + [Email notifications](#email-notifications)
+- [Database and Gettext](#database-and-gettext)
+- [JavaScript](#javascript)
+- [Modified nodes](#modified-nodes)
+- [HTML](#html)
+- [Ambiguous translations and plural forms](#ambiguous-translations-and-plural-forms)
+- [Multiple source languages](#multiple-source-languages)
+- [Router](#router)
+- [Domain schema](#domain-schema)
+- [Dealing with assets](#dealing-with-assets)
+- [JSON Responses](#json-responses)
+- [Translation management](#translation-management)
+- [Flow diagram](#flow-diagram)
+- [Language picker](#language-picker)
+- [Helper functions](#helper-functions)
+- [Notes on gtbabel\_\_()](#notes-on-gtbabel------)
+- [Dealing with dynamic data](#dealing-with-dynamic-data)
+    + [Search](#search)
+    + [URL query arguments](#url-query-arguments)
+    + [Mails](#mails)
+    + [Comments](#comments)
+- [Language codes](#language-codes)
+- [Google Translation API](#google-translation-api)
+- [API usage costs](#api-usage-costs)
+- [Custom translation providers](#custom-translation-providers)
+- [Caveats](#caveats)
+- [Credits](#credits)
+
 ## Basic idea
 
 -   Gtbabel extracts on every page load any page into logical paragraph tokens.
