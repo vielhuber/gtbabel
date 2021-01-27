@@ -28,7 +28,7 @@ Gtbabel automatically translates your HTML/PHP pages – server sided!
 - [Flow diagram](#flow-diagram)
 - [Language picker](#language-picker)
 - [Helper functions](#helper-functions)
-- [Notes on gtbabel\_\_()](#notes-on-gtbabel------)
+- [Echoing strings](#echoing-strings)
 - [Dealing with dynamic data](#dealing-with-dynamic-data)
     + [Search](#search)
     + [URL query arguments](#url-query-arguments)
@@ -1778,7 +1778,7 @@ gtbabel_languagepicker() // [['code' => 'de', 'label' => 'Deutsch', 'url' => 'ht
 gtbabel__('Hallo') // 'Hi there'
 ```
 
-## Notes on gtbabel\_\_()
+## Echoing strings
 
 Don't use `gtbabel__()` in your templates for echoing strings, just output them in the source language. Gtbabel will take care of the rest. However, there are some places (e.g. in your backend logic), where you need to translate strings. This is what this function is intended for.
 
@@ -1808,14 +1808,51 @@ Nevertheless, one has to manually take care of how multilingual input data shoul
 
 #### Search
 
-If you need to translate queries to your source language (for example in searches),\
-translate the search term into the source language before actually querying your content:
+Doing search on translated content can be done in three ways:
+
+##### Manually searching in translations
+
+One approach is to use the search term (not in source language) and
+search inside the translated content instead.
+You have to modify your search queries manually – in SQL this could look like this:
+
+Before:
+```
+SELECT posts.id, posts.col1, posts.col2
+FROM posts
+WHERE posts.col1 = 'English search term' OR posts.col2 = 'English search term';
+```
+
+After:
+```
+SELECT posts.id, posts.col1, posts.col2
+FROM posts
+LEFT JOIN translations ON translations.lng_target = 'en' AND (translations.str = wp_posts.col1 OR translations.str = wp_posts.col2)
+GROUP BY posts.ID
+HAVING FIND_IN_SET('English search term', GROUP_CONCAT(translations.trans));
+```
+
+One caveat is that this only works for short single columns, which are translated directly by Gtbabel.
+
+##### Translate search terms
+
+Another approach is to translate all incoming queries to your source language\
+before actually querying your content (provided in source language):
 
 ```php
 $s = gtbabel__($s, gtbabel_source_lng(), gtbabel_current_lng());
 ```
 
 In WordPress this is done automatically for you.
+
+The caveat here is that you essentially translate all incoming queries,
+so be aware of that and use the `throttle_chars_per_month` option.
+
+##### Searching parsed html
+
+Another approach is to search generated cached html pages. Since Gtbabel does not cache pages, you have to have your caching system running.
+Translated pages can be basically treated like pages in source language, since they are both just html, which can be searched.
+Also evaluate if you can try to use the [Google Programmable Search Engine](https://developers.google.com/custom-search), which follows the same idea.
 
 #### URL query arguments
 
