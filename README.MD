@@ -1810,7 +1810,7 @@ Nevertheless, one has to manually take care of how multilingual input data shoul
 
 Doing search on translated content can be done in three ways:
 
-#### Manually searching in translations
+#### Approach 1: Manually searching in translations
 
 One approach is to use the search term (not in source language) and
 search inside the translated content instead.
@@ -1834,7 +1834,7 @@ HAVING FIND_IN_SET('English search term', GROUP_CONCAT(translations.trans));
 
 One caveat is that this only works for short single columns, which are translated directly by Gtbabel.
 
-#### Translate search terms
+#### Approach 2: Translate search terms
 
 Another approach is to translate all incoming queries to your source language\
 before actually querying your content (provided in source language):
@@ -1848,7 +1848,7 @@ In WordPress this is done automatically for you.
 The caveat here is that you essentially translate all incoming queries,
 so be aware of that and use the `throttle_chars_per_month` option.
 
-#### Searching parsed html
+#### Approach 3 Searching parsed html
 
 Another approach is to search generated cached html pages.\
 Since Gtbabel does not cache pages, you have to have your caching system running.\
