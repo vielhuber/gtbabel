@@ -1857,7 +1857,7 @@ GROUP BY posts.ID
 HAVING FIND_IN_SET('English search term', GROUP_CONCAT(translations.trans));
 ```
 
-One caveat is that this only works for short single columns, which are translated directly by Gtbabel.
+One caveat is that this only works for columns, where direct translations are available.
 
 #### Approach 3: Searching parsed html
 
@@ -1870,8 +1870,7 @@ Also evaluate if you can try to use the [Google Programmable Search Engine](http
 #### Approach 4: Build your own search index
 
 In this approach you build a search index for every object you want to include into the search results.\
-You collect and permanently store all strings in the source language, translate them (once) by Gtbabel and store these translations also.\
-This way you can combine the best of the above approaches, although it involves the largest integration effort.
+You collect and permanently store all strings in the source language, translate them (once) by Gtbabel and also permanently store these translations. This way you can combine the best of the above approaches, although it involves the largest integration effort.
 
 ### URL query arguments
 
