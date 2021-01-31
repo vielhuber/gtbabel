@@ -369,13 +369,29 @@ class Data
         return $this->db->fetch_all('SELECT * FROM ' . $this->table . ' ORDER BY id ASC');
     }
 
-    function getTranslationCountFromDatabase($lng_target = null, $checked = null, $discovered_last_time = null)
-    {
+    function getTranslationCountFromDatabase(
+        $lng_target = null,
+        $checked = null,
+        $discovered_last_time = null,
+        $exclude_contexts = null
+    ) {
         $query = 'SELECT COUNT(*) FROM ' . $this->table;
         $args = [];
         if ($lng_target !== null || $checked !== null || $discovered_last_time !== null) {
             $query .= ' WHERE ';
             $query_and = [];
+            if ($exclude_contexts !== null) {
+                $query_and[] =
+                    'context NOT IN (' .
+                    implode(
+                        ',',
+                        array_map(function () {
+                            return '?';
+                        }, $exclude_contexts)
+                    ) .
+                    ')';
+                $args = array_merge($args, $exclude_contexts);
+            }
             if ($lng_target !== null) {
                 $query_and[] = 'lng_target = ?';
                 $args[] = $lng_target;
@@ -409,7 +425,8 @@ class Data
         $shared = null,
         $checked = null,
         $take = null,
-        $skip = null
+        $skip = null,
+        $exclude_contexts = null
     ) {
         $data = [];
 
@@ -568,6 +585,14 @@ class Data
         if ($context !== null) {
             foreach ($data as $data__key => $data__value) {
                 if ($data__value['context'] != $context) {
+                    unset($data[$data__key]);
+                }
+            }
+        }
+
+        if ($exclude_contexts !== null) {
+            foreach ($data as $data__key => $data__value) {
+                if (in_array($data__value['context'], $exclude_contexts)) {
                     unset($data[$data__key]);
                 }
             }

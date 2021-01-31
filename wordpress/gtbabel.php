@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 5.6.5
+ * Version: 5.6.6
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -170,11 +170,12 @@ class GtbabelWordPress
                 $this->gtbabel->translate(
                     $query->get('s'),
                     $this->gtbabel->settings->getSourceLanguageCode(),
-                    $this->gtbabel->data->getCurrentLanguageCode()
+                    $this->gtbabel->data->getCurrentLanguageCode(),
+                    'search_term'
                 )
             );
         });
-        // reset again (so that in the output on the page it's the original query)
+        // reset again (so that in the output on the page is the original query)
         add_action('template_redirect', function ($query) {
             global $original_query;
             if ($original_query === null) {
@@ -183,6 +184,18 @@ class GtbabelWordPress
             global $wp_query;
             $wp_query->query_vars['s'] = $original_query;
         });
+        // filter __( 'Search Results for &#8220;%s&#8221;' ), so that the search term does not get translated
+        add_filter(
+            'gettext',
+            function ($translated, $text, $domain) {
+                if ($text === 'Search Results for &#8220;%s&#8221;' || $text === 'Results for "%s"') {
+                    return __('Search');
+                }
+                return $translated;
+            },
+            10,
+            3
+        );
     }
 
     private function disableAutoRedirect()
@@ -2000,7 +2013,8 @@ class GtbabelWordPress
             @$_GET['shared'],
             @$_GET['checked'],
             $this->getBackendPaginationCount($lng),
-            (@$_GET['p'] != '' ? intval($_GET['p']) - 1 : 0) * $this->getBackendPaginationCount($lng)
+            (@$_GET['p'] != '' ? intval($_GET['p']) - 1 : 0) * $this->getBackendPaginationCount($lng),
+            null
         );
 
         $translations = $data['data'];
@@ -2365,7 +2379,12 @@ class GtbabelWordPress
                     if (!current_user_can('gtbabel__translate_' . $languages__key)) {
                         continue;
                     }
-                    $count = $this->gtbabel->data->getTranslationCountFromDatabase($languages__key, false);
+                    $count = $this->gtbabel->data->getTranslationCountFromDatabase($languages__key, false, null, [
+                        'email',
+                        'file',
+                        'url',
+                        'search_term'
+                    ]);
                     echo '<li class="gtbabel__transwizard-language' .
                         ($count === 0 ? ' gtbabel__transwizard-language--disabled' : '') .
                         '">';
@@ -2394,7 +2413,8 @@ class GtbabelWordPress
                 null,
                 false,
                 1,
-                0
+                0,
+                ['email', 'file', 'url', 'search_term']
             );
             if (!empty($translations['count'] > 0)) {
                 $translation = $translations['data'][0];
@@ -4072,7 +4092,7 @@ EOD;
                         (@$prototype__value['key'] != '' ? '[' . $prototype__value['key'] . ']' : '') .
                         '[]" value="' .
                         (is_array($settings__value['value'])
-                            ? ($settings__value['value'][@$prototype__value['key']] != ''
+                            ? (@$settings__value['value'][@$prototype__value['key']] != ''
                                 ? esc_attr(
                                     $prototype__value['type'] === 'string'
                                         ? $settings__value['value'][$prototype__value['key']]
@@ -4251,7 +4271,8 @@ EOD;
                         $count = $this->gtbabel->data->getTranslationCountFromDatabase(
                             $languages__key,
                             false,
-                            $discovered_last_time
+                            $discovered_last_time,
+                            ['email', 'file', 'url', 'search_term']
                         );
                         if ($count > 0) {
                             $match = true;
