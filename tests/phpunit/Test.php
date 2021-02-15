@@ -297,7 +297,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test031()
     {
-        $this->runDiff('31.html', 750, [
+        $this->runDiff('31.html', 1000, [
             'debug_translations' => false,
             'auto_translation' => true
         ]);
@@ -305,7 +305,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test032()
     {
-        $this->runDiff('32.html', 750, [
+        $this->runDiff('32.html', 1000, [
             'debug_translations' => false,
             'auto_translation' => true
         ]);
@@ -328,7 +328,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test036()
     {
-        $this->runDiff('36.html', 750, [
+        $this->runDiff('36.html', 1000, [
             'debug_translations' => false,
             'auto_translation' => true
         ]);
@@ -377,7 +377,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test040()
     {
-        $this->runDiff('40.html', 500, [
+        $this->runDiff('40.html', 750, [
             'debug_translations' => false,
             'auto_translation' => true,
             'auto_translation_service' => [
@@ -396,7 +396,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test041()
     {
-        $this->runDiff('41.html', 2000, [
+        $this->runDiff('41.html', 3500, [
             'languages' => $this->getLanguageSettings([['code' => 'de', 'url_prefix' => 'de']], false),
             'lng_source' => 'en',
             'lng_target' => 'de',
@@ -553,7 +553,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test059()
     {
-        $this->runDiff('59.html', 1500, [
+        $this->runDiff('59.html', 2000, [
             'debug_translations' => false,
             'auto_translation' => true
         ]);

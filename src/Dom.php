@@ -600,6 +600,7 @@ class Dom
         }
 
         if ($this->settings->get('xml_hreflang_tags') === true) {
+            /* notes: https://developers.google.com/search/docs/advanced/crawling/localized-versions?hl=de&visit_id=637489903664231830-3049723367&rd=2#methods-for-indicating-your-alternate-pages */
             $nodes = $this->DOMXPath->query('//*[name()=\'loc\']');
             if (count($nodes) > 0) {
                 foreach ($nodes as $nodes__value) {
@@ -618,6 +619,12 @@ class Dom
                             $nodes__value->parentNode->insertBefore($tag, $nodes__value->nextSibling);
                         }
                     }
+                }
+            }
+            $nodes = $this->DOMXPath->query('/*');
+            if (count($nodes) > 0) {
+                foreach ($nodes as $nodes__value) {
+                    $nodes__value->setAttribute('xmlns:xhtml', 'http://www.w3.org/1999/xhtml');
                 }
             }
         }
