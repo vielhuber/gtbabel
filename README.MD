@@ -30,7 +30,7 @@ Gtbabel automatically translates your HTML/PHP pages – server sided!
 -   [Language picker](#language-picker)
 -   [Helper functions](#helper-functions)
 -   [Echoing strings](#echoing-strings)
--   [Dynamic data](#dealing-with-dynamic-data)
+-   [Dynamic data](#dynamic-data)
     -   [Search](#search)
     -   [URL query arguments](#url-query-arguments)
     -   [Mails](#mails)
