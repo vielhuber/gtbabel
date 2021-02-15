@@ -1,0 +1,24 @@
+{
+    "domain": "messages",
+    "locale_data": {
+        "messages": {
+            "": {
+                "domain": "messages",
+                "lang": "de_DE",
+                "plural-forms": "nplurals=2; plural=(n != 1);"
+            },
+            "Languages": [
+                "Sprachen"
+            ],
+            "Page language": [
+                "Seitensprache"
+            ],
+            "Source language": [
+                "Ausgangssprache"
+            ],
+            "Show only there": [
+                "Nur dort anzeigen"
+            ]
+        }
+    }
+}

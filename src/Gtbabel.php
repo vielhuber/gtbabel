@@ -14,7 +14,6 @@ class Gtbabel
         Host $host = null,
         Publish $publish = null,
         Data $data = null,
-        Altlng $altlng = null,
         Grabber $grabber = null,
         DomFactory $domfactory = null,
         Router $router = null,
@@ -29,19 +28,10 @@ class Gtbabel
         $this->publish = $publish ?: new Publish($this->settings, $this->host, $this->log);
         $this->data =
             $data ?: new Data($this->utils, $this->host, $this->settings, $this->tags, $this->log, $this->publish);
-        $this->altlng = $altlng ?: new Altlng($this->settings, $this->host);
         $this->grabber = $grabber ?: new Grabber($this->settings, $this->utils, $this->log, $this->data);
         $this->domfactory =
             $domfactory ?:
-            new DomFactory(
-                $this->utils,
-                $this->data,
-                $this->host,
-                $this->settings,
-                $this->tags,
-                $this->log,
-                $this->altlng
-            );
+            new DomFactory($this->utils, $this->data, $this->host, $this->settings, $this->tags, $this->log);
         $this->router = $router ?: new Router($this->data, $this->host, $this->settings, $this->publish, $this->log);
         $this->gettext = $gettext ?: new Gettext($this->data, $this->settings);
         $this->excel = $excel ?: new Excel($this->data, $this->settings);

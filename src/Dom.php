@@ -8,7 +8,7 @@ class Dom
     public $DOMDocument;
     public $DOMXPath;
     public $excluded_nodes;
-    public $lng_areas;
+    public $alt_lng_areas;
     public $force_tokenize;
     public $group_cache;
     public $localize_js_script;
@@ -20,7 +20,6 @@ class Dom
         Settings $settings = null,
         Tags $tags = null,
         Log $log = null,
-        Altlng $altlng = null,
         DomFactory $domfactory = null
     ) {
         $this->utils = $utils ?: new Utils();
@@ -29,7 +28,6 @@ class Dom
         $this->settings = $settings ?: new Settings();
         $this->tags = $tags ?: new Tags();
         $this->log = $log ?: new Log();
-        $this->altlng = $altlng ?: new Altlng();
         $this->domfactory = $domfactory ?: new DomFactory();
     }
 
@@ -133,20 +131,76 @@ class Dom
         return in_array($this->getIdOfNode($node), $this->force_tokenize);
     }
 
-    function preloadLngAreas()
+    function removeHiddenBlocks()
     {
-        $this->lng_areas = [];
+        $nodes = $this->DOMXPath->query(
+            '/html/body//*[contains(concat(" ", normalize-space(@class), " "), " hide-block")]'
+        );
+        if (count($nodes) === 0) {
+            return;
+        }
+        $lng_current = $this->data->getCurrentLanguageCode();
+        // preload alt lngs without modifying attributes (so that we can call it later again)
+        // if we call it before, we have problems because the ids of the nodes changes due to path changes
+        $this->preloadAltLngAreas(false);
+        $to_remove = [];
+        foreach ($nodes as $nodes__value) {
+            if ($this->getAltLngForElement($nodes__value) !== null) {
+                $lng_source = $this->getAltLngForElement($nodes__value);
+            } else {
+                $lng_source = $this->settings->getSourceLanguageCode();
+            }
+            $class = $nodes__value->getAttribute('class');
+            $class = explode(' ', $class);
+            $class = array_map(function ($classes__value) {
+                return trim($classes__value);
+            }, $class);
+            $class = array_filter($class, function ($classes__value) {
+                return strpos($classes__value, 'hide-block') === 0;
+            });
+            foreach ($class as $classes__value) {
+                if (
+                    $classes__value === 'hide-block' ||
+                    ($classes__value === 'hide-block-source' && $lng_current === $lng_source) ||
+                    ($classes__value === 'hide-block-target' && $lng_current !== $lng_source) ||
+                    preg_match('/^hide-block(-[a-zA-Z]+)*-' . $lng_current . '(-[a-zA-Z]+)*$/', $classes__value)
+                ) {
+                    $to_remove[] = $nodes__value;
+                    break;
+                }
+            }
+        }
+        // remove it afterwards (because otherwise the paths in between get mixed and getAltLngForElement does not work)
+        foreach ($to_remove as $to_remove__value) {
+            $to_remove__value->parentNode->removeChild($to_remove__value);
+        }
+    }
+
+    function preloadAltLngAreas($modify = true)
+    {
+        $this->alt_lng_areas = [];
         $nodes = $this->DOMXPath->query('/html//*[@lang]');
         foreach ($nodes as $nodes__value) {
             $lng = $nodes__value->getAttribute('lang');
+            if ($modify === true) {
+                $nodes__value->setAttribute('lang', $this->data->getCurrentLanguageCode());
+            }
             if (!in_array($lng, $this->settings->getSelectedLanguageCodes())) {
                 continue;
             }
-            $this->lng_areas[$this->getIdOfNode($nodes__value)] = $lng;
+            $this->alt_lng_areas[$this->getIdOfNode($nodes__value)] = $lng;
             foreach ($this->getChildrenOfNodeIncludingWhitespace($nodes__value) as $nodes__value__value) {
-                $this->lng_areas[$this->getIdOfNode($nodes__value__value)] = $lng;
+                $this->alt_lng_areas[$this->getIdOfNode($nodes__value__value)] = $lng;
             }
         }
+    }
+
+    function getAltLngForElement($node)
+    {
+        if (array_key_exists($this->getIdOfNode($node), $this->alt_lng_areas)) {
+            return $this->alt_lng_areas[$this->getIdOfNode($node)];
+        }
+        return null;
     }
 
     function getGroupsForTextNodes($textnodes)
@@ -286,8 +340,8 @@ class Dom
                                     continue;
                                 }
 
-                                if (array_key_exists($this->getIdOfNode($nodes__value), $this->lng_areas)) {
-                                    $lng_source = $this->lng_areas[$this->getIdOfNode($nodes__value)];
+                                if ($this->getAltLngForElement($nodes__value) !== null) {
+                                    $lng_source = $this->getAltLngForElement($nodes__value);
                                 } else {
                                     $lng_source = $this->settings->getSourceLanguageCode();
                                 }
@@ -444,11 +498,10 @@ class Dom
             return $html;
         }
         $this->setupDomDocument($html);
-        $this->fixPluginSpecifics();
         if ($mode === 'buffer') {
             $this->setHtmlLangTags();
             $this->setRtlAttr();
-            $this->setAltLngUrls();
+            $this->doWordPressSpecifics();
             $this->detectDomChangesFrontend();
             $this->frontendEditorFrontend();
             $this->localizeJsPrepare();
@@ -457,9 +510,10 @@ class Dom
             $this->showSimpleLanguagePicker();
             $this->showFrontendEditorLinks();
         }
+        $this->removeHiddenBlocks();
+        $this->preloadAltLngAreas();
         $this->preloadExcludedNodes();
         $this->preloadForceTokenize();
-        $this->preloadLngAreas();
         $this->modifyHtmlNodes($mode);
         $html = $this->finishDomDocument();
         // DomDocument always encodes characters (meaning we receive plain text links with &amp; inside, which is bad for plain text)
@@ -566,22 +620,6 @@ class Dom
                     }
                 }
             }
-        }
-    }
-
-    function setAltLngUrls()
-    {
-        $lng = $this->altlng->get();
-        if ($this->altlng->get() === $this->settings->getSourceLanguageCode()) {
-            return;
-        }
-        $html_node = $this->DOMXPath->query('/html/head//title')[0];
-        if ($html_node !== null) {
-            $html_node->setAttribute('lang', $lng);
-        }
-        $html_node = $this->DOMXPath->query('/html/head//meta[@name="description"][@content]')[0];
-        if ($html_node !== null) {
-            $html_node->setAttribute('lang', $lng);
         }
     }
 
@@ -1132,8 +1170,11 @@ class Dom
         $head->appendChild($tag);
     }
 
-    function fixPluginSpecifics()
+    function doWordPressSpecifics()
     {
+        if (!$this->utils->isWordPress()) {
+            return;
+        }
         // woocommerce card cache
         // woocommerce uses a nasty cache in session storage
         // this causes the card on the top right of "storefront" to have a wrong language after switching languages
@@ -1155,6 +1196,24 @@ class Dom
         if ($wc_personal_intro_in_mail->length > 0) {
             foreach ($wc_personal_intro_in_mail as $wc_personal_intro_in_mail__value) {
                 $wc_personal_intro_in_mail__value->parentNode->removeChild($wc_personal_intro_in_mail__value);
+            }
+        }
+
+        // alt lng: handle title / meta description
+        if (is_single()) {
+            $id = get_the_ID();
+            if (__::x($id)) {
+                $alt_lng = get_post_meta($id, 'gtbabel_alt_lng', true);
+                if (__::x($alt_lng)) {
+                    $html_node = $this->DOMXPath->query('/html/head//title')[0];
+                    if ($html_node !== null) {
+                        $html_node->setAttribute('class', 'notranslate');
+                    }
+                    $html_node = $this->DOMXPath->query('/html/head//meta[@name="description"][@content]')[0];
+                    if ($html_node !== null) {
+                        $html_node->setAttribute('lang', $alt_lng);
+                    }
+                }
             }
         }
     }

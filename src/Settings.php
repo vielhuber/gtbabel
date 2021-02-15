@@ -108,7 +108,6 @@ class Settings
                 ['url' => '/slug1/*/slug2', 'lng' => ['fr']]
             ],
             'prevent_publish_wp_new_posts' => false,
-            'alt_lng_urls' => [['url' => '/path/in/source/lng/to/specific/page', 'lng' => 'en']],
             'url_query_args' => [
                 [
                     'type' => 'keep',
@@ -190,7 +189,6 @@ class Settings
             $default_settings['localize_js_strings'] = [];
             $default_settings['detect_dom_changes_include'] = [];
             $default_settings['prevent_publish_urls'] = [];
-            $default_settings['alt_lng_urls'] = [];
             $default_settings['translate_json_include'] = [
                 ['url' => '?wc-ajax=*', 'selector' => ['fragments.*', 'messages', 'redirect']], // woocommerce
                 ['url' => 'wp-json', 'selector' => ['message']] // contact form 7
@@ -1517,6 +1515,19 @@ class Settings
             }
             $lng[$languages__key] = $languages__value;
         }
+        return $lng;
+    }
+
+    function getSelectedLanguageCodesLabelsWithSourceAtLast()
+    {
+        $lng = [];
+        foreach ($this->getSelectedLanguageCodesLabels() as $languages__key => $languages__value) {
+            if ($languages__key === $this->getSourceLanguageCode()) {
+                continue;
+            }
+            $lng[$languages__key] = $languages__value;
+        }
+        $lng[$this->getSourceLanguageCode()] = $this->getSourceLanguageLabel();
         return $lng;
     }
 

@@ -29,8 +29,8 @@ class GtbabelWordPress
         $this->installHook();
         $this->localizePlugin();
         $this->initBackend();
+        $this->handleAltLng();
         $this->triggerPreventPublish();
-        $this->triggerAltLngUrls();
         $this->addLastmodToSitemap();
         $this->addTopBarItem();
         $this->modifyGutenbergSidebar();
@@ -44,7 +44,7 @@ class GtbabelWordPress
         $this->sendMailNotificationsSetupCron();
         $this->filterSpecificUrls();
         $this->autoTranslatePluginMails();
-        $this->autoTranslateSearch();
+        $this->enhanceSearchIndex();
         $this->startHook();
         $this->stopHook();
     }
@@ -156,45 +156,85 @@ class GtbabelWordPress
         );
     }
 
-    private function autoTranslateSearch()
+    private function enhanceSearchIndex()
     {
-        $original_query = null;
-        add_action('pre_get_posts', function ($query) {
-            if (!$query->is_main_query() || is_admin() || !is_search()) {
-                return;
-            }
-            global $original_query;
-            $original_query = $query->get('s');
-            $query->set(
-                's',
-                $this->gtbabel->translate(
-                    $query->get('s'),
-                    $this->gtbabel->settings->getSourceLanguageCode(),
-                    $this->gtbabel->data->getCurrentLanguageCode(),
-                    'search_term'
-                )
-            );
-        });
-        // reset again (so that in the output on the page is the original query)
-        add_action('template_redirect', function ($query) {
-            global $original_query;
-            if ($original_query === null) {
-                return;
-            }
-            global $wp_query;
-            $wp_query->query_vars['s'] = $original_query;
-        });
-        // filter __( 'Search Results for &#8220;%s&#8221;' ), so that the search term does not get translated
+        /* idea: search inside translations, get sources, combine them, search in db source content */
+        /* note that this also works on alt languages */
+
         add_filter(
-            'gettext',
-            function ($translated, $text, $domain) {
-                if ($text === 'Search Results for &#8220;%s&#8221;' || $text === 'Results for "%s"') {
-                    return __('Search');
+            'posts_search',
+            function ($sql, $wp_query) {
+                if (empty($sql)) {
+                    return $sql;
                 }
-                return $translated;
+
+                $search_term = $wp_query->query_vars['s'];
+
+                $translations = $this->gtbabel->data->db->fetch_col(
+                    'SELECT str FROM ' . $this->gtbabel->data->table . ' WHERE trans LIKE ? AND lng_target = ?',
+                    '%' . $search_term . '%',
+                    $this->gtbabel->data->getCurrentLanguageCode()
+                );
+
+                if (empty($translations)) {
+                    return $sql;
+                }
+
+                $translations = array_map(function ($a) {
+                    return '.*' . str_replace("'", "\'", preg_quote($a)) . '.*';
+                }, $translations);
+
+                $translations = implode('|', $translations);
+
+                global $wpdb;
+                $sql =
+                    ' AND (' .
+                    $wpdb->prefix .
+                    'posts.ID IN (
+                    SELECT ID FROM (
+                        SELECT
+                            ' .
+                    $wpdb->prefix .
+                    'posts.ID as ID,
+                            CONCAT(
+                                ' .
+                    $wpdb->prefix .
+                    'posts.post_title,
+                                ExtractValue(' .
+                    $wpdb->prefix .
+                    'posts.post_content, \'//text()\'),
+                                GROUP_CONCAT(' .
+                    $wpdb->prefix .
+                    'postmeta.meta_value)
+                            ) as content
+                        FROM
+                            ' .
+                    $wpdb->prefix .
+                    'posts
+                        LEFT JOIN
+                            ' .
+                    $wpdb->prefix .
+                    'postmeta ON ' .
+                    $wpdb->prefix .
+                    'postmeta.post_id = ' .
+                    $wpdb->prefix .
+                    'posts.ID
+                        GROUP BY
+                            ' .
+                    $wpdb->prefix .
+                    'posts.ID
+                        HAVING
+                            content REGEXP \'' .
+                    $translations .
+                    '\') as t
+                ) OR (' .
+                    (strpos($sql, ' AND') === 0 ? substr($sql, strlen(' AND')) : $sql) .
+                    '))';
+
+                return $sql;
             },
-            10,
-            3
+            20,
+            2
         );
     }
 
@@ -421,6 +461,216 @@ class GtbabelWordPress
         return rtrim(wp_upload_dir()['basedir'], '/') . '/gtbabel';
     }
 
+    private function handleAltLng()
+    {
+        // on slug change we manually translate the string to the source language and store that in the database
+        add_action(
+            'post_updated',
+            function ($post_ID, $post_after, $post_before) {
+                $post_before_url = get_permalink($post_before);
+                $post_after_url = get_permalink($post_after);
+                if ($post_before_url != $post_after_url) {
+                    $alt_lng = get_post_meta($post_ID, 'gtbabel_alt_lng', true);
+                    if (__::x($alt_lng) && $alt_lng !== $this->gtbabel->settings->getSourceLanguageCode()) {
+                        // prevent endless loop
+                        $trans = $this->gtbabel->data->getExistingTranslationReverseFromCache(
+                            $post_after->post_name,
+                            $alt_lng,
+                            $this->gtbabel->settings->getSourceLanguageCode(),
+                            'slug'
+                        );
+                        if ($trans === false) {
+                            $this->gtbabel->translate(
+                                $post_after->post_name,
+                                $this->gtbabel->settings->getSourceLanguageCode(),
+                                $alt_lng,
+                                'slug'
+                            );
+                            // directly get translation (we don't need any path prefixes)
+                            $trans = $this->gtbabel->data->getExistingTranslationFromCache(
+                                $post_after->post_name,
+                                $alt_lng,
+                                $this->gtbabel->settings->getSourceLanguageCode(),
+                                'slug'
+                            );
+                            wp_update_post([
+                                'ID' => $post_ID,
+                                'post_name' => $trans
+                            ]);
+                        }
+                    }
+                }
+            },
+            10,
+            3
+        );
+
+        add_filter(
+            'the_title',
+            function ($param, $id) {
+                if (!$this->isFrontend()) {
+                    return $param;
+                }
+                $alt_lng = get_post_meta($id, 'gtbabel_alt_lng', true);
+                if (__::x($alt_lng)) {
+                    return '<div lang="' . $alt_lng . '">' . $param . '</div>';
+                }
+                return $param;
+            },
+            10,
+            2
+        );
+
+        add_filter(
+            'document_title_parts',
+            function ($title) {
+                if (!$this->isFrontend()) {
+                    return $title;
+                }
+                if (!is_single()) {
+                    return $title;
+                }
+                $id = get_the_ID();
+                if ($id === null) {
+                    return $title;
+                }
+                $alt_lng = get_post_meta($id, 'gtbabel_alt_lng', true);
+                if (__::x($alt_lng)) {
+                    if (__::x(@$title['title'])) {
+                        $trans = $this->gtbabel->translate(
+                            $title['title'],
+                            $this->gtbabel->data->getCurrentLanguageCode(),
+                            $alt_lng,
+                            'title'
+                        );
+                        if ($trans != '') {
+                            $title['title'] = $trans;
+                        }
+                    }
+                    if (__::x(@$title['site'])) {
+                        $trans = $this->gtbabel->translate(
+                            $title['site'],
+                            $this->gtbabel->data->getCurrentLanguageCode(),
+                            $this->gtbabel->settings->getSourceLanguageCode(),
+                            'title'
+                        );
+                        if ($trans != '') {
+                            $title['site'] = $trans;
+                        }
+                    }
+                }
+                return $title;
+            },
+            10,
+            2
+        );
+
+        add_filter(
+            'render_block',
+            function ($block_content, $block) {
+                if (!$this->isFrontend()) {
+                    return $block_content;
+                }
+                if (!is_single()) {
+                    return $block_content;
+                }
+                $id = get_the_ID();
+                if ($id === null) {
+                    return $block_content;
+                }
+                $alt_lng = get_post_meta($id, 'gtbabel_alt_lng', true);
+
+                $attrs = ['class' => [], 'lang' => []];
+
+                if (__::x(@$block['attrs']['gtbabel_hide_block_target'])) {
+                    $attrs['class'][] = 'hide-block-target';
+                }
+
+                if (__::x(@$block['attrs']['gtbabel_alt_lng'])) {
+                    $attrs['lang'][] = $block['attrs']['gtbabel_alt_lng'];
+                } elseif (__::x($alt_lng)) {
+                    $attrs['lang'][] = $alt_lng;
+                }
+
+                if (__::x($attrs['class']) || __::x($attrs['lang'])) {
+                    // if content has no surrounding html tag
+                    if (!preg_match('/^<([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>(.*?)<\/\1>$/', trim($block_content))) {
+                        $block_content = '<div>' . $block_content . '</div>';
+                    }
+                    // now apply all attributes to all top level dom elements
+                    $domdocument = __::str_to_dom($block_content);
+                    $domxpath = new \DOMXPath($domdocument);
+                    $nodes = $domxpath->query('/html/body/*');
+                    foreach ($nodes as $nodes__value) {
+                        foreach ($attrs as $attrs__key => $attrs__value) {
+                            if (empty($attrs__value)) {
+                                continue;
+                            }
+                            $nodes__value->setAttribute(
+                                $attrs__key,
+                                trim($nodes__value->getAttribute($attrs__key) . ' ' . implode($attrs__value))
+                            );
+                        }
+                    }
+                    $block_content = __::dom_to_str($domdocument);
+                }
+
+                return $block_content;
+            },
+            10,
+            2
+        );
+
+        add_filter(
+            'get_the_excerpt',
+            function ($param, $post) {
+                if (!$this->isFrontend()) {
+                    return $param;
+                }
+                $alt_lng = get_post_meta($post->ID, 'gtbabel_alt_lng', true);
+                if (__::x($alt_lng)) {
+                    return '<div lang="' . $alt_lng . '">' . $param . '</div>';
+                }
+                return $param;
+            },
+            10,
+            2
+        );
+
+        add_filter(
+            'acf/format_value',
+            function ($value, $post_id) {
+                if (!$this->isFrontend()) {
+                    return $value;
+                }
+                $alt_lng = get_post_meta($post_id, 'gtbabel_alt_lng', true);
+                if (__::x($alt_lng)) {
+                    return '<div lang="' . $alt_lng . '">' . $value . '</div>';
+                }
+                return $value;
+            },
+            10,
+            2
+        );
+
+        add_action('enqueue_block_editor_assets', function () {
+            wp_enqueue_script('wpgutenberg', plugins_url('assets/build/wpgutenberg/bundle.js', __FILE__), [
+                'wp-blocks',
+                'wp-components',
+                'wp-compose',
+                'wp-dom-ready',
+                'wp-editor',
+                'wp-element',
+                'wp-hooks',
+                'wp-i18n'
+            ]);
+            wp_set_script_translations('wpgutenberg', 'gtbabel-plugin', plugin_dir_path(__FILE__) . 'languages');
+            wp_localize_script('wpgutenberg', 'wpgutenberg_data', [
+                'languages' => $this->gtbabel->settings->getSelectedLanguageCodesLabelsWithSourceAtLast()
+            ]);
+        });
+    }
+
     private function triggerPreventPublish()
     {
         add_action(
@@ -457,23 +707,6 @@ class GtbabelWordPress
 
                 if ($trigger1 || $trigger2 || $trigger3) {
                     $this->saveSetting('prevent_publish_urls', $this->gtbabel->settings->get('prevent_publish_urls'));
-                }
-            },
-            10,
-            3
-        );
-    }
-
-    private function triggerAltLngUrls()
-    {
-        add_action(
-            'post_updated',
-            function ($post_ID, $post_after, $post_before) {
-                $post_before_url = get_permalink($post_before);
-                $post_after_url = get_permalink($post_after);
-                if ($post_before_url != $post_after_url) {
-                    $this->gtbabel->altlng->change($post_before_url, $post_after_url);
-                    $this->saveSetting('alt_lng_urls', $this->gtbabel->settings->get('alt_lng_urls'));
                 }
             },
             10,
@@ -585,12 +818,19 @@ class GtbabelWordPress
                 'gtbabel-trans-links',
                 __('Translations', 'gtbabel-plugin'),
                 function ($post) {
+                    $post_lng = __::v(
+                        get_post_meta($post->ID, 'gtbabel_alt_lng', true),
+                        $this->gtbabel->settings->getSourceLanguageCode()
+                    );
                     echo '<ul>';
                     foreach (
-                        $this->gtbabel->settings->getSelectedLanguageCodesLabelsWithoutSource()
+                        $this->gtbabel->settings->getSelectedLanguageCodesLabels()
                         as $languages__key => $languages__value
                     ) {
                         if (!current_user_can('gtbabel__translate_' . $languages__key)) {
+                            continue;
+                        }
+                        if ($post_lng === $languages__key) {
                             continue;
                         }
                         echo '<li><a href="' .
@@ -613,10 +853,10 @@ class GtbabelWordPress
                 function ($post) {
                     echo "<script>
                     document.addEventListener('DOMContentLoaded', () => {
-                        document.querySelector('.gtbabel_edit_alt_lng_urls').addEventListener('change', (e) =>
+                        document.querySelector('.gtbabel_edit_alt_lng').addEventListener('change', (e) =>
                         {
                             let data = new URLSearchParams();
-                            data.append('edit_alt_lng_urls', 1);
+                            data.append('edit_alt_lng', 1);
                             data.append('lng', e.currentTarget.value);
                             data.append('p', e.currentTarget.getAttribute('data-post-id'));
 	                        fetch(e.currentTarget.getAttribute('data-url'), { method: 'POST', body: data }).then(v=>v).catch(v=>v).then(data => {}); 
@@ -624,20 +864,17 @@ class GtbabelWordPress
                         }); 
                     });
                     </script>";
-                    echo '<small>';
-                    echo __('Notice: The slug must be always in the general source language.', 'gtbabel-plugin');
-                    echo '</small><br/>';
                     echo '<select data-post-id="' .
                         $post->ID .
                         '" data-url="' .
                         admin_url('admin.php?page=gtbabel-settings') .
-                        '" class="gtbabel_edit_alt_lng_urls">';
+                        '" class="gtbabel_edit_alt_lng">';
                     foreach (
                         $this->gtbabel->settings->getSelectedLanguageCodesLabels()
                         as $languages__key => $languages__value
                     ) {
                         echo '<option' .
-                            ($this->gtbabel->altlng->get(get_permalink($post->ID)) === $languages__key
+                            (get_post_meta($post->ID, 'gtbabel_alt_lng', true) === $languages__key
                                 ? ' selected="selected"'
                                 : '') .
                             ' value="' .
@@ -845,10 +1082,10 @@ class GtbabelWordPress
 
             foreach ($menus as $menus__value) {
                 add_action('admin_print_styles-' . $menus__value, function () {
-                    wp_enqueue_style('gtbabel-css', plugins_url('assets/build/bundle.css', __FILE__));
+                    wp_enqueue_style('gtbabel-css', plugins_url('assets/build/wpbackend/bundle.css', __FILE__));
                 });
                 add_action('admin_print_scripts-' . $menus__value, function () {
-                    wp_enqueue_script('gtbabel-js', plugins_url('assets/build/bundle.js', __FILE__));
+                    wp_enqueue_script('gtbabel-js', plugins_url('assets/build/wpbackend/bundle.js', __FILE__));
                 });
             }
         });
@@ -899,7 +1136,6 @@ class GtbabelWordPress
                             'prevent_publish_urls',
                             'prevent_publish_wp_new_posts',
                             'url_query_args',
-                            'alt_lng_urls',
                             'exclude_urls_content',
                             'exclude_urls_slugs',
                             'html_lang_attribute',
@@ -1127,23 +1363,6 @@ class GtbabelWordPress
                         }
                     }
 
-                    $post_data = $settings['alt_lng_urls'];
-                    $settings['alt_lng_urls'] = [];
-                    if (!empty(@$post_data['url'])) {
-                        foreach ($post_data['url'] as $post_data__key => $post_data__value) {
-                            if (
-                                @$post_data['url'][$post_data__key] == '' &&
-                                @$post_data['lng'][$post_data__key] == ''
-                            ) {
-                                continue;
-                            }
-                            $settings['alt_lng_urls'][] = [
-                                'url' => $post_data['url'][$post_data__key],
-                                'lng' => $post_data['lng'][$post_data__key]
-                            ];
-                        }
-                    }
-
                     $post_data = @$settings['hide_languages'];
                     $settings['prevent_publish_urls'] = array_filter($settings['prevent_publish_urls'], function ($a) {
                         return $a['url'] !== '/*';
@@ -1224,12 +1443,12 @@ class GtbabelWordPress
                 }
             }
 
-            if (isset($_POST['edit_alt_lng_urls'])) {
-                $this->gtbabel->altlng->edit(
-                    get_permalink(sanitize_textarea_field($_POST['p'])),
+            if (isset($_POST['edit_alt_lng'])) {
+                update_post_meta(
+                    sanitize_textarea_field($_POST['p']),
+                    'gtbabel_alt_lng',
                     sanitize_textarea_field($_POST['lng'])
                 );
-                $this->saveSetting('alt_lng_urls', $this->gtbabel->settings->get('alt_lng_urls'));
             }
 
             $message =
@@ -1815,18 +2034,6 @@ class GtbabelWordPress
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label class="gtbabel__label">';
-        echo __('Alternate language for main content', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        $this->renderRepeater('alt_lng_urls', [
-            ['key' => 'url', 'type' => 'string', 'placeholder' => __('URL', 'gtbabel-plugin')],
-            ['key' => 'lng', 'type' => 'string', 'placeholder' => __('Language code', 'gtbabel-plugin')]
-        ]);
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
         echo '<label for="gtbabel_localize_js" class="gtbabel__label">';
         echo __('Provide strings in JavaScript', 'gtbabel-plugin');
         echo '</label>';
@@ -2246,7 +2453,7 @@ class GtbabelWordPress
                             'field' => 'trans'
                         ]) .
                         ']">' .
-                        $translations__value[$languages__key] .
+                        @$translations__value[$languages__key] .
                         '</textarea>';
                     if ($translations__value['context'] === 'file') {
                         $this->initBackendStringTranslationShowFile(

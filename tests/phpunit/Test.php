@@ -56,16 +56,12 @@ class Test extends \PHPUnit\Framework\TestCase
             ->setConstructorArgs([$utils, $host, $settings, $tags, $log, $publish])
             ->onlyMethods([])
             ->getMock();
-        $altlng = $this->getMockBuilder(vielhuber\gtbabel\Altlng::class)
-            ->setConstructorArgs([$settings, $host])
-            ->onlyMethods([])
-            ->getMock();
         $grabber = $this->getMockBuilder(vielhuber\gtbabel\Grabber::class)
             ->setConstructorArgs([$settings, $utils, $log, $data])
             ->onlyMethods([])
             ->getMock();
         $domfactory = $this->getMockBuilder(vielhuber\gtbabel\DomFactory::class)
-            ->setConstructorArgs([$utils, $data, $host, $settings, $tags, $log, $altlng])
+            ->setConstructorArgs([$utils, $data, $host, $settings, $tags, $log])
             ->onlyMethods([])
             ->getMock();
         $router = $this->getMockBuilder(vielhuber\gtbabel\Router::class)
@@ -98,7 +94,6 @@ class Test extends \PHPUnit\Framework\TestCase
                 $host,
                 $publish,
                 $data,
-                $altlng,
                 $grabber,
                 $domfactory,
                 $router,
@@ -452,7 +447,8 @@ class Test extends \PHPUnit\Framework\TestCase
             'lng_source' => 'en',
             'lng_target' => 'de',
             'debug_translations' => false,
-            'auto_translation' => true
+            'auto_translation' => true,
+            'html_lang_attribute' => true
         ]);
     }
 
@@ -695,6 +691,30 @@ class Test extends \PHPUnit\Framework\TestCase
             ],
             '/en/'
         );
+    }
+
+    public function test077()
+    {
+        $this->runDiff('77.html', 1500, [
+            'lng_source' => 'de',
+            'lng_target' => 'en'
+        ]);
+    }
+
+    public function test078()
+    {
+        $this->runDiff('78.html', 1500, [
+            'lng_source' => 'de',
+            'lng_target' => 'de'
+        ]);
+    }
+
+    public function test079()
+    {
+        $this->runDiff('79.html', 1500, [
+            'lng_source' => 'de',
+            'lng_target' => 'es'
+        ]);
     }
 
     public function test_string_detection()

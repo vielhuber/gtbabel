@@ -108,14 +108,3 @@ if (!function_exists('gtbabel__')) {
         return $gtbabel->translate($str, $lng_target, $lng_source, $context);
     }
 }
-
-if (!function_exists('gtbabel_alt_lng')) {
-    function gtbabel_alt_lng($url = null)
-    {
-        global $gtbabel;
-        if ($gtbabel === null) {
-            $gtbabel = new \vielhuber\gtbabel\Gtbabel();
-        }
-        return $gtbabel->altlng->get($url);
-    }
-}

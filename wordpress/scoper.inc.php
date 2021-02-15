@@ -18,7 +18,6 @@ $functions = [
         'gtbabel_default_settings',
         'gtbabel_languagepicker',
         'gtbabel__',
-        'gtbabel_alt_lng',
         'ICL_LANGUAGE_CODE'
     ],
     /* native wp functions must not be prefixed (https://codex.wordpress.org/Function_Reference, https://github.com/humbug/php-scoper/issues/303) */

@@ -1201,7 +1201,6 @@ The default configuration is:
         //['url' => '/*', 'lng' => ['en', 'fr']] // disable whole languages
     ],
     'prevent_publish_wp_new_posts' => false,
-    'alt_lng_urls' => [['url' => '/path/in/source/lng/to/specific/page', 'lng' => 'en']],
     'url_query_args' => [
         [
             'type' => 'keep',
@@ -1539,20 +1538,34 @@ This all gets translated correctly to the target language (in our case `de`):
 <html lang="de">
     <body>
         <p>Einige Inhalte in Englisch.</p>
-        <div lang="de">Inhalt auf Französisch.</div>
+        <div>Inhalt auf Französisch.</div>
         <p>Einige andere Inhalte in Englisch.</p>
     </body>
 </html>
 ```
 
-If a page consists mainly of a block in another language, you can easily set the `lang`-tags using the `gtbabel_alt_lng` function:
+In WordPress there is a convenient way of defining a different source language\
+for whole posts or pages or even on block level.
 
-```php
-gtbabel_alt_lng() // current url
-gtbabel_alt_lng('https://tld.com/some-page') // specific url (in source language)
+## Hiding content
+
+Besides providing content in different source languages, you can hide specific dom nodes entirely:
+
+```html
+<ul>
+    <li>I am rendered everywhere</li>
+    <li class="hide-block">I am missing everywhere (including source language)</li>
+    <li class="hide-block-target">I am rendered only in the source language</li>
+    <li class="hide-block-source">I am missing only in the source language</li>
+    <li class="hide-block-en-fr">
+        I am missing specifically in the languages `en` and `fr` and rendered everywhere else
+    </li>
+</ul>
 ```
 
-You can provide those settings beforehand via the `alt_lng_urls` option.
+Note that _rendered_ means completely missing from the DOM.
+
+This is (in conjunction with the css classes `notranslate` to prevent translation and `force-tokenize` to force tokenization and the `lang`-attribute) an attempt to get around the intended limitation of Gtbabel that all content is always translated into all languages.
 
 ## Router
 
@@ -1815,9 +1828,9 @@ Nevertheless, one has to manually take care of how multilingual input data shoul
 
 ### Search
 
-Doing search on translated content can be done in various ways:
+Doing search on translated content is hard, but can be addressed with different approaches:
 
-#### Approach 1: Translate search terms
+#### Approach 1: Translating the search term
 
 A quite effective and easy approach is to translate all incoming search queries into your source language\
 before actually querying your content (provided in source language):
@@ -1829,14 +1842,38 @@ $s = gtbabel__($s, gtbabel_source_lng(), gtbabel_current_lng(), 'search_term');
 As you can see, such search queries get the special context `search_term`
 so they can be filtered out or garbage collected later on.
 
-In WordPress this is done automatically for you.
-
 The caveat here is that you essentially translate all incoming queries,
 so be aware of that and use the `throttle_chars_per_month` option.
 
-#### Approach 2: Manually searching in translations
+The results are also not accurate, because previously unseen queries are always translated ad-hoc.
+Also it does not work for content in multiple source languages.
 
-One approach is to use the search term (not in source language) and search inside the translated content instead.\
+#### Approach 2: Searching in parsed html
+
+Another approach is to search generated cached html pages.\
+Since Gtbabel does not cache pages, you have to have your caching system running.
+
+Translated pages can be basically treated like pages in source language,\
+since they are both just html, which can be searched.
+
+Also evaluate if you can try to use the [Google Programmable Search Engine](https://developers.google.com/custom-search), which follows the same idea.
+
+#### Approach 3: Building a custom search index
+
+In this approach you build a search index for every object\
+you want to include into the search results.
+
+You collect and permanently store all strings in the source language,\
+translate them (once) by Gtbabel and also permanently store these translations.
+
+This way you can combine the best of the above approaches,\
+although it involves the largest integration effort.
+
+#### Approach 4: Searching in translations
+
+One approach is to use the search term (not in source language) and\
+search inside the translated content instead.
+
 You have to modify your search queries manually – in SQL this could look like this:
 
 Before:
@@ -1857,20 +1894,9 @@ GROUP BY posts.ID
 HAVING FIND_IN_SET('English search term', GROUP_CONCAT(translations.trans));
 ```
 
-One caveat is that this only works for columns, where direct translations are available.
-
-#### Approach 3: Searching parsed html
-
-Another approach is to search generated cached html pages.\
-Since Gtbabel does not cache pages, you have to have your caching system running.\
-Translated pages can be basically treated like pages in source language,\
-since they are both just html, which can be searched.\
-Also evaluate if you can try to use the [Google Programmable Search Engine](https://developers.google.com/custom-search), which follows the same idea.
-
-#### Approach 4: Build your own search index
-
-In this approach you build a search index for every object you want to include into the search results.\
-You collect and permanently store all strings in the source language, translate them (once) by Gtbabel and also permanently store these translations. This way you can combine the best of the above approaches, although it involves the largest integration effort.
+This idea can be expanded significantly (e.g. by using regex patterns).\
+Note that this also works for content in different source languages.\
+In WordPress this approach is implemented and works automatically – providing full text search on all meta fields.
 
 ### URL query arguments
 
