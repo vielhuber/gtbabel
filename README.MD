@@ -20,6 +20,7 @@ Gtbabel automatically translates your HTML/PHP pages – server sided!
 -   [HTML](#html)
 -   [Ambiguous translations and plural forms](#ambiguous-translations-and-plural-forms)
 -   [Multiple source languages](#multiple-source-languages)
+-   [Hiding content](#hiding-content)
 -   [Router](#router)
 -   [Domain schema](#domain-schema)
 -   [Dealing with assets](#dealing-with-assets)
@@ -29,7 +30,7 @@ Gtbabel automatically translates your HTML/PHP pages – server sided!
 -   [Language picker](#language-picker)
 -   [Helper functions](#helper-functions)
 -   [Echoing strings](#echoing-strings)
--   [Dealing with dynamic data](#dealing-with-dynamic-data)
+-   [Dynamic data](#dealing-with-dynamic-data)
     -   [Search](#search)
     -   [URL query arguments](#url-query-arguments)
     -   [Mails](#mails)
@@ -1821,7 +1822,7 @@ However, you can also get a translation in a specific context:
 gtbabel__('datenschutz', null, null, 'slug'); // 'data-protection'
 ```
 
-## Dealing with dynamic data
+## Dynamic data
 
 Gtbabel translates your frontend, json responses and watches dom changes.\
 Nevertheless, one has to manually take care of how multilingual input data should be further processed.
