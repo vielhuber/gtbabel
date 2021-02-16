@@ -297,7 +297,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test031()
     {
-        $this->runDiff('31.html', 1000, [
+        $this->runDiff('31.html', 1250, [
             'debug_translations' => false,
             'auto_translation' => true
         ]);
@@ -305,7 +305,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test032()
     {
-        $this->runDiff('32.html', 1000, [
+        $this->runDiff('32.html', 1250, [
             'debug_translations' => false,
             'auto_translation' => true
         ]);
@@ -328,7 +328,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test036()
     {
-        $this->runDiff('36.html', 1000, [
+        $this->runDiff('36.html', 1250, [
             'debug_translations' => false,
             'auto_translation' => true
         ]);
@@ -349,7 +349,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test038()
     {
-        $this->runDiff('38.html', 500, [
+        $this->runDiff('38.html', 750, [
             'lng_target' => 'ar',
             'debug_translations' => false,
             'auto_translation' => true
@@ -396,7 +396,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test041()
     {
-        $this->runDiff('41.html', 3500, [
+        $this->runDiff('41.html', 4500, [
             'languages' => $this->getLanguageSettings([['code' => 'de', 'url_prefix' => 'de']], false),
             'lng_source' => 'en',
             'lng_target' => 'de',
@@ -443,7 +443,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test048()
     {
-        $this->runDiff('48.html', 1500, [
+        $this->runDiff('48.html', 1750, [
             'lng_source' => 'en',
             'lng_target' => 'de',
             'debug_translations' => false,
@@ -553,7 +553,7 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test059()
     {
-        $this->runDiff('59.html', 2000, [
+        $this->runDiff('59.html', 2250, [
             'debug_translations' => false,
             'auto_translation' => true
         ]);
@@ -662,28 +662,35 @@ class Test extends \PHPUnit\Framework\TestCase
 
     public function test073()
     {
-        $this->runDiff('73.xml', 200, [
-            'languages' => $this->getLanguageSettings([['code' => 'de', 'url_prefix' => ''], ['code' => 'en']]),
+        $this->runDiff('73.xml', 1500, [
             'xml_hreflang_tags' => true
         ]);
     }
 
     public function test074()
     {
-        $_SERVER['CONTENT_TYPE'] = 'text/css';
-        $this->runDiff('74.css');
-        $_SERVER['CONTENT_TYPE'] = null;
+        $this->runDiff('74.xml', 200, [
+            'languages' => $this->getLanguageSettings([['code' => 'de', 'url_prefix' => ''], ['code' => 'en']]),
+            'xml_hreflang_tags' => true
+        ]);
     }
 
     public function test075()
     {
+        $_SERVER['CONTENT_TYPE'] = 'text/css';
         $this->runDiff('75.css');
+        $_SERVER['CONTENT_TYPE'] = null;
     }
 
     public function test076()
     {
+        $this->runDiff('76.css');
+    }
+
+    public function test077()
+    {
         $this->runDiff(
-            '76.json',
+            '77.json',
             200,
             [
                 'translate_json' => true,
@@ -693,25 +700,25 @@ class Test extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function test077()
-    {
-        $this->runDiff('77.html', 1500, [
-            'lng_source' => 'de',
-            'lng_target' => 'en'
-        ]);
-    }
-
     public function test078()
     {
         $this->runDiff('78.html', 1500, [
             'lng_source' => 'de',
-            'lng_target' => 'de'
+            'lng_target' => 'en'
         ]);
     }
 
     public function test079()
     {
         $this->runDiff('79.html', 1500, [
+            'lng_source' => 'de',
+            'lng_target' => 'de'
+        ]);
+    }
+
+    public function test080()
+    {
+        $this->runDiff('80.html', 1500, [
             'lng_source' => 'de',
             'lng_target' => 'es'
         ]);

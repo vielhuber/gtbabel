@@ -2147,7 +2147,10 @@ class Data
                 trim($this->getPathTranslationInLanguage($from_lng, $to_lng, $path), '/'),
             '/'
         );
-        return $path . (mb_strpos($path, '?') === false ? '/' : '');
+        if (mb_strpos($path, '?') === false && mb_strrpos($url, '/') === mb_strlen($url) - 1) {
+            $path .= '/';
+        }
+        return $path;
     }
 
     function getTranslationInForeignLng($str, $to_lng, $from_lng = null, $context = null)

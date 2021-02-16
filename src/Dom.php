@@ -535,8 +535,8 @@ class Dom
             return $xml;
         }
         $this->setupDomDocument($xml);
-        $this->setXmlLangTags();
         $this->modifyXmlNodes();
+        $this->setXmlLangTags();
         $xml = $this->finishDomDocument();
         return $xml;
     }
@@ -598,9 +598,54 @@ class Dom
         if (!$this->host->responseCodeIsSuccessful()) {
             return;
         }
+        if ($this->settings->get('xml_hreflang_tags') !== true) {
+            return;
+        }
 
-        if ($this->settings->get('xml_hreflang_tags') === true) {
-            /* notes: https://developers.google.com/search/docs/advanced/crawling/localized-versions?hl=de&visit_id=637489903664231830-3049723367&rd=2#methods-for-indicating-your-alternate-pages */
+        /* notes:
+        - https://developers.google.com/search/docs/advanced/crawling/localized-versions?hl=de&visit_id=637489903664231830-3049723367&rd=2#methods-for-indicating-your-alternate-pages
+        - https://webmasters.stackexchange.com/questions/74118/is-a-different-sitemap-per-language-ok-how-do-i-tell-google-about-them
+        */
+        if (count($this->DOMDocument->getElementsByTagName('sitemap')) > 0) {
+            $to_append = [];
+            $preload = [];
+            foreach ($this->DOMDocument->getElementsByTagName('sitemap') as $nodes__value) {
+                $preload[] = [
+                    'node' => $nodes__value,
+                    'data' => $this->data->getLanguagePickerData(
+                        false,
+                        $this->DOMXPath->query('.//*[name()=\'loc\']', $nodes__value)[0]->nodeValue
+                    )
+                ];
+            }
+            foreach ($this->settings->getSelectedLanguageCodes() as $languages__value) {
+                foreach ($preload as $preload__value) {
+                    if ($languages__value === $this->data->getCurrentLanguageCode()) {
+                        continue;
+                    }
+                    foreach ($preload__value['data'] as $data__value) {
+                        if ($data__value['hreflang'] === null) {
+                            continue;
+                        }
+                        if ($data__value['code'] !== $languages__value) {
+                            continue;
+                        }
+                        $tag = $preload__value['node']->cloneNode(true);
+                        $loc = $this->DOMXPath->query('.//*[name()=\'loc\']', $tag)[0];
+                        $loc->nodeValue = $data__value['url'];
+                        $to_append[] = $tag;
+                    }
+                }
+            }
+            if (!empty($to_append)) {
+                if (count($this->DOMDocument->getElementsByTagName('sitemapindex')) > 0) {
+                    $parent = $this->DOMDocument->getElementsByTagName('sitemapindex')[0];
+                    foreach ($to_append as $to_append__value) {
+                        $parent->appendChild($to_append__value);
+                    }
+                }
+            }
+        } else {
             $nodes = $this->DOMXPath->query('//*[name()=\'loc\']');
             if (count($nodes) > 0) {
                 foreach ($nodes as $nodes__value) {
@@ -624,7 +669,9 @@ class Dom
             $nodes = $this->DOMXPath->query('/*');
             if (count($nodes) > 0) {
                 foreach ($nodes as $nodes__value) {
-                    $nodes__value->setAttribute('xmlns:xhtml', 'http://www.w3.org/1999/xhtml');
+                    if ($nodes__value->getAttribute('xmlns') != '') {
+                        $nodes__value->setAttribute('xmlns:xhtml', 'http://www.w3.org/1999/xhtml');
+                    }
                 }
             }
         }
