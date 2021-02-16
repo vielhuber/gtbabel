@@ -32,7 +32,8 @@ class Gtbabel
         $this->domfactory =
             $domfactory ?:
             new DomFactory($this->utils, $this->data, $this->host, $this->settings, $this->tags, $this->log);
-        $this->router = $router ?: new Router($this->data, $this->host, $this->settings, $this->publish, $this->log);
+        $this->router =
+            $router ?: new Router($this->data, $this->host, $this->settings, $this->publish, $this->log, $this->utils);
         $this->gettext = $gettext ?: new Gettext($this->data, $this->settings);
         $this->excel = $excel ?: new Excel($this->data, $this->settings);
     }

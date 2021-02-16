@@ -8,13 +8,15 @@ class Router
         Host $host = null,
         Settings $settings = null,
         Publish $publish = null,
-        Log $log = null
+        Log $log = null,
+        Utils $utils = null
     ) {
         $this->data = $data ?: new Data();
         $this->host = $host ?: new Host();
         $this->settings = $settings ?: new Settings();
         $this->publish = $publish ?: new Publish();
         $this->log = $log ?: new Log();
+        $this->utils = $utils ?: new Utils();
     }
 
     function handleRedirects()
@@ -114,11 +116,21 @@ class Router
         }
         $path = $this->host->getPathWithoutPrefixFromUrl($this->host->getCurrentUrlWithArgs());
         if (!$this->data->sourceLngIsCurrentLng()) {
+            $translations_missing = false;
             $path = $this->data->getPathTranslationInLanguage(
                 $this->data->getCurrentLanguageCode(),
                 $this->settings->getSourceLanguageCode(),
-                $path
+                $path,
+                $translations_missing
             );
+            /* normally, if the path could partly not be translated, the original path is returned here
+            this is in general OK, but wordpress has an odd behaviour, that will allow
+            path prefixes to work also. this leads to the fact, that
+            https://tld.com/en/deutscher-pfad is working (because https://tld.com/en/deutscher-pfad is also working)
+            we forcefully prevent that */
+            if ($this->utils->isWordPress() && $translations_missing === true) {
+                $path = $path . '_force404';
+            }
         }
         $path = trim($path, '/');
         $path = '/' . $path;

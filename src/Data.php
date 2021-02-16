@@ -2264,7 +2264,7 @@ class Data
         return $trans;
     }
 
-    function getPathTranslationInLanguage($from_lng, $to_lng, $path = null)
+    function getPathTranslationInLanguage($from_lng, $to_lng, $path = null, &$missing_translations = false)
     {
         /* this is a different approach than modifyLinkAndGetTranslationOfLinkHrefAndAddDynamicallyIfNeeded:
         if does not translate actively a link (which is generally in the source language)
@@ -2309,9 +2309,16 @@ class Data
             if ($this->settings->get('unchecked_strings') !== 'trans') {
                 // no string has been found in general (unchecked or checked)
                 // this is always the case, if you are on a unchecked url (like /en/impressum)
-                // and try to translate that e.g. from english to french
+                // and try to translate that e.g. from english to french and french is checked
+                // redo the translation (and try to translate it not from the current language to the target language
+                // but from the source language to the target language)
                 if ($data['trans'] === false) {
-                    $data = $this->getTranslationInForeignLng($path_parts__value, $to_lng, $from_lng, 'slug');
+                    $data = $this->getTranslationInForeignLng(
+                        $path_parts__value,
+                        $to_lng,
+                        $this->settings->getSourceLanguageCode(),
+                        'slug'
+                    );
                 }
                 if ($data['checked_from'] === false && $data['checked_to'] === false) {
                     $trans = false;
@@ -2327,6 +2334,11 @@ class Data
             }
             if ($trans !== false) {
                 $path_parts[$path_parts__key] = $trans;
+            }
+
+            // register, that in this slug (some) translations have been missing
+            if ($trans === false) {
+                $missing_translations = true;
             }
         }
 

@@ -65,7 +65,7 @@ class Test extends \PHPUnit\Framework\TestCase
             ->onlyMethods([])
             ->getMock();
         $router = $this->getMockBuilder(vielhuber\gtbabel\Router::class)
-            ->setConstructorArgs([$data, $host, $settings, $publish, $log])
+            ->setConstructorArgs([$data, $host, $settings, $publish, $log, $utils])
             ->onlyMethods(['redirect'])
             ->getMock();
         $router
