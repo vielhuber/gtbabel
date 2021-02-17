@@ -771,6 +771,9 @@ class Test extends \PHPUnit\Framework\TestCase
                         : '')
             );
         }
+        $this->assertEquals($this->gtbabel->data->stringShouldNotBeTranslated('099999-1'), true);
+        $this->assertEquals($this->gtbabel->data->stringShouldNotBeTranslated('099999-1', ''), true);
+        $this->assertEquals($this->gtbabel->data->stringShouldNotBeTranslated('099999-1', 'slug'), false);
     }
 
     public function test_translate()

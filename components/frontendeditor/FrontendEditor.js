@@ -185,6 +185,8 @@ export default class FrontendEditor {
                                 this.classNameContainerListitemTextarea +
                                 ' ' +
                                 this.classNameContainerListitemTrans +
+                                '" data-context="' +
+                                (data__value.context ?? '') +
                                 '">' +
                                 data__value.trans +
                                 '</textarea>';

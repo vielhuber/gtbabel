@@ -1965,17 +1965,19 @@ class Data
             return true;
         }
         $length = mb_strlen($str);
-        // numbers
-        if (is_numeric($str)) {
-            return true;
-        }
-        // if the string does not contain any char of a string of ANY language
-        // see https://stackoverflow.com/a/48902765/2068362
-        if (preg_match('/\p{L}/u', $str) !== 1) {
-            return true;
-        }
-        if (preg_match('/^[a-z](\)|\])$/', $str)) {
-            return true;
+        if ($context !== 'slug') {
+            // numbers
+            if (is_numeric($str)) {
+                return true;
+            }
+            // if the string does not contain any char of a string of ANY language
+            // see https://stackoverflow.com/a/48902765/2068362
+            if (preg_match('/\p{L}/u', $str) !== 1) {
+                return true;
+            }
+            if (preg_match('/^[a-z](\)|\])$/', $str)) {
+                return true;
+            }
         }
         // lng codes
         if ($context === 'slug') {
@@ -2001,28 +2003,30 @@ class Data
                 return true;
             }
         }
-        // detect paths to php scripts
-        if (mb_strpos($str, ' ') === false && mb_strpos($str, '.php') !== false) {
-            return true;
-        }
-        // parse errors
-        if (mb_stripos($str, 'parse error') !== false || mb_stripos($str, 'syntax error') !== false) {
-            return true;
-        }
-        // detect print_r outputs
-        if (mb_strpos($str, '(') === 0 && mb_strrpos($str, ')') === $length - 1 && mb_strpos($str, '=') !== false) {
-            return true;
-        }
-        // detect mathjax/latex
-        if (mb_strpos($str, '$$') === 0 && mb_strrpos($str, '$$') === $length - 2) {
-            return true;
-        }
-        if (mb_strpos($str, '\\(') === 0 && mb_strrpos($str, '\\)') === $length - 2) {
-            return true;
-        }
-        // (multiple) classes
-        if (preg_match('/^(\.)[a-z][a-z0-9- \.]*$/', $str)) {
-            return true;
+        if ($context !== 'slug') {
+            // detect paths to php scripts
+            if (mb_strpos($str, ' ') === false && mb_strpos($str, '.php') !== false) {
+                return true;
+            }
+            // parse errors
+            if (mb_stripos($str, 'parse error') !== false || mb_stripos($str, 'syntax error') !== false) {
+                return true;
+            }
+            // detect print_r outputs
+            if (mb_strpos($str, '(') === 0 && mb_strrpos($str, ')') === $length - 1 && mb_strpos($str, '=') !== false) {
+                return true;
+            }
+            // detect mathjax/latex
+            if (mb_strpos($str, '$$') === 0 && mb_strrpos($str, '$$') === $length - 2) {
+                return true;
+            }
+            if (mb_strpos($str, '\\(') === 0 && mb_strrpos($str, '\\)') === $length - 2) {
+                return true;
+            }
+            // (multiple) classes
+            if (preg_match('/^(\.)[a-z][a-z0-9- \.]*$/', $str)) {
+                return true;
+            }
         }
         if ($context !== 'email' && $context !== 'slug' && $context !== 'file' && $context !== 'url') {
             // don't ignore root relative links beginning with "/"

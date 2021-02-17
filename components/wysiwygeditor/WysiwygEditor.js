@@ -3,10 +3,10 @@ import pell from 'pell';
 export default class WysiwygEditor {
     init(el) {
         if (el !== null) {
-            // check if is html
             let isHtml = Array.from(new DOMParser().parseFromString(el.value, 'text/html').body.childNodes).some(
-                node => node.nodeType === 1
-            );
+                    node => node.nodeType === 1
+                ),
+                context = el.getAttribute('data-context');
 
             el.classList.add('gtbabel__wysiwyg-textarea');
             el.setAttribute('spellcheck', 'false');
@@ -55,6 +55,12 @@ export default class WysiwygEditor {
                 });
             });
 
+            if (context === 'slug') {
+                el.addEventListener('blur', () => {
+                    el.value = this.slugify(el.value);
+                });
+            }
+
             if (isHtml === true) {
                 let container = document.createElement('div');
                 container.setAttribute('class', 'gtbabel__wysiwyg-editor');
@@ -102,5 +108,23 @@ export default class WysiwygEditor {
     textareaSetHeight(el) {
         el.style.height = '5px';
         el.style.height = el.scrollHeight + 'px';
+    }
+
+    slugify(text) {
+        return text
+            .toString()
+            .toLowerCase()
+            .trim()
+            .split('ä')
+            .join('ae')
+            .split('ö')
+            .join('oe')
+            .split('ü')
+            .join('ue')
+            .split('ß')
+            .join('ss')
+            .replace(/[^\w\s-]/g, '')
+            .replace(/[\s_-]+/g, '-')
+            .replace(/^-+|-+$/g, '');
     }
 }
