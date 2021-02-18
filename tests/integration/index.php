@@ -212,14 +212,10 @@ $gtbabel->start();
     <p>Dies ist ein Test!</p>
     <?php if (function_exists('gtbabel_languagepicker')) {
         echo '<ul class="lngpicker">';
-        foreach (gtbabel_languagepicker() as $languagepicker__value) {
+        foreach (gtbabel_languagepicker() as $val) {
             echo '<li>';
-            echo '<a href="' .
-                $languagepicker__value['url'] .
-                '"' .
-                ($languagepicker__value['active'] ? ' class="active"' : '') .
-                '>';
-            echo $languagepicker__value['label'];
+            echo '<a href="' . $val['url'] . '"' . ($val['active'] ? ' class="active"' : '') . '>';
+            echo $val['label'];
             echo '</a>';
             echo '</li>';
         }

@@ -912,7 +912,7 @@ class GtbabelWordPress
             function ($object) {
                 add_meta_box(
                     'custom-menu-metabox',
-                    __('Gtbabel language picker', 'gtbabel-plugin'),
+                    __('Language picker', 'gtbabel-plugin'),
                     function () {
                         global $nav_menu_selected_id;
                         echo '
@@ -926,7 +926,7 @@ class GtbabelWordPress
                                         'ID' => 1,
                                         'object_id' => 1,
                                         'type_label' => '',
-                                        'title' => __('Gtbabel language picker', 'gtbabel-plugin'),
+                                        'title' => __('Language picker', 'gtbabel-plugin'),
                                         'url' => '#gtbabel_languagepicker',
                                         'type' => 'custom',
                                         'object' => 'gtbabel-slug-slug',
@@ -1168,6 +1168,7 @@ class GtbabelWordPress
                         return sanitize_textarea_field($settings__value);
                     });
 
+                    // set true/false
                     foreach (
                         [
                             'translate_html',
@@ -3175,10 +3176,33 @@ class GtbabelWordPress
     private function initBackendLanguagePicker()
     {
         $this->checkToken();
-
+        $message = '';
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (isset($_POST['save_show_language_picker'])) {
+                if (isset($_POST['gtbabel']) && isset($_POST['gtbabel']['show_language_picker'])) {
+                    $this->saveSetting(
+                        'show_language_picker',
+                        $_POST['gtbabel']['show_language_picker'] == '1' ? true : false
+                    );
+                }
+            }
+            $message =
+                '<div class="gtbabel__notice notice notice-success is-dismissible"><p>' .
+                __('Successfully edited', 'gtbabel-plugin') .
+                '</p></div>';
+        }
         echo '<div class="gtbabel gtbabel--lngpicker wrap">';
+        echo '<form class="gtbabel__form" method="post" action="' .
+            admin_url('admin.php?page=gtbabel-lngpicker') .
+            '">';
+        wp_nonce_field('gtbabel-lngpicker');
         echo '<h1 class="gtbabel__title">🌐 ' . $this->getPluginTitle() . ' 🌐</h1>';
+        echo $message;
         echo $this->initBackendLanguagePickerContent();
+        echo '<input class="gtbabel__submit button button-primary gtbabel__submit--space" name="save_show_language_picker" value="' .
+            __('Save', 'gtbabel-plugin') .
+            '" type="submit" />';
+        echo '</form>';
         echo '</div>';
     }
 
@@ -3221,35 +3245,44 @@ class GtbabelWordPress
         );
         echo '</p>';
 
-        echo '<h2 class="gtbabel__subtitle">' . __('Simple', 'gtbabel-plugin') . '</h2>';
+        echo '<h2 class="gtbabel__subtitle">' . __('Overlay', 'gtbabel-plugin') . '</h2>';
         echo '<p class="gtbabel__paragraph">';
-        echo sprintf(
-            __('Just enable the simple language picker in the %ssettings%s and you are good to go.', 'gtbabel-plugin'),
-            '<a target="_blank" href="' . admin_url('admin.php?page=gtbabel-settings') . '">',
-            '</a>'
-        );
+        echo __('Enable the simple language picker and you are good to go.', 'gtbabel-plugin');
         echo '</p>';
+        echo '<ul class="gtbabel__fields">';
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_show_language_picker" class="gtbabel__label">';
+        echo __('Show simple language picker', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox gtbabel__input--submit-unchecked" type="checkbox" id="gtbabel_show_language_picker" name="gtbabel[show_language_picker]" value="1"' .
+            ($this->getSetting('show_language_picker') == '1' ? ' checked="checked"' : '') .
+            ' />';
+        echo '</div>';
+        echo '</li>';
+        echo '</ul>';
 
         echo '<h2 class="gtbabel__subtitle">' . __('Template', 'gtbabel-plugin') . '</h2>';
         echo '<p class="gtbabel__paragraph">';
         echo __('If you need more control, use the following php-code:', 'gtbabel-plugin');
         echo '</p>';
-        echo '<code class="gtbabel__code">';
+        echo '<div class="gtbabel__code-container">';
         $code = <<<'EOD'
+<?php
 if(function_exists('gtbabel_languagepicker')) {
     echo '<ul class="lngpicker">';
-    foreach(gtbabel_languagepicker() as $languagepicker__value) {
+    foreach(gtbabel_languagepicker() as $val) {
         echo '<li>';
-            echo '<a href="'.$languagepicker__value['url'].'"'.($languagepicker__value['active']?' class="active"':'').'>';
-                echo $languagepicker__value['label'];
+            echo '<a href="'.$val['url'].'"'.($val['active']?' class="active"':'').'>';
+                echo $val['label'];
             echo '</a>';
         echo '</li>';
     }
     echo '</ul>';
 }
 EOD;
-        echo htmlentities($code);
-        echo '</code>';
+        echo highlight_string($code, true);
+        echo '</div>';
     }
 
     private function getBackendWizardStep()
@@ -3275,7 +3308,12 @@ EOD;
 
                     // whitelist
                     foreach (
-                        ['languages', 'auto_translation_service_provider', 'auto_translation_service_api_key']
+                        [
+                            'languages',
+                            'auto_translation_service_provider',
+                            'auto_translation_service_api_key',
+                            'show_language_picker'
+                        ]
                         as $fields__value
                     ) {
                         if (!isset($_POST['gtbabel'][$fields__value])) {
@@ -3283,12 +3321,21 @@ EOD;
                         }
                         $settings[$fields__value] = $_POST['gtbabel'][$fields__value];
                     }
-                }
 
-                // sanitize
-                $settings = __::array_map_deep($settings, function ($settings__value) {
-                    return sanitize_textarea_field($settings__value);
-                });
+                    // sanitize
+                    $settings = __::array_map_deep($settings, function ($settings__value) {
+                        return sanitize_textarea_field($settings__value);
+                    });
+
+                    // set true/false
+                    foreach (['show_language_picker'] as $checkbox__value) {
+                        if (@$settings[$checkbox__value] == '1') {
+                            $settings[$checkbox__value] = true;
+                        } else {
+                            $settings[$checkbox__value] = false;
+                        }
+                    }
+                }
 
                 // make changes
                 if ($this->getBackendWizardStep() === 2) {
@@ -3367,6 +3414,7 @@ EOD;
                 }
                 if ($this->getBackendWizardStep() === 5) {
                     check_admin_referer('gtbabel-wizard-step-4');
+                    $this->saveSetting('show_language_picker', $settings['show_language_picker']);
                     $this->saveSetting('wizard_finished', true);
                 }
 
@@ -3581,7 +3629,7 @@ EOD;
                 __('Back', 'gtbabel-plugin') .
                 '</a>';
             echo '<input class="gtbabel__submit button button-primary" name="save_step" value="' .
-                __('Finish', 'gtbabel-plugin') .
+                __('Next', 'gtbabel-plugin') .
                 '" type="submit" />';
             echo '</div>';
             echo '</div>';
@@ -3596,11 +3644,11 @@ EOD;
                 plugin_dir_url(__FILE__) .
                 'assets/images/finish.gif" alt="" />';
             echo '<div class="gtbabel__wizard-buttons">';
-            if ($this->gtbabel->data->getTranslationCountFromDatabase() > 0) {
-                echo '<a class="button button-secondary" href="' . admin_url('admin.php?page=gtbabel-trans') . '">';
-                echo __('Translated strings', 'gtbabel-plugin');
-                echo '</a>';
-            }
+            echo '<a class="button button-secondary" href="' .
+                admin_url('admin.php?page=gtbabel-wizard&step=4') .
+                '">' .
+                __('Back', 'gtbabel-plugin') .
+                '</a>';
             echo '<a class="button button-primary" href="' . get_bloginfo('url') . '" target="_blank">';
             echo __('To the website', 'gtbabel-plugin');
             echo '</a>';
@@ -4565,8 +4613,8 @@ class gtbabel_lngpicker_widget extends \WP_Widget
 {
     function __construct()
     {
-        parent::__construct('gtbabel_lngpicker_widget', __('Gtbabel language picker', 'gtbabel-plugin'), [
-            'description' => __('The language picker of Gtbabel.', 'gtbabel-plugin')
+        parent::__construct('gtbabel_lngpicker_widget', __('Language picker', 'gtbabel-plugin'), [
+            'description' => __('A basic language picker.', 'gtbabel-plugin')
         ]);
     }
     public function widget($args, $instance)

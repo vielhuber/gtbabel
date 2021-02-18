@@ -14,6 +14,9 @@
     line-height: 30px;
     min-height: 30px;
 }
+.gtbabel__submit--space.gtbabel__submit--space {
+    margin-top: 20px;
+}
 .gtbabel__inputbox {
     flex: 0 1 calc(100% - 320px);
 }
@@ -318,10 +321,12 @@ $button_width: 105px;
     font-weight: bold;
 }
 
-.gtbabel__code {
+.gtbabel__code-container code {
     display: block;
-    white-space: pre;
-    overflow: hidden;
+    overflow-x: auto;
+    white-space: nowrap;
+    line-height: 13px;
+    font-size: 12px;
 }
 
 .gtbabel__progress {
