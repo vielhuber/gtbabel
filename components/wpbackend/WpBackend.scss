@@ -1,5 +1,6 @@
 .gtbabel__field {
     display: flex;
+    flex-wrap: wrap;
     align-items: flex-start;
     align-content: flex-start;
     margin: 0;
@@ -13,6 +14,7 @@
     flex: 0 1 320px;
     line-height: 30px;
     min-height: 30px;
+    text-align: left;
 }
 .gtbabel__submit--space.gtbabel__submit--space {
     margin-top: 20px;
@@ -338,7 +340,6 @@ $button_width: 105px;
     overflow: hidden;
     margin-top: 20px;
 }
-
 .gtbabel__progress-inner {
     height: 100%;
 }
@@ -542,4 +543,17 @@ body[class*='_page_gtbabel-wizard'] #wpbody {
     display: block;
     margin-top: 100px;
     margin-bottom: 10px;
+}
+
+.gtbabel__basicauth-note {
+    width: 100%;
+    padding: 7px 10px;
+    margin: 10px 0;
+    color: #fff;
+}
+.gtbabel__basicauth-note--warning {
+    background-color: #dac651;
+}
+.gtbabel__basicauth-note--error {
+    background-color: #ff8888;
 }

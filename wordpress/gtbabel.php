@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 5.7.2
+ * Version: 5.7.3
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -1832,6 +1832,7 @@ class GtbabelWordPress
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
+        $this->showBasicAuthInfo();
         echo '<label for="gtbabel_basic_auth" class="gtbabel__label">';
         echo __('Basic auth', 'gtbabel-plugin');
         echo '</label>';
@@ -3299,7 +3300,12 @@ EOD;
         $this->checkToken();
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            if (isset($_POST['save_step'])) {
+            if (
+                isset($_POST['save_step_1']) ||
+                isset($_POST['save_step_2']) ||
+                isset($_POST['save_step_3']) ||
+                isset($_POST['save_step_4'])
+            ) {
                 $settings = [];
 
                 if (isset($_POST['gtbabel'])) {
@@ -3312,7 +3318,9 @@ EOD;
                             'languages',
                             'auto_translation_service_provider',
                             'auto_translation_service_api_key',
-                            'show_language_picker'
+                            'show_language_picker',
+                            'basic_auth_username',
+                            'basic_auth_password'
                         ]
                         as $fields__value
                     ) {
@@ -3339,83 +3347,96 @@ EOD;
 
                 // make changes
                 if ($this->getBackendWizardStep() === 2) {
-                    check_admin_referer('gtbabel-wizard-step-1');
-                    if (!isset($settings['languages'])) {
-                        $settings = array_merge(['languages' => []], $settings);
+                    if (isset($_POST['save_step_1'])) {
+                        check_admin_referer('gtbabel-wizard-step-1');
+                        if (!isset($settings['languages'])) {
+                            $settings = array_merge(['languages' => []], $settings);
+                        }
+                        $settings['languages'] = array_map(function ($settings__value) {
+                            return __::decode_data($settings__value);
+                        }, $settings['languages']);
+                        array_unshift(
+                            $settings['languages'],
+                            $this->gtbabel->settings->getLanguageDataForCode($this->getSetting('lng_source'))
+                        );
+                        $this->saveSetting('languages', $settings['languages']);
                     }
-                    $settings['languages'] = array_map(function ($settings__value) {
-                        return __::decode_data($settings__value);
-                    }, $settings['languages']);
-                    array_unshift(
-                        $settings['languages'],
-                        $this->gtbabel->settings->getLanguageDataForCode($this->getSetting('lng_source'))
-                    );
-                    $this->saveSetting('languages', $settings['languages']);
                 }
                 if ($this->getBackendWizardStep() === 3) {
-                    check_admin_referer('gtbabel-wizard-step-2');
-                    if ($settings['auto_translation_service_provider'] !== 'manual') {
-                        $auto_translation_service = $this->getSetting('auto_translation_service');
-                        if ($auto_translation_service === null || $auto_translation_service === '') {
-                            $auto_translation_service = [];
-                        }
-                        $exists = false;
-                        foreach (
-                            $auto_translation_service
-                            as $auto_translation_service__key => $auto_translation_service__value
-                        ) {
-                            if (
-                                $auto_translation_service__value['provider'] ===
-                                $settings['auto_translation_service_provider']
-                            ) {
-                                $exists = true;
-                                if (
-                                    $auto_translation_service__value['api_keys'] === null ||
-                                    $auto_translation_service__value['api_keys'] === '' ||
-                                    is_string($auto_translation_service__value['api_keys'])
-                                ) {
-                                    $auto_translation_service__value['api_keys'] = [
-                                        $settings['auto_translation_service_api_key']
-                                    ];
-                                } elseif (is_array($auto_translation_service__value['api_keys'])) {
-                                    $auto_translation_service__value['api_keys'][0] =
-                                        $settings['auto_translation_service_api_key'];
-                                }
-                                $auto_translation_service__value['disabled'] = false;
-                            } else {
-                                $auto_translation_service__value['disabled'] = true;
+                    if (isset($_POST['save_step_2'])) {
+                        check_admin_referer('gtbabel-wizard-step-2');
+                        if ($settings['auto_translation_service_provider'] !== 'manual') {
+                            $auto_translation_service = $this->getSetting('auto_translation_service');
+                            if ($auto_translation_service === null || $auto_translation_service === '') {
+                                $auto_translation_service = [];
                             }
-                            $auto_translation_service[
-                                $auto_translation_service__key
-                            ] = $auto_translation_service__value;
+                            $exists = false;
+                            foreach (
+                                $auto_translation_service
+                                as $auto_translation_service__key => $auto_translation_service__value
+                            ) {
+                                if (
+                                    $auto_translation_service__value['provider'] ===
+                                    $settings['auto_translation_service_provider']
+                                ) {
+                                    $exists = true;
+                                    if (
+                                        $auto_translation_service__value['api_keys'] === null ||
+                                        $auto_translation_service__value['api_keys'] === '' ||
+                                        is_string($auto_translation_service__value['api_keys'])
+                                    ) {
+                                        $auto_translation_service__value['api_keys'] = [
+                                            $settings['auto_translation_service_api_key']
+                                        ];
+                                    } elseif (is_array($auto_translation_service__value['api_keys'])) {
+                                        $auto_translation_service__value['api_keys'][0] =
+                                            $settings['auto_translation_service_api_key'];
+                                    }
+                                    $auto_translation_service__value['disabled'] = false;
+                                } else {
+                                    $auto_translation_service__value['disabled'] = true;
+                                }
+                                $auto_translation_service[
+                                    $auto_translation_service__key
+                                ] = $auto_translation_service__value;
+                            }
+                            if ($exists === false) {
+                                $auto_translation_service[] = [
+                                    'provider' => $settings['auto_translation_service_provider'],
+                                    'api_keys' => [$settings['auto_translation_service_api_key']],
+                                    'throttle_chars_per_month' => 1000000,
+                                    'lng' => null,
+                                    'label' =>
+                                        $settings['auto_translation_service_provider'] !== 'close2translate'
+                                            ? null
+                                            : 'close2 Translation API',
+                                    'api_url' =>
+                                        $settings['auto_translation_service_provider'] !== 'close2translate'
+                                            ? null
+                                            : 'https://translate.close2dev.de/?str=%str%&lng_source=%lng_source%&lng_target=%lng_target%&api_key=%api_key%&service=google',
+                                    'disabled' => false
+                                ];
+                            }
+                            $this->saveSetting('auto_translation_service', $auto_translation_service);
+                            $this->saveSetting('auto_translation', true);
+                        } else {
+                            $this->saveSetting('auto_translation', false);
                         }
-                        if ($exists === false) {
-                            $auto_translation_service[] = [
-                                'provider' => $settings['auto_translation_service_provider'],
-                                'api_keys' => [$settings['auto_translation_service_api_key']],
-                                'throttle_chars_per_month' => 1000000,
-                                'lng' => null,
-                                'label' =>
-                                    $settings['auto_translation_service_provider'] !== 'close2translate'
-                                        ? null
-                                        : 'close2 Translation API',
-                                'api_url' =>
-                                    $settings['auto_translation_service_provider'] !== 'close2translate'
-                                        ? null
-                                        : 'https://translate.close2dev.de/?str=%str%&lng_source=%lng_source%&lng_target=%lng_target%&api_key=%api_key%&service=google',
-                                'disabled' => false
-                            ];
-                        }
-                        $this->saveSetting('auto_translation_service', $auto_translation_service);
-                        $this->saveSetting('auto_translation', true);
-                    } else {
-                        $this->saveSetting('auto_translation', false);
+                    }
+                    if (isset($_POST['save_step_3'])) {
+                        check_admin_referer('gtbabel-wizard-step-3');
+                        $this->saveSetting(
+                            'basic_auth',
+                            $settings['basic_auth_username'] . ':' . $settings['basic_auth_password']
+                        );
                     }
                 }
                 if ($this->getBackendWizardStep() === 5) {
-                    check_admin_referer('gtbabel-wizard-step-4');
-                    $this->saveSetting('show_language_picker', $settings['show_language_picker']);
-                    $this->saveSetting('wizard_finished', true);
+                    if (isset($_POST['save_step_4'])) {
+                        check_admin_referer('gtbabel-wizard-step-4');
+                        $this->saveSetting('show_language_picker', $settings['show_language_picker']);
+                        $this->saveSetting('wizard_finished', true);
+                    }
                 }
 
                 $this->setupConfig();
@@ -3438,6 +3459,15 @@ EOD;
                 'api_url' => null,
                 'disabled' => false
             ];
+        }
+
+        $basic_auth_needed = $this->needsValidBasicAuthInfo();
+        $basic_auth_setting = $this->getSetting('basic_auth');
+        $basic_auth_username = '';
+        $basic_auth_password = '';
+        if (is_string($basic_auth_setting) && count(explode(':', $basic_auth_setting)) === 2) {
+            $basic_auth_username = explode(':', $basic_auth_setting)[0];
+            $basic_auth_password = explode(':', $basic_auth_setting)[1];
         }
 
         echo '<div class="gtbabel gtbabel--wizard">';
@@ -3484,7 +3514,7 @@ EOD;
             }
             echo '</ul>';
             echo '<div class="gtbabel__wizard-buttons">';
-            echo '<input class="gtbabel__submit button button-primary" name="save_step" value="' .
+            echo '<input class="gtbabel__submit button button-primary" name="save_step_1" value="' .
                 __('Next', 'gtbabel-plugin') .
                 '" type="submit" />';
             echo '</div>';
@@ -3570,7 +3600,7 @@ EOD;
                 '">' .
                 __('Back', 'gtbabel-plugin') .
                 '</a>';
-            echo '<input class="gtbabel__submit button button-primary" name="save_step" value="' .
+            echo '<input class="gtbabel__submit button button-primary" name="save_step_2" value="' .
                 __('Next', 'gtbabel-plugin') .
                 '" type="submit" />';
             echo '</div>';
@@ -3581,7 +3611,7 @@ EOD;
         // 3
         if ($this->getBackendWizardStep() === 3) {
             echo '<form class="gtbabel__form" method="post" action="' .
-                admin_url('admin.php?page=gtbabel-wizard&step=4') .
+                admin_url('admin.php?page=gtbabel-wizard&step=' . ($basic_auth_needed === true ? 3 : 4)) .
                 '">';
             wp_nonce_field('gtbabel-wizard-step-3');
             echo '<div class="gtbabel__wizard-step gtbabel__wizard-step--center">';
@@ -3593,11 +3623,36 @@ EOD;
             );
             echo '</p>';
 
-            $this->initBackendAutoTranslate('page=gtbabel-wizard&step=3');
-
-            echo '<div class="gtbabel__stats-log">';
-            echo $this->showStatsLog('google');
-            echo '</div>';
+            if ($basic_auth_needed === true) {
+                $this->showBasicAuthInfo();
+                echo '<ul class="gtbabel__fields">';
+                echo '<li class="gtbabel__field">';
+                echo '<label for="gtbabel_basic_auth_username" class="gtbabel__label">';
+                echo __('Username', 'gtbabel-plugin');
+                echo '</label>';
+                echo '<div class="gtbabel__inputbox">';
+                echo '<input required="required" class="gtbabel__input" type="text" id="gtbabel_basic_auth_username" name="gtbabel[basic_auth_username]" value="' .
+                    $basic_auth_username .
+                    '" />';
+                echo '</div>';
+                echo '</li>';
+                echo '<li class="gtbabel__field">';
+                echo '<label for="gtbabel_basic_auth_password" class="gtbabel__label">';
+                echo __('Password', 'gtbabel-plugin');
+                echo '</label>';
+                echo '<div class="gtbabel__inputbox">';
+                echo '<input required="required" class="gtbabel__input" type="text" id="gtbabel_basic_auth_password" name="gtbabel[basic_auth_password]" value="' .
+                    $basic_auth_password .
+                    '" />';
+                echo '</div>';
+                echo '</li>';
+                echo '</ul>';
+            } else {
+                $this->initBackendAutoTranslate('page=gtbabel-wizard&step=3');
+                echo '<div class="gtbabel__stats-log">';
+                echo $this->showStatsLog('google');
+                echo '</div>';
+            }
 
             echo '<div class="gtbabel__wizard-buttons">';
             echo '<a class="button button-secondary" href="' .
@@ -3605,7 +3660,7 @@ EOD;
                 '">' .
                 __('Back', 'gtbabel-plugin') .
                 '</a>';
-            echo '<input class="gtbabel__submit button button-primary" name="save_step" value="' .
+            echo '<input class="gtbabel__submit button button-primary" name="save_step_3" value="' .
                 __('Next', 'gtbabel-plugin') .
                 '" type="submit" />';
             echo '</div>';
@@ -3628,7 +3683,7 @@ EOD;
                 '">' .
                 __('Back', 'gtbabel-plugin') .
                 '</a>';
-            echo '<input class="gtbabel__submit button button-primary" name="save_step" value="' .
+            echo '<input class="gtbabel__submit button button-primary" name="save_step_4" value="' .
                 __('Next', 'gtbabel-plugin') .
                 '" type="submit" />';
             echo '</div>';
@@ -3649,7 +3704,7 @@ EOD;
                 '">' .
                 __('Back', 'gtbabel-plugin') .
                 '</a>';
-            echo '<a class="button button-primary" href="' . get_bloginfo('url') . '" target="_blank">';
+            echo '<a class="button button-primary" href="' . get_bloginfo('url') . '">';
             echo __('To the website', 'gtbabel-plugin');
             echo '</a>';
             echo '</div>';
@@ -3967,7 +4022,7 @@ EOD;
                 echo __('An error occured. Is your website accessible?', 'gtbabel-plugin');
                 echo '<br/>';
                 echo sprintf(
-                    __('If your site is password protected, populate the %sbasic auth option%s.', 'gtbabel-plugin'),
+                    __('Could not crawl your website. Check the general %ssettings%s.', 'gtbabel-plugin'),
                     '<a href="' . admin_url('admin.php?page=gtbabel-settings') . '">',
                     '</a>'
                 );
@@ -4561,6 +4616,47 @@ EOD;
                 }
             }
         }
+    }
+
+    private function showBasicAuthInfo()
+    {
+        if (!$this->needsValidBasicAuthInfo()) {
+            return;
+        }
+        $setting = $this->getSetting('basic_auth');
+        echo '<div class="gtbabel__basicauth-note gtbabel__basicauth-note--';
+        if (is_string($setting) && count(explode(':', $setting)) === 2) {
+            if (!__::check_basic_auth(get_bloginfo('url'), explode(':', $setting)[0], explode(':', $setting)[1])) {
+                echo 'warning">';
+                echo __('Your provided credentials may not seem to be correct. Try again.', 'gtbabel-plugin');
+            }
+        } else {
+            echo 'error">';
+            echo __(
+                'Your site may be password protected (basic auth). Please provide the credentials here.',
+                'gtbabel-plugin'
+            );
+        }
+        echo '</div>';
+    }
+
+    private function needsValidBasicAuthInfo()
+    {
+        if (@$_GET['gtbabel_auto_translate'] == '1') {
+            return false;
+        }
+        if (__::has_basic_auth(get_bloginfo('url'))) {
+            $setting = $this->getSetting('basic_auth');
+            if (
+                is_string($setting) &&
+                count(explode(':', $setting)) === 2 &&
+                __::check_basic_auth(get_bloginfo('url'), explode(':', $setting)[0], explode(':', $setting)[1])
+            ) {
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
 
     private function isRepoPlugin()
