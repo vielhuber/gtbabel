@@ -1,6 +1,6 @@
 .gtbabel-simple-lngpicker {
     position: fixed;
-    bottom: 30px;
+    bottom: 60px;
     left: 0;
     z-index: 2147483647;
     float: none;
@@ -16,6 +16,7 @@
 }
 .gtbabel-simple-lngpicker__item {
     border-top: 1px solid #4c4c4c;
+    list-style-type: none;
 }
 .gtbabel-simple-lngpicker__item:first-child {
     border-top: 0;

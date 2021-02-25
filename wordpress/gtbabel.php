@@ -3,7 +3,7 @@
  * Plugin Name: Gtbabel
  * Plugin URI: https://github.com/vielhuber/gtbabel
  * Description: Instant server-side translation of any page.
- * Version: 5.7.3
+ * Version: 5.7.4
  * Author: David Vielhuber
  * Author URI: https://vielhuber.de
  * License: free
@@ -2764,7 +2764,7 @@ class GtbabelWordPress
         echo '</li>';
         echo '<li class="gtbabel__field">';
         echo '<label for="gtbabel_auto_set_discovered_strings_checked" class="gtbabel__label">';
-        echo __('Auto set discovered strings to checked', 'gtbabel-plugin');
+        echo __('Set discovered strings to checked', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
         echo '<input class="gtbabel__input gtbabel__input--checkbox" id="gtbabel_auto_set_discovered_strings_checked" type="checkbox" checked="checked" value="1" />';
@@ -3216,6 +3216,26 @@ class GtbabelWordPress
         );
         echo '</p>';
 
+        echo '<h2 class="gtbabel__subtitle">' . __('Overlay', 'gtbabel-plugin') . '</h2>';
+        echo '<p class="gtbabel__paragraph">';
+        echo __(
+            'Activate the simple language picker and you are ready to go without any configuration effort.',
+            'gtbabel-plugin'
+        );
+        echo '</p>';
+        echo '<ul class="gtbabel__fields">';
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_show_language_picker" class="gtbabel__label">';
+        echo __('Show simple language picker', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox gtbabel__input--submit-unchecked" type="checkbox" id="gtbabel_show_language_picker" name="gtbabel[show_language_picker]" value="1"' .
+            ($this->getSetting('show_language_picker') == '1' ? ' checked="checked"' : '') .
+            ' />';
+        echo '</div>';
+        echo '</li>';
+        echo '</ul>';
+
         echo '<h2 class="gtbabel__subtitle">' . __('Widget', 'gtbabel-plugin') . '</h2>';
         echo '<p class="gtbabel__paragraph">';
         if (count(wp_get_sidebars_widgets()) > 1) {
@@ -3245,23 +3265,6 @@ class GtbabelWordPress
             '</a>'
         );
         echo '</p>';
-
-        echo '<h2 class="gtbabel__subtitle">' . __('Overlay', 'gtbabel-plugin') . '</h2>';
-        echo '<p class="gtbabel__paragraph">';
-        echo __('Enable the simple language picker and you are good to go.', 'gtbabel-plugin');
-        echo '</p>';
-        echo '<ul class="gtbabel__fields">';
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_show_language_picker" class="gtbabel__label">';
-        echo __('Show simple language picker', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox gtbabel__input--submit-unchecked" type="checkbox" id="gtbabel_show_language_picker" name="gtbabel[show_language_picker]" value="1"' .
-            ($this->getSetting('show_language_picker') == '1' ? ' checked="checked"' : '') .
-            ' />';
-        echo '</div>';
-        echo '</li>';
-        echo '</ul>';
 
         echo '<h2 class="gtbabel__subtitle">' . __('Template', 'gtbabel-plugin') . '</h2>';
         echo '<p class="gtbabel__paragraph">';
@@ -3451,7 +3454,7 @@ EOD;
         if ($auto_translation === null) {
             $auto_translation = true;
             $auto_translation_service[] = [
-                'provider' => 'google',
+                'provider' => $this->isRepoPlugin() === true ? 'google' : 'close2translate',
                 'api_keys' => null,
                 'throttle_chars_per_month' => 1000000,
                 'lng' => null,
