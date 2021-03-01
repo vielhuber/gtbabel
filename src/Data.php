@@ -2041,6 +2041,11 @@ class Data
                 }
             }
         }
+        // exclude json strings (this function is only called on content type html
+        // also make sure strings like "false" don't get caught
+        if (preg_match('/^({|\[).+/', $str) && __::string_is_json($str)) {
+            return true;
+        }
         return false;
     }
 

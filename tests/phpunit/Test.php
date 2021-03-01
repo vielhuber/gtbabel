@@ -751,7 +751,8 @@ class Test extends \PHPUnit\Framework\TestCase
             ']',
             '.foo',
             '.foo .bar',
-            '.foo-bar .bar-baz'
+            '.foo-bar .bar-baz',
+            '{"after":"","before":"","can_partial_refresh":true,"container":"div","container_aria_label":"","container_class":"main-header-bar-navigation","container_id":"","depth":0,"echo":true,"fallback_cb":"wp_page_menu","item_spacing":"preserve","items_wrap":"&lt;nav class=\"ast-flex-grow-1 navigation-accessibility\" id=\"site-navigation\" aria-label=\"Site Navigation\" itemtype=\"https:\/\/schema.org\/SiteNavigationElement\" itemscope=\"itemscope\"&gt;&lt;div class=\"main-navigation\"&gt;&lt;ul id=\"%1$s\" class=\"%2$s\"&gt;%3$s&lt;\/ul&gt;&lt;\/div&gt;&lt;\/nav&gt;","link_after":"","link_before":"","menu":"","menu_class":"main-header-menu ast-nav-menu ast-flex ast-justify-content-flex-end  submenu-with-border astra-menu-animation-fade ","menu_id":"primary-menu","theme_location":"primary","walker":"","args_hmac":"59a0964e109beb0a4c7acf392c9dc52b"}'
         ];
         foreach ($should_translate as $should_translate__value) {
             $this->assertEquals(
@@ -1148,15 +1149,15 @@ class Test extends \PHPUnit\Framework\TestCase
             ],
             [
                 '<p>Das deutsche <a href="#test1" target="_self">Brot</a> <a href="#test2" target="_blank">vermisse</a> ich am meisten.</p>',
-                '<p>I <a href="#test2" target="_blank">miss</a> German <a href="#test1" target="_self">bread</a> the most.</p>',
+                '<p><a href="#test2" target="_blank">I miss</a> German <a href="#test1" target="_self">bread</a> the most.</p>',
                 'Das deutsche <a>Brot</a> <a>vermisse</a> ich am meisten.',
-                'I <a p="2">miss</a> German <a p="1">bread</a> the most.'
+                '<a p="2">I miss</a> German <a p="1">bread</a> the most.'
             ],
             [
                 '<p>Das deutsche <strong data-foo="bar">Brot</strong> <a href="#test2" target="_blank">vermisse</a> ich am meisten.</p>',
-                '<p>I <a href="#test2" target="_blank">miss</a> German <strong data-foo="bar">bread</strong> the most.</p>',
+                '<p><a href="#test2" target="_blank">I miss</a> German <strong data-foo="bar">bread</strong> the most.</p>',
                 'Das deutsche <strong>Brot</strong> <a>vermisse</a> ich am meisten.',
-                'I <a>miss</a> German <strong>bread</strong> the most.'
+                '<a>I miss</a> German <strong>bread</strong> the most.'
             ],
             [
                 '<p>Das deutsche <strong data-foo="bar">Brot</strong> <a href="#test1" target="_blank">vermisse</a> <a href="#test2" target="_self">ich</a> am <small style="font-size:bold;">meisten</small></p>',
