@@ -978,10 +978,10 @@ class GtbabelWordPress
             $menu = add_menu_page(
                 $this->name,
                 $this->getPluginTitle(),
-                'gtbabel__edit_settings',
-                'gtbabel-settings',
+                'gtbabel__translation_list',
+                'gtbabel-trans',
                 function () {
-                    $this->initBackendSettings();
+                    $this->initBackendStringTranslation();
                 },
                 'dashicons-admin-site-alt3',
                 100
@@ -989,75 +989,15 @@ class GtbabelWordPress
             $menus[] = $menu;
 
             add_submenu_page(
-                'gtbabel-settings',
-                __('Settings', 'gtbabel-plugin'),
-                __('Settings', 'gtbabel-plugin'),
-                'gtbabel__edit_settings',
-                'gtbabel-settings'
-            );
-
-            $submenu = add_submenu_page(
-                'gtbabel-settings',
+                'gtbabel-trans',
                 __('Translations', 'gtbabel-plugin'),
                 __('Translations', 'gtbabel-plugin'),
                 'gtbabel__translation_list',
+                'gtbabel-trans'
+            );
+
+            $submenu = add_submenu_page(
                 'gtbabel-trans',
-                function () {
-                    $this->initBackendStringTranslation();
-                }
-            );
-            $menus[] = $submenu;
-
-            $submenu = add_submenu_page(
-                'gtbabel-settings',
-                __('Actions', 'gtbabel-plugin'),
-                __('Actions', 'gtbabel-plugin'),
-                'gtbabel__edit_settings',
-                'gtbabel-actions',
-                function () {
-                    $this->initBackendActions();
-                }
-            );
-            $menus[] = $submenu;
-
-            $submenu = add_submenu_page(
-                'gtbabel-settings',
-                __('Language picker', 'gtbabel-plugin'),
-                __('Language picker', 'gtbabel-plugin'),
-                'gtbabel__edit_settings',
-                'gtbabel-lngpicker',
-                function () {
-                    $this->initBackendLanguagePicker();
-                }
-            );
-            $menus[] = $submenu;
-
-            $submenu = add_submenu_page(
-                'gtbabel-settings',
-                __('Export/import', 'gtbabel-plugin'),
-                __('Export/import', 'gtbabel-plugin'),
-                'gtbabel__edit_settings',
-                'gtbabel-exportimport',
-                function () {
-                    $this->initBackendImportExport();
-                }
-            );
-            $menus[] = $submenu;
-
-            $submenu = add_submenu_page(
-                'gtbabel-settings',
-                __('Permissions', 'gtbabel-plugin'),
-                __('Permissions', 'gtbabel-plugin'),
-                'gtbabel__edit_settings',
-                'gtbabel-permissions',
-                function () {
-                    $this->initBackendPermissions();
-                }
-            );
-            $menus[] = $submenu;
-
-            $submenu = add_submenu_page(
-                'gtbabel-settings',
                 __('Translation wizard', 'gtbabel-plugin'),
                 __('Translation wizard', 'gtbabel-plugin'),
                 'gtbabel__translation_assistant',
@@ -1069,7 +1009,67 @@ class GtbabelWordPress
             $menus[] = $submenu;
 
             $submenu = add_submenu_page(
+                'gtbabel-trans',
+                __('Actions', 'gtbabel-plugin'),
+                __('Actions', 'gtbabel-plugin'),
+                'gtbabel__edit_settings',
+                'gtbabel-actions',
+                function () {
+                    $this->initBackendActions();
+                }
+            );
+            $menus[] = $submenu;
+
+            $submenu = add_submenu_page(
+                'gtbabel-trans',
+                __('Export/import', 'gtbabel-plugin'),
+                __('Export/import', 'gtbabel-plugin'),
+                'gtbabel__edit_settings',
+                'gtbabel-exportimport',
+                function () {
+                    $this->initBackendImportExport();
+                }
+            );
+            $menus[] = $submenu;
+
+            $submenu = add_submenu_page(
+                'gtbabel-trans',
+                __('Permissions', 'gtbabel-plugin'),
+                __('Permissions', 'gtbabel-plugin'),
+                'gtbabel__edit_settings',
+                'gtbabel-permissions',
+                function () {
+                    $this->initBackendPermissions();
+                }
+            );
+            $menus[] = $submenu;
+
+            $submenu = add_submenu_page(
+                'gtbabel-trans',
+                __('Language picker', 'gtbabel-plugin'),
+                __('Language picker', 'gtbabel-plugin'),
+                'gtbabel__edit_settings',
+                'gtbabel-lngpicker',
+                function () {
+                    $this->initBackendLanguagePicker();
+                }
+            );
+            $menus[] = $submenu;
+
+            $submenu = add_submenu_page(
+                'gtbabel-trans',
+                __('Settings', 'gtbabel-plugin'),
+                __('Settings', 'gtbabel-plugin'),
+                'gtbabel__edit_settings',
                 'gtbabel-settings',
+                function () {
+                    $this->initBackendSettings();
+                }
+            );
+            $menus[] = $submenu;
+
+            $submenu = add_submenu_page(
+                'gtbabel-trans',
                 __('Setup wizard', 'gtbabel-plugin'),
                 __('Setup wizard', 'gtbabel-plugin'),
                 'gtbabel__edit_settings',
