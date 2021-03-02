@@ -2135,6 +2135,13 @@ class GtbabelWordPress
         if (isset($_GET['lng']) && $_GET['lng'] != '') {
             $lng = sanitize_textarea_field($_GET['lng']);
         }
+        if (
+            $lng === null &&
+            $url !== null &&
+            $this->gtbabel->settings->getSourceLanguageCode() !== $this->gtbabel->host->getLanguageCodeFromUrl($url)
+        ) {
+            $lng = $this->gtbabel->host->getLanguageCodeFromUrl($url);
+        }
         if ($url !== null) {
             $source_url_published = $this->isUrlPublished($url);
         }
@@ -2235,9 +2242,18 @@ class GtbabelWordPress
         echo $message;
         echo '<h2 class="gtbabel__subtitle">' . __('String translations', 'gtbabel-plugin') . '</h2>';
 
-        echo '<div class="gtbabel__transmeta">';
+        echo '<form class="gtbabel__form" method="get" action="' . admin_url('admin.php') . '">';
+        echo '<input type="hidden" name="page" value="gtbabel-trans" />';
+        echo '<input type="hidden" name="p" value="1" />';
+        echo '<input type="hidden" name="lng" value="' . ($lng !== null ? $lng : '') . '" />';
+        echo '<input type="hidden" name="post_id" value="' . ($post_id !== null ? $post_id : '') . '" />';
         if ($url !== null) {
-            echo '<p class="gtbabel__transmeta-mainlink">';
+            echo '<input type="hidden" name="url" value="' . $url . '" />';
+        }
+
+        echo '<div class="gtbabel__transmeta">';
+        echo '<p class="gtbabel__transmeta-mainurl">';
+        if ($url !== null) {
             if ($lng === null || $this->gtbabel->settings->getSourceLanguageCode() === $lng) {
                 $link_public = $url;
             } else {
@@ -2247,9 +2263,18 @@ class GtbabelWordPress
                     $url
                 );
             }
-            echo '<a href="' . $link_public . '" target="_blank">' . $link_public . '</a>';
-            echo '</p>';
+            echo '<a href="' .
+                $link_public .
+                '" target="_blank" class="gtbabel__transmeta-mainurl-link">' .
+                $link_public .
+                '</a>';
+            echo '<a href="#" class="gtbabel__transmeta-reset">❌</a>';
+        } else {
+            echo '<input class="gtbabel__transmeta-mainurl-input" type="text" name="url" value="" placeholder="' .
+                __('URL', 'gtbabel-plugin') .
+                '" />';
         }
+        echo '</p>';
         echo '<ul class="gtbabel__transmeta-list">';
         echo '<li class="gtbabel__transmeta-listitem">';
         if ($lng !== null) {
@@ -2265,7 +2290,7 @@ class GtbabelWordPress
                         $url
                     );
             }
-            echo '<a class="gtbabel__transmeta-listitem-link" href="' . admin_url($lng_link) . '">';
+            echo '<a class="gtbabel__input gtbabel__transmeta-listitem-link" href="' . admin_url($lng_link) . '">';
         }
         echo __('All languages', 'gtbabel-plugin');
         if ($lng !== null) {
@@ -2309,11 +2334,6 @@ class GtbabelWordPress
         echo '</div>';
 
         echo '<div class="gtbabel__search">';
-        echo '<form class="gtbabel__form" method="get" action="' . admin_url('admin.php') . '">';
-        echo '<input type="hidden" name="page" value="gtbabel-trans" />';
-        echo '<input type="hidden" name="p" value="1" />';
-        echo '<input type="hidden" name="lng" value="' . ($lng !== null ? $lng : '') . '" />';
-        echo '<input type="hidden" name="post_id" value="' . ($post_id !== null ? $post_id : '') . '" />';
         echo '<input class="gtbabel__input" type="text" name="s" value="' .
             (isset($_GET['s']) ? htmlentities(stripslashes($_GET['s'])) : '') .
             '" placeholder="' .
@@ -2363,8 +2383,9 @@ class GtbabelWordPress
         echo '<input class="gtbabel__submit button button-secondary" value="' .
             __('Search', 'gtbabel-plugin') .
             '" type="submit" />';
-        echo '</form>';
         echo '</div>';
+
+        echo '</form>';
 
         if (!empty($translations)) {
             echo '<p class="gtbabel__paragraph">' .
@@ -4107,8 +4128,9 @@ EOD;
                 echo __('Deleted strings', 'gtbabel-plugin') . ': ' . $deleted;
                 echo '<br/>';
             }
-
-            echo __('Finished', 'gtbabel-plugin');
+            echo '<img class="gtbabel__wizard-done-image" src="' .
+                plugin_dir_url(__FILE__) .
+                'assets/images/done.gif" alt="" />';
         }
 
         // next

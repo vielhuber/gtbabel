@@ -273,37 +273,44 @@ $button_width: 105px;
 
 .gtbabel__search {
     width: 100%;
-    margin-bottom: 20px;
-}
-.gtbabel__search .gtbabel__form {
-    width: 100%;
     display: flex;
     align-items: flex-start;
     align-content: flex-start;
+    margin-bottom: 20px;
 }
-.gtbabel__search .gtbabel__form > * {
+.gtbabel__search > * {
     margin-right: 5px;
     margin-left: 0;
 }
-.gtbabel__search .gtbabel__form .gtbabel__input[name='s'] {
+.gtbabel__search .gtbabel__input[name='s'] {
     flex: 0 0 calc((100% - 80px - (4 * 5px)) * 0.7);
 }
-.gtbabel__search .gtbabel__form .gtbabel__input[name='shared'] {
+.gtbabel__search .gtbabel__input[name='shared'] {
     flex: 0 0 calc((100% - 80px - (4 * 5px)) * 0.1);
 }
-.gtbabel__search .gtbabel__form .gtbabel__input[name='checked'] {
+.gtbabel__search .gtbabel__input[name='checked'] {
     flex: 0 0 calc((100% - 80px - (4 * 5px)) * 0.1);
 }
-.gtbabel__search .gtbabel__form .gtbabel__input[name='context'] {
+.gtbabel__search .gtbabel__input[name='context'] {
     flex: 0 0 calc((100% - 80px - (4 * 5px)) * 0.1);
 }
-.gtbabel__search .gtbabel__form .gtbabel__submit {
+.gtbabel__search .gtbabel__submit {
     flex: 0 0 80px;
     margin-right: 0;
 }
 
-.gtbabel__transmeta-mainlink {
+.gtbabel__transmeta-mainurl-link {
     font-size: 16px;
+    vertical-align: middle;
+}
+.gtbabel__transmeta-reset {
+    font-size: 10px;
+    margin-left: 5px;
+    vertical-align: middle;
+    text-decoration: none;
+}
+.gtbabel__transmeta-mainurl-input {
+    width: 100%;
 }
 .gtbabel__transmeta-list {
     display: flex;
@@ -381,6 +388,13 @@ body[class*='_page_gtbabel-wizard'] #wpbody {
 .gtbabel__wizard-buttons > *:first-child:last-child {
     margin-left: auto;
     order: 2;
+}
+
+.gtbabel__wizard-done-image {
+    width: auto;
+    width: 150px;
+    margin: 0 auto;
+    display: block;
 }
 
 .gtbabel--wizard .gtbabel__input--big {

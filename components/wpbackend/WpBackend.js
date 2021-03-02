@@ -6,7 +6,8 @@ export default class WpBackend {
             this.initRepeater();
             this.initAutoTranslate();
             this.initAutoGrab();
-            this.initFormReset();
+            this.initSearchMainUrlReset();
+            this.initFormResetQuestion();
             this.initFileUpload();
             this.initFormChange();
             this.initFormInverse();
@@ -300,7 +301,18 @@ export default class WpBackend {
         });
     }
 
-    initFormReset() {
+    initSearchMainUrlReset() {
+        document.addEventListener('click', e => {
+            let el = e.target.closest('.gtbabel__transmeta-reset');
+            if (el) {
+                document.querySelector('.gtbabel__form input[name="url"]').value = '';
+                document.querySelector('.gtbabel__form').submit();
+                e.preventDefault();
+            }
+        });
+    }
+
+    initFormResetQuestion() {
         document.addEventListener('click', e => {
             let el = e.target.closest('.gtbabel__submit--reset');
             if (el) {
