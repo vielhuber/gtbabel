@@ -1,4 +1,5 @@
 import WysiwygEditor from './../wysiwygeditor/WysiwygEditor';
+import Tooltips from './../tooltips/Tooltips';
 
 export default class WpBackend {
     init() {
@@ -14,6 +15,7 @@ export default class WpBackend {
             this.initSubmitUnchecked();
             this.initWysiwyg();
             this.initWizardAutoTranslationChange();
+            this.initTooltips();
         });
     }
 
@@ -392,5 +394,10 @@ export default class WpBackend {
         el2.style.display = el.value === 'manual' || el.value === 'custom' ? 'none' : 'inline-block';
         el2.required = el.value === 'manual' || el.value === 'custom' ? false : true;
         el2.value = el.options[el.selectedIndex].getAttribute('data-api-key');
+    }
+
+    initTooltips() {
+        let tooltips = new Tooltips();
+        tooltips.init();
     }
 }

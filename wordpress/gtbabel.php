@@ -1475,6 +1475,12 @@ class GtbabelWordPress
         echo '<li class="gtbabel__field">';
         echo '<label class="gtbabel__label">';
         echo __('Languages', 'gtbabel-plugin');
+        echo '<div class="tooltip">';
+        echo __(
+            'Here you can specify all languages into which the website should be translated. The source language cannot be deselected. You can add or remove languages at any time later. The translations of removed languages are not lost.',
+            'gtbabel-plugin'
+        );
+        echo '</div>';
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
         echo '<ul class="gtbabel__languagelist">';
@@ -1503,8 +1509,117 @@ class GtbabelWordPress
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_auto_add_translations" class="gtbabel__label">';
+        echo __('Auto add translations', 'gtbabel-plugin');
+        echo '<div class="tooltip">';
+        echo __(
+            'New strings are automatically added to the translation database if this option is enabled (when they are detected for the first time). If the option is deselected, this must be done manually.',
+            'gtbabel-plugin'
+        );
+        echo '</div>';
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_auto_add_translations" name="gtbabel[auto_add_translations]" value="1"' .
+            ($settings['auto_add_translations'] == '1' ? ' checked="checked"' : '') .
+            ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_auto_translation" class="gtbabel__label">';
+        echo __('Enable automatic translation', 'gtbabel-plugin');
+        echo '<div class="tooltip">';
+        echo __(
+            'New strings are automatically translated with the selected translation service if this option is enabled (when they are detected for the first time) and can be revised in various ways afterwards. If the option is deselected, you will have to enter all translations manually.',
+            'gtbabel-plugin'
+        );
+        echo '</div>';
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_auto_translation" name="gtbabel[auto_translation]" value="1"' .
+            ($settings['auto_translation'] == '1' ? ' checked="checked"' : '') .
+            ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_show_language_picker" class="gtbabel__label">';
+        echo __('Show simple language picker', 'gtbabel-plugin');
+        echo '<div class="tooltip">';
+        echo '<img src="' . plugin_dir_url(__FILE__) . 'assets/images/tooltip_language_picker" alt="" />';
+        echo __(
+            'If this option is enabled, a simple language selection is added to the frontend. This is especially recommended if you want to provide a language selection quickly and without programming knowledge.',
+            'gtbabel-plugin'
+        );
+        echo '</div>';
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_show_language_picker" name="gtbabel[show_language_picker]" value="1"' .
+            ($settings['show_language_picker'] == '1' ? ' checked="checked"' : '') .
+            ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_show_frontend_editor_links" class="gtbabel__label">';
+        echo __('Show frontend editor links', 'gtbabel-plugin');
+        echo '<div class="tooltip">';
+        echo __(
+            'If this option is enabled, authorized users will see links in the frontend to translate the current page using the frontend editor or the translation list.',
+            'gtbabel-plugin'
+        );
+        echo '</div>';
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_show_frontend_editor_links" name="gtbabel[show_frontend_editor_links]" value="1"' .
+            ($settings['show_frontend_editor_links'] == '1' ? ' checked="checked"' : '') .
+            ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_prevent_publish_wp_new_posts" class="gtbabel__label">';
+        echo __('Prevent publish of new posts', 'gtbabel-plugin');
+        echo '<div class="tooltip">';
+        echo __(
+            'Translations of new pages or posts are not published automatically if this option is enabled. The publication must then always be done manually.',
+            'gtbabel-plugin'
+        );
+        echo '</div>';
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_prevent_publish_wp_new_posts" name="gtbabel[prevent_publish_wp_new_posts]" value="1"' .
+            (@$settings['prevent_publish_wp_new_posts'] == '1' ? ' checked="checked"' : '') .
+            ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_auto_set_new_strings_checked" class="gtbabel__label">';
+        echo __('Auto set new strings to checked', 'gtbabel-plugin');
+        echo '<div class="tooltip">';
+        echo __(
+            'Newly detected and automatically translated strings are automatically set to checked if this option is enabled. This makes the two-stage checking system de facto inactive. This can be particularly helpful for first-time translations.',
+            'gtbabel-plugin'
+        );
+        echo '</div>';
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_auto_set_new_strings_checked" name="gtbabel[auto_set_new_strings_checked]" value="1"' .
+            ($settings['auto_set_new_strings_checked'] == '1' ? ' checked="checked"' : '') .
+            ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
         echo '<label for="gtbabel_hide_languages" class="gtbabel__label">';
         echo __('Hide languages', 'gtbabel-plugin');
+        echo '<div class="tooltip">';
+        echo __(
+            'If you want to prepare a language, you can use this option to temporarily hide this language in the frontend for guests. Note that as a logged-in user, you will still see the language in the frontend.',
+            'gtbabel-plugin'
+        );
+        echo '</div>';
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
         echo '<ul class="gtbabel__languagelist">';
@@ -1536,6 +1651,153 @@ class GtbabelWordPress
             echo '</li>';
         }
         echo '</ul>';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_lng_source" class="gtbabel__label">';
+        echo __('Source language', 'gtbabel-plugin');
+        echo '<div class="tooltip">';
+        echo __(
+            'The general source language of the website. Note that you can specify a different source language for individual pages or modules. Changing the general source language later is also possible, but will result in a complete retranslation of the website.',
+            'gtbabel-plugin'
+        );
+        echo '</div>';
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<select class="gtbabel__input gtbabel__input--select" id="gtbabel_lng_source" name="gtbabel[lng_source]">';
+        echo '<option value="">&ndash;&ndash;</option>';
+        foreach ($this->gtbabel->settings->getDefaultLanguages() as $languages__value) {
+            echo '<option value="' .
+                $languages__value['code'] .
+                '"' .
+                ($settings['lng_source'] == $languages__value['code'] ? ' selected="selected"' : '') .
+                '>' .
+                $languages__value['label'] .
+                '</option>';
+        }
+        echo '</select>';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_redirect_root_domain" class="gtbabel__label">';
+        echo __('Redirect root domain to', 'gtbabel-plugin');
+        echo '<div class="tooltip">';
+        echo __(
+            'If no explicit language is specified in the main URL, this option can be used to specify the criterion to which a new user is initially redirected.',
+            'gtbabel-plugin'
+        );
+        echo '</div>';
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<select class="gtbabel__input gtbabel__input--select" id="gtbabel_redirect_root_domain" name="gtbabel[redirect_root_domain]">';
+        echo '<option value="browser"' .
+            ($settings['redirect_root_domain'] == 'browser' ? ' selected="selected"' : '') .
+            '>' .
+            __('Browser language', 'gtbabel-plugin') .
+            '</option>';
+        echo '<option value="source"' .
+            ($settings['redirect_root_domain'] == 'source' ? ' selected="selected"' : '') .
+            '>' .
+            __('Source language', 'gtbabel-plugin') .
+            '</option>';
+        echo '<option value="ip"' .
+            ($settings['redirect_root_domain'] == 'ip' ? ' selected="selected"' : '') .
+            '>' .
+            __('IP based', 'gtbabel-plugin') .
+            '</option>';
+        echo '</select>';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_unchecked_strings" class="gtbabel__label">';
+        echo __('Behaviour for unchecked strings', 'gtbabel-plugin');
+        echo '<div class="tooltip">';
+        echo __(
+            'This option controls the behavior of unchecked strings in the frontend for visitors who are not logged in. Each option has advantages and disadvantages - a recommended option is to display the strings automatically translated by the translation service and then revise these strings in a timely manner.',
+            'gtbabel-plugin'
+        );
+        echo '</div>';
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<select class="gtbabel__input gtbabel__input--select" id="gtbabel_unchecked_strings" name="gtbabel[unchecked_strings]">';
+        echo '<option value="trans"' .
+            ($settings['unchecked_strings'] == 'trans' ? ' selected="selected"' : '') .
+            '>' .
+            __('Show translations', 'gtbabel-plugin') .
+            '</option>';
+        echo '<option value="source"' .
+            ($settings['unchecked_strings'] == 'source' ? ' selected="selected"' : '') .
+            '>' .
+            __('Show sources', 'gtbabel-plugin') .
+            '</option>';
+        echo '<option value="hide"' .
+            ($settings['unchecked_strings'] == 'hide' ? ' selected="selected"' : '') .
+            '>' .
+            __('Hide strings', 'gtbabel-plugin') .
+            '</option>';
+        echo '</select>';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_wp_mail_notifications" class="gtbabel__label">';
+        echo __('Email notifications', 'gtbabel-plugin');
+        echo '<div class="tooltip">';
+        echo __(
+            'Editors who can receive e-mail notifications via the authorization system are informed by e-mail about new strings to be translated if this option is activated. Here you can control how often the e-mail should be sent.',
+            'gtbabel-plugin'
+        );
+        echo '</div>';
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<select class="gtbabel__input gtbabel__input--select" id="gtbabel_wp_mail_notifications" name="gtbabel[wp_mail_notifications]">';
+        echo '<option value="false"' .
+            ($settings['wp_mail_notifications'] === false ? ' selected="selected"' : '') .
+            '>' .
+            __('Disable notifications', 'gtbabel-plugin') .
+            '</option>';
+        echo '<option value="hourly"' .
+            ($settings['wp_mail_notifications'] == 'hourly' ? ' selected="selected"' : '') .
+            '>' .
+            __('Send hourly', 'gtbabel-plugin') .
+            '</option>';
+        echo '<option value="twicedaily"' .
+            ($settings['wp_mail_notifications'] == 'twicedaily' ? ' selected="selected"' : '') .
+            '>' .
+            __('Send twice a day', 'gtbabel-plugin') .
+            '</option>';
+        echo '<option value="daily"' .
+            ($settings['wp_mail_notifications'] == 'daily' ? ' selected="selected"' : '') .
+            '>' .
+            __('Send daily', 'gtbabel-plugin') .
+            '</option>';
+        echo '<option value="weekly"' .
+            ($settings['wp_mail_notifications'] == 'weekly' ? ' selected="selected"' : '') .
+            '>' .
+            __('Send weekly', 'gtbabel-plugin') .
+            '</option>';
+        echo '</select>';
+        echo '</div>';
+        echo '</li>';
+        echo '</ul>';
+
+        echo '<input class="gtbabel__submit button button-primary" name="save_settings" value="' .
+            __('Save', 'gtbabel-plugin') .
+            '" type="submit" />';
+
+        echo '<h2 class="gtbabel__subtitle">' . __('Advanced settings', 'gtbabel-plugin') . '</h2>';
+        echo '<ul class="gtbabel__fields">';
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_debug_translations" class="gtbabel__label">';
+        echo __('Enable debug mode', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_debug_translations" name="gtbabel[debug_translations]" value="1"' .
+            ($settings['debug_translations'] == '1' ? ' checked="checked"' : '') .
+            ' />';
         echo '</div>';
         echo '</li>';
 
@@ -1573,173 +1835,35 @@ class GtbabelWordPress
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_auto_add_translations" class="gtbabel__label">';
-        echo __('Auto add translations', 'gtbabel-plugin');
+        echo '<label for="gtbabel_html_lang_attribute" class="gtbabel__label">';
+        echo __('Set html lang attribute', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_auto_add_translations" name="gtbabel[auto_add_translations]" value="1"' .
-            ($settings['auto_add_translations'] == '1' ? ' checked="checked"' : '') .
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_html_lang_attribute" name="gtbabel[html_lang_attribute]" value="1"' .
+            ($settings['html_lang_attribute'] == '1' ? ' checked="checked"' : '') .
             ' />';
         echo '</div>';
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_prevent_publish_wp_new_posts" class="gtbabel__label">';
-        echo __('Prevent publish of new posts', 'gtbabel-plugin');
+        echo '<label for="gtbabel_html_hreflang_tags" class="gtbabel__label">';
+        echo __('Add html hreflang tags', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_prevent_publish_wp_new_posts" name="gtbabel[prevent_publish_wp_new_posts]" value="1"' .
-            (@$settings['prevent_publish_wp_new_posts'] == '1' ? ' checked="checked"' : '') .
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_html_hreflang_tags" name="gtbabel[html_hreflang_tags]" value="1"' .
+            ($settings['html_hreflang_tags'] == '1' ? ' checked="checked"' : '') .
             ' />';
         echo '</div>';
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_auto_set_new_strings_checked" class="gtbabel__label">';
-        echo __('Auto set new strings to checked', 'gtbabel-plugin');
+        echo '<label for="gtbabel_xml_hreflang_tags" class="gtbabel__label">';
+        echo __('Add xml hreflang tags', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_auto_set_new_strings_checked" name="gtbabel[auto_set_new_strings_checked]" value="1"' .
-            ($settings['auto_set_new_strings_checked'] == '1' ? ' checked="checked"' : '') .
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_xml_hreflang_tags" name="gtbabel[xml_hreflang_tags]" value="1"' .
+            ($settings['xml_hreflang_tags'] == '1' ? ' checked="checked"' : '') .
             ' />';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_auto_translation" class="gtbabel__label">';
-        echo __('Enable automatic translation', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_auto_translation" name="gtbabel[auto_translation]" value="1"' .
-            ($settings['auto_translation'] == '1' ? ' checked="checked"' : '') .
-            ' />';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_show_language_picker" class="gtbabel__label">';
-        echo __('Show simple language picker', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_show_language_picker" name="gtbabel[show_language_picker]" value="1"' .
-            ($settings['show_language_picker'] == '1' ? ' checked="checked"' : '') .
-            ' />';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_show_frontend_editor_links" class="gtbabel__label">';
-        echo __('Show frontend editor links', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_show_frontend_editor_links" name="gtbabel[show_frontend_editor_links]" value="1"' .
-            ($settings['show_frontend_editor_links'] == '1' ? ' checked="checked"' : '') .
-            ' />';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_lng_source" class="gtbabel__label">';
-        echo __('Source language', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<select class="gtbabel__input gtbabel__input--select" id="gtbabel_lng_source" name="gtbabel[lng_source]">';
-        echo '<option value="">&ndash;&ndash;</option>';
-        foreach ($this->gtbabel->settings->getDefaultLanguages() as $languages__value) {
-            echo '<option value="' .
-                $languages__value['code'] .
-                '"' .
-                ($settings['lng_source'] == $languages__value['code'] ? ' selected="selected"' : '') .
-                '>' .
-                $languages__value['label'] .
-                '</option>';
-        }
-        echo '</select>';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_redirect_root_domain" class="gtbabel__label">';
-        echo __('Redirect root domain to', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<select class="gtbabel__input gtbabel__input--select" id="gtbabel_redirect_root_domain" name="gtbabel[redirect_root_domain]">';
-        echo '<option value="browser"' .
-            ($settings['redirect_root_domain'] == 'browser' ? ' selected="selected"' : '') .
-            '>' .
-            __('Browser language', 'gtbabel-plugin') .
-            '</option>';
-        echo '<option value="source"' .
-            ($settings['redirect_root_domain'] == 'source' ? ' selected="selected"' : '') .
-            '>' .
-            __('Source language', 'gtbabel-plugin') .
-            '</option>';
-        echo '<option value="ip"' .
-            ($settings['redirect_root_domain'] == 'ip' ? ' selected="selected"' : '') .
-            '>' .
-            __('IP based', 'gtbabel-plugin') .
-            '</option>';
-        echo '</select>';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_unchecked_strings" class="gtbabel__label">';
-        echo __('Behaviour for unchecked strings', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<select class="gtbabel__input gtbabel__input--select" id="gtbabel_unchecked_strings" name="gtbabel[unchecked_strings]">';
-        echo '<option value="trans"' .
-            ($settings['unchecked_strings'] == 'trans' ? ' selected="selected"' : '') .
-            '>' .
-            __('Show translations', 'gtbabel-plugin') .
-            '</option>';
-        echo '<option value="source"' .
-            ($settings['unchecked_strings'] == 'source' ? ' selected="selected"' : '') .
-            '>' .
-            __('Show sources', 'gtbabel-plugin') .
-            '</option>';
-        echo '<option value="hide"' .
-            ($settings['unchecked_strings'] == 'hide' ? ' selected="selected"' : '') .
-            '>' .
-            __('Hide strings', 'gtbabel-plugin') .
-            '</option>';
-        echo '</select>';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_wp_mail_notifications" class="gtbabel__label">';
-        echo __('Email notifications', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<select class="gtbabel__input gtbabel__input--select" id="gtbabel_wp_mail_notifications" name="gtbabel[wp_mail_notifications]">';
-        echo '<option value="false"' .
-            ($settings['wp_mail_notifications'] === false ? ' selected="selected"' : '') .
-            '>' .
-            __('Disable notifications', 'gtbabel-plugin') .
-            '</option>';
-        echo '<option value="hourly"' .
-            ($settings['wp_mail_notifications'] == 'hourly' ? ' selected="selected"' : '') .
-            '>' .
-            __('Send hourly', 'gtbabel-plugin') .
-            '</option>';
-        echo '<option value="twicedaily"' .
-            ($settings['wp_mail_notifications'] == 'twicedaily' ? ' selected="selected"' : '') .
-            '>' .
-            __('Send twice a day', 'gtbabel-plugin') .
-            '</option>';
-        echo '<option value="daily"' .
-            ($settings['wp_mail_notifications'] == 'daily' ? ' selected="selected"' : '') .
-            '>' .
-            __('Send daily', 'gtbabel-plugin') .
-            '</option>';
-        echo '<option value="weekly"' .
-            ($settings['wp_mail_notifications'] == 'weekly' ? ' selected="selected"' : '') .
-            '>' .
-            __('Send weekly', 'gtbabel-plugin') .
-            '</option>';
-        echo '</select>';
         echo '</div>';
         echo '</li>';
 
@@ -1777,57 +1901,6 @@ class GtbabelWordPress
                 'options' => [0 => __('active', 'gtbabel-plugin'), 1 => __('inactive', 'gtbabel-plugin')]
             ]
         ]);
-        echo '</div>';
-        echo '</li>';
-        echo '</ul>';
-
-        echo '<input class="gtbabel__submit button button-primary" name="save_settings" value="' .
-            __('Save', 'gtbabel-plugin') .
-            '" type="submit" />';
-
-        echo '<h2 class="gtbabel__subtitle">' . __('Advanced settings', 'gtbabel-plugin') . '</h2>';
-        echo '<ul class="gtbabel__fields">';
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_debug_translations" class="gtbabel__label">';
-        echo __('Enable debug mode', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_debug_translations" name="gtbabel[debug_translations]" value="1"' .
-            ($settings['debug_translations'] == '1' ? ' checked="checked"' : '') .
-            ' />';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_html_lang_attribute" class="gtbabel__label">';
-        echo __('Set html lang attribute', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_html_lang_attribute" name="gtbabel[html_lang_attribute]" value="1"' .
-            ($settings['html_lang_attribute'] == '1' ? ' checked="checked"' : '') .
-            ' />';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_html_hreflang_tags" class="gtbabel__label">';
-        echo __('Add html hreflang tags', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_html_hreflang_tags" name="gtbabel[html_hreflang_tags]" value="1"' .
-            ($settings['html_hreflang_tags'] == '1' ? ' checked="checked"' : '') .
-            ' />';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_xml_hreflang_tags" class="gtbabel__label">';
-        echo __('Add xml hreflang tags', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_xml_hreflang_tags" name="gtbabel[xml_hreflang_tags]" value="1"' .
-            ($settings['xml_hreflang_tags'] == '1' ? ' checked="checked"' : '') .
-            ' />';
         echo '</div>';
         echo '</li>';
 
@@ -3237,7 +3310,16 @@ class GtbabelWordPress
         );
         echo '</p>';
 
-        echo '<h2 class="gtbabel__subtitle">' . __('Overlay', 'gtbabel-plugin') . '</h2>';
+        echo '<h2 class="gtbabel__subtitle">';
+        echo __('Overlay', 'gtbabel-plugin');
+        echo '<div class="tooltip">';
+        echo '<img src="' . plugin_dir_url(__FILE__) . 'assets/images/tooltip_language_picker" alt="" />';
+        echo __(
+            'If this option is enabled, a simple language selection is added to the frontend. This is especially recommended if you want to provide a language selection quickly and without programming knowledge.',
+            'gtbabel-plugin'
+        );
+        echo '</div>';
+        echo '</h2>';
         echo '<p class="gtbabel__paragraph">';
         echo __(
             'Activate the simple language picker and you are ready to go without any configuration effort.',
@@ -3257,7 +3339,15 @@ class GtbabelWordPress
         echo '</li>';
         echo '</ul>';
 
-        echo '<h2 class="gtbabel__subtitle">' . __('Widget', 'gtbabel-plugin') . '</h2>';
+        echo '<h2 class="gtbabel__subtitle">';
+        echo __('Widget', 'gtbabel-plugin');
+        echo '<div class="tooltip">';
+        echo __(
+            'Using the WordPress widget system, you can display a language selection in predefined sidebars under Design > Widgets. Please note that your theme must support widgets to use this feature. The design must be realized manually via CSS.',
+            'gtbabel-plugin'
+        );
+        echo '</div>';
+        echo '</h2>';
         echo '<p class="gtbabel__paragraph">';
         if (count(wp_get_sidebars_widgets()) > 1) {
             echo sprintf(
@@ -3273,12 +3363,28 @@ class GtbabelWordPress
         }
         echo '</p>';
 
-        echo '<h2 class="gtbabel__subtitle">' . __('Shortcode', 'gtbabel-plugin') . '</h2>';
+        echo '<h2 class="gtbabel__subtitle">';
+        echo __('Shortcode', 'gtbabel-plugin');
+        echo '<div class="tooltip">';
+        echo __(
+            'With the help of the shortcode you can display the language selection at any place (e.g. in widgets, within pages or posts or even directly in the template). The design must be realized manually via CSS.',
+            'gtbabel-plugin'
+        );
+        echo '</div>';
+        echo '</h2>';
         echo '<p class="gtbabel__paragraph">';
         echo sprintf(__('Just add %s to your code.', 'gtbabel-plugin'), '<code>[gtbabel_languagepicker]</code>');
         echo '</p>';
 
-        echo '<h2 class="gtbabel__subtitle">' . __('Menu', 'gtbabel-plugin') . '</h2>';
+        echo '<h2 class="gtbabel__subtitle">';
+        echo __('Menu', 'gtbabel-plugin');
+        echo '<div class="tooltip">';
+        echo __(
+            'By adding the language selection menu item, you can integrate the language selection into your existing menu. Note that possible adjustments in the CSS are necessary if your menu does not yet support submenu items.',
+            'gtbabel-plugin'
+        );
+        echo '</div>';
+        echo '</h2>';
         echo '<p class="gtbabel__paragraph">';
         echo sprintf(
             __('Simply add the %sLanguage picker menu item%s to one of your menus.', 'gtbabel-plugin'),
@@ -3287,7 +3393,15 @@ class GtbabelWordPress
         );
         echo '</p>';
 
-        echo '<h2 class="gtbabel__subtitle">' . __('Template', 'gtbabel-plugin') . '</h2>';
+        echo '<h2 class="gtbabel__subtitle">';
+        echo __('Template', 'gtbabel-plugin');
+        echo '<div class="tooltip">';
+        echo __(
+            'With this option you have the greatest possible flexibility over the HTML structure, positioning and design. This requires programming skills for integration.',
+            'gtbabel-plugin'
+        );
+        echo '</div>';
+        echo '</h2>';
         echo '<p class="gtbabel__paragraph">';
         echo __('If you need more control, use the following php-code:', 'gtbabel-plugin');
         echo '</p>';

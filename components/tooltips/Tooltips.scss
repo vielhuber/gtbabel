@@ -1,0 +1,45 @@
+.tooltip {
+    display: none;
+    position: relative;
+    cursor: help;
+}
+.tooltip__icon {
+    padding: 0 3px;
+}
+.tooltip__inner {
+    opacity: 0;
+    height: 0;
+    width: 0;
+    pointer-events: none;
+    position: absolute;
+    z-index: 2147483647;
+    left: 0;
+    top: 100%;
+    background-color: #fffcc2;
+    color: #000;
+    box-shadow: 2px 3px 6px -1px #888888;
+    padding: 10px 10px;
+    border-radius: 0 20px 20px 20px;
+    transition: opacity 0.25s ease-in-out;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+.tooltip__inner--visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+.tooltip__inner img {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+    border: 1px solid #eee;
+}
+.tooltip__inner p {
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 0 0 10px;
+    font-weight: normal;
+}
+.tooltip__inner *:last-child {
+    margin-bottom: 0;
+}
