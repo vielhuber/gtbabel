@@ -2197,7 +2197,8 @@ class GtbabelWordPress
         $url = null;
         $post_id = null;
         $lng = null;
-        $source_url_published = null;
+        $url_source = null;
+        $wp_url_published = null;
         if (isset($_GET['post_id']) && $_GET['post_id'] != '' && is_numeric($_GET['post_id'])) {
             $post_id = intval($_GET['post_id']);
             $url = get_permalink($post_id);
@@ -2216,7 +2217,12 @@ class GtbabelWordPress
             $lng = $this->gtbabel->host->getLanguageCodeFromUrl($url);
         }
         if ($url !== null) {
-            $source_url_published = $this->isUrlPublished($url);
+            $url_source = $this->gtbabel->data->getUrlTranslationInLanguage(
+                $lng,
+                $this->gtbabel->settings->getSourceLanguageCode(),
+                $url
+            );
+            $wp_url_published = $this->isUrlPublished($url);
         }
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -2273,9 +2279,9 @@ class GtbabelWordPress
                 }
                 if (isset($_POST['translations_submit']['publish'])) {
                     if (isset($_POST['translations_submit']['publish'][1])) {
-                        $this->gtbabel->publish->publish($url, $lng);
+                        $this->gtbabel->publish->publish($url_source, $lng);
                     } else {
-                        $this->gtbabel->publish->unpublish($url, $lng);
+                        $this->gtbabel->publish->unpublish($url_source, $lng);
                     }
                     $this->saveSetting('prevent_publish_urls', $this->gtbabel->settings->get('prevent_publish_urls'));
                 }
@@ -2610,8 +2616,8 @@ class GtbabelWordPress
             echo '</table>';
             echo $pagination->html;
 
-            if ($url !== null && $lng !== null && $source_url_published === true) {
-                if ($this->gtbabel->publish->isPrevented($url, $lng, false) === true) {
+            if ($url !== null && $lng !== null && $wp_url_published === true) {
+                if ($this->gtbabel->publish->isPrevented($url_source, $lng, false) === true) {
                     echo '<input class="gtbabel__submit button button-secondary" name="translations_submit[save]" value="' .
                         __('Save', 'gtbabel-plugin') .
                         '" type="submit" />';

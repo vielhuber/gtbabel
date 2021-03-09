@@ -1195,7 +1195,7 @@ The default configuration is:
     'translate_wp_localize_script' => true,
     'translate_wp_localize_script_include' => ['key1_*.key2.*', 'key3_*.key4'],
     'prevent_publish' => true,
-    '' => [
+    'prevent_publish_urls' => [
         ['url' => '/path/in/source/lng/to/specific/page', 'lng' => ['en', 'fr']],
         ['url' => '/slug1/*', 'lng' => ['en']], // you can also use wildcards here
         ['url' => '/slug1/*/slug2', 'lng' => ['fr']]

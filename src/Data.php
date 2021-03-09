@@ -1038,7 +1038,14 @@ class Data
         foreach ($this->settings->getSelectedLanguageCodesLabels() as $languages__key => $languages__value) {
             if (
                 $this->publish->isActive() &&
-                $this->publish->isPrevented($this->host->getCurrentUrl(), $languages__key)
+                $this->publish->isPrevented(
+                    $this->getUrlTranslationInLanguage(
+                        $languages__key,
+                        $this->settings->getSourceLanguageCode(),
+                        $this->host->getCurrentUrl()
+                    ),
+                    $languages__key
+                )
             ) {
                 continue;
             }
@@ -2143,6 +2150,9 @@ class Data
             return $url;
         }
         if ($this->host->urlIsStaticFile($url)) {
+            return $url;
+        }
+        if ($from_lng === $to_lng) {
             return $url;
         }
         $path = $this->host->getPathWithoutPrefixFromUrl($url);
