@@ -30,6 +30,7 @@ class GtbabelWordPress
         $this->localizePlugin();
         $this->initBackend();
         $this->handleAltLng();
+        $this->handlePreventPublish();
         $this->triggerPreventPublish();
         $this->addLastmodToSitemap();
         $this->addTopBarItem();
@@ -669,6 +670,48 @@ class GtbabelWordPress
                 'languages' => $this->gtbabel->settings->getSelectedLanguageCodesLabelsWithSourceAtLast()
             ]);
         });
+    }
+
+    private function handlePreventPublish()
+    {
+        add_action(
+            'wp',
+            function () {
+                if ($this->handlePreventPublishForLanguageCode($this->gtbabel->data->getCurrentLanguageCode())) {
+                    global $wp_query;
+                    $wp_query->set_404();
+                    status_header(404);
+                    nocache_headers();
+                }
+            },
+            PHP_INT_MAX
+        );
+
+        __::hook_add(
+            'gtbabel_hide_languagepicker_entry',
+            function ($lng) {
+                return $this->handlePreventPublishForLanguageCode($lng);
+            },
+            PHP_INT_MAX
+        );
+    }
+
+    private function handlePreventPublishForLanguageCode($lng)
+    {
+        global $post;
+        $prevent_lngs = [];
+        if (
+            is_singular() &&
+            get_post_meta($post->ID, 'gtbabel_prevent_lngs', true) !== false &&
+            is_array(get_post_meta($post->ID, 'gtbabel_prevent_lngs', true))
+        ) {
+            $prevent_lngs = get_post_meta($post->ID, 'gtbabel_prevent_lngs', true);
+        }
+        // debug
+        if ($post->ID == 50) {
+            $prevent_lngs = ['de', 'en'];
+        }
+        return in_array($lng, $prevent_lngs);
     }
 
     private function triggerPreventPublish()
