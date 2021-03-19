@@ -48,12 +48,8 @@ class Test extends \PHPUnit\Framework\TestCase
             ->setConstructorArgs([$settings, $log])
             ->onlyMethods([])
             ->getMock();
-        $publish = $this->getMockBuilder(vielhuber\gtbabel\Publish::class)
-            ->setConstructorArgs([$settings, $host, $log])
-            ->onlyMethods([])
-            ->getMock();
         $data = $this->getMockBuilder(vielhuber\gtbabel\Data::class)
-            ->setConstructorArgs([$utils, $host, $settings, $tags, $log, $publish])
+            ->setConstructorArgs([$utils, $host, $settings, $tags, $log])
             ->onlyMethods([])
             ->getMock();
         $grabber = $this->getMockBuilder(vielhuber\gtbabel\Grabber::class)
@@ -65,7 +61,7 @@ class Test extends \PHPUnit\Framework\TestCase
             ->onlyMethods([])
             ->getMock();
         $router = $this->getMockBuilder(vielhuber\gtbabel\Router::class)
-            ->setConstructorArgs([$data, $host, $settings, $publish, $log, $utils])
+            ->setConstructorArgs([$data, $host, $settings, $log, $utils])
             ->onlyMethods(['redirect'])
             ->getMock();
         $router
@@ -92,7 +88,6 @@ class Test extends \PHPUnit\Framework\TestCase
                 $log,
                 $tags,
                 $host,
-                $publish,
                 $data,
                 $grabber,
                 $domfactory,
@@ -752,7 +747,8 @@ class Test extends \PHPUnit\Framework\TestCase
             '.foo',
             '.foo .bar',
             '.foo-bar .bar-baz',
-            '{"after":"","before":"","can_partial_refresh":true,"container":"div","container_aria_label":"","container_class":"main-header-bar-navigation","container_id":"","depth":0,"echo":true,"fallback_cb":"wp_page_menu","item_spacing":"preserve","items_wrap":"&lt;nav class=\"ast-flex-grow-1 navigation-accessibility\" id=\"site-navigation\" aria-label=\"Site Navigation\" itemtype=\"https:\/\/schema.org\/SiteNavigationElement\" itemscope=\"itemscope\"&gt;&lt;div class=\"main-navigation\"&gt;&lt;ul id=\"%1$s\" class=\"%2$s\"&gt;%3$s&lt;\/ul&gt;&lt;\/div&gt;&lt;\/nav&gt;","link_after":"","link_before":"","menu":"","menu_class":"main-header-menu ast-nav-menu ast-flex ast-justify-content-flex-end  submenu-with-border astra-menu-animation-fade ","menu_id":"primary-menu","theme_location":"primary","walker":"","args_hmac":"59a0964e109beb0a4c7acf392c9dc52b"}'
+            '{"after":"","before":"","can_partial_refresh":true,"container":"div","container_aria_label":"","container_class":"main-header-bar-navigation","container_id":"","depth":0,"echo":true,"fallback_cb":"wp_page_menu","item_spacing":"preserve","items_wrap":"&lt;nav class=\"ast-flex-grow-1 navigation-accessibility\" id=\"site-navigation\" aria-label=\"Site Navigation\" itemtype=\"https:\/\/schema.org\/SiteNavigationElement\" itemscope=\"itemscope\"&gt;&lt;div class=\"main-navigation\"&gt;&lt;ul id=\"%1$s\" class=\"%2$s\"&gt;%3$s&lt;\/ul&gt;&lt;\/div&gt;&lt;\/nav&gt;","link_after":"","link_before":"","menu":"","menu_class":"main-header-menu ast-nav-menu ast-flex ast-justify-content-flex-end  submenu-with-border astra-menu-animation-fade ","menu_id":"primary-menu","theme_location":"primary","walker":"","args_hmac":"59a0964e109beb0a4c7acf392c9dc52b"}',
+            'Array ([0] => Array ([0] => '
         ];
         foreach ($should_translate as $should_translate__value) {
             $this->assertEquals(
@@ -853,6 +849,15 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->assertEquals($translations[0]['context'], '');
         $this->assertEquals($translations[1]['str'], 'datenschutz');
         $this->assertEquals($translations[1]['context'], 'slug');
+        $this->gtbabel->reset();
+
+        $this->gtbabel->config($settings);
+        $this->assertEquals($this->gtbabel->translate('Hund', null, null, null), 'Dog');
+        $this->assertEquals($this->gtbabel->translate('Haus', null, null, null, false), 'House');
+        $this->assertEquals($this->gtbabel->translate('Wasser', null, null, null, true), 'Water');
+        $translations = $this->gtbabel->data->getTranslationsFromDatabase();
+        $this->assertEquals(count($translations), 2);
+        $this->gtbabel->reset();
     }
 
     public function test_tokenize()
@@ -2129,23 +2134,23 @@ EOD;
             [
                 'http://gtbabel.local.vielhuber.de/',
                 'http://gtbabel.local.vielhuber.de/de/',
-                ['de', ['de', null, 'en', null], 'source', false, null, []]
+                ['de', ['de', null, 'en', null], 'source', false, null]
             ],
             [
                 'http://gtbabel.local.vielhuber.de/',
                 'http://gtbabel.local.vielhuber.de/german/',
-                ['de', ['german', null, 'english', null], 'source', false, null, []]
+                ['de', ['german', null, 'english', null], 'source', false, null]
             ],
             ['http://gtbabel.local.vielhuber.de/', null, ['de', ['', null, 'en', null], 'source', false, null, []]],
             [
                 'http://gtbabel.local.vielhuber.de/',
                 'http://gtbabel.local.vielhuber.de/en/',
-                ['en', ['de', null, 'en', null], 'source', false, null, []]
+                ['en', ['de', null, 'en', null], 'source', false, null]
             ],
             [
                 'http://gtbabel.local.vielhuber.de/dies/ist/ein/test/',
                 'http://gtbabel.local.vielhuber.de/de/dies/ist/ein/test/',
-                ['de', ['de', null, 'en', null], 'source', false, null, []]
+                ['de', ['de', null, 'en', null], 'source', false, null]
             ],
             [
                 'http://gtbabel-de.local.vielhuber.de/',
@@ -2155,8 +2160,7 @@ EOD;
                     ['de', 'http://gtbabel-de.local.vielhuber.de', 'en', 'http://gtbabel-en.local.vielhuber.de'],
                     'source',
                     false,
-                    null,
-                    []
+                    null
                 ]
             ],
             [
@@ -2167,8 +2171,7 @@ EOD;
                     ['', 'http://gtbabel.local.vielhuber.de', '', 'http://gtbabel.local.vielhuber.de'],
                     'source',
                     false,
-                    null,
-                    []
+                    null
                 ]
             ],
             [
@@ -2179,51 +2182,28 @@ EOD;
                     ['', 'http://gtbabel.local.vielhuber.de', '', 'http://gtbabel.local.vielhuber.de'],
                     'source',
                     false,
-                    null,
-                    []
+                    null
                 ]
             ],
             [
                 'http://gtbabel.local.vielhuber.de/?ajax=foo',
                 'http://gtbabel.local.vielhuber.de/en/?ajax=foo',
-                ['en', ['de', null, 'en', null], 'source', true, 'http://gtbabel.local.vielhuber.de/en/', []]
+                ['en', ['de', null, 'en', null], 'source', true, 'http://gtbabel.local.vielhuber.de/en/']
             ],
             [
                 'http://gtbabel.local.vielhuber.de/test',
                 'http://gtbabel.local.vielhuber.de/test/',
-                ['de', ['', null, 'en', null], 'source', false, null, []]
+                ['de', ['', null, 'en', null], 'source', false, null]
             ],
             [
                 'http://gtbabel.local.vielhuber.de/test',
                 'http://gtbabel.local.vielhuber.de/test/',
-                ['de', ['', null, 'en', null], 'source', false, null, []]
+                ['de', ['', null, 'en', null], 'source', false, null]
             ],
             [
                 'http://gtbabel.local.vielhuber.de/test',
                 'http://gtbabel.local.vielhuber.de/de/test/',
-                ['de', ['de', null, 'en', null], 'source', false, null, []]
-            ],
-            [
-                'http://gtbabel.local.vielhuber.de/de/unpublished/page/',
-                'http://gtbabel.local.vielhuber.de/de/',
-                [
-                    'de',
-                    ['de', null, 'en', null],
-                    'source',
-                    false,
-                    null,
-                    [['url' => '/unpublished/page', 'lng' => ['de']]]
-                ]
-            ],
-            [
-                'http://gtbabel.local.vielhuber.de/en/',
-                'http://gtbabel.local.vielhuber.de/de/',
-                ['de', ['de', null, 'en', null], 'source', false, null, [['url' => '/*', 'lng' => ['en']]]]
-            ],
-            [
-                'http://gtbabel.local.vielhuber.de/en/foo/bar/baz/',
-                'http://gtbabel.local.vielhuber.de/de/',
-                ['de', ['de', null, 'en', null], 'source', false, null, [['url' => '/*', 'lng' => ['en']]]]
+                ['de', ['de', null, 'en', null], 'source', false, null]
             ]
         ];
 
@@ -2247,10 +2227,6 @@ EOD;
                 $this->setAjaxRequest($data__value[2][3]);
                 if ($data__value[2][4] !== null) {
                     $this->setRefererTo($data__value[2][4]);
-                }
-                if (!empty($data__value[2][5])) {
-                    $settings['prevent_publish'] = true;
-                    $settings['prevent_publish_urls'] = $data__value[2][5];
                 }
                 $this->gtbabel->config($settings);
                 $this->gtbabel->start();
@@ -2580,7 +2556,7 @@ EOD;
             'translate_wp_localize_script' => true,
             'translate_wp_localize_script_include' => ['key1_*.key2.*', 'key3_*.key4'],
             'debug_translations' => true,
-            'auto_add_translations' => false,
+            'auto_add_translations' => true,
             'auto_set_new_strings_checked' => false,
             'auto_set_discovered_strings_checked' => false,
             'unchecked_strings' => 'trans',
