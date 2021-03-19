@@ -7,17 +7,14 @@
                 "lang": "de_DE",
                 "plural-forms": "nplurals=2; plural=(n != 1);"
             },
-            "Languages": [
-                "Sprachen"
-            ],
-            "Page language": [
-                "Seitensprache"
-            ],
-            "Source language": [
-                "Ausgangssprache"
-            ],
-            "Show only there": [
-                "Nur dort anzeigen"
+            "Languages": ["Sprachen"],
+            "Language": ["Sprache"],
+            "Page language": ["Seitensprache"],
+            "Source language": ["Ausgangssprache"],
+            "Show only there": ["Nur dort anzeigen"],
+            "Availability": ["Verfügbarkeit"],
+            "Here you can control whether this page should be translated in all or only in a few languages.": [
+                "Hier können Sie steuern, ob diese Seite in alle oder nur in einige wenige Sprachen übersetzt werden soll."
             ]
         }
     }
