@@ -101,12 +101,6 @@ class Settings
             ],
             'translate_wp_localize_script' => true,
             'translate_wp_localize_script_include' => ['key1_*.key2.*', 'key3_*.key4'],
-            'prevent_publish' => true,
-            'prevent_publish_urls' => [
-                ['url' => '/path/in/source/lng/to/specific/page', 'lng' => ['en', 'fr']],
-                ['url' => '/slug1/*', 'lng' => ['en']],
-                ['url' => '/slug1/*/slug2', 'lng' => ['fr']]
-            ],
             'prevent_publish_wp_new_posts' => false,
             'url_query_args' => [
                 [
@@ -188,7 +182,6 @@ class Settings
             $default_settings['log_folder'] = $this->utils->getWordPressPluginFileStorePathRelative() . '/logs';
             $default_settings['localize_js_strings'] = [];
             $default_settings['detect_dom_changes_include'] = [];
-            $default_settings['prevent_publish_urls'] = [];
             $default_settings['translate_json_include'] = [
                 ['url' => '?wc-ajax=*', 'selector' => ['fragments.*', 'messages', 'redirect']], // woocommerce
                 ['url' => 'wp-json', 'selector' => ['message']] // contact form 7
