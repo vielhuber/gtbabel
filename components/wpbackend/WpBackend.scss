@@ -270,6 +270,17 @@ $button_width: 105px;
 .gtbabel--wizard .gtbabel__auto-translate-loading {
     margin: 10px auto;
 }
+.gtbabel__auto-translate-done {
+    width: 85px;
+    display: block;
+    margin-top: 10px;
+    border: 1px solid #dadada;
+}
+.gtbabel--wizard .gtbabel__auto-translate-done {
+    width: 150px;
+    margin: 0px auto;
+    border: none;
+}
 
 .gtbabel__search {
     width: 100%;
@@ -388,13 +399,6 @@ body[class*='_page_gtbabel-wizard'] #wpbody {
 .gtbabel__wizard-buttons > *:first-child:last-child {
     margin-left: auto;
     order: 2;
-}
-
-.gtbabel__wizard-done-image {
-    width: auto;
-    width: 150px;
-    margin: 0 auto;
-    display: block;
 }
 
 .gtbabel--wizard .gtbabel__input--big {
