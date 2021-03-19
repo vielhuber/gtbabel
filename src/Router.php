@@ -7,14 +7,12 @@ class Router
         Data $data = null,
         Host $host = null,
         Settings $settings = null,
-        Publish $publish = null,
         Log $log = null,
         Utils $utils = null
     ) {
         $this->data = $data ?: new Data();
         $this->host = $host ?: new Host();
         $this->settings = $settings ?: new Settings();
-        $this->publish = $publish ?: new Publish();
         $this->log = $log ?: new Log();
         $this->utils = $utils ?: new Utils();
     }
@@ -63,28 +61,6 @@ class Router
 
             if ($this->host->shouldUseLangQueryArg()) {
                 $url = $this->host->appendArgToUrl($url, 'lang', $lng);
-            }
-        }
-
-        // redirect unpublished
-        if ($this->publish->isActive()) {
-            if ($this->settings->getSourceLanguageCode() !== $lng) {
-                $source_url = $this->data->getUrlTranslationInLanguage(
-                    $lng,
-                    $this->settings->getSourceLanguageCode(),
-                    $url
-                );
-            } else {
-                $source_url = $url;
-            }
-            if ($this->publish->isPrevented($source_url, $lng)) {
-                $target_url = $this->host->getBaseUrlWithPrefixForLanguageCode($lng);
-                // if whole languages are disabled
-                if ($this->publish->isPrevented($target_url, $lng)) {
-                    $url = $this->host->getBaseUrlWithPrefixForLanguageCode($this->settings->getSourceLanguageCode());
-                } else {
-                    $url = $target_url;
-                }
             }
         }
 
