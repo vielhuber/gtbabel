@@ -12,7 +12,6 @@ class Gtbabel
         Log $log = null,
         Tags $tags = null,
         Host $host = null,
-        Publish $publish = null,
         Data $data = null,
         Grabber $grabber = null,
         DomFactory $domfactory = null,
@@ -25,15 +24,14 @@ class Gtbabel
         $this->log = $log ?: new Log($this->utils, $this->settings);
         $this->tags = $tags ?: new Tags($this->utils);
         $this->host = $host ?: new Host($this->settings, $this->log);
-        $this->publish = $publish ?: new Publish($this->settings, $this->host, $this->log);
         $this->data =
-            $data ?: new Data($this->utils, $this->host, $this->settings, $this->tags, $this->log, $this->publish);
+            $data ?: new Data($this->utils, $this->host, $this->settings, $this->tags, $this->log);
         $this->grabber = $grabber ?: new Grabber($this->settings, $this->utils, $this->log, $this->data);
         $this->domfactory =
             $domfactory ?:
             new DomFactory($this->utils, $this->data, $this->host, $this->settings, $this->tags, $this->log);
         $this->router =
-            $router ?: new Router($this->data, $this->host, $this->settings, $this->publish, $this->log, $this->utils);
+            $router ?: new Router($this->data, $this->host, $this->settings, $this->log, $this->utils);
         $this->gettext = $gettext ?: new Gettext($this->data, $this->settings);
         $this->excel = $excel ?: new Excel($this->data, $this->settings);
     }
@@ -100,10 +98,15 @@ class Gtbabel
         $this->log->generalLogReset();
     }
 
-    function translate($str, $lng_target = null, $lng_source = null, $context = null)
+    function translate($str, $lng_target = null, $lng_source = null, $context = null, $auto_add_translations = null)
     {
         if ($this->configured === false) {
             $this->config();
+        }
+
+        if ($auto_add_translations !== null) {
+            $auto_add_translations_prev = $this->settings->get('auto_add_translations');
+            $this->settings->set('auto_add_translations', $auto_add_translations);
         }
 
         $lng_source_prev = false;
@@ -132,6 +135,8 @@ class Gtbabel
             $trans = str_replace(['<template data-context="' . $context . '">', '</template>'], '', $trans);
         }
 
+        $this->data->saveCacheToDatabase();
+
         if ($lng_source_prev !== false) {
             $this->settings->set('lng_source', $lng_source_prev);
         }
@@ -139,7 +144,9 @@ class Gtbabel
             $this->settings->set('lng_target', $lng_target_prev);
         }
 
-        $this->data->saveCacheToDatabase();
+        if ($auto_add_translations !== null) {
+            $this->settings->set('auto_add_translations', $auto_add_translations_prev);
+        }
 
         return $trans;
     }
