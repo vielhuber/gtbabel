@@ -16,15 +16,13 @@ class Data
         Host $host = null,
         Settings $settings = null,
         Tags $tags = null,
-        Log $log = null,
-        Publish $publish = null
+        Log $log = null
     ) {
         $this->utils = $utils ?: new Utils();
         $this->host = $host ?: new Host();
         $this->settings = $settings ?: new Settings();
         $this->tags = $tags ?: new Tags();
         $this->log = $log ?: new Log();
-        $this->publish = $publish ?: new Publish();
     }
 
     function initDatabase()
@@ -860,6 +858,9 @@ class Data
         if ($lng_target === $lng_source) {
             return;
         }
+        if ($this->settings->get('auto_add_translations') === false) {
+            return;
+        }
         // enhance meta (only add translation to previously by lookup added string)
         foreach ($meta as $meta__key => $meta__value) {
             if (
@@ -1036,19 +1037,6 @@ class Data
             $cur_url = $with_args === true ? $this->host->getCurrentUrlWithArgs() : $this->host->getCurrentUrl();
         }
         foreach ($this->settings->getSelectedLanguageCodesLabels() as $languages__key => $languages__value) {
-            if (
-                $this->publish->isActive() &&
-                $this->publish->isPrevented(
-                    $this->getUrlTranslationInLanguage(
-                        $languages__key,
-                        $this->settings->getSourceLanguageCode(),
-                        $this->host->getCurrentUrl()
-                    ),
-                    $languages__key
-                )
-            ) {
-                continue;
-            }
             if ($hide_active === true && $this->getCurrentLanguageCode() === $languages__key) {
                 continue;
             }
@@ -2021,6 +2009,9 @@ class Data
         }
         // detect print_r outputs
         if (mb_strpos($str, '(') === 0 && mb_strrpos($str, ')') === $length - 1 && mb_strpos($str, '=') !== false) {
+            return true;
+        }
+        if (mb_strpos($str, 'Array (') !== false || mb_strpos($str, '] =>') !== false) {
             return true;
         }
         // detect mathjax/latex
