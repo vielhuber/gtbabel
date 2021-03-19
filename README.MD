@@ -1194,13 +1194,6 @@ The default configuration is:
     ],
     'translate_wp_localize_script' => true,
     'translate_wp_localize_script_include' => ['key1_*.key2.*', 'key3_*.key4'],
-    'prevent_publish' => true,
-    'prevent_publish_urls' => [
-        ['url' => '/path/in/source/lng/to/specific/page', 'lng' => ['en', 'fr']],
-        ['url' => '/slug1/*', 'lng' => ['en']], // you can also use wildcards here
-        ['url' => '/slug1/*/slug2', 'lng' => ['fr']]
-        //['url' => '/*', 'lng' => ['en', 'fr']] // disable whole languages
-    ],
     'prevent_publish_wp_new_posts' => false,
     'url_query_args' => [
         [
@@ -1282,7 +1275,7 @@ The following features are included:
 -   Translation services
 -   Support for plugins like [Contact Form 7](https://de.wordpress.org/plugins/contact-form-7/)
 -   Translate specific posts/pages or any other url
--   Control publish status of posts/pages (slug changes are auto-reflected in the `prevent_publish_urls`-option)
+-   Control publish status of posts/pages
 -   Possibility to replace files per language via the media library
 -   Multisite support
 -   Flexible permission system based on capabilities
