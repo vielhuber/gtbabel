@@ -1,5 +1,5 @@
 /* increase specificity */
-html[lang][lang] {
+html[lang][lang][lang][lang] {
     @import './FrontendEditor';
     @import './../wysiwygeditor/style';
 }
