@@ -432,8 +432,13 @@ class Data
         $query = 'SELECT * FROM ' . $this->table . '';
         $query_args = [];
         if ($lng_target !== null) {
-            $query .= ' WHERE lng_target = ?';
-            $query_args[] = $lng_target;
+            if (is_array($lng_target)) {
+                $query .= ' WHERE lng_target IN (?)';
+                $query_args = $lng_target;
+            } else {
+                $query .= ' WHERE lng_target = ?';
+                $query_args[] = $lng_target;
+            }
         }
         $query .= ' ORDER BY id ASC';
         $result = $this->db->fetch_all($query, $query_args);
@@ -2146,9 +2151,6 @@ class Data
         if ($this->host->urlIsStaticFile($url)) {
             return $url;
         }
-        if ($from_lng === $to_lng) {
-            return $url;
-        }
         $path = $this->host->getPathWithoutPrefixFromUrl($url);
         $path = trim(
             trim($this->host->getBaseUrlWithPrefixForLanguageCode($to_lng), '/') .
@@ -2380,7 +2382,16 @@ class Data
         if (!$this->host->responseCodeIsSuccessful()) {
             return;
         }
+        // as we've seen, on wp we trigger later, so that also the post can be read
+        $prevent_lngs = null;
+        if ($this->utils->isWordPress()) {
+            global $post;
+            $prevent_lngs = get_post_meta($post->ID, 'gtbabel_prevent_lngs', true);
+        }
         foreach ($this->settings->getSelectedLanguageCodesWithoutSource() as $languages__value) {
+            if ($prevent_lngs != '' && in_array($languages__value, explode(',', $prevent_lngs))) {
+                continue;
+            }
             $this->prepareTranslationAndAddDynamicallyIfNeeded(
                 $this->host->getCurrentUrl(),
                 $this->settings->getSourceLanguageCode(),

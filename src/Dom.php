@@ -1254,7 +1254,7 @@ class Dom
         }
 
         // alt lng: handle title / meta description
-        if (is_single()) {
+        if (is_singular()) {
             $id = get_the_ID();
             if (__::x($id)) {
                 $alt_lng = get_post_meta($id, 'gtbabel_alt_lng', true);

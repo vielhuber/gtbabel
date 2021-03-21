@@ -308,6 +308,8 @@ export default class WpBackend {
             let el = e.target.closest('.gtbabel__transmeta-reset');
             if (el) {
                 document.querySelector('.gtbabel__form input[name="url"]').value = '';
+                document.querySelector('.gtbabel__form input[name="p"]').value = '';
+                document.querySelector('.gtbabel__form input[name="post_id"]').value = '';
                 document.querySelector('.gtbabel__form').submit();
                 e.preventDefault();
             }
