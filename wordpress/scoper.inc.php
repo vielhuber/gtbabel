@@ -610,6 +610,7 @@ $functions = [
         'register_nav_menus',
         'register_post_status',
         'register_post_type',
+        'register_post_meta',
         'register_setting',
         'register_sidebar',
         'register_sidebars',

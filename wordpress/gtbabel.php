@@ -1212,6 +1212,7 @@ class GtbabelWordPress
                             'url_query_args',
                             'exclude_urls_content',
                             'exclude_urls_slugs',
+                            'exclude_stopwords',
                             'html_lang_attribute',
                             'html_hreflang_tags',
                             'xml_hreflang_tags',
@@ -1276,6 +1277,7 @@ class GtbabelWordPress
                         [
                             'exclude_urls_content',
                             'exclude_urls_slugs',
+                            'exclude_stopwords',
                             'translate_html_force_tokenize',
                             'translate_wp_localize_script_include',
                             'detect_dom_changes_include',
@@ -2111,6 +2113,17 @@ class GtbabelWordPress
             ],
             $url_settings
         );
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label class="gtbabel__label">';
+        echo __('Exclude stopwords from translation', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        $this->renderRepeater('exclude_stopwords', [
+            ['type' => 'string', 'placeholder' => __('Word', 'gtbabel-plugin')]
+        ]);
         echo '</div>';
         echo '</li>';
 

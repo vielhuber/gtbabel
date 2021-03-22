@@ -1638,46 +1638,52 @@ class Data
 
         [
             $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks,
-            $mappingTableInlineLinks
-        ] = $this->tags->removeInlineLinks($origWithoutPrefixSuffixWithoutAttributes);
+            $mappingTableInlineLinks,
+            $mappingTableStopwords
+        ] = $this->tags->removeInlineLinksAndStopwords($origWithoutPrefixSuffixWithoutAttributes);
 
         $mappingTableInlineLinks = $this->translateInlineLinks($mappingTableInlineLinks, $meta);
 
-        $transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks = $this->getExistingTranslationFromCache(
-            $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks,
-            $lng_source,
-            $lng_target,
-            $context,
-            $meta
-        );
-
-        if ($transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks === false) {
-            $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinksWithIds = $this->tags->addIds(
-                $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks
-            );
-            $transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinksWithIds = $this->autoTranslateString(
-                $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinksWithIds,
+        // if string consists only of placeholders
+        if (preg_match('/^(( )*({\d+})( )*)+$/', $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks)) {
+            $transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks = $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks;
+        } else {
+            $transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks = $this->getExistingTranslationFromCache(
+                $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks,
                 $lng_source,
                 $lng_target,
-                $context
+                $context,
+                $meta
             );
-            if ($transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinksWithIds !== null) {
-                $transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks = $this->tags->removeAttributesExceptIrregularIds(
-                    $transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinksWithIds
+
+            if ($transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks === false) {
+                $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinksWithIds = $this->tags->addIds(
+                    $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks
                 );
-                $this->addTranslationToDatabaseAndToCache(
-                    $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks,
-                    $transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks,
+                $transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinksWithIds = $this->autoTranslateString(
+                    $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinksWithIds,
                     $lng_source,
                     $lng_target,
-                    $context,
-                    true,
-                    $meta
+                    $context
                 );
-            } else {
-                $transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks = $this->tags->removeAttributesExceptIrregularIds(
-                    $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinksWithIds
-                );
+                if ($transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinksWithIds !== null) {
+                    $transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks = $this->tags->removeAttributesExceptIrregularIds(
+                        $transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinksWithIds
+                    );
+                    $this->addTranslationToDatabaseAndToCache(
+                        $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks,
+                        $transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks,
+                        $lng_source,
+                        $lng_target,
+                        $context,
+                        true,
+                        $meta
+                    );
+                } else {
+                    $transWithoutPrefixSuffixWithoutAttributesWithoutInlineLinks = $this->tags->removeAttributesExceptIrregularIds(
+                        $origWithoutPrefixSuffixWithoutAttributesWithoutInlineLinksWithIds
+                    );
+                }
             }
         }
 
@@ -1686,9 +1692,10 @@ class Data
             $mappingTableTags
         );
 
-        $transWithoutPrefixSuffix = $this->tags->addInlineLinks(
+        $transWithoutPrefixSuffix = $this->tags->addInlineLinksAndStopwords(
             $transWithoutPrefixSuffixWithoutInlineLinks,
-            $mappingTableInlineLinks
+            $mappingTableInlineLinks,
+            $mappingTableStopwords
         );
 
         $trans = $this->tags->addPrefixSuffix($transWithoutPrefixSuffix, $mappingTablePrefixSuffix);

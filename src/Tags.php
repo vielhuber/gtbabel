@@ -5,9 +5,11 @@ use vielhuber\stringhelper\__;
 
 class Tags
 {
-    function __construct(Utils $utils = null)
+    function __construct(Utils $utils = null, Settings $settings = null, Log $log = null)
     {
         $this->utils = $utils ?: new Utils();
+        $this->settings = $settings ?: new Settings();
+        $this->log = $log ?: new Log();
     }
 
     function catchOpeningTags($str)
@@ -53,10 +55,30 @@ class Tags
         if (empty($match[0])) {
             return [];
         }
+        // strip last dot (this was too tricky with regex)
+        $match[0] = array_map(function ($a) {
+            if (mb_strrpos($a, '.') === mb_strlen($a) - 1) {
+                $a = mb_substr($a, 0, -1);
+            }
+            return $a;
+        }, $match[0]);
         return $match[0];
     }
 
-    function catchInlineLinksPlaceholders($str)
+    function catchStopwords($str)
+    {
+        $exclude_stopwords = $this->settings->get('exclude_stopwords');
+        if ($exclude_stopwords === null || $exclude_stopwords == '' || empty($exclude_stopwords)) {
+            return [];
+        }
+        preg_match_all('(' . implode('|', $exclude_stopwords) . ')', $str, $match);
+        if (empty($match[0])) {
+            return [];
+        }
+        return $match[0];
+    }
+
+    function catchInlineLinksStopwordsPlaceholders($str)
     {
         preg_match_all('({[0-9]+})', $str, $match);
         if (empty($match[0])) {
@@ -154,15 +176,23 @@ class Tags
         return [$str, $mappingTableTags];
     }
 
-    function removeInlineLinks($str)
+    function removeInlineLinksAndStopwords($str)
     {
         $mappingTableInlineLinks = [];
+        $mappingTableStopwords = [];
+        $shift = 0;
         foreach ($this->catchInlineLinks($str) as $matches__key => $matches__value) {
-            $id = $matches__key + 1;
+            $id = $shift + $matches__key + 1;
             $mappingTableInlineLinks[$id] = $matches__value;
             $str = __::str_replace_first($matches__value, '{' . $id . '}', $str);
         }
-        return [$str, $mappingTableInlineLinks];
+        $shift = count($mappingTableInlineLinks);
+        foreach ($this->catchStopwords($str) as $matches__key => $matches__value) {
+            $id = $shift + $matches__key + 1;
+            $mappingTableStopwords[$id] = $matches__value;
+            $str = __::str_replace_first($matches__value, '{' . $id . '}', $str);
+        }
+        return [$str, $mappingTableInlineLinks, $mappingTableStopwords];
     }
 
     function removePrefixSuffix($str)
@@ -273,14 +303,17 @@ class Tags
         return $str;
     }
 
-    function addInlineLinks($str, $mappingTableInlineLinks)
+    function addInlineLinksAndStopwords($str, $mappingTableInlineLinks, $mappingTableStopwords)
     {
-        foreach ($this->catchInlineLinksPlaceholders($str) as $matches__value) {
+        foreach ($this->catchInlineLinksStopwordsPlaceholders($str) as $matches__value) {
             $id = str_replace(['{', '}'], '', $matches__value);
-            if (!array_key_exists($id, $mappingTableInlineLinks)) {
+            if (array_key_exists($id, $mappingTableInlineLinks)) {
+                $link = $mappingTableInlineLinks[$id];
+            } elseif (array_key_exists($id, $mappingTableStopwords)) {
+                $link = $mappingTableStopwords[$id];
+            } else {
                 continue;
             }
-            $link = $mappingTableInlineLinks[$id];
             $str = __::str_replace_first($matches__value, $link, $str);
         }
         return $str;

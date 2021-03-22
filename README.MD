@@ -67,6 +67,7 @@ Gtbabel automatically translates your HTML/PHP pages – server sided!
 -   PHPUnit e2e tests available.
 -   Exports and imports directly to [gettext](https://www.gnu.org/software/gettext/) (using extracted comments and template files).
 -   Multiple source languages supported concurrently.
+-   Provide stopwords to prevent translations for specific words.
 -   DOM change detection: Observe specific page parts and translate dynamic content.
 -   Auto throttling api translation for cost control.
 -   Custom domain support (path based, subdomain based, top level domain based).
@@ -1214,6 +1215,7 @@ The default configuration is:
     ],
     'exclude_urls_content' => ['backend'],
     'exclude_urls_slugs' => ['api/v1.0'],
+    'exclude_stopwords' => ['Some specific string to exclude'],
     'html_lang_attribute' => true,
     'html_hreflang_tags' => true,
     'xml_hreflang_tags' => true,
@@ -1275,7 +1277,7 @@ The following features are included:
 -   Translation services
 -   Support for plugins like [Contact Form 7](https://de.wordpress.org/plugins/contact-form-7/)
 -   Translate specific posts/pages or any other url
--   Control publish status of posts/pages
+-   Fine grained control publish status of posts/pages
 -   Possibility to replace files per language via the media library
 -   Multisite support
 -   Flexible permission system based on capabilities
@@ -1560,6 +1562,8 @@ Besides providing content in different source languages, you can hide specific d
 Note that _rendered_ means completely missing from the DOM.
 
 This is (in conjunction with the css classes `notranslate` to prevent translation and `force-tokenize` to force tokenization and the `lang`-attribute) an attempt to get around the intended limitation of Gtbabel that all content is always translated into all languages.
+
+In WordPress you individually can configure in which languages a specific page should be translated. An exclusive view for logged-in users is also possible – this allows you to prepare translations in quietly before they are available to the public.
 
 ## Router
 

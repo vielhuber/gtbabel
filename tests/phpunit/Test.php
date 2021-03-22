@@ -41,7 +41,7 @@ class Test extends \PHPUnit\Framework\TestCase
             ->onlyMethods([])
             ->getMock();
         $tags = $this->getMockBuilder(vielhuber\gtbabel\Tags::class)
-            ->setConstructorArgs([$utils])
+            ->setConstructorArgs([$utils, $settings, $log])
             ->onlyMethods([])
             ->getMock();
         $host = $this->getMockBuilder(vielhuber\gtbabel\Host::class)
@@ -1128,6 +1128,61 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->assertEquals(count($translations), 1);
         $this->assertEquals($translations[0]['str'], 'https://test.de');
         $this->gtbabel->reset();
+    }
+
+    public function test_stopwords()
+    {
+        $settings = $this->getDefaultSettings();
+        $settings['languages'] = $this->getLanguageSettings([['code' => 'de'], ['code' => 'en']]);
+        $settings['debug_translations'] = false;
+        $settings['auto_translation'] = true;
+        $settings['auto_add_translations'] = true;
+        $settings['exclude_stopwords'] = ['Haus'];
+
+        ob_start();
+        $this->gtbabel->config($settings);
+        $this->gtbabel->start();
+        echo '<!DOCTYPE html>
+<html>
+    <head>
+        <title>Ein Review von Haus</title>
+        <meta name="description" content="Ich lese gerade Haus.">
+    </head>
+    <body>
+        <a href="#" title="Haus">Der Link https://test.de handelt vom dem Stoppword Haus und mehr findet man auf https://test2.de.</a>
+    </body>
+</html>';
+        $this->gtbabel->stop();
+        $output = ob_get_contents();
+        ob_end_clean();
+        $translations = $this->gtbabel->data->getTranslationsFromDatabase();
+        $this->gtbabel->reset();
+
+        $this->assertEquals(
+            __::minify_html($this->normalize($output)),
+            __::minify_html(
+                $this->normalize('<!DOCTYPE html>
+<html>
+    <head>
+        <title>A review by Haus</title>
+        <meta name="description" content="I\'m reading Haus right now.">
+    </head>
+    <body>
+        <a href="#" title="Haus">The link https://test.de is about the stop word Haus and more can be found on https://test2.de.</a>
+    </body>
+</html>')
+            )
+        );
+
+        $this->assertEquals(count($translations), 5);
+        $this->assertEquals($translations[0]['str'], 'https://test.de');
+        $this->assertEquals($translations[1]['str'], 'https://test2.de');
+        $this->assertEquals(
+            $translations[2]['str'],
+            'Der Link {1} handelt vom dem Stoppword {3} und mehr findet man auf {2}.'
+        );
+        $this->assertEquals($translations[3]['str'], 'Ein Review von {1}');
+        $this->assertEquals($translations[4]['str'], 'Ich lese gerade {1}.');
     }
 
     public function test_inline_html_tags()
@@ -2572,6 +2627,7 @@ EOD;
             ],
             'exclude_urls_content' => null,
             'exclude_urls_slugs' => null,
+            'exclude_stopwords' => null,
             'html_lang_attribute' => false,
             'html_hreflang_tags' => false,
             'xml_hreflang_tags' => false,

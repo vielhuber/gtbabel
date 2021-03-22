@@ -501,7 +501,7 @@ class Dom
         if ($mode === 'buffer') {
             $this->setHtmlLangTags();
             $this->setRtlAttr();
-            $this->doWordPressSpecifics();
+            $this->doWordPressSpecificsBefore();
             $this->detectDomChangesFrontend();
             $this->frontendEditorFrontend();
             $this->localizeJsPrepare();
@@ -515,6 +515,9 @@ class Dom
         $this->preloadExcludedNodes();
         $this->preloadForceTokenize();
         $this->modifyHtmlNodes($mode);
+        if ($mode === 'buffer') {
+            $this->doWordPressSpecificsAfter();
+        }
         $html = $this->finishDomDocument();
         // DomDocument always encodes characters (meaning we receive plain text links with &amp; inside, which is bad for plain text)
         if ($content_type === 'plain') {
@@ -1224,7 +1227,7 @@ class Dom
         $head->appendChild($tag);
     }
 
-    function doWordPressSpecifics()
+    function doWordPressSpecificsBefore()
     {
         if (!$this->utils->isWordPress()) {
             return;
@@ -1268,6 +1271,30 @@ class Dom
                         $html_node->setAttribute('lang', $alt_lng);
                     }
                 }
+            }
+        }
+
+        // preserve search term in title
+        // note that we cannot use the concept of stopwords here (because you can crash the whole page when reading stopwords from $_GET)
+        if (is_search() && get_search_query() != '') {
+            $html_node = $this->DOMXPath->query('/html/head//title')[0];
+            if ($html_node !== null) {
+                $html_node->textContent = __::str_replace_last(get_search_query(), '{1}', $html_node->textContent);
+            }
+        }
+    }
+
+    function doWordPressSpecificsAfter()
+    {
+        if (!$this->utils->isWordPress()) {
+            return;
+        }
+
+        // restore search term in title
+        if (is_search() && get_search_query() != '') {
+            $html_node = $this->DOMXPath->query('/html/head//title')[0];
+            if ($html_node !== null) {
+                $html_node->textContent = str_replace('{1}', get_search_query(), $html_node->textContent);
             }
         }
     }

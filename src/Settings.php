@@ -29,6 +29,9 @@ class Settings
         if ($this->args === null) {
             return null;
         }
+        if (!array_key_exists($prop, $this->args)) {
+            return null;
+        }
         return $this->args[$prop];
     }
 
@@ -114,6 +117,7 @@ class Settings
             ],
             'exclude_urls_content' => ['backend'],
             'exclude_urls_slugs' => ['api/v1.0'],
+            'exclude_stopwords' => ['Some specific string to exclude'],
             'html_lang_attribute' => true,
             'html_hreflang_tags' => true,
             'xml_hreflang_tags' => true,
@@ -201,6 +205,7 @@ class Settings
                 'wp-comments-post.php'
             ];
             $default_settings['exclude_urls_slugs'] = ['wp-json'];
+            $default_settings['exclude_stopwords'] = [];
             $default_settings['translate_html_exclude'] = [
                 ['selector' => '.notranslate'],
                 ['selector' => '[data-context]', 'attribute' => 'data-context'],

@@ -22,16 +22,14 @@ class Gtbabel
         $this->utils = $utils ?: new Utils();
         $this->settings = $settings ?: new Settings($this->utils);
         $this->log = $log ?: new Log($this->utils, $this->settings);
-        $this->tags = $tags ?: new Tags($this->utils);
+        $this->tags = $tags ?: new Tags($this->utils, $this->settings, $this->log);
         $this->host = $host ?: new Host($this->settings, $this->log);
-        $this->data =
-            $data ?: new Data($this->utils, $this->host, $this->settings, $this->tags, $this->log);
+        $this->data = $data ?: new Data($this->utils, $this->host, $this->settings, $this->tags, $this->log);
         $this->grabber = $grabber ?: new Grabber($this->settings, $this->utils, $this->log, $this->data);
         $this->domfactory =
             $domfactory ?:
             new DomFactory($this->utils, $this->data, $this->host, $this->settings, $this->tags, $this->log);
-        $this->router =
-            $router ?: new Router($this->data, $this->host, $this->settings, $this->log, $this->utils);
+        $this->router = $router ?: new Router($this->data, $this->host, $this->settings, $this->log, $this->utils);
         $this->gettext = $gettext ?: new Gettext($this->data, $this->settings);
         $this->excel = $excel ?: new Excel($this->data, $this->settings);
     }
