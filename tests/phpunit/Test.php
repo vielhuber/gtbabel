@@ -2189,23 +2189,23 @@ EOD;
             [
                 'http://gtbabel.local.vielhuber.de/',
                 'http://gtbabel.local.vielhuber.de/de/',
-                ['de', ['de', null, 'en', null], 'source', false, null]
+                ['de', ['de', null, 'en', null], 'source', false, null, null]
             ],
             [
                 'http://gtbabel.local.vielhuber.de/',
                 'http://gtbabel.local.vielhuber.de/german/',
-                ['de', ['german', null, 'english', null], 'source', false, null]
+                ['de', ['german', null, 'english', null], 'source', false, null, null]
             ],
-            ['http://gtbabel.local.vielhuber.de/', null, ['de', ['', null, 'en', null], 'source', false, null, []]],
+            ['http://gtbabel.local.vielhuber.de/', null, ['de', ['', null, 'en', null], 'source', false, null, null]],
             [
                 'http://gtbabel.local.vielhuber.de/',
                 'http://gtbabel.local.vielhuber.de/en/',
-                ['en', ['de', null, 'en', null], 'source', false, null]
+                ['en', ['de', null, 'en', null], 'source', false, null, null]
             ],
             [
                 'http://gtbabel.local.vielhuber.de/dies/ist/ein/test/',
                 'http://gtbabel.local.vielhuber.de/de/dies/ist/ein/test/',
-                ['de', ['de', null, 'en', null], 'source', false, null]
+                ['de', ['de', null, 'en', null], 'source', false, null, null]
             ],
             [
                 'http://gtbabel-de.local.vielhuber.de/',
@@ -2215,6 +2215,7 @@ EOD;
                     ['de', 'http://gtbabel-de.local.vielhuber.de', 'en', 'http://gtbabel-en.local.vielhuber.de'],
                     'source',
                     false,
+                    null,
                     null
                 ]
             ],
@@ -2226,6 +2227,7 @@ EOD;
                     ['', 'http://gtbabel.local.vielhuber.de', '', 'http://gtbabel.local.vielhuber.de'],
                     'source',
                     false,
+                    null,
                     null
                 ]
             ],
@@ -2237,28 +2239,39 @@ EOD;
                     ['', 'http://gtbabel.local.vielhuber.de', '', 'http://gtbabel.local.vielhuber.de'],
                     'source',
                     false,
+                    null,
                     null
                 ]
             ],
             [
                 'http://gtbabel.local.vielhuber.de/?ajax=foo',
                 'http://gtbabel.local.vielhuber.de/en/?ajax=foo',
-                ['en', ['de', null, 'en', null], 'source', true, 'http://gtbabel.local.vielhuber.de/en/']
+                ['en', ['de', null, 'en', null], 'source', true, 'http://gtbabel.local.vielhuber.de/en/', null]
             ],
             [
                 'http://gtbabel.local.vielhuber.de/test',
                 'http://gtbabel.local.vielhuber.de/test/',
-                ['de', ['', null, 'en', null], 'source', false, null]
+                ['de', ['', null, 'en', null], 'source', false, null, null]
             ],
             [
                 'http://gtbabel.local.vielhuber.de/test',
                 'http://gtbabel.local.vielhuber.de/test/',
-                ['de', ['', null, 'en', null], 'source', false, null]
+                ['de', ['', null, 'en', null], 'source', false, null, null]
             ],
             [
                 'http://gtbabel.local.vielhuber.de/test',
                 'http://gtbabel.local.vielhuber.de/de/test/',
-                ['de', ['de', null, 'en', null], 'source', false, null]
+                ['de', ['de', null, 'en', null], 'source', false, null, null]
+            ],
+            [
+                'http://gtbabel.local.vielhuber.de/en/',
+                'http://gtbabel.local.vielhuber.de/de/',
+                ['de', ['de', null, 'en', null], 'source', false, null, ['en']]
+            ],
+            [
+                'http://gtbabel.local.vielhuber.de/en/test/',
+                'http://gtbabel.local.vielhuber.de/de/',
+                ['de', ['de', null, 'en', null], 'source', false, null, ['en']]
             ]
         ];
 
@@ -2273,8 +2286,18 @@ EOD;
                 $settings['lng_source'] = $data__value[2][0];
                 $settings['languages'] = $this->getLanguageSettings(
                     [
-                        ['code' => 'de', 'url_prefix' => $data__value[2][1][0], 'url_base' => $data__value[2][1][1]],
-                        ['code' => 'en', 'url_prefix' => $data__value[2][1][2], 'url_base' => $data__value[2][1][3]]
+                        [
+                            'code' => 'de',
+                            'url_prefix' => $data__value[2][1][0],
+                            'url_base' => $data__value[2][1][1],
+                            'hidden' => $data__value[2][5] !== null && in_array('de', $data__value[2][5])
+                        ],
+                        [
+                            'code' => 'en',
+                            'url_prefix' => $data__value[2][1][2],
+                            'url_base' => $data__value[2][1][3],
+                            'hidden' => $data__value[2][5] !== null && in_array('en', $data__value[2][5])
+                        ]
                     ],
                     true
                 );

@@ -68,6 +68,7 @@ Gtbabel automatically translates your HTML/PHP pages – server sided!
 -   Exports and imports directly to [gettext](https://www.gnu.org/software/gettext/) (using extracted comments and template files).
 -   Multiple source languages supported concurrently.
 -   Provide stopwords to prevent translations for specific words.
+-   Entirely hide languages to prepare new translations beforehand.
 -   DOM change detection: Observe specific page parts and translate dynamic content.
 -   Auto throttling api translation for cost control.
 -   Custom domain support (path based, subdomain based, top level domain based).
