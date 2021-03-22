@@ -64,6 +64,11 @@ class Router
             }
         }
 
+        // redirect unpublished
+        if ($this->settings->isLanguageHidden($this->data->getCurrentLanguageCode())) {
+            $url = $this->host->getBaseUrlWithPrefixForLanguageCode($this->settings->getSourceLanguageCode());
+        }
+
         // add trailing slash
         if (
             mb_strrpos($this->host->stripArgsFromUrl($url), '/') !==

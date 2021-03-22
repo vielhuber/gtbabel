@@ -1048,6 +1048,9 @@ class Data
             if (__::hook_fire('gtbabel_hide_languagepicker_entry', $languages__key) === true) {
                 continue;
             }
+            if ($this->settings->isLanguageHidden($languages__key)) {
+                continue;
+            }
             $trans_url = $this->getUrlTranslationInLanguage($this->getCurrentLanguageCode(), $languages__key, $cur_url);
             $hreflang = $this->settings->getHreflangCodeForLanguage($languages__key);
             $data[] = [

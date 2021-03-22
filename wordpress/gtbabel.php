@@ -1469,6 +1469,16 @@ class GtbabelWordPress
                         $settings['languages'],
                         $this->gtbabel->settings->getLanguageDataForCode($settings['lng_source'])
                     );
+                    $post_data = @$settings['hide_languages'];
+                    if (!empty($post_data)) {
+                        foreach ($settings['languages'] as $settings_languages__key => $settings_languages__value) {
+                            $settings['languages'][$settings_languages__key]['hidden'] = in_array(
+                                $settings_languages__value['code'],
+                                array_keys($post_data)
+                            );
+                        }
+                    }
+                    unset($settings['hide_languages']);
                     foreach ($settings['languages'] as $languages__key => $languages__value) {
                         unset($settings['languages'][$languages__key]['url_base']);
                         unset($settings['languages'][$languages__key]['url_prefix']);
@@ -1658,19 +1668,26 @@ class GtbabelWordPress
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
         echo '<ul class="gtbabel__languagelist">';
-        foreach (
-            $this->gtbabel->settings->getSelectedLanguageCodesLabelsWithoutSource()
-            as $languages__key => $languages__value
-        ) {
+        foreach ($this->gtbabel->settings->getSelectedLanguagesWithoutSource() as $languages__value) {
             $checked = false;
+            if (
+                !empty(
+                    array_filter($settings['languages'], function ($settings__value) use ($languages__value) {
+                        return $settings__value['code'] === $languages__value['code'] &&
+                            $languages__value['hidden'] === true;
+                    })
+                )
+            ) {
+                $checked = true;
+            }
             echo '<li class="gtbabel__languagelist-item">';
             echo '<label class="gtbabel__languagelist-label">';
             echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" name="gtbabel[hide_languages][' .
-                $languages__key .
+                $languages__value['code'] .
                 ']"' .
                 ($checked === true ? ' checked="checked"' : '') .
                 ' value="1" />';
-            echo '<span class="gtbabel__languagelist-label-inner">' . $languages__value . '</span>';
+            echo '<span class="gtbabel__languagelist-label-inner">' . $languages__value['label'] . '</span>';
             echo '</label>';
             echo '</li>';
         }

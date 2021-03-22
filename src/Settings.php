@@ -160,7 +160,8 @@ class Settings
                     'hreflang_code' => 'de',
                     'google_translation_code' => 'de',
                     'microsoft_translation_code' => 'de',
-                    'deepl_translation_code' => 'de'
+                    'deepl_translation_code' => 'de',
+                    'hidden' => false
                 ],
                 [
                     'code' => 'en',
@@ -168,7 +169,8 @@ class Settings
                     'hreflang_code' => 'en',
                     'google_translation_code' => 'en',
                     'microsoft_translation_code' => 'en',
-                    'deepl_translation_code' => 'en'
+                    'deepl_translation_code' => 'en',
+                    'hidden' => false
                 ]
             ];
             if (!in_array($default_settings['lng_source'], ['de', 'en'])) {
@@ -180,7 +182,8 @@ class Settings
                     'hreflang_code' => $default_settings['lng_source'],
                     'google_translation_code' => $default_settings['lng_source'],
                     'microsoft_translation_code' => $default_settings['lng_source'],
-                    'deepl_translation_code' => $default_settings['lng_source']
+                    'deepl_translation_code' => $default_settings['lng_source'],
+                    'hidden' => false
                 ];
             }
             $default_settings['log_folder'] = $this->utils->getWordPressPluginFileStorePathRelative() . '/logs';
@@ -464,7 +467,8 @@ class Settings
                 'hreflang_code' => 'de',
                 'google_translation_code' => 'de',
                 'microsoft_translation_code' => 'de',
-                'deepl_translation_code' => 'de'
+                'deepl_translation_code' => 'de',
+                'hidden' => false
             ],
             [
                 'code' => 'en',
@@ -473,7 +477,8 @@ class Settings
                 'hreflang_code' => 'en',
                 'google_translation_code' => 'en',
                 'microsoft_translation_code' => 'en',
-                'deepl_translation_code' => 'en'
+                'deepl_translation_code' => 'en',
+                'hidden' => false
             ],
             [
                 'code' => 'fr',
@@ -482,7 +487,8 @@ class Settings
                 'hreflang_code' => 'fr',
                 'google_translation_code' => 'fr',
                 'microsoft_translation_code' => 'fr',
-                'deepl_translation_code' => 'fr'
+                'deepl_translation_code' => 'fr',
+                'hidden' => false
             ],
             [
                 'code' => 'af',
@@ -491,7 +497,8 @@ class Settings
                 'hreflang_code' => 'af',
                 'google_translation_code' => 'af',
                 'microsoft_translation_code' => 'af',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'am',
@@ -500,7 +507,8 @@ class Settings
                 'hreflang_code' => 'am',
                 'google_translation_code' => 'am',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'ar',
@@ -509,7 +517,8 @@ class Settings
                 'hreflang_code' => 'ar',
                 'google_translation_code' => 'ar',
                 'microsoft_translation_code' => 'ar',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'az',
@@ -518,7 +527,8 @@ class Settings
                 'hreflang_code' => 'az',
                 'google_translation_code' => 'az',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'be',
@@ -527,7 +537,8 @@ class Settings
                 'hreflang_code' => 'be',
                 'google_translation_code' => 'be',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'bg',
@@ -536,7 +547,8 @@ class Settings
                 'hreflang_code' => 'bg',
                 'google_translation_code' => 'bg',
                 'microsoft_translation_code' => 'bg',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'bn',
@@ -545,7 +557,8 @@ class Settings
                 'hreflang_code' => 'bn',
                 'google_translation_code' => 'bn',
                 'microsoft_translation_code' => 'bn',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'bs',
@@ -554,7 +567,8 @@ class Settings
                 'hreflang_code' => 'bs',
                 'google_translation_code' => 'bs',
                 'microsoft_translation_code' => 'bs',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'ca',
@@ -563,7 +577,8 @@ class Settings
                 'hreflang_code' => 'ca',
                 'google_translation_code' => 'ca',
                 'microsoft_translation_code' => 'ca',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'ceb',
@@ -572,7 +587,8 @@ class Settings
                 'hreflang_code' => null,
                 'google_translation_code' => 'ceb',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'co',
@@ -581,7 +597,8 @@ class Settings
                 'hreflang_code' => 'co',
                 'google_translation_code' => 'co',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'cs',
@@ -590,7 +607,8 @@ class Settings
                 'hreflang_code' => 'cs',
                 'google_translation_code' => 'cs',
                 'microsoft_translation_code' => 'cs',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'cy',
@@ -599,7 +617,8 @@ class Settings
                 'hreflang_code' => 'cy',
                 'google_translation_code' => 'cy',
                 'microsoft_translation_code' => 'cy',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'da',
@@ -608,7 +627,8 @@ class Settings
                 'hreflang_code' => 'da',
                 'google_translation_code' => 'da',
                 'microsoft_translation_code' => 'da',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'el',
@@ -617,7 +637,8 @@ class Settings
                 'hreflang_code' => 'el',
                 'google_translation_code' => 'el',
                 'microsoft_translation_code' => 'el',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'eo',
@@ -626,7 +647,8 @@ class Settings
                 'hreflang_code' => 'eo',
                 'google_translation_code' => 'eo',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'es',
@@ -635,7 +657,8 @@ class Settings
                 'hreflang_code' => 'es',
                 'google_translation_code' => 'es',
                 'microsoft_translation_code' => 'es',
-                'deepl_translation_code' => 'es'
+                'deepl_translation_code' => 'es',
+                'hidden' => false
             ],
             [
                 'code' => 'et',
@@ -644,7 +667,8 @@ class Settings
                 'hreflang_code' => 'et',
                 'google_translation_code' => 'et',
                 'microsoft_translation_code' => 'et',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'eu',
@@ -653,7 +677,8 @@ class Settings
                 'hreflang_code' => 'eu',
                 'google_translation_code' => 'eu',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'fa',
@@ -662,7 +687,8 @@ class Settings
                 'hreflang_code' => 'fa',
                 'google_translation_code' => 'fa',
                 'microsoft_translation_code' => 'fa',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'fi',
@@ -671,7 +697,8 @@ class Settings
                 'hreflang_code' => 'fi',
                 'google_translation_code' => 'fi',
                 'microsoft_translation_code' => 'fi',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'ga',
@@ -680,7 +707,8 @@ class Settings
                 'hreflang_code' => 'ga',
                 'google_translation_code' => 'ga',
                 'microsoft_translation_code' => 'ga',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'gd',
@@ -689,7 +717,8 @@ class Settings
                 'hreflang_code' => 'gd',
                 'google_translation_code' => 'gd',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'gl',
@@ -698,7 +727,8 @@ class Settings
                 'hreflang_code' => 'gl',
                 'google_translation_code' => 'gl',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'gu',
@@ -707,7 +737,8 @@ class Settings
                 'hreflang_code' => 'gu',
                 'google_translation_code' => 'gu',
                 'microsoft_translation_code' => 'gu',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'ha',
@@ -716,7 +747,8 @@ class Settings
                 'hreflang_code' => 'ha',
                 'google_translation_code' => 'ha',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'haw',
@@ -725,7 +757,8 @@ class Settings
                 'hreflang_code' => null,
                 'google_translation_code' => 'haw',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'he',
@@ -734,7 +767,8 @@ class Settings
                 'hreflang_code' => 'he',
                 'google_translation_code' => 'he',
                 'microsoft_translation_code' => 'he',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'hi',
@@ -743,7 +777,8 @@ class Settings
                 'hreflang_code' => 'hi',
                 'google_translation_code' => 'hi',
                 'microsoft_translation_code' => 'hi',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'hmn',
@@ -752,7 +787,8 @@ class Settings
                 'hreflang_code' => null,
                 'google_translation_code' => 'hmn',
                 'microsoft_translation_code' => 'mww',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'hr',
@@ -761,7 +797,8 @@ class Settings
                 'hreflang_code' => 'hr',
                 'google_translation_code' => 'hr',
                 'microsoft_translation_code' => 'hr',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'ht',
@@ -770,7 +807,8 @@ class Settings
                 'hreflang_code' => 'ht',
                 'google_translation_code' => 'ht',
                 'microsoft_translation_code' => 'ht',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'hu',
@@ -779,7 +817,8 @@ class Settings
                 'hreflang_code' => 'hu',
                 'google_translation_code' => 'hu',
                 'microsoft_translation_code' => 'hu',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'hy',
@@ -788,7 +827,8 @@ class Settings
                 'hreflang_code' => 'hy',
                 'google_translation_code' => 'hy',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'id',
@@ -797,7 +837,8 @@ class Settings
                 'hreflang_code' => 'id',
                 'google_translation_code' => 'id',
                 'microsoft_translation_code' => 'id',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'ig',
@@ -806,7 +847,8 @@ class Settings
                 'hreflang_code' => 'ig',
                 'google_translation_code' => 'ig',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'is',
@@ -815,7 +857,8 @@ class Settings
                 'hreflang_code' => 'is',
                 'google_translation_code' => 'is',
                 'microsoft_translation_code' => 'is',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'it',
@@ -824,7 +867,8 @@ class Settings
                 'hreflang_code' => 'it',
                 'google_translation_code' => 'it',
                 'microsoft_translation_code' => 'it',
-                'deepl_translation_code' => 'it'
+                'deepl_translation_code' => 'it',
+                'hidden' => false
             ],
             [
                 'code' => 'ja',
@@ -833,7 +877,8 @@ class Settings
                 'hreflang_code' => 'ja',
                 'google_translation_code' => 'ja',
                 'microsoft_translation_code' => 'ja',
-                'deepl_translation_code' => 'ja'
+                'deepl_translation_code' => 'ja',
+                'hidden' => false
             ],
             [
                 'code' => 'jv',
@@ -842,7 +887,8 @@ class Settings
                 'hreflang_code' => 'jv',
                 'google_translation_code' => 'jv',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'ka',
@@ -851,7 +897,8 @@ class Settings
                 'hreflang_code' => 'ka',
                 'google_translation_code' => 'ka',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'kk',
@@ -860,7 +907,8 @@ class Settings
                 'hreflang_code' => 'kk',
                 'google_translation_code' => 'kk',
                 'microsoft_translation_code' => 'kk',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'km',
@@ -869,7 +917,8 @@ class Settings
                 'hreflang_code' => 'km',
                 'google_translation_code' => 'km',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'kn',
@@ -878,7 +927,8 @@ class Settings
                 'hreflang_code' => 'kn',
                 'google_translation_code' => 'kn',
                 'microsoft_translation_code' => 'kn',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'ko',
@@ -887,7 +937,8 @@ class Settings
                 'hreflang_code' => 'ko',
                 'google_translation_code' => 'ko',
                 'microsoft_translation_code' => 'ko',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'ku',
@@ -896,7 +947,8 @@ class Settings
                 'hreflang_code' => 'ku',
                 'google_translation_code' => 'ku',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'ky',
@@ -905,7 +957,8 @@ class Settings
                 'hreflang_code' => 'ky',
                 'google_translation_code' => 'ky',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'la',
@@ -914,7 +967,8 @@ class Settings
                 'hreflang_code' => 'la',
                 'google_translation_code' => 'la',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'lb',
@@ -923,7 +977,8 @@ class Settings
                 'hreflang_code' => 'lb',
                 'google_translation_code' => 'lb',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'lo',
@@ -932,7 +987,8 @@ class Settings
                 'hreflang_code' => 'lo',
                 'google_translation_code' => 'lo',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'lt',
@@ -941,7 +997,8 @@ class Settings
                 'hreflang_code' => 'lt',
                 'google_translation_code' => 'lt',
                 'microsoft_translation_code' => 'lt',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'lv',
@@ -950,7 +1007,8 @@ class Settings
                 'hreflang_code' => 'lv',
                 'google_translation_code' => 'lv',
                 'microsoft_translation_code' => 'lv',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'mg',
@@ -959,7 +1017,8 @@ class Settings
                 'hreflang_code' => 'mg',
                 'google_translation_code' => 'mg',
                 'microsoft_translation_code' => 'mg',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'mi',
@@ -968,7 +1027,8 @@ class Settings
                 'hreflang_code' => 'mi',
                 'google_translation_code' => 'mi',
                 'microsoft_translation_code' => 'mi',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'mk',
@@ -977,7 +1037,8 @@ class Settings
                 'hreflang_code' => 'mk',
                 'google_translation_code' => 'mk',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'ml',
@@ -986,7 +1047,8 @@ class Settings
                 'hreflang_code' => 'ml',
                 'google_translation_code' => 'ml',
                 'microsoft_translation_code' => 'ml',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'mn',
@@ -995,7 +1057,8 @@ class Settings
                 'hreflang_code' => 'mn',
                 'google_translation_code' => 'mn',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'mr',
@@ -1004,7 +1067,8 @@ class Settings
                 'hreflang_code' => 'mr',
                 'google_translation_code' => 'mr',
                 'microsoft_translation_code' => 'mr',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'ms',
@@ -1013,7 +1077,8 @@ class Settings
                 'hreflang_code' => 'ms',
                 'google_translation_code' => 'ms',
                 'microsoft_translation_code' => 'ms',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'mt',
@@ -1022,7 +1087,8 @@ class Settings
                 'hreflang_code' => 'mt',
                 'google_translation_code' => 'mt',
                 'microsoft_translation_code' => 'mt',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'my',
@@ -1031,7 +1097,8 @@ class Settings
                 'hreflang_code' => 'my',
                 'google_translation_code' => 'my',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'ne',
@@ -1040,7 +1107,8 @@ class Settings
                 'hreflang_code' => 'ne',
                 'google_translation_code' => 'ne',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'nl',
@@ -1049,7 +1117,8 @@ class Settings
                 'hreflang_code' => 'nl',
                 'google_translation_code' => 'nl',
                 'microsoft_translation_code' => 'nl',
-                'deepl_translation_code' => 'nl'
+                'deepl_translation_code' => 'nl',
+                'hidden' => false
             ],
             [
                 'code' => 'no',
@@ -1058,7 +1127,8 @@ class Settings
                 'hreflang_code' => 'no',
                 'google_translation_code' => 'no',
                 'microsoft_translation_code' => 'nb',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'ny',
@@ -1067,7 +1137,8 @@ class Settings
                 'hreflang_code' => 'ny',
                 'google_translation_code' => 'ny',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'pa',
@@ -1076,7 +1147,8 @@ class Settings
                 'hreflang_code' => 'pa',
                 'google_translation_code' => 'pa',
                 'microsoft_translation_code' => 'pa',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'pl',
@@ -1085,7 +1157,8 @@ class Settings
                 'hreflang_code' => 'pl',
                 'google_translation_code' => 'pl',
                 'microsoft_translation_code' => 'pl',
-                'deepl_translation_code' => 'pl'
+                'deepl_translation_code' => 'pl',
+                'hidden' => false
             ],
             [
                 'code' => 'ps',
@@ -1094,7 +1167,8 @@ class Settings
                 'hreflang_code' => 'ps',
                 'google_translation_code' => 'ps',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'pt-br',
@@ -1103,7 +1177,8 @@ class Settings
                 'hreflang_code' => 'pt',
                 'google_translation_code' => 'pt',
                 'microsoft_translation_code' => 'pt-br',
-                'deepl_translation_code' => 'pt'
+                'deepl_translation_code' => 'pt',
+                'hidden' => false
             ],
             [
                 'code' => 'pt-pt',
@@ -1112,7 +1187,8 @@ class Settings
                 'hreflang_code' => 'pt',
                 'google_translation_code' => 'pt',
                 'microsoft_translation_code' => 'pt-pt',
-                'deepl_translation_code' => 'pt'
+                'deepl_translation_code' => 'pt',
+                'hidden' => false
             ],
             [
                 'code' => 'ro',
@@ -1121,7 +1197,8 @@ class Settings
                 'hreflang_code' => 'ro',
                 'google_translation_code' => 'ro',
                 'microsoft_translation_code' => 'ro',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'ru',
@@ -1130,7 +1207,8 @@ class Settings
                 'hreflang_code' => 'ru',
                 'google_translation_code' => 'ru',
                 'microsoft_translation_code' => 'ru',
-                'deepl_translation_code' => 'ru'
+                'deepl_translation_code' => 'ru',
+                'hidden' => false
             ],
             [
                 'code' => 'sd',
@@ -1139,7 +1217,8 @@ class Settings
                 'hreflang_code' => 'sd',
                 'google_translation_code' => 'sd',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'si',
@@ -1148,7 +1227,8 @@ class Settings
                 'hreflang_code' => 'si',
                 'google_translation_code' => 'si',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'sk',
@@ -1157,7 +1237,8 @@ class Settings
                 'hreflang_code' => 'sk',
                 'google_translation_code' => 'sk',
                 'microsoft_translation_code' => 'sk',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'sl',
@@ -1166,7 +1247,8 @@ class Settings
                 'hreflang_code' => 'sl',
                 'google_translation_code' => 'sl',
                 'microsoft_translation_code' => 'sl',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'sm',
@@ -1175,7 +1257,8 @@ class Settings
                 'hreflang_code' => 'sm',
                 'google_translation_code' => 'sm',
                 'microsoft_translation_code' => 'sm',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'sn',
@@ -1184,7 +1267,8 @@ class Settings
                 'hreflang_code' => 'sn',
                 'google_translation_code' => 'sn',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'so',
@@ -1193,7 +1277,8 @@ class Settings
                 'hreflang_code' => 'so',
                 'google_translation_code' => 'so',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'sq',
@@ -1202,7 +1287,8 @@ class Settings
                 'hreflang_code' => 'sq',
                 'google_translation_code' => 'sq',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'sr-cy',
@@ -1211,7 +1297,8 @@ class Settings
                 'hreflang_code' => 'sr',
                 'google_translation_code' => 'sr',
                 'microsoft_translation_code' => 'sr-Cyrl',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'sr-la',
@@ -1220,7 +1307,8 @@ class Settings
                 'hreflang_code' => 'sr',
                 'google_translation_code' => 'sr',
                 'microsoft_translation_code' => 'sr-Latn',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'su',
@@ -1229,7 +1317,8 @@ class Settings
                 'hreflang_code' => 'su',
                 'google_translation_code' => 'su',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'sv',
@@ -1238,7 +1327,8 @@ class Settings
                 'hreflang_code' => 'sv',
                 'google_translation_code' => 'sv',
                 'microsoft_translation_code' => 'sv',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'ta',
@@ -1247,7 +1337,8 @@ class Settings
                 'hreflang_code' => 'ta',
                 'google_translation_code' => 'ta',
                 'microsoft_translation_code' => 'ta',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'te',
@@ -1256,7 +1347,8 @@ class Settings
                 'hreflang_code' => 'te',
                 'google_translation_code' => 'te',
                 'microsoft_translation_code' => 'te',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'tg',
@@ -1265,7 +1357,8 @@ class Settings
                 'hreflang_code' => 'tg',
                 'google_translation_code' => 'tg',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'th',
@@ -1274,7 +1367,8 @@ class Settings
                 'hreflang_code' => 'th',
                 'google_translation_code' => 'th',
                 'microsoft_translation_code' => 'th',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'tr',
@@ -1283,7 +1377,8 @@ class Settings
                 'hreflang_code' => 'tr',
                 'google_translation_code' => 'tr',
                 'microsoft_translation_code' => 'tr',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'uk',
@@ -1292,7 +1387,8 @@ class Settings
                 'hreflang_code' => 'uk',
                 'google_translation_code' => 'uk',
                 'microsoft_translation_code' => 'uk',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'ur',
@@ -1301,7 +1397,8 @@ class Settings
                 'hreflang_code' => 'ur',
                 'google_translation_code' => 'ur',
                 'microsoft_translation_code' => 'ur',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'uz',
@@ -1310,7 +1407,8 @@ class Settings
                 'hreflang_code' => 'uz',
                 'google_translation_code' => 'uz',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'vi',
@@ -1319,7 +1417,8 @@ class Settings
                 'hreflang_code' => 'vi',
                 'google_translation_code' => 'vi',
                 'microsoft_translation_code' => 'vi',
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'xh',
@@ -1328,7 +1427,8 @@ class Settings
                 'hreflang_code' => 'xh',
                 'google_translation_code' => 'xh',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'yi',
@@ -1337,7 +1437,8 @@ class Settings
                 'hreflang_code' => 'yi',
                 'google_translation_code' => 'yi',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'yo',
@@ -1346,7 +1447,8 @@ class Settings
                 'hreflang_code' => 'yo',
                 'google_translation_code' => 'yo',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ],
             [
                 'code' => 'zh-cn',
@@ -1355,7 +1457,8 @@ class Settings
                 'hreflang_code' => 'zh-cn',
                 'google_translation_code' => 'zh-cn',
                 'microsoft_translation_code' => 'zh-Hans',
-                'deepl_translation_code' => 'zh'
+                'deepl_translation_code' => 'zh',
+                'hidden' => false
             ],
             [
                 'code' => 'zh-tw',
@@ -1364,7 +1467,8 @@ class Settings
                 'hreflang_code' => 'zh-tw',
                 'google_translation_code' => 'zh-tw',
                 'microsoft_translation_code' => 'zh-Hant',
-                'deepl_translation_code' => 'zh'
+                'deepl_translation_code' => 'zh',
+                'hidden' => false
             ],
             [
                 'code' => 'zu',
@@ -1373,7 +1477,8 @@ class Settings
                 'hreflang_code' => 'zu',
                 'google_translation_code' => 'zu',
                 'microsoft_translation_code' => null,
-                'deepl_translation_code' => null
+                'deepl_translation_code' => null,
+                'hidden' => false
             ]
         ];
         // if this already set (this is not the case on init, but we don't need the ordering)
@@ -1402,6 +1507,14 @@ class Settings
     function isLanguageDirectionRtl($lng)
     {
         return @$this->getLanguageDataForCode($lng)['rtl'] === true;
+    }
+
+    function isLanguageHidden($lng)
+    {
+        if ($this->utils->isWordPress() && is_user_logged_in()) {
+            return false;
+        }
+        return @$this->getLanguageDataForCode($lng)['hidden'] === true;
     }
 
     function getApiLngCodeForService($service, $lng)
@@ -1543,6 +1656,18 @@ class Settings
     function getSourceLanguageLabel()
     {
         return $this->getLabelForLanguageCode($this->getSourceLanguageCode());
+    }
+
+    function getSelectedLanguagesWithoutSource()
+    {
+        $lng = [];
+        foreach ($this->getSelectedLanguages() as $languages__value) {
+            if ($languages__value['code'] === $this->getSourceLanguageCode()) {
+                continue;
+            }
+            $lng[] = $languages__value;
+        }
+        return $lng;
     }
 
     function getSelectedLanguageCodesWithoutSource()

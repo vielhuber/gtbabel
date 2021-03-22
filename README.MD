@@ -132,7 +132,8 @@ The default configuration is:
             'hreflang_code' => 'de',
             'google_translation_code' => 'de',
             'microsoft_translation_code' => 'de',
-            'deepl_translation_code' => 'de'
+            'deepl_translation_code' => 'de',
+            'hidden' => false
         ],
         [
             'code' => 'en',
@@ -141,7 +142,8 @@ The default configuration is:
             'hreflang_code' => 'en',
             'google_translation_code' => 'en',
             'microsoft_translation_code' => 'en',
-            'deepl_translation_code' => 'en'
+            'deepl_translation_code' => 'en',
+            'hidden' => false
         ],
         [
             'code' => 'fr',
@@ -150,7 +152,8 @@ The default configuration is:
             'hreflang_code' => 'fr',
             'google_translation_code' => 'fr',
             'microsoft_translation_code' => 'fr',
-            'deepl_translation_code' => 'fr'
+            'deepl_translation_code' => 'fr',
+            'hidden' => false
         ],
         [
             'code' => 'af',
@@ -159,7 +162,8 @@ The default configuration is:
             'hreflang_code' => 'af',
             'google_translation_code' => 'af',
             'microsoft_translation_code' => 'af',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'am',
@@ -168,7 +172,8 @@ The default configuration is:
             'hreflang_code' => 'am',
             'google_translation_code' => 'am',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'ar',
@@ -177,7 +182,8 @@ The default configuration is:
             'hreflang_code' => 'ar',
             'google_translation_code' => 'ar',
             'microsoft_translation_code' => 'ar',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'az',
@@ -186,7 +192,8 @@ The default configuration is:
             'hreflang_code' => 'az',
             'google_translation_code' => 'az',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'be',
@@ -195,7 +202,8 @@ The default configuration is:
             'hreflang_code' => 'be',
             'google_translation_code' => 'be',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'bg',
@@ -204,7 +212,8 @@ The default configuration is:
             'hreflang_code' => 'bg',
             'google_translation_code' => 'bg',
             'microsoft_translation_code' => 'bg',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'bn',
@@ -213,7 +222,8 @@ The default configuration is:
             'hreflang_code' => 'bn',
             'google_translation_code' => 'bn',
             'microsoft_translation_code' => 'bn',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'bs',
@@ -222,7 +232,8 @@ The default configuration is:
             'hreflang_code' => 'bs',
             'google_translation_code' => 'bs',
             'microsoft_translation_code' => 'bs',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'ca',
@@ -231,7 +242,8 @@ The default configuration is:
             'hreflang_code' => 'ca',
             'google_translation_code' => 'ca',
             'microsoft_translation_code' => 'ca',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'ceb',
@@ -240,7 +252,8 @@ The default configuration is:
             'hreflang_code' => null,
             'google_translation_code' => 'ceb',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'co',
@@ -249,7 +262,8 @@ The default configuration is:
             'hreflang_code' => 'co',
             'google_translation_code' => 'co',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'cs',
@@ -258,7 +272,8 @@ The default configuration is:
             'hreflang_code' => 'cs',
             'google_translation_code' => 'cs',
             'microsoft_translation_code' => 'cs',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'cy',
@@ -267,7 +282,8 @@ The default configuration is:
             'hreflang_code' => 'cy',
             'google_translation_code' => 'cy',
             'microsoft_translation_code' => 'cy',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'da',
@@ -276,7 +292,8 @@ The default configuration is:
             'hreflang_code' => 'da',
             'google_translation_code' => 'da',
             'microsoft_translation_code' => 'da',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'el',
@@ -285,7 +302,8 @@ The default configuration is:
             'hreflang_code' => 'el',
             'google_translation_code' => 'el',
             'microsoft_translation_code' => 'el',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'eo',
@@ -294,7 +312,8 @@ The default configuration is:
             'hreflang_code' => 'eo',
             'google_translation_code' => 'eo',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'es',
@@ -303,7 +322,8 @@ The default configuration is:
             'hreflang_code' => 'es',
             'google_translation_code' => 'es',
             'microsoft_translation_code' => 'es',
-            'deepl_translation_code' => 'es'
+            'deepl_translation_code' => 'es',
+            'hidden' => false
         ],
         [
             'code' => 'et',
@@ -312,7 +332,8 @@ The default configuration is:
             'hreflang_code' => 'et',
             'google_translation_code' => 'et',
             'microsoft_translation_code' => 'et',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'eu',
@@ -321,7 +342,8 @@ The default configuration is:
             'hreflang_code' => 'eu',
             'google_translation_code' => 'eu',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'fa',
@@ -330,7 +352,8 @@ The default configuration is:
             'hreflang_code' => 'fa',
             'google_translation_code' => 'fa',
             'microsoft_translation_code' => 'fa',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'fi',
@@ -339,7 +362,8 @@ The default configuration is:
             'hreflang_code' => 'fi',
             'google_translation_code' => 'fi',
             'microsoft_translation_code' => 'fi',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'ga',
@@ -348,7 +372,8 @@ The default configuration is:
             'hreflang_code' => 'ga',
             'google_translation_code' => 'ga',
             'microsoft_translation_code' => 'ga',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'gd',
@@ -357,7 +382,8 @@ The default configuration is:
             'hreflang_code' => 'gd',
             'google_translation_code' => 'gd',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'gl',
@@ -366,7 +392,8 @@ The default configuration is:
             'hreflang_code' => 'gl',
             'google_translation_code' => 'gl',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'gu',
@@ -375,7 +402,8 @@ The default configuration is:
             'hreflang_code' => 'gu',
             'google_translation_code' => 'gu',
             'microsoft_translation_code' => 'gu',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'ha',
@@ -384,7 +412,8 @@ The default configuration is:
             'hreflang_code' => 'ha',
             'google_translation_code' => 'ha',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'haw',
@@ -393,7 +422,8 @@ The default configuration is:
             'hreflang_code' => null,
             'google_translation_code' => 'haw',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'he',
@@ -402,7 +432,8 @@ The default configuration is:
             'hreflang_code' => 'he',
             'google_translation_code' => 'he',
             'microsoft_translation_code' => 'he',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'hi',
@@ -411,7 +442,8 @@ The default configuration is:
             'hreflang_code' => 'hi',
             'google_translation_code' => 'hi',
             'microsoft_translation_code' => 'hi',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'hmn',
@@ -420,7 +452,8 @@ The default configuration is:
             'hreflang_code' => null,
             'google_translation_code' => 'hmn',
             'microsoft_translation_code' => 'mww',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'hr',
@@ -429,7 +462,8 @@ The default configuration is:
             'hreflang_code' => 'hr',
             'google_translation_code' => 'hr',
             'microsoft_translation_code' => 'hr',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'ht',
@@ -438,7 +472,8 @@ The default configuration is:
             'hreflang_code' => 'ht',
             'google_translation_code' => 'ht',
             'microsoft_translation_code' => 'ht',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'hu',
@@ -447,7 +482,8 @@ The default configuration is:
             'hreflang_code' => 'hu',
             'google_translation_code' => 'hu',
             'microsoft_translation_code' => 'hu',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'hy',
@@ -456,7 +492,8 @@ The default configuration is:
             'hreflang_code' => 'hy',
             'google_translation_code' => 'hy',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'id',
@@ -465,7 +502,8 @@ The default configuration is:
             'hreflang_code' => 'id',
             'google_translation_code' => 'id',
             'microsoft_translation_code' => 'id',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'ig',
@@ -474,7 +512,8 @@ The default configuration is:
             'hreflang_code' => 'ig',
             'google_translation_code' => 'ig',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'is',
@@ -483,7 +522,8 @@ The default configuration is:
             'hreflang_code' => 'is',
             'google_translation_code' => 'is',
             'microsoft_translation_code' => 'is',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'it',
@@ -492,7 +532,8 @@ The default configuration is:
             'hreflang_code' => 'it',
             'google_translation_code' => 'it',
             'microsoft_translation_code' => 'it',
-            'deepl_translation_code' => 'it'
+            'deepl_translation_code' => 'it',
+            'hidden' => false
         ],
         [
             'code' => 'ja',
@@ -501,7 +542,8 @@ The default configuration is:
             'hreflang_code' => 'ja',
             'google_translation_code' => 'ja',
             'microsoft_translation_code' => 'ja',
-            'deepl_translation_code' => 'ja'
+            'deepl_translation_code' => 'ja',
+            'hidden' => false
         ],
         [
             'code' => 'jv',
@@ -510,7 +552,8 @@ The default configuration is:
             'hreflang_code' => 'jv',
             'google_translation_code' => 'jv',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'ka',
@@ -519,7 +562,8 @@ The default configuration is:
             'hreflang_code' => 'ka',
             'google_translation_code' => 'ka',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'kk',
@@ -528,7 +572,8 @@ The default configuration is:
             'hreflang_code' => 'kk',
             'google_translation_code' => 'kk',
             'microsoft_translation_code' => 'kk',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'km',
@@ -537,7 +582,8 @@ The default configuration is:
             'hreflang_code' => 'km',
             'google_translation_code' => 'km',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'kn',
@@ -546,7 +592,8 @@ The default configuration is:
             'hreflang_code' => 'kn',
             'google_translation_code' => 'kn',
             'microsoft_translation_code' => 'kn',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'ko',
@@ -555,7 +602,8 @@ The default configuration is:
             'hreflang_code' => 'ko',
             'google_translation_code' => 'ko',
             'microsoft_translation_code' => 'ko',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'ku',
@@ -564,7 +612,8 @@ The default configuration is:
             'hreflang_code' => 'ku',
             'google_translation_code' => 'ku',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'ky',
@@ -573,7 +622,8 @@ The default configuration is:
             'hreflang_code' => 'ky',
             'google_translation_code' => 'ky',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'la',
@@ -582,7 +632,8 @@ The default configuration is:
             'hreflang_code' => 'la',
             'google_translation_code' => 'la',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'lb',
@@ -591,7 +642,8 @@ The default configuration is:
             'hreflang_code' => 'lb',
             'google_translation_code' => 'lb',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'lo',
@@ -600,7 +652,8 @@ The default configuration is:
             'hreflang_code' => 'lo',
             'google_translation_code' => 'lo',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'lt',
@@ -609,7 +662,8 @@ The default configuration is:
             'hreflang_code' => 'lt',
             'google_translation_code' => 'lt',
             'microsoft_translation_code' => 'lt',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'lv',
@@ -618,7 +672,8 @@ The default configuration is:
             'hreflang_code' => 'lv',
             'google_translation_code' => 'lv',
             'microsoft_translation_code' => 'lv',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'mg',
@@ -627,7 +682,8 @@ The default configuration is:
             'hreflang_code' => 'mg',
             'google_translation_code' => 'mg',
             'microsoft_translation_code' => 'mg',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'mi',
@@ -636,7 +692,8 @@ The default configuration is:
             'hreflang_code' => 'mi',
             'google_translation_code' => 'mi',
             'microsoft_translation_code' => 'mi',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'mk',
@@ -645,7 +702,8 @@ The default configuration is:
             'hreflang_code' => 'mk',
             'google_translation_code' => 'mk',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'ml',
@@ -654,7 +712,8 @@ The default configuration is:
             'hreflang_code' => 'ml',
             'google_translation_code' => 'ml',
             'microsoft_translation_code' => 'ml',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'mn',
@@ -663,7 +722,8 @@ The default configuration is:
             'hreflang_code' => 'mn',
             'google_translation_code' => 'mn',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'mr',
@@ -672,7 +732,8 @@ The default configuration is:
             'hreflang_code' => 'mr',
             'google_translation_code' => 'mr',
             'microsoft_translation_code' => 'mr',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'ms',
@@ -681,7 +742,8 @@ The default configuration is:
             'hreflang_code' => 'ms',
             'google_translation_code' => 'ms',
             'microsoft_translation_code' => 'ms',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'mt',
@@ -690,7 +752,8 @@ The default configuration is:
             'hreflang_code' => 'mt',
             'google_translation_code' => 'mt',
             'microsoft_translation_code' => 'mt',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'my',
@@ -699,7 +762,8 @@ The default configuration is:
             'hreflang_code' => 'my',
             'google_translation_code' => 'my',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'ne',
@@ -708,7 +772,8 @@ The default configuration is:
             'hreflang_code' => 'ne',
             'google_translation_code' => 'ne',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'nl',
@@ -717,7 +782,8 @@ The default configuration is:
             'hreflang_code' => 'nl',
             'google_translation_code' => 'nl',
             'microsoft_translation_code' => 'nl',
-            'deepl_translation_code' => 'nl'
+            'deepl_translation_code' => 'nl',
+            'hidden' => false
         ],
         [
             'code' => 'no',
@@ -726,7 +792,8 @@ The default configuration is:
             'hreflang_code' => 'no',
             'google_translation_code' => 'no',
             'microsoft_translation_code' => 'nb',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'ny',
@@ -735,7 +802,8 @@ The default configuration is:
             'hreflang_code' => 'ny',
             'google_translation_code' => 'ny',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'pa',
@@ -744,7 +812,8 @@ The default configuration is:
             'hreflang_code' => 'pa',
             'google_translation_code' => 'pa',
             'microsoft_translation_code' => 'pa',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'pl',
@@ -753,7 +822,8 @@ The default configuration is:
             'hreflang_code' => 'pl',
             'google_translation_code' => 'pl',
             'microsoft_translation_code' => 'pl',
-            'deepl_translation_code' => 'pl'
+            'deepl_translation_code' => 'pl',
+            'hidden' => false
         ],
         [
             'code' => 'ps',
@@ -762,7 +832,8 @@ The default configuration is:
             'hreflang_code' => 'ps',
             'google_translation_code' => 'ps',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'pt-br',
@@ -771,7 +842,8 @@ The default configuration is:
             'hreflang_code' => 'pt',
             'google_translation_code' => 'pt',
             'microsoft_translation_code' => 'pt-br',
-            'deepl_translation_code' => 'pt'
+            'deepl_translation_code' => 'pt',
+            'hidden' => false
         ],
         [
             'code' => 'pt-pt',
@@ -780,7 +852,8 @@ The default configuration is:
             'hreflang_code' => 'pt',
             'google_translation_code' => 'pt',
             'microsoft_translation_code' => 'pt-pt',
-            'deepl_translation_code' => 'pt'
+            'deepl_translation_code' => 'pt',
+            'hidden' => false
         ],
         [
             'code' => 'ro',
@@ -789,7 +862,8 @@ The default configuration is:
             'hreflang_code' => 'ro',
             'google_translation_code' => 'ro',
             'microsoft_translation_code' => 'ro',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'ru',
@@ -798,7 +872,8 @@ The default configuration is:
             'hreflang_code' => 'ru',
             'google_translation_code' => 'ru',
             'microsoft_translation_code' => 'ru',
-            'deepl_translation_code' => 'ru'
+            'deepl_translation_code' => 'ru',
+            'hidden' => false
         ],
         [
             'code' => 'sd',
@@ -807,7 +882,8 @@ The default configuration is:
             'hreflang_code' => 'sd',
             'google_translation_code' => 'sd',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'si',
@@ -816,7 +892,8 @@ The default configuration is:
             'hreflang_code' => 'si',
             'google_translation_code' => 'si',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'sk',
@@ -825,7 +902,8 @@ The default configuration is:
             'hreflang_code' => 'sk',
             'google_translation_code' => 'sk',
             'microsoft_translation_code' => 'sk',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'sl',
@@ -834,7 +912,8 @@ The default configuration is:
             'hreflang_code' => 'sl',
             'google_translation_code' => 'sl',
             'microsoft_translation_code' => 'sl',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'sm',
@@ -843,7 +922,8 @@ The default configuration is:
             'hreflang_code' => 'sm',
             'google_translation_code' => 'sm',
             'microsoft_translation_code' => 'sm',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'sn',
@@ -852,7 +932,8 @@ The default configuration is:
             'hreflang_code' => 'sn',
             'google_translation_code' => 'sn',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'so',
@@ -861,7 +942,8 @@ The default configuration is:
             'hreflang_code' => 'so',
             'google_translation_code' => 'so',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'sq',
@@ -870,7 +952,8 @@ The default configuration is:
             'hreflang_code' => 'sq',
             'google_translation_code' => 'sq',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'sr-cy',
@@ -879,7 +962,8 @@ The default configuration is:
             'hreflang_code' => 'sr',
             'google_translation_code' => 'sr',
             'microsoft_translation_code' => 'sr-Cyrl',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'sr-la',
@@ -888,7 +972,8 @@ The default configuration is:
             'hreflang_code' => 'sr',
             'google_translation_code' => 'sr',
             'microsoft_translation_code' => 'sr-Latn',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'su',
@@ -897,7 +982,8 @@ The default configuration is:
             'hreflang_code' => 'su',
             'google_translation_code' => 'su',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'sv',
@@ -906,7 +992,8 @@ The default configuration is:
             'hreflang_code' => 'sv',
             'google_translation_code' => 'sv',
             'microsoft_translation_code' => 'sv',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'ta',
@@ -915,7 +1002,8 @@ The default configuration is:
             'hreflang_code' => 'ta',
             'google_translation_code' => 'ta',
             'microsoft_translation_code' => 'ta',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'te',
@@ -924,7 +1012,8 @@ The default configuration is:
             'hreflang_code' => 'te',
             'google_translation_code' => 'te',
             'microsoft_translation_code' => 'te',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'tg',
@@ -933,7 +1022,8 @@ The default configuration is:
             'hreflang_code' => 'tg',
             'google_translation_code' => 'tg',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'th',
@@ -942,7 +1032,8 @@ The default configuration is:
             'hreflang_code' => 'th',
             'google_translation_code' => 'th',
             'microsoft_translation_code' => 'th',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'tr',
@@ -951,7 +1042,8 @@ The default configuration is:
             'hreflang_code' => 'tr',
             'google_translation_code' => 'tr',
             'microsoft_translation_code' => 'tr',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'uk',
@@ -960,7 +1052,8 @@ The default configuration is:
             'hreflang_code' => 'uk',
             'google_translation_code' => 'uk',
             'microsoft_translation_code' => 'uk',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'ur',
@@ -969,7 +1062,8 @@ The default configuration is:
             'hreflang_code' => 'ur',
             'google_translation_code' => 'ur',
             'microsoft_translation_code' => 'ur',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'uz',
@@ -978,7 +1072,8 @@ The default configuration is:
             'hreflang_code' => 'uz',
             'google_translation_code' => 'uz',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'vi',
@@ -987,7 +1082,8 @@ The default configuration is:
             'hreflang_code' => 'vi',
             'google_translation_code' => 'vi',
             'microsoft_translation_code' => 'vi',
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'xh',
@@ -996,7 +1092,8 @@ The default configuration is:
             'hreflang_code' => 'xh',
             'google_translation_code' => 'xh',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'yi',
@@ -1005,7 +1102,8 @@ The default configuration is:
             'hreflang_code' => 'yi',
             'google_translation_code' => 'yi',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'yo',
@@ -1014,7 +1112,8 @@ The default configuration is:
             'hreflang_code' => 'yo',
             'google_translation_code' => 'yo',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ],
         [
             'code' => 'zh-cn',
@@ -1023,7 +1122,8 @@ The default configuration is:
             'hreflang_code' => 'zh-cn',
             'google_translation_code' => 'zh-cn',
             'microsoft_translation_code' => 'zh-Hans',
-            'deepl_translation_code' => 'zh'
+            'deepl_translation_code' => 'zh',
+            'hidden' => false
         ],
         [
             'code' => 'zh-tw',
@@ -1032,7 +1132,8 @@ The default configuration is:
             'hreflang_code' => 'zh-tw',
             'google_translation_code' => 'zh-tw',
             'microsoft_translation_code' => 'zh-Hant',
-            'deepl_translation_code' => 'zh'
+            'deepl_translation_code' => 'zh',
+            'hidden' => false
         ],
         [
             'code' => 'zu',
@@ -1041,7 +1142,8 @@ The default configuration is:
             'hreflang_code' => 'zu',
             'google_translation_code' => 'zu',
             'microsoft_translation_code' => null,
-            'deepl_translation_code' => null
+            'deepl_translation_code' => null,
+            'hidden' => false
         ]
     ],
     'lng_source' => 'de',

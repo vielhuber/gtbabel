@@ -112,6 +112,7 @@ $gtbabel->config([
             'google_translation_code' => 'de',
             'microsoft_translation_code' => 'de',
             'deepl_translation_code' => 'de',
+            'hidden' => false,
             'url_base' => $settings['de']['url_base'],
             'url_prefix' => $settings['de']['url_prefix']
         ],
@@ -123,6 +124,7 @@ $gtbabel->config([
             'google_translation_code' => 'en',
             'microsoft_translation_code' => 'en',
             'deepl_translation_code' => 'en',
+            'hidden' => false,
             'url_base' => $settings['en']['url_base'],
             'url_prefix' => $settings['en']['url_prefix']
         ]
