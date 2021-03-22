@@ -462,7 +462,7 @@ class GtbabelWordPress
     private function handleAltLng()
     {
         add_action('rest_api_init', function () {
-            register_rest_route('v1', '/get/slug', [
+            register_rest_route('v1', '/translate/slug', [
                 'methods' => \WP_REST_Server::CREATABLE,
                 'permission_callback' => function () {
                     return is_user_logged_in();
@@ -670,9 +670,10 @@ class GtbabelWordPress
             function ($query) {
                 if (!is_admin() && 'nav_menu_item' !== $query->get('post_type')) {
                     // exclude direct urls (because we want to properly redirect those urls)
-                    if (!is_singular()) {
-                        $query->set('post__not_in', $this->handlePreventLngsGetExcludedIds());
+                    if (is_singular() && $query->name != '') {
+                        return;
                     }
+                    $query->set('post__not_in', $this->handlePreventLngsGetExcludedIds());
                 }
             },
             PHP_INT_MAX
@@ -718,6 +719,18 @@ class GtbabelWordPress
             },
             PHP_INT_MAX
         );
+
+        /* prev/next link (they unfortunately don't use pre_get_posts */
+        foreach (['previous', 'next'] as $adjacent_link) {
+            add_filter(
+                'get_' . $adjacent_link . '_post_where',
+                function ($where) {
+                    $where .= ' AND p.ID NOT IN (' . implode(',', $this->handlePreventLngsGetExcludedIds()) . ')';
+                    return $where;
+                },
+                PHP_INT_MAX
+            );
+        }
 
         /* yoast sitemap uses a custom sql query: modify that */
         add_filter('wpseo_exclude_from_sitemap_by_post_ids', function () {

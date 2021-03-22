@@ -209,8 +209,14 @@ class Settings
                 ['selector' => '#wpadminbar'],
                 ['selector' => '#comments .comment-content'],
                 ['selector' => '/html/body//address/br/parent::address'],
-                ['selector' => '.woocommerce-order-overview__email']
+                ['selector' => '.woocommerce-order-overview__email'],
+                ['selector' => '.page-title .search-term'],
+                ['selector' => '.screen-reader-text']
             ];
+            $default_settings['translate_html_force_tokenize'] = array_merge(
+                $default_settings['translate_html_force_tokenize'],
+                ['.page-title .search-term', '.screen-reader-text']
+            );
             $default_settings['auto_translation'] = null; // undefined
             $default_settings['auto_translation_service'] = [];
             $default_settings['show_frontend_editor_links'] = true;

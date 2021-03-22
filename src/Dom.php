@@ -829,7 +829,7 @@ class Dom
     {
         $str = mb_convert_encoding($str, 'HTML-ENTITIES', 'UTF-8');
         $tmp = new \DOMDocument();
-        $tmp->loadHTML($str, LIBXML_HTML_NOIMPLIED);
+        @$tmp->loadHTML($str, LIBXML_HTML_NOIMPLIED);
         $repl = $this->DOMDocument->importNode($tmp->documentElement, true);
         $node->parentNode->replaceChild($repl, $node);
     }
@@ -858,7 +858,7 @@ class Dom
     {
         $str = mb_convert_encoding($str, 'HTML-ENTITIES', 'UTF-8');
         $tmp = new \DOMDocument();
-        $tmp->loadHTML($str, LIBXML_HTML_NOIMPLIED);
+        @$tmp->loadHTML($str, LIBXML_HTML_NOIMPLIED);
         $node = $this->DOMDocument->importNode($tmp->documentElement, true);
         return $node;
     }

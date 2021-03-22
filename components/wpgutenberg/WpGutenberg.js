@@ -188,7 +188,7 @@ export default class WpGutenberg {
 
                                         if (content != '') {
                                             wp.apiFetch({
-                                                path: '/v1/get/slug',
+                                                path: '/v1/translate/slug',
                                                 method: 'POST',
                                                 body: JSON.stringify({
                                                     slug: props.get_slug,

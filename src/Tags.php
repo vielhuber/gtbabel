@@ -178,6 +178,8 @@ class Tags
         $prefix_pattern .= '|';
         $prefix_pattern .= '^(\*|–|:|•|●)'; // * etc.
         $prefix_pattern .= '|';
+        $prefix_pattern .= '^("|“)( | )+'; // split quote
+        $prefix_pattern .= '|';
         $prefix_pattern .= '^((\d|[a-z])\))( | )+'; // 1) 2) 3) a) b) c) etc.
         $prefix_pattern .= '|';
         $prefix_pattern .= '^(\.\.\.|…|&hellip;)( | )*'; // ...
@@ -187,6 +189,8 @@ class Tags
         $suffix_pattern .= '( | )*<br+\b[^>]*\/?>$'; // <br/> etc.
         $suffix_pattern .= '|';
         $suffix_pattern .= '( | )*(\*|-|–|\||:|•|●|\/|,)$'; // * etc.
+        $suffix_pattern .= '|';
+        $suffix_pattern .= '( | )+("|„)$'; // split quote
         $suffix_pattern .= '|';
         $suffix_pattern .= '( | )*(\.\.\.|…|&hellip;)$'; // ...
         $suffix_pattern .= '|';
