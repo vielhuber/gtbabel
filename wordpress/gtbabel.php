@@ -2224,6 +2224,24 @@ class GtbabelWordPress
         echo '</div>';
     }
 
+    private function initBackendStringTranslationShowVideo($str, $allow_change = true)
+    {
+        $video_info = __::video_info($str);
+        if ($video_info === null) {
+            return;
+        }
+        echo '<div class="gtbabel__video-info">';
+        echo $video_info['id'];
+        if ($video_info['thumbnail'] !== null) {
+            echo '<img class="gtbabel__video-info-img" src="' . $video_info['thumbnail'] . '" alt="" />';
+        }
+
+        if ($allow_change === true) {
+            echo 'CHANGE';
+        }
+        echo '</div>';
+    }
+
     private function initBackendStringTranslation()
     {
         $this->checkToken();
@@ -2600,12 +2618,18 @@ class GtbabelWordPress
                         '</textarea>';
                     if ($translations__value['context'] === 'file') {
                         $this->initBackendStringTranslationShowFile(
-                            $translations__value[$lngs_to_show__value],
+                            @$translations__value[$lngs_to_show__value],
                             $lngs_to_show__value !== $translations__value['lng_source'] &&
                                 preg_match(
                                     '/.+\.(jpg|jpeg|png|gif|svg)$/i',
                                     $translations__value[$translations__value['lng_source']]
                                 )
+                        );
+                    }
+                    if ($translations__value['context'] === 'url') {
+                        $this->initBackendStringTranslationShowVideo(
+                            @$translations__value[$lngs_to_show__value],
+                            $lngs_to_show__value !== $translations__value['lng_source']
                         );
                     }
                     $discovered_url = null;

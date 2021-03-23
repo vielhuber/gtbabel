@@ -51,7 +51,7 @@ export default class FrontendEditor {
                     e.target.classList.add(this.classNameEdit);
                     if (
                         e.target.querySelectorAll(':scope > .' + this.classNameButton).length === 0 &&
-                        !['TEXTAREA', 'INPUT', 'SELECT'].includes(e.target.tagName)
+                        !['TEXTAREA', 'INPUT', 'SELECT', 'IFRAME', 'IMG'].includes(e.target.tagName)
                     ) {
                         let html = `
                             <a href="#" class="${this.classNameButton}"></a>

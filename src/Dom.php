@@ -1453,7 +1453,7 @@ class Dom
             $html .= '<li class="gtbabel-frontend-editor-links__item">';
             $html .=
                 '<a class="gtbabel-frontend-editor-links__link" href="' .
-                admin_url('admin.php?page=gtbabel-trans&url=' . urlencode($url) . '&lng=' . $lng) .
+                admin_url('admin.php?page=gtbabel-trans&url=' . urlencode($url) . '&lng=' . $lng . '&shared=0') .
                 '" target="_blank">🌐</a>';
             $html .= '</li>';
         }

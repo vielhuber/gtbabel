@@ -238,6 +238,21 @@ $button_width: 105px;
     z-index: 2;
 }
 
+.gtbabel__video-info-img {
+    display: block;
+    height: 26px;
+    width: auto;
+    position: absolute;
+    top: 4px;
+    left: 2px;
+    z-index: 1;
+    transition: all 0.1s ease-in-out;
+}
+.gtbabel__video-info-img:hover {
+    height: 200px;
+    z-index: 2;
+}
+
 .gtbabel__pagination {
     display: flex;
     align-items: flex-start;
