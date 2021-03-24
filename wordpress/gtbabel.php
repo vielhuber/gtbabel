@@ -2231,14 +2231,21 @@ class GtbabelWordPress
             return;
         }
         echo '<div class="gtbabel__video-info">';
-        echo $video_info['id'];
         if ($video_info['thumbnail'] !== null) {
             echo '<img class="gtbabel__video-info-img" src="' . $video_info['thumbnail'] . '" alt="" />';
         }
 
-        if ($allow_change === true) {
-            echo 'CHANGE';
-        }
+        echo '<input ' .
+            ($allow_change === false ? 'disabled="disabled"' : '') .
+            ' class="gtbabel__input gtbabel__video-id" data-id-orig="' .
+            $video_info['id'] .
+            '" data-str-orig="' .
+            htmlspecialchars($str) .
+            '" placeholder="' .
+            __('Video ID', 'gtbabel-plugin') .
+            '" type="text" value="' .
+            $video_info['id'] .
+            '" />';
         echo '</div>';
     }
 

@@ -10,6 +10,7 @@ export default class WpBackend {
             this.initSearchMainUrlReset();
             this.initFormResetQuestion();
             this.initFileUpload();
+            this.initVideoChange();
             this.initFormChange();
             this.initFormInverse();
             this.initSubmitUnchecked();
@@ -301,6 +302,22 @@ export default class WpBackend {
                 e.preventDefault();
             }
         });
+    }
+
+    initVideoChange() {
+        if (document.querySelector('.gtbabel__video-id') !== null) {
+            document.querySelectorAll('.gtbabel__video-id').forEach(el => {
+                el.addEventListener('keyup', () => {
+                    el.closest('.gtbabel__video-info').previousElementSibling.value = el
+                        .getAttribute('data-str-orig')
+                        .split(el.getAttribute('data-id-orig'))
+                        .join(el.value);
+                    el.closest('.gtbabel__video-info').previousElementSibling.dispatchEvent(
+                        new Event('change', { bubbles: true })
+                    );
+                });
+            });
+        }
     }
 
     initSearchMainUrlReset() {

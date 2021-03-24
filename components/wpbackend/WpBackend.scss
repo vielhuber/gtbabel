@@ -238,6 +238,13 @@ $button_width: 105px;
     z-index: 2;
 }
 
+.gtbabel__video-info {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    align-content: flex-start;
+    position: relative;
+}
 .gtbabel__video-info-img {
     display: block;
     height: 26px;
@@ -251,6 +258,11 @@ $button_width: 105px;
 .gtbabel__video-info-img:hover {
     height: 200px;
     z-index: 2;
+}
+.gtbabel__video-id {
+    font-size: 12px;
+    flex: 0 1 auto;
+    width: 60%;
 }
 
 .gtbabel__pagination {
