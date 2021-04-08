@@ -1172,97 +1172,110 @@ The default configuration is:
         [
             'selector' => '/html/body//text()',
             'attribute' => null,
-            'context' => null
+            'context' => null,
+            'comment' => 'Text nodes'
         ],
         [
             'selector' => '/html/body//a[starts-with(@href, \'mailto:\')]',
             'attribute' => 'href',
-            'context' => 'email'
+            'context' => 'email',
+            'comment' => 'Email links'
         ],
         [
             'selector' => '/html/body//a[@href]',
             'attribute' => 'href',
-            'context' => 'slug|file|url'
+            'context' => 'slug|file|url',
+            'comment' => 'Links'
         ],
         [
             'selector' => '/html/body//form[@action]',
             'attribute' => 'action',
-            'context' => 'slug|file|url'
+            'context' => 'slug|file|url',
+            'comment' => 'Form actions'
         ],
         [
             'selector' => '/html/body//iframe[@src]',
             'attribute' => 'src',
-            'context' => 'slug|file|url'
+            'context' => 'slug|file|url',
+            'comment' => 'Iframe content'
         ],
         [
             'selector' => '/html/body//img[@alt]',
             'attribute' => 'alt',
-            'context' => null
+            'context' => null,
+            'comment' => 'Alt tags'
         ],
         [
             'selector' => '/html/body//*[@title]',
             'attribute' => 'title',
-            'context' => null
+            'context' => null,
+            'comment' => 'Title attributes'
         ],
         [
             'selector' => '/html/body//*[@placeholder]',
             'attribute' => 'placeholder',
-            'context' => null
+            'context' => null,
+            'comment' => 'Input placeholders'
         ],
         [
             'selector' => '/html/body//input[@type="submit"][@value]',
             'attribute' => 'value',
-            'context' => null
+            'context' => null,
+            'comment' => 'Submit values'
         ],
         [
             'selector' => '/html/body//input[@type="reset"][@value]',
             'attribute' => 'value',
-            'context' => null
+            'context' => null,
+            'comment' => 'Reset values'
         ],
         [
             'selector' => '/html/head//title',
             'attribute' => null,
-            'context' => 'title'
+            'context' => 'title',
+            'comment' => 'Page title'
         ],
         [
             'selector' => '/html/head//meta[@name="description"][@content]',
             'attribute' => 'content',
-            'context' => 'description'
+            'context' => 'description',
+            'comment' => 'Page description'
         ],
         [
             'selector' => '/html/head//link[@rel="canonical"][@href]',
             'attribute' => 'href',
-            'context' => 'slug'
+            'context' => 'slug',
+            'comment' => 'Canonical tags'
         ],
         [
             'selector' => '/html/body//img[@src]',
             'attribute' => 'src',
-            'context' => 'file'
+            'context' => 'file',
+            'comment' => 'Image urls'
         ],
         [
             'selector' => '/html/body//img[@srcset]',
             'attribute' => 'srcset',
-            'context' => 'file'
+            'context' => 'file',
+            'comment' => 'Image srcset urls'
         ],
         [
             'selector' => '/html/body//*[contains(@style, "url(")]',
             'attribute' => 'style',
-            'context' => 'file'
+            'context' => 'file',
+            'comment' => 'Background images'
         ],
         [
             'selector' => '/html/body//*[@label]',
             'attribute' => 'label',
-            'context' => null
+            'context' => null,
+            'comment' => 'Labels'
         ],
         [
             'selector' => '/html/body//@*[contains(name(), \'text\')]/parent::*', // *text*
             'attribute' => '*text*', // *text*
-            'context' => null
-        ],
-        [
-            'selector' => '#payment .place-order .button', // woocommerce
-            'attribute' => 'data-value|value',
-            'context' => null
+            'context' => null,
+            'comment' => 'Text attributes'
         ],
         [
             'selector' => '.example-link', // css selectors are also supported
@@ -1271,12 +1284,12 @@ The default configuration is:
         ]
     ],
     'translate_html_exclude' => [
-        ['selector' => '.notranslate'],
-        ['selector' => '[data-context]', 'attribute' => 'data-context'],
-        ['selector' => '.lngpicker'],
-        ['selector' => '.xdebug-error'],
-        ['selector' => '.example1', 'attribute' => 'data-text'],
-        ['selector' => '.example2', 'attribute' => 'data-*']
+        ['selector' => '.notranslate', 'comment' => 'Default class'],
+        ['selector' => '[data-context]', 'attribute' => 'data-context', 'comment' => 'Data context attributes'],
+        ['selector' => '.lngpicker', 'comment' => 'Language picker'],
+        ['selector' => '.xdebug-error', 'comment' => 'Xdebug errors'],
+        ['selector' => '.example1', 'attribute' => 'data-text', 'comment' => 'Example'],
+        ['selector' => '.example2', 'attribute' => 'data-*', 'comment' => 'Example']
     ],
     'translate_html_force_tokenize' => ['.force-tokenize'],
     'localize_js' => false,
@@ -1288,16 +1301,24 @@ The default configuration is:
         [
             'selector' => '//*[name()=\'loc\']',
             'attribute' => null,
-            'context' => 'slug'
+            'context' => 'slug',
+            'comment' => 'Sitemap links'
         ]
     ],
     'translate_json' => true,
     'translate_json_include' => [
-        ['url' => '/path/in/source/lng/to/specific/page', 'selector' => ['key']],
-        ['url' => 'wp-json/v1/*/endpoint', 'selector' => ['key', 'nested.key', 'key.with.*.wildcard']]
+        ['url' => '/path/in/source/lng/to/specific/page', 'selector' => ['key'], 'comment' => 'Example'],
+        [
+            'url' => 'wp-json/v1/*/endpoint',
+            'selector' => ['key', 'nested.key', 'key.with.*.wildcard'],
+            'comment' => 'Example'
+        ]
     ],
     'translate_wp_localize_script' => true,
-    'translate_wp_localize_script_include' => ['key1_*.key2.*', 'key3_*.key4'],
+    'translate_wp_localize_script_include' => [
+        ['selector' => 'key1_*.key2.*', 'comment' => 'Example'],
+        ['selector' => 'key3_*.key4', 'comment' => 'Example']
+    ],
     'prevent_publish_wp_new_posts' => false,
     'url_query_args' => [
         [

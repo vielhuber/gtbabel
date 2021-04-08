@@ -41,7 +41,9 @@ export default class WpBackend {
                     .querySelectorAll('.gtbabel__repeater-listitem:last-child input')
                     .forEach(el__value => {
                         el__value.value = '';
-                        el__value.removeAttribute('readonly');
+                        if (!el__value.hasAttribute('disabled')) {
+                            el__value.removeAttribute('readonly');
+                        }
                         if (el__value.hasAttribute('data-name')) {
                             el__value.setAttribute('name', el__value.getAttribute('data-name'));
                             el__value.removeAttribute('data-name');

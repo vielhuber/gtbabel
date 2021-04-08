@@ -77,12 +77,17 @@ class Settings
             'translate_html' => true,
             'translate_html_include' => $this->getDefaultTranslateHtmlInclude(),
             'translate_html_exclude' => [
-                ['selector' => '.notranslate'],
-                ['selector' => '[data-context]', 'attribute' => 'data-context'],
-                ['selector' => '.lngpicker'],
-                ['selector' => '.xdebug-error'],
-                ['selector' => '.example1', 'attribute' => 'data-text'],
-                ['selector' => '.example2', 'attribute' => 'data-*']
+                ['selector' => '.notranslate', 'comment' => 'Default class'],
+                ['selector' => '[data-context]', 'attribute' => 'data-context', 'comment' => 'Data context attributes'],
+                ['selector' => '.lngpicker', 'comment' => 'Language picker'],
+                ['selector' => '.xdebug-error', 'comment' => 'Xdebug errors'],
+                [
+                    'selector' => '.example1',
+                    'attribute' => 'data-text',
+                    'attribute' => 'data-text',
+                    'comment' => 'Example'
+                ],
+                ['selector' => '.example2', 'attribute' => 'data-*', 'comment' => 'Example']
             ],
             'translate_html_force_tokenize' => ['.force-tokenize'],
             'localize_js' => false,
@@ -94,16 +99,24 @@ class Settings
                 [
                     'selector' => '//*[name()=\'loc\']',
                     'attribute' => null,
-                    'context' => 'slug'
+                    'context' => 'slug',
+                    'comment' => 'Sitemap links'
                 ]
             ],
             'translate_json' => true,
             'translate_json_include' => [
-                ['url' => '/path/in/source/lng/to/specific/page', 'selector' => ['key']],
-                ['url' => 'wp-json/v1/*/endpoint', 'selector' => ['key', 'nested.key', 'key.with.*.wildcard']]
+                ['url' => '/path/in/source/lng/to/specific/page', 'selector' => ['key'], 'comment' => 'Example'],
+                [
+                    'url' => 'wp-json/v1/*/endpoint',
+                    'selector' => ['key', 'nested.key', 'key.with.*.wildcard'],
+                    'comment' => 'Example'
+                ]
             ],
             'translate_wp_localize_script' => true,
-            'translate_wp_localize_script_include' => ['key1_*.key2.*', 'key3_*.key4'],
+            'translate_wp_localize_script_include' => [
+                ['selector' => 'key1_*.key2.*', 'comment' => 'Example'],
+                ['selector' => 'key3_*.key4', 'comment' => 'Example']
+            ],
             'prevent_publish_wp_new_posts' => false,
             'url_query_args' => [
                 [
@@ -152,6 +165,18 @@ class Settings
                     return $a['selector'] != '.example-link';
                 }
             );
+            $default_settings['translate_html_include'][] = [
+                'selector' => '#payment .place-order .button',
+                'attribute' => 'data-value|value',
+                'context' => null,
+                'comment' => 'WooCommerce'
+            ];
+            $default_settings['translate_html_include'][] = [
+                'selector' => '.elementor-widget-video',
+                'attribute' => 'data-settings',
+                'context' => null,
+                'comment' => 'Elementor videos'
+            ];
             $default_settings['lng_source'] = mb_strtolower(mb_substr(get_locale(), 0, 2));
             $default_settings['languages'] = [
                 [
@@ -190,14 +215,19 @@ class Settings
             $default_settings['localize_js_strings'] = [];
             $default_settings['detect_dom_changes_include'] = [];
             $default_settings['translate_json_include'] = [
-                ['url' => '?wc-ajax=*', 'selector' => ['fragments.*', 'messages', 'redirect']], // woocommerce
-                ['url' => 'wp-json', 'selector' => ['message']] // contact form 7
+                [
+                    'url' => '?wc-ajax=*',
+                    'selector' => ['fragments.*', 'messages', 'redirect'],
+                    'comment' => 'WooCommerce'
+                ],
+                ['url' => 'wp-json', 'selector' => ['message'], 'comment' => 'Contact Form 7'],
+                ['url' => '*', 'selector' => ['youtube_url'], 'comment' => 'Elementor videos']
             ];
             $default_settings['translate_wp_localize_script_include'] = [
-                'wc_*.locale.*',
-                'wc_*.i18n_*',
-                'wc_*.cart_url'
-            ]; // woocommerce
+                ['selector' => 'wc_*.locale.*', 'comment' => 'WooCommerce'],
+                ['selector' => 'wc_*.i18n_*', 'comment' => 'WooCommerce'],
+                ['selector' => 'wc_*.cart_url', 'comment' => 'WooCommerce']
+            ];
             $default_settings['exclude_urls_content'] = [
                 'wp-admin',
                 'feed',
@@ -210,16 +240,16 @@ class Settings
             $default_settings['exclude_urls_slugs'] = ['wp-json'];
             $default_settings['exclude_stopwords'] = [];
             $default_settings['translate_html_exclude'] = [
-                ['selector' => '.notranslate'],
-                ['selector' => '[data-context]', 'attribute' => 'data-context'],
-                ['selector' => '.lngpicker'],
-                ['selector' => '.xdebug-error'],
-                ['selector' => '#wpadminbar'],
-                ['selector' => '#comments .comment-content'],
-                ['selector' => '/html/body//address/br/parent::address'],
-                ['selector' => '.woocommerce-order-overview__email'],
-                ['selector' => '.page-title .search-term'],
-                ['selector' => '.screen-reader-text']
+                ['selector' => '.notranslate', 'comment' => 'Default class'],
+                ['selector' => '[data-context]', 'attribute' => 'data-context', 'comment' => 'Data context attributes'],
+                ['selector' => '.lngpicker', 'comment' => 'Language picker'],
+                ['selector' => '.xdebug-error', 'comment' => 'Xdebug errors'],
+                ['selector' => '#wpadminbar', 'attribute' => 'data-text', 'comment' => 'WordPress adminbar'],
+                ['selector' => '#comments .comment-content', 'comment' => 'WordPress comments'],
+                ['selector' => '.page-title .search-term', 'comment' => 'WordPress search term'],
+                ['selector' => '.screen-reader-text', 'comment' => 'WordPress screen reader text'],
+                ['selector' => '/html/body//address/br/parent::address', 'comment' => 'WooCommerce addresses'],
+                ['selector' => '.woocommerce-order-overview__email', 'comment' => 'WooCommerce order email']
             ];
             $default_settings['translate_html_force_tokenize'] = array_merge(
                 $default_settings['translate_html_force_tokenize'],
@@ -283,10 +313,12 @@ class Settings
                     if ($settings__key !== $key) {
                         continue;
                     }
-                    foreach ($settings__value as $settings__value__value) {
-                        if ($this->valuesAreEqual($default_settings__value__value, $settings__value__value)) {
-                            $missing = false;
-                            break 2;
+                    if (!empty($settings__value)) {
+                        foreach ($settings__value as $settings__value__value) {
+                            if ($this->valuesAreEqual($default_settings__value__value, $settings__value__value)) {
+                                $missing = false;
+                                break 2;
+                            }
                         }
                     }
                 }
@@ -297,23 +329,25 @@ class Settings
             if ($settings__key !== $key) {
                 continue;
             }
-            foreach ($settings__value as $settings__value__value) {
-                $default = false;
-                foreach ($default_settings as $default_settings__key => $default_settings__value) {
-                    if ($default_settings__key !== $key) {
-                        continue;
-                    }
-                    foreach ($default_settings__value as $default_settings__value__value) {
-                        if ($this->valuesAreEqual($settings__value__value, $default_settings__value__value)) {
-                            $default = true;
-                            break 2;
+            if (!empty($settings__value)) {
+                foreach ($settings__value as $settings__value__value) {
+                    $default = false;
+                    foreach ($default_settings as $default_settings__key => $default_settings__value) {
+                        if ($default_settings__key !== $key) {
+                            continue;
+                        }
+                        foreach ($default_settings__value as $default_settings__value__value) {
+                            if ($this->valuesAreEqual($settings__value__value, $default_settings__value__value)) {
+                                $default = true;
+                                break 2;
+                            }
                         }
                     }
+                    if ($default === true) {
+                        continue;
+                    }
+                    $return[] = ['value' => $settings__value__value, 'missing' => false, 'default' => false];
                 }
-                if ($default === true) {
-                    continue;
-                }
-                $return[] = ['value' => $settings__value__value, 'missing' => false, 'default' => false];
             }
         }
         return $return;
@@ -354,97 +388,110 @@ class Settings
             [
                 'selector' => '/html/body//text()',
                 'attribute' => null,
-                'context' => null
+                'context' => null,
+                'comment' => 'Text nodes'
             ],
             [
                 'selector' => '/html/body//a[starts-with(@href, \'mailto:\')]',
                 'attribute' => 'href',
-                'context' => 'email'
+                'context' => 'email',
+                'comment' => 'Email links'
             ],
             [
                 'selector' => '/html/body//a[@href]',
                 'attribute' => 'href',
-                'context' => 'slug|file|url'
+                'context' => 'slug|file|url',
+                'comment' => 'Links'
             ],
             [
                 'selector' => '/html/body//form[@action]',
                 'attribute' => 'action',
-                'context' => 'slug|file|url'
+                'context' => 'slug|file|url',
+                'comment' => 'Form actions'
             ],
             [
                 'selector' => '/html/body//iframe[@src]',
                 'attribute' => 'src',
-                'context' => 'slug|file|url'
+                'context' => 'slug|file|url',
+                'comment' => 'Iframe content'
             ],
             [
                 'selector' => '/html/body//img[@alt]',
                 'attribute' => 'alt',
-                'context' => null
+                'context' => null,
+                'comment' => 'Alt tags'
             ],
             [
                 'selector' => '/html/body//*[@title]',
                 'attribute' => 'title',
-                'context' => null
+                'context' => null,
+                'comment' => 'Title attributes'
             ],
             [
                 'selector' => '/html/body//*[@placeholder]',
                 'attribute' => 'placeholder',
-                'context' => null
+                'context' => null,
+                'comment' => 'Input placeholders'
             ],
             [
                 'selector' => '/html/body//input[@type="submit"][@value]',
                 'attribute' => 'value',
-                'context' => null
+                'context' => null,
+                'comment' => 'Submit values'
             ],
             [
                 'selector' => '/html/body//input[@type="reset"][@value]',
                 'attribute' => 'value',
-                'context' => null
+                'context' => null,
+                'comment' => 'Reset values'
             ],
             [
                 'selector' => '/html/head//title',
                 'attribute' => null,
-                'context' => 'title'
+                'context' => 'title',
+                'comment' => 'Page title'
             ],
             [
                 'selector' => '/html/head//meta[@name="description"][@content]',
                 'attribute' => 'content',
-                'context' => 'description'
+                'context' => 'description',
+                'comment' => 'Page description'
             ],
             [
                 'selector' => '/html/head//link[@rel="canonical"][@href]',
                 'attribute' => 'href',
-                'context' => 'slug'
+                'context' => 'slug',
+                'comment' => 'Canonical tags'
             ],
             [
                 'selector' => '/html/body//img[@src]',
                 'attribute' => 'src',
-                'context' => 'file'
+                'context' => 'file',
+                'comment' => 'Image urls'
             ],
             [
                 'selector' => '/html/body//img[@srcset]',
                 'attribute' => 'srcset',
-                'context' => 'file'
+                'context' => 'file',
+                'comment' => 'Image srcset urls'
             ],
             [
                 'selector' => '/html/body//*[contains(@style, "url(")]',
                 'attribute' => 'style',
-                'context' => 'file'
+                'context' => 'file',
+                'comment' => 'Background images'
             ],
             [
                 'selector' => '/html/body//*[@label]',
                 'attribute' => 'label',
-                'context' => null
+                'context' => null,
+                'comment' => 'Labels'
             ],
             [
                 'selector' => '/html/body//@*[contains(name(), \'text\')]/parent::*',
                 'attribute' => '*text*',
-                'context' => null
-            ],
-            [
-                'selector' => '#payment .place-order .button', // woocommerce
-                'attribute' => 'data-value|value',
-                'context' => null
+                'context' => null,
+                'comment' => 'Text attributes'
             ],
             [
                 'selector' => '.example-link',

@@ -1279,7 +1279,6 @@ class GtbabelWordPress
                             'exclude_urls_slugs',
                             'exclude_stopwords',
                             'translate_html_force_tokenize',
-                            'translate_wp_localize_script_include',
                             'detect_dom_changes_include',
                             'localize_js_strings'
                         ]
@@ -1329,14 +1328,33 @@ class GtbabelWordPress
                             if (
                                 @$post_data['selector'][$post_data__key] == '' &&
                                 @$post_data['attribute'][$post_data__key] == '' &&
-                                @$post_data['context'][$post_data__key] == ''
+                                @$post_data['context'][$post_data__key] == '' &&
+                                @$post_data['comment'][$post_data__key] == ''
                             ) {
                                 continue;
                             }
                             $settings['translate_xml_include'][] = [
                                 'selector' => $post_data['selector'][$post_data__key],
                                 'attribute' => $post_data['attribute'][$post_data__key],
-                                'context' => $post_data['context'][$post_data__key]
+                                'context' => $post_data['context'][$post_data__key],
+                                'comment' => $post_data['comment'][$post_data__key]
+                            ];
+                        }
+                    }
+
+                    $post_data = $settings['translate_wp_localize_script_include'];
+                    $settings['translate_wp_localize_script_include'] = [];
+                    if (!empty(@$post_data['selector'])) {
+                        foreach ($post_data['selector'] as $post_data__key => $post_data__value) {
+                            if (
+                                @$post_data['selector'][$post_data__key] == '' &&
+                                @$post_data['comment'][$post_data__key] == ''
+                            ) {
+                                continue;
+                            }
+                            $settings['translate_wp_localize_script_include'][] = [
+                                'selector' => $post_data['selector'][$post_data__key],
+                                'comment' => $post_data['comment'][$post_data__key]
                             ];
                         }
                     }
@@ -1412,13 +1430,15 @@ class GtbabelWordPress
                         foreach ($post_data['url'] as $post_data__key => $post_data__value) {
                             if (
                                 @$post_data['url'][$post_data__key] == '' &&
-                                @$post_data['selector'][$post_data__key] == ''
+                                @$post_data['selector'][$post_data__key] == '' &&
+                                @$post_data['comment'][$post_data__key] == ''
                             ) {
                                 continue;
                             }
                             $settings['translate_json_include'][] = [
                                 'url' => $post_data['url'][$post_data__key],
-                                'selector' => explode(',', $post_data['selector'][$post_data__key])
+                                'selector' => explode(',', $post_data['selector'][$post_data__key]),
+                                'comment' => $post_data['comment'][$post_data__key]
                             ];
                         }
                     }
@@ -1430,14 +1450,16 @@ class GtbabelWordPress
                             if (
                                 @$post_data['selector'][$post_data__key] == '' &&
                                 @$post_data['attribute'][$post_data__key] == '' &&
-                                @$post_data['context'][$post_data__key] == ''
+                                @$post_data['context'][$post_data__key] == '' &&
+                                @$post_data['comment'][$post_data__key] == ''
                             ) {
                                 continue;
                             }
                             $settings['translate_html_include'][] = [
                                 'selector' => $post_data['selector'][$post_data__key],
                                 'attribute' => $post_data['attribute'][$post_data__key],
-                                'context' => $post_data['context'][$post_data__key]
+                                'context' => $post_data['context'][$post_data__key],
+                                'comment' => $post_data['comment'][$post_data__key]
                             ];
                         }
                     }
@@ -1448,13 +1470,15 @@ class GtbabelWordPress
                         foreach ($post_data['selector'] as $post_data__key => $post_data__value) {
                             if (
                                 @$post_data['selector'][$post_data__key] == '' &&
-                                @$post_data['attribute'][$post_data__key] == ''
+                                @$post_data['attribute'][$post_data__key] == '' &&
+                                @$post_data['comment'][$post_data__key] == ''
                             ) {
                                 continue;
                             }
                             $settings['translate_html_exclude'][] = [
                                 'selector' => $post_data['selector'][$post_data__key],
-                                'attribute' => $post_data['attribute'][$post_data__key]
+                                'attribute' => $post_data['attribute'][$post_data__key],
+                                'comment' => $post_data['comment'][$post_data__key]
                             ];
                         }
                     }
@@ -1843,39 +1867,6 @@ class GtbabelWordPress
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_translate_html" class="gtbabel__label">';
-        echo __('Translate html', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_translate_html" name="gtbabel[translate_html]" value="1"' .
-            ($settings['translate_html'] == '1' ? ' checked="checked"' : '') .
-            ' />';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_translate_xml" class="gtbabel__label">';
-        echo __('Translate xml', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_translate_xml" name="gtbabel[translate_xml]" value="1"' .
-            ($settings['translate_xml'] == '1' ? ' checked="checked"' : '') .
-            ' />';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_translate_json" class="gtbabel__label">';
-        echo __('Translate json', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_translate_json" name="gtbabel[translate_json]" value="1"' .
-            ($settings['translate_json'] == '1' ? ' checked="checked"' : '') .
-            ' />';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
         echo '<label for="gtbabel_html_lang_attribute" class="gtbabel__label">';
         echo __('Set html lang attribute', 'gtbabel-plugin');
         echo '</label>';
@@ -1973,62 +1964,41 @@ class GtbabelWordPress
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label class="gtbabel__label">';
-        echo __('Include dom nodes', 'gtbabel-plugin');
+        echo '<label for="gtbabel_translate_html" class="gtbabel__label">';
+        echo __('HTML translation', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        $this->renderRepeater('translate_html_include', [
-            ['key' => 'selector', 'type' => 'string', 'placeholder' => __('Selector', 'gtbabel-plugin')],
-            ['key' => 'attribute', 'type' => 'string', 'placeholder' => __('Attribute', 'gtbabel-plugin')],
-            ['key' => 'context', 'type' => 'string', 'placeholder' => __('Context', 'gtbabel-plugin')]
-        ]);
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_translate_html" name="gtbabel[translate_html]" value="1"' .
+            ($settings['translate_html'] == '1' ? ' checked="checked"' : '') .
+            ' />';
         echo '</div>';
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label class="gtbabel__label">';
-        echo __('Exclude dom nodes', 'gtbabel-plugin');
+        echo '<label for="gtbabel_translate_xml" class="gtbabel__label">';
+        echo __('XML translation', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        $this->renderRepeater('translate_html_exclude', [
-            ['key' => 'selector', 'type' => 'string', 'placeholder' => __('Selector', 'gtbabel-plugin')],
-            ['key' => 'attribute', 'type' => 'string', 'placeholder' => __('Attribute', 'gtbabel-plugin')]
-        ]);
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_translate_xml" name="gtbabel[translate_xml]" value="1"' .
+            ($settings['translate_xml'] == '1' ? ' checked="checked"' : '') .
+            ' />';
         echo '</div>';
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
-        echo '<label class="gtbabel__label">';
-        echo __('Include xml nodes', 'gtbabel-plugin');
+        echo '<label for="gtbabel_translate_json" class="gtbabel__label">';
+        echo __('JSON translation', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        $this->renderRepeater('translate_xml_include', [
-            ['key' => 'selector', 'type' => 'string', 'placeholder' => __('Selector', 'gtbabel-plugin')],
-            ['key' => 'attribute', 'type' => 'string', 'placeholder' => __('Attribute', 'gtbabel-plugin')],
-            ['key' => 'context', 'type' => 'string', 'placeholder' => __('Context', 'gtbabel-plugin')]
-        ]);
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label class="gtbabel__label">';
-        echo __('Translate json for urls and keys', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        $this->renderRepeater('translate_json_include', [
-            ['key' => 'url', 'type' => 'string', 'placeholder' => __('URL', 'gtbabel-plugin')],
-            [
-                'key' => 'selector',
-                'type' => 'array',
-                'placeholder' => __('Selectors (comma separated)', 'gtbabel-plugin')
-            ]
-        ]);
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_translate_json" name="gtbabel[translate_json]" value="1"' .
+            ($settings['translate_json'] == '1' ? ' checked="checked"' : '') .
+            ' />';
         echo '</div>';
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
         echo '<label for="gtbabel_translate_wp_localize_script" class="gtbabel__label">';
-        echo __('Translate wp_localize_script', 'gtbabel-plugin');
+        echo __('wp_localize_script translation', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
         echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_translate_wp_localize_script" name="gtbabel[translate_wp_localize_script]" value="1"' .
@@ -2039,11 +2009,74 @@ class GtbabelWordPress
 
         echo '<li class="gtbabel__field">';
         echo '<label class="gtbabel__label">';
-        echo __('Translate wp_localize_script paths', 'gtbabel-plugin');
+        echo __('HTML rules', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        $this->renderRepeater('translate_html_include', [
+            ['key' => 'selector', 'type' => 'string', 'placeholder' => __('Selector', 'gtbabel-plugin')],
+            ['key' => 'attribute', 'type' => 'string', 'placeholder' => __('Attribute', 'gtbabel-plugin')],
+            ['key' => 'context', 'type' => 'string', 'placeholder' => __('Context', 'gtbabel-plugin')],
+            ['key' => 'comment', 'type' => 'string', 'placeholder' => __('Comment', 'gtbabel-plugin')]
+        ]);
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label class="gtbabel__label">';
+        echo __('HTML exclusions', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        $this->renderRepeater('translate_html_exclude', [
+            ['key' => 'selector', 'type' => 'string', 'placeholder' => __('Selector', 'gtbabel-plugin')],
+            ['key' => 'attribute', 'type' => 'string', 'placeholder' => __('Attribute', 'gtbabel-plugin')],
+            ['key' => 'context', 'type' => 'dummy'],
+            ['key' => 'comment', 'type' => 'string', 'placeholder' => __('Comment', 'gtbabel-plugin')]
+        ]);
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label class="gtbabel__label">';
+        echo __('XML rules', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        $this->renderRepeater('translate_xml_include', [
+            ['key' => 'selector', 'type' => 'string', 'placeholder' => __('Selector', 'gtbabel-plugin')],
+            ['key' => 'attribute', 'type' => 'string', 'placeholder' => __('Attribute', 'gtbabel-plugin')],
+            ['key' => 'context', 'type' => 'string', 'placeholder' => __('Context', 'gtbabel-plugin')],
+            ['key' => 'comment', 'type' => 'string', 'placeholder' => __('Comment', 'gtbabel-plugin')]
+        ]);
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label class="gtbabel__label">';
+        echo __('JSON rules', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        $this->renderRepeater('translate_json_include', [
+            ['key' => 'url', 'type' => 'string', 'placeholder' => __('Selector', 'gtbabel-plugin')],
+            [
+                'key' => 'selector',
+                'type' => 'array',
+                'placeholder' => __('Attribute', 'gtbabel-plugin')
+            ],
+            ['key' => 'context', 'type' => 'dummy'],
+            ['key' => 'comment', 'type' => 'string', 'placeholder' => __('Comment', 'gtbabel-plugin')]
+        ]);
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label class="gtbabel__label">';
+        echo __('wp_localize_script rules', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
         $this->renderRepeater('translate_wp_localize_script_include', [
-            ['type' => 'string', 'placeholder' => __('Selector', 'gtbabel-plugin')]
+            ['key' => 'selector', 'type' => 'string', 'placeholder' => __('Selector', 'gtbabel-plugin')],
+            ['key' => 'attribute', 'type' => 'dummy'],
+            ['key' => 'context', 'type' => 'dummy'],
+            ['key' => 'comment', 'type' => 'string', 'placeholder' => __('Comment', 'gtbabel-plugin')]
         ]);
         echo '</div>';
         echo '</li>';
@@ -2913,7 +2946,7 @@ class GtbabelWordPress
         echo __('Delete unused translations', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" id="gtbabel_delete_unused" type="checkbox" checked="checked" value="1" />';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" id="gtbabel_delete_unused" type="checkbox" value="1" />';
         echo '</div>';
         echo '</li>';
         echo '<li class="gtbabel__field">';
@@ -4549,7 +4582,9 @@ EOD;
                         : (@$prototype__value['key'] != ''
                             ? $prototype__value['key']
                             : '');
-                if ($prototype__value['type'] === 'select') {
+                if ($prototype__value['type'] === 'dummy') {
+                    echo '<input readonly="readonly" disabled="disabled" class="gtbabel__input" type="text" value="" />';
+                } elseif ($prototype__value['type'] === 'select') {
                     echo '<select' .
                         ($settings__value['default'] === true ? ' readonly="readonly"' : '') .
                         ' class="gtbabel__input gtbabel__input--select" ' .
@@ -4949,9 +4984,9 @@ class gtbabel_localize_script extends \WP_Scripts
             $localize = $gtbabel->settings->get('translate_wp_localize_script_include');
             foreach ($localize as $localize__value) {
                 if (
-                    $localize__value === '*' ||
+                    $localize__value['selector'] === '*' ||
                     preg_match(
-                        '/' . str_replace('\*', '.*', preg_quote(explode('.', $localize__value)[0])) . '/',
+                        '/' . str_replace('\*', '.*', preg_quote(explode('.', $localize__value['selector'])[0])) . '/',
                         $object_name
                     )
                 ) {
@@ -4962,8 +4997,11 @@ class gtbabel_localize_script extends \WP_Scripts
                     ) {
                         $path = $object_name . '.' . implode('.', $key_chain);
                         if (
-                            $localize__value === '*' ||
-                            preg_match('/' . str_replace('\*', '.*', preg_quote($localize__value)) . '/', $path)
+                            $localize__value['selector'] === '*' ||
+                            preg_match(
+                                '/' . str_replace('\*', '.*', preg_quote($localize__value['selector'])) . '/',
+                                $path
+                            )
                         ) {
                             if (is_string($value)) {
                                 $value = $gtbabel->translate($value);

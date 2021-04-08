@@ -719,6 +719,20 @@ class Test extends \PHPUnit\Framework\TestCase
         ]);
     }
 
+    public function test081()
+    {
+        $this->runDiff('81.html', 200, [
+            'translate_html_include' => array_merge($this->gtbabel->settings->getDefaultTranslateHtmlInclude(), [
+                [
+                    'selector' => '.elementor-widget-video',
+                    'attribute' => 'data-settings'
+                ]
+            ]),
+            'translate_json' => true,
+            'translate_json_include' => [['url' => '*', 'selector' => ['youtube_url']]]
+        ]);
+    }
+
     public function test_string_detection()
     {
         $should_translate = ['Haus', 'Sending...', 'ब्लॉग'];
@@ -747,7 +761,6 @@ class Test extends \PHPUnit\Framework\TestCase
             '.foo',
             '.foo .bar',
             '.foo-bar .bar-baz',
-            '{"after":"","before":"","can_partial_refresh":true,"container":"div","container_aria_label":"","container_class":"main-header-bar-navigation","container_id":"","depth":0,"echo":true,"fallback_cb":"wp_page_menu","item_spacing":"preserve","items_wrap":"&lt;nav class=\"ast-flex-grow-1 navigation-accessibility\" id=\"site-navigation\" aria-label=\"Site Navigation\" itemtype=\"https:\/\/schema.org\/SiteNavigationElement\" itemscope=\"itemscope\"&gt;&lt;div class=\"main-navigation\"&gt;&lt;ul id=\"%1$s\" class=\"%2$s\"&gt;%3$s&lt;\/ul&gt;&lt;\/div&gt;&lt;\/nav&gt;","link_after":"","link_before":"","menu":"","menu_class":"main-header-menu ast-nav-menu ast-flex ast-justify-content-flex-end  submenu-with-border astra-menu-animation-fade ","menu_id":"primary-menu","theme_location":"primary","walker":"","args_hmac":"59a0964e109beb0a4c7acf392c9dc52b"}',
             'Array ([0] => Array ([0] => '
         ];
         foreach ($should_translate as $should_translate__value) {
@@ -807,11 +820,11 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->gtbabel->translate('Hund'), 'Dog');
         $this->assertEquals($this->gtbabel->translate('Hund', 'en', 'de'), 'Dog');
         $this->assertEquals(
-            $this->gtbabel->translate('<p>Hallo <a href="/datenschutz">Datenschutz</a>!</p>'),
-            '<p>Hello <a href="/en/data-protection">data protection</a> !</p>'
+            $this->gtbabel->translate('<p>Hallo <a href="/fisch">Fisch</a>!</p>'),
+            '<p>Hello <a href="/en/fish">fish</a> !</p>'
         );
-        $this->assertEquals($this->gtbabel->translate('Datenschutz'), 'Data protection');
-        $this->assertEquals($this->gtbabel->translate('/datenschutz'), '/en/data-protection');
+        $this->assertEquals($this->gtbabel->translate('Fisch'), 'Fish');
+        $this->assertEquals($this->gtbabel->translate('/fisch'), '/en/fish');
         $this->assertEquals($this->gtbabel->translate('/hund/haus/eimer'), '/en/dog/house/bucket');
         $this->assertEquals(
             $this->gtbabel->translate('http://gtbabel.local.vielhuber.de/katze/mund'),
@@ -822,11 +835,11 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->assertEquals(count($translations), 9);
         $this->assertEquals($translations[0]['str'], 'Hund');
         $this->assertEquals($translations[0]['context'], '');
-        $this->assertEquals($translations[1]['str'], 'Hallo <a>Datenschutz</a>!');
+        $this->assertEquals($translations[1]['str'], 'Hallo <a>Fisch</a>!');
         $this->assertEquals($translations[1]['context'], '');
-        $this->assertEquals($translations[2]['str'], 'datenschutz');
+        $this->assertEquals($translations[2]['str'], 'fisch');
         $this->assertEquals($translations[2]['context'], 'slug');
-        $this->assertEquals($translations[3]['str'], 'Datenschutz');
+        $this->assertEquals($translations[3]['str'], 'Fisch');
         $this->assertEquals($translations[3]['context'], '');
         $this->assertEquals($translations[4]['str'], 'hund');
         $this->assertEquals($translations[4]['context'], 'slug');
@@ -841,13 +854,13 @@ class Test extends \PHPUnit\Framework\TestCase
         $this->gtbabel->reset();
 
         $this->gtbabel->config($settings);
-        $this->assertEquals($this->gtbabel->translate('datenschutz'), 'data protection');
-        $this->assertEquals($this->gtbabel->translate('datenschutz', null, null, 'slug'), 'en/data-protection');
+        $this->assertEquals($this->gtbabel->translate('fisch'), 'fish');
+        $this->assertEquals($this->gtbabel->translate('fisch', null, null, 'slug'), 'en/fish');
         $translations = $this->gtbabel->data->getTranslationsFromDatabase();
         $this->assertEquals(count($translations), 2);
-        $this->assertEquals($translations[0]['str'], 'datenschutz');
+        $this->assertEquals($translations[0]['str'], 'fisch');
         $this->assertEquals($translations[0]['context'], '');
-        $this->assertEquals($translations[1]['str'], 'datenschutz');
+        $this->assertEquals($translations[1]['str'], 'fisch');
         $this->assertEquals($translations[1]['context'], 'slug');
         $this->gtbabel->reset();
 
@@ -1776,16 +1789,16 @@ class Test extends \PHPUnit\Framework\TestCase
         $settings['unchecked_strings'] = 'trans';
 
         $input = <<<'EOD'
-<div style="background-image: url(http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei1.jpg);"></div>
-<div style="background-image: url('http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei1.jpg');"></div>
-<div style="background-image:    url(    'http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei1.jpg' )"></div>
+<div style="background-image: url(http://gtbabel.local.vielhuber.de/fisch/beispiel-bilddatei1.jpg);"></div>
+<div style="background-image: url('http://gtbabel.local.vielhuber.de/fisch/beispiel-bilddatei1.jpg');"></div>
+<div style="background-image:    url(    'http://gtbabel.local.vielhuber.de/fisch/beispiel-bilddatei1.jpg' )"></div>
 <div style="background-image: url(/beispiel-bilddatei2.jpg);"></div>
 <div style="background-image: url('beispiel-bilddatei3.jpg');"></div>
 <div style="background-image: url('http://test.de/beispiel-bilddatei4.jpg');"></div>
 <div style="background-image: url('beispiel-bilddatei1.jpg'), url('beispiel-bilddatei2.jpg');"></div>
 <div style="width: 20%;"></div>
 <img src="http://test.de/beispiel-bilddatei5.jpg" alt="" />
-<img src="http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei6.jpg" alt="" />
+<img src="http://gtbabel.local.vielhuber.de/fisch/beispiel-bilddatei6.jpg" alt="" />
 <img src="/beispiel-bilddatei7.jpg" alt="" />
 <img src="beispiel-bilddatei8.jpg" alt="" />
 <img srcset="http://gtbabel.local.vielhuber.de/320x100.png?text=small,
@@ -1803,13 +1816,13 @@ class Test extends \PHPUnit\Framework\TestCase
 <a href="mailto:"></a>
 <a href="mailto:david@vielhuber.de"></a>
 <a href="mailto:david@vielhuber.de?subject=Haus&amp;body=Dies%20ist%20ein%20Test"></a>
-<a href="mailto:david@vielhuber.de?subject=Haus&amp;body=Dies%20ist%20ein%20Link%20http%3A%2F%2Fgtbabel.local.vielhuber.de%2Fdatenschutz"></a>
-<a href="mailto:?subject=Haus&amp;body=http%3A%2F%2Fgtbabel.local.vielhuber.de%2Fdatenschutz%2F"></a>
+<a href="mailto:david@vielhuber.de?subject=Haus&amp;body=Dies%20ist%20ein%20Link%20http%3A%2F%2Fgtbabel.local.vielhuber.de%2Ffisch"></a>
+<a href="mailto:?subject=Haus&amp;body=http%3A%2F%2Fgtbabel.local.vielhuber.de%2Ffisch%2F"></a>
 <a href="tel:+4989111312113"></a>
 <a href="http://test.de/beispiel-bilddatei9.jpg"></a>
 <a href="http://test.de/beispiel-pfad10"></a>
-<a href="http://gtbabel.local.vielhuber.de/datenschutz/beispiel-pfad11"></a>
-<a href="http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei12.jpg"></a>
+<a href="http://gtbabel.local.vielhuber.de/fisch/beispiel-pfad11"></a>
+<a href="http://gtbabel.local.vielhuber.de/fisch/beispiel-bilddatei12.jpg"></a>
 <a href="http://gtbabel.local.vielhuber.de"></a>
 <a href="http://gtbabel.local.vielhuber.de/"></a>
 <a href="/beispiel-bilddatei13.jpg"></a>
@@ -1825,16 +1838,16 @@ class Test extends \PHPUnit\Framework\TestCase
 EOD;
 
         $expected_html = <<<'EOD'
-<div style="background-image: url(http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei1_EN.jpg);"></div>
-<div style="background-image: url('http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei1_EN.jpg');"></div>
-<div style="background-image: url( 'http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei1_EN.jpg' )"></div>
+<div style="background-image: url(http://gtbabel.local.vielhuber.de/fisch/beispiel-bilddatei1_EN.jpg);"></div>
+<div style="background-image: url('http://gtbabel.local.vielhuber.de/fisch/beispiel-bilddatei1_EN.jpg');"></div>
+<div style="background-image: url( 'http://gtbabel.local.vielhuber.de/fisch/beispiel-bilddatei1_EN.jpg' )"></div>
 <div style="background-image: url(/beispiel-bilddatei2_EN.jpg);"></div>
 <div style="background-image: url('beispiel-bilddatei3_EN.jpg');"></div>
 <div style="background-image: url('http://test.de/beispiel-bilddatei4.jpg');"></div>
 <div style="background-image: url('beispiel-bilddatei1_EN.jpg'), url('beispiel-bilddatei2_EN.jpg');"></div>
 <div style="width: 20%;"></div>
 <img src="http://test.de/beispiel-bilddatei5.jpg" alt="">
-<img src="http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei6_EN.jpg" alt="">
+<img src="http://gtbabel.local.vielhuber.de/fisch/beispiel-bilddatei6_EN.jpg" alt="">
 <img src="/beispiel-bilddatei7_EN.jpg" alt="">
 <img src="beispiel-bilddatei8_EN.jpg" alt="">
 <img srcset="http://gtbabel.local.vielhuber.de/320x100_EN.png?text=small, http://gtbabel.local.vielhuber.de/600x100_EN.png?text=medium 600w, http://gtbabel.local.vielhuber.de/900x100_EN.png?text=large 2x" src="http://gtbabel.local.vielhuber.de/900x200_EN.png?text=fallback" alt="" />
@@ -1842,13 +1855,13 @@ EOD;
 <a href="mailto:"></a>
 <a href="mailto:david@vielhuber.de_EN"></a>
 <a href="mailto:david@vielhuber.de_EN?subject=House&amp;body=This%20is%20a%20test"></a>
-<a href="mailto:david@vielhuber.de_EN?subject=House&amp;body=This%20is%20a%20link%20http://gtbabel.local.vielhuber.de/en/data-protection"></a>
-<a href="mailto:?subject=House&amp;body=http://gtbabel.local.vielhuber.de/en/data-protection/"></a>
+<a href="mailto:david@vielhuber.de_EN?subject=House&amp;body=This%20is%20a%20link%20http://gtbabel.local.vielhuber.de/en/fish"></a>
+<a href="mailto:?subject=House&amp;body=http://gtbabel.local.vielhuber.de/en/fish/"></a>
 <a href="tel:+4989111312113"></a>
 <a href="http://test.de/beispiel-bilddatei9.jpg"></a>
 <a href="http://test.de/beispiel-pfad10"></a>
-<a href="http://gtbabel.local.vielhuber.de/en/data-protection/example-path11"></a>
-<a href="http://gtbabel.local.vielhuber.de/datenschutz/beispiel-bilddatei12_EN.jpg"></a>
+<a href="http://gtbabel.local.vielhuber.de/en/fish/example-path11"></a>
+<a href="http://gtbabel.local.vielhuber.de/fisch/beispiel-bilddatei12_EN.jpg"></a>
 <a href="http://gtbabel.local.vielhuber.de/en/"></a>
 <a href="http://gtbabel.local.vielhuber.de/en/"></a>
 <a href="/beispiel-bilddatei13_EN.jpg"></a>
@@ -1864,16 +1877,16 @@ EOD;
 EOD;
 
         $expected_data = [
-            ['datenschutz', 'slug', 'de', 'en', 'data-protection', 0],
+            ['fisch', 'slug', 'de', 'en', 'fish', 0],
             ['beispiel-pfad11', 'slug', 'de', 'en', 'example-path11', 0],
             ['beispiel', 'slug', 'de', 'en', 'example', 0],
             ['pfad', 'slug', 'de', 'en', 'path', 0],
             ['1._Buch_Moses', 'slug', 'de', 'en', '1-book-moses', 0],
-            ['datenschutz/beispiel-bilddatei1.jpg', 'file', 'de', 'en', 'datenschutz/beispiel-bilddatei1_EN.jpg', 1],
+            ['fisch/beispiel-bilddatei1.jpg', 'file', 'de', 'en', 'fisch/beispiel-bilddatei1_EN.jpg', 1],
             ['beispiel-bilddatei2.jpg', 'file', 'de', 'en', 'beispiel-bilddatei2_EN.jpg', 1],
             ['beispiel-bilddatei3.jpg', 'file', 'de', 'en', 'beispiel-bilddatei3_EN.jpg', 1],
             ['beispiel-bilddatei1.jpg', 'file', 'de', 'en', 'beispiel-bilddatei1_EN.jpg', 1],
-            ['datenschutz/beispiel-bilddatei6.jpg', 'file', 'de', 'en', 'datenschutz/beispiel-bilddatei6_EN.jpg', 1],
+            ['fisch/beispiel-bilddatei6.jpg', 'file', 'de', 'en', 'fisch/beispiel-bilddatei6_EN.jpg', 1],
             ['beispiel-bilddatei7.jpg', 'file', 'de', 'en', 'beispiel-bilddatei7_EN.jpg', 1],
             ['beispiel-bilddatei8.jpg', 'file', 'de', 'en', 'beispiel-bilddatei8_EN.jpg', 1],
             ['320x100.png?text=small', 'file', 'de', 'en', '320x100_EN.png?text=small', 1],
@@ -1884,7 +1897,7 @@ EOD;
             ['Haus', null, 'de', 'en', 'House', 0],
             ['Dies ist ein Test', null, 'de', 'en', 'This is a test', 0],
             ['Dies ist ein Link {1}', null, 'de', 'en', 'This is a link {1}', 0],
-            ['datenschutz/beispiel-bilddatei12.jpg', 'file', 'de', 'en', 'datenschutz/beispiel-bilddatei12_EN.jpg', 1],
+            ['fisch/beispiel-bilddatei12.jpg', 'file', 'de', 'en', 'fisch/beispiel-bilddatei12_EN.jpg', 1],
             ['beispiel-bilddatei13.jpg', 'file', 'de', 'en', 'beispiel-bilddatei13_EN.jpg', 1],
             ['beispiel-bilddatei14.jpg', 'file', 'de', 'en', 'beispiel-bilddatei14_EN.jpg', 1],
             ['http://test.de/beispiel-pfad10', 'url', 'de', 'en', 'http://test.de/beispiel-pfad10', 0],
@@ -1936,11 +1949,11 @@ EOD;
         ob_end_clean();
 
         $this->gtbabel->data->editTranslation(
-            'datenschutz/beispiel-bilddatei1.jpg',
+            'fisch/beispiel-bilddatei1.jpg',
             'file',
             'de',
             'en',
-            'datenschutz/beispiel-bilddatei1_EN.jpg',
+            'fisch/beispiel-bilddatei1_EN.jpg',
             true
         );
         $this->gtbabel->data->editTranslation(
@@ -1968,11 +1981,11 @@ EOD;
             true
         );
         $this->gtbabel->data->editTranslation(
-            'datenschutz/beispiel-bilddatei6.jpg',
+            'fisch/beispiel-bilddatei6.jpg',
             'file',
             'de',
             'en',
-            'datenschutz/beispiel-bilddatei6_EN.jpg',
+            'fisch/beispiel-bilddatei6_EN.jpg',
             true
         );
         $this->gtbabel->data->editTranslation(
@@ -2025,11 +2038,11 @@ EOD;
         );
         $this->gtbabel->data->editTranslation('david@vielhuber.de', 'email', 'de', 'en', 'david@vielhuber.de_EN', true);
         $this->gtbabel->data->editTranslation(
-            'datenschutz/beispiel-bilddatei12.jpg',
+            'fisch/beispiel-bilddatei12.jpg',
             'file',
             'de',
             'en',
-            'datenschutz/beispiel-bilddatei12_EN.jpg',
+            'fisch/beispiel-bilddatei12_EN.jpg',
             true
         );
         $this->gtbabel->data->editTranslation(
@@ -2623,7 +2636,8 @@ EOD;
                 [
                     'selector' => '//*[name()=\'loc\']',
                     'attribute' => null,
-                    'context' => 'slug'
+                    'context' => 'slug',
+                    'comment' => 'Sitemap links'
                 ]
             ],
             'translate_json' => true,
@@ -2632,7 +2646,10 @@ EOD;
                 ['url' => 'wp-json/v1/*/endpoint', 'selector' => ['key', 'nested.key', 'key.with.*.wildcard']]
             ],
             'translate_wp_localize_script' => true,
-            'translate_wp_localize_script_include' => ['key1_*.key2.*', 'key3_*.key4'],
+            'translate_wp_localize_script_include' => [
+                ['selector' => 'key1_*.key2.*', 'comment' => 'Example'],
+                ['selector' => 'key3_*.key4', 'comment' => 'Example']
+            ],
             'debug_translations' => true,
             'auto_add_translations' => true,
             'auto_set_new_strings_checked' => false,

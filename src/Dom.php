@@ -364,13 +364,25 @@ class Dom
 
                                 $meta = [];
 
-                                $trans = $this->data->prepareTranslationAndAddDynamicallyIfNeeded(
-                                    $str_without_lb,
-                                    $lng_source,
-                                    $lng_target,
-                                    $context,
-                                    $meta
-                                );
+                                // recursively detect json
+                                // also make sure strings like "false" don't get caught
+                                if (
+                                    preg_match('/^({|\[).+/', $str_without_lb) &&
+                                    __::string_is_json(htmlspecialchars_decode($str_without_lb))
+                                ) {
+                                    $trans = $this->domfactory->modifyContentFactory(
+                                        htmlspecialchars_decode($str_without_lb),
+                                        'translate'
+                                    );
+                                } else {
+                                    $trans = $this->data->prepareTranslationAndAddDynamicallyIfNeeded(
+                                        $str_without_lb,
+                                        $lng_source,
+                                        $lng_target,
+                                        $context,
+                                        $meta
+                                    );
+                                }
 
                                 if ($trans === null) {
                                     continue;
@@ -1424,6 +1436,10 @@ class Dom
             return;
         }
         if (!$this->host->responseCodeIsSuccessful()) {
+            return;
+        }
+        // hide on elementor backend
+        if ($this->utils->isWordPress() && isset($_GET['elementor-preview']) && $_GET['elementor-preview'] != '') {
             return;
         }
         $head = $this->DOMXPath->query('/html/head')[0];
