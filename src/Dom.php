@@ -54,7 +54,7 @@ class Dom
         if (!isset($_GET['gtbabel_translate_part'])) {
             if ($this->settings->get('detect_dom_changes_include') !== null) {
                 foreach ($this->settings->get('detect_dom_changes_include') as $exclude__value) {
-                    $nodes = $this->DOMXPath->query($this->transformSelectorToXpath($exclude__value));
+                    $nodes = $this->DOMXPath->query($this->transformSelectorToXpath($exclude__value['selector']));
                     foreach ($nodes as $nodes__value) {
                         $this->addToExcludedNodes($nodes__value, '*');
                         foreach ($this->getChildrenOfNodeIncludingWhitespace($nodes__value) as $nodes__value__value) {
@@ -1190,12 +1190,19 @@ class Dom
         $script = '';
         $detect_dom_changes_include = [];
         foreach ($this->settings->get('detect_dom_changes_include') as $detect_dom_changes_include__value) {
-            $detect_dom_changes_include__value = str_replace("\r", '', $detect_dom_changes_include__value);
+            $detect_dom_changes_include__value['selector'] = str_replace(
+                "\r",
+                '',
+                $detect_dom_changes_include__value['selector']
+            );
             $to_escape = ['\\', "\f", "\n", "\r", "\t", "\v", "\""];
             foreach ($to_escape as $to_escape__value) {
-                $detect_dom_changes_include__value = addcslashes($detect_dom_changes_include__value, $to_escape__value);
+                $detect_dom_changes_include__value['selector'] = addcslashes(
+                    $detect_dom_changes_include__value['selector'],
+                    $to_escape__value
+                );
             }
-            $detect_dom_changes_include[] = $detect_dom_changes_include__value;
+            $detect_dom_changes_include[] = $detect_dom_changes_include__value['selector'];
         }
         $script .=
             'var gtbabel_detect_dom_changes_include = JSON.parse(\'' .

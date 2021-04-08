@@ -170,7 +170,7 @@ $gtbabel->config([
     ],
     'localize_js' => false,
     'detect_dom_changes' => true,
-    'detect_dom_changes_include' => ['.js'],
+    'detect_dom_changes_include' => [['selector' => '.js']],
     'show_language_picker' => true,
     'frontend_editor' => @$_GET['gtbabel_frontend_editor'] == '1',
     'show_frontend_editor_links' => true
@@ -187,6 +187,7 @@ $gtbabel->start();
         document.addEventListener('DOMContentLoaded', function() {
             let i = 0;
             document.addEventListener('keypress', function(e) {
+                // press "n"
                 if (e.which == 110) {
                     document.querySelector('.timer').innerHTML = 'Meine Nummer: '+i;
                     i++;

@@ -1273,10 +1273,7 @@ class GtbabelWordPress
                         }
                     }
 
-                    foreach (
-                        ['exclude_stopwords', 'detect_dom_changes_include', 'localize_js_strings']
-                        as $repeater__value
-                    ) {
+                    foreach (['exclude_stopwords', 'localize_js_strings'] as $repeater__value) {
                         $post_data = $settings[$repeater__value];
                         $settings[$repeater__value] = [];
                         if (!empty(@$post_data)) {
@@ -1330,6 +1327,23 @@ class GtbabelWordPress
                                 'selector' => $post_data['selector'][$post_data__key],
                                 'attribute' => $post_data['attribute'][$post_data__key],
                                 'context' => $post_data['context'][$post_data__key],
+                                'comment' => $post_data['comment'][$post_data__key]
+                            ];
+                        }
+                    }
+
+                    $post_data = $settings['detect_dom_changes_include'];
+                    $settings['detect_dom_changes_include'] = [];
+                    if (!empty(@$post_data['selector'])) {
+                        foreach ($post_data['selector'] as $post_data__key => $post_data__value) {
+                            if (
+                                @$post_data['selector'][$post_data__key] == '' &&
+                                @$post_data['comment'][$post_data__key] == ''
+                            ) {
+                                continue;
+                            }
+                            $settings['detect_dom_changes_include'][] = [
+                                'selector' => $post_data['selector'][$post_data__key],
                                 'comment' => $post_data['comment'][$post_data__key]
                             ];
                         }
@@ -2054,6 +2068,17 @@ class GtbabelWordPress
         echo '</li>';
 
         echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_detect_dom_changes" class="gtbabel__label">';
+        echo __('Detect dom changes', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_detect_dom_changes" name="gtbabel[detect_dom_changes]" value="1"' .
+            ($settings['detect_dom_changes'] == '1' ? ' checked="checked"' : '') .
+            ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
         echo '<label class="gtbabel__label">';
         echo __('HTML rules', 'gtbabel-plugin');
         echo '</label>';
@@ -2185,6 +2210,20 @@ class GtbabelWordPress
 
         echo '<li class="gtbabel__field">';
         echo '<label class="gtbabel__label">';
+        echo __('Detect dom changes in areas', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        $this->renderRepeater('detect_dom_changes_include', [
+            ['key' => 'selector', 'type' => 'string', 'placeholder' => __('Selector', 'gtbabel-plugin')],
+            ['key' => 'attribute', 'type' => 'dummy'],
+            ['key' => 'context', 'type' => 'dummy'],
+            ['key' => 'comment', 'type' => 'string', 'placeholder' => __('Comment', 'gtbabel-plugin')]
+        ]);
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label class="gtbabel__label">';
         echo __('Language specific base urls and prefixes', 'gtbabel-plugin');
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
@@ -2252,28 +2291,6 @@ class GtbabelWordPress
         echo '<div class="gtbabel__inputbox">';
         $this->renderRepeater('localize_js_strings', [
             ['type' => 'string', 'placeholder' => __('String', 'gtbabel-plugin')]
-        ]);
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_detect_dom_changes" class="gtbabel__label">';
-        echo __('Detect dom changes', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_detect_dom_changes" name="gtbabel[detect_dom_changes]" value="1"' .
-            ($settings['detect_dom_changes'] == '1' ? ' checked="checked"' : '') .
-            ' />';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label class="gtbabel__label">';
-        echo __('Detect dom changes in areas', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        $this->renderRepeater('detect_dom_changes_include', [
-            ['type' => 'string', 'placeholder' => __('Selector', 'gtbabel-plugin')]
         ]);
         echo '</div>';
         echo '</li>';

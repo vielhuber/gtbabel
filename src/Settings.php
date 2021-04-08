@@ -93,7 +93,10 @@ class Settings
             'localize_js' => false,
             'localize_js_strings' => ['Schließen', '/blog'],
             'detect_dom_changes' => false,
-            'detect_dom_changes_include' => ['.top-button', '.swal-overlay'],
+            'detect_dom_changes_include' => [
+                ['selector' => '.top-button', 'comment' => 'Top button'],
+                ['selector' => '.swal-overlay', 'comment' => 'SweetAlert']
+            ],
             'translate_xml' => true,
             'translate_xml_include' => [
                 [
