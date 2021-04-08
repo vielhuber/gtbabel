@@ -2172,7 +2172,7 @@ EOD;
         $this->assertEquals($path, '/en/house/');
 
         $settings['exclude_urls_content'] = [];
-        $settings['exclude_urls_slugs'] = ['house'];
+        $settings['exclude_urls_slugs'] = [['url' => 'house']];
         $this->setHostTo('/haus/');
         ob_start();
         $this->gtbabel->config($settings);

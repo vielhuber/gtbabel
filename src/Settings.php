@@ -129,7 +129,7 @@ class Settings
                 ]
             ],
             'exclude_urls_content' => [['url' => 'backend', 'comment' => 'Backend']],
-            'exclude_urls_slugs' => ['api/v1.0'],
+            'exclude_urls_slugs' => [['url' => 'api/v1.0', 'comment' => 'API']],
             'exclude_stopwords' => ['Some specific string to exclude'],
             'html_lang_attribute' => true,
             'html_hreflang_tags' => true,
@@ -237,7 +237,7 @@ class Settings
                 ['url' => 'wp-cron.php', 'comment' => 'WordPress'],
                 ['url' => 'wp-comments-post.php', 'comment' => 'WordPress']
             ];
-            $default_settings['exclude_urls_slugs'] = ['wp-json'];
+            $default_settings['exclude_urls_slugs'] = [['url' => 'wp-json', 'comment' => 'WordPress']];
             $default_settings['exclude_stopwords'] = [];
             $default_settings['translate_html_exclude'] = [
                 ['selector' => '.notranslate', 'comment' => 'Default class'],

@@ -176,7 +176,7 @@ class Host
             is_array($this->settings->get('exclude_urls_slugs'))
         ) {
             foreach ($this->settings->get('exclude_urls_slugs') as $exclude__value) {
-                $regex = '/^(.+\/)?' . preg_quote(trim($exclude__value, '/'), '/') . '(\/.+)?$/';
+                $regex = '/^(.+\/)?' . preg_quote(trim($exclude__value['url'], '/'), '/') . '(\/.+)?$/';
                 if (preg_match($regex, trim($url, '/'))) {
                     return true;
                 }

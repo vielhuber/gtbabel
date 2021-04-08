@@ -1275,7 +1275,6 @@ class GtbabelWordPress
 
                     foreach (
                         [
-                            'exclude_urls_slugs',
                             'exclude_stopwords',
                             'translate_html_force_tokenize',
                             'detect_dom_changes_include',
@@ -1352,6 +1351,23 @@ class GtbabelWordPress
                                 continue;
                             }
                             $settings['exclude_urls_content'][] = [
+                                'url' => $post_data['url'][$post_data__key],
+                                'comment' => $post_data['comment'][$post_data__key]
+                            ];
+                        }
+                    }
+
+                    $post_data = $settings['exclude_urls_slugs'];
+                    $settings['exclude_urls_slugs'] = [];
+                    if (!empty(@$post_data['url'])) {
+                        foreach ($post_data['url'] as $post_data__key => $post_data__value) {
+                            if (
+                                @$post_data['url'][$post_data__key] == '' &&
+                                @$post_data['comment'][$post_data__key] == ''
+                            ) {
+                                continue;
+                            }
+                            $settings['exclude_urls_slugs'][] = [
                                 'url' => $post_data['url'][$post_data__key],
                                 'comment' => $post_data['comment'][$post_data__key]
                             ];
@@ -2129,7 +2145,10 @@ class GtbabelWordPress
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
         $this->renderRepeater('exclude_urls_slugs', [
-            ['type' => 'string', 'placeholder' => __('URL', 'gtbabel-plugin')]
+            ['key' => 'url', 'type' => 'string', 'placeholder' => __('URL', 'gtbabel-plugin')],
+            ['key' => 'attribute', 'type' => 'dummy'],
+            ['key' => 'context', 'type' => 'dummy'],
+            ['key' => 'comment', 'type' => 'string', 'placeholder' => __('Comment', 'gtbabel-plugin')]
         ]);
         echo '</div>';
         echo '</li>';
