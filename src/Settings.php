@@ -120,12 +120,14 @@ class Settings
             'prevent_publish_wp_new_posts' => false,
             'url_query_args' => [
                 [
+                    'selector' => '*',
                     'type' => 'keep',
-                    'selector' => '*'
+                    'comment' => 'Keep everything'
                 ],
                 [
+                    'selector' => 'nonce',
                     'type' => 'discard',
-                    'selector' => 'nonce'
+                    'comment' => 'Discard nonces'
                 ]
             ],
             'exclude_urls_content' => [['url' => 'backend', 'comment' => 'Backend']],

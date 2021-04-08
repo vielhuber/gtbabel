@@ -1453,17 +1453,19 @@ class GtbabelWordPress
 
                     $post_data = $settings['url_query_args'];
                     $settings['url_query_args'] = [];
-                    if (!empty(@$post_data['type'])) {
-                        foreach ($post_data['type'] as $post_data__key => $post_data__value) {
+                    if (!empty(@$post_data['selector'])) {
+                        foreach ($post_data['selector'] as $post_data__key => $post_data__value) {
                             if (
+                                @$post_data['selector'][$post_data__key] == '' &&
                                 @$post_data['type'][$post_data__key] == '' &&
-                                @$post_data['selector'][$post_data__key] == ''
+                                @$post_data['comment'][$post_data__key] == ''
                             ) {
                                 continue;
                             }
                             $settings['url_query_args'][] = [
+                                'selector' => $post_data['selector'][$post_data__key],
                                 'type' => $post_data['type'][$post_data__key],
-                                'selector' => $post_data['selector'][$post_data__key]
+                                'comment' => $post_data['comment'][$post_data__key]
                             ];
                         }
                     }
@@ -2131,8 +2133,10 @@ class GtbabelWordPress
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
         $this->renderRepeater('url_query_args', [
+            ['key' => 'selector', 'type' => 'string', 'placeholder' => __('Selector', 'gtbabel-plugin')],
             ['key' => 'type', 'type' => 'string', 'placeholder' => __('Type', 'gtbabel-plugin')],
-            ['key' => 'selector', 'type' => 'string', 'placeholder' => __('Selector', 'gtbabel-plugin')]
+            ['key' => 'context', 'type' => 'dummy'],
+            ['key' => 'comment', 'type' => 'string', 'placeholder' => __('Comment', 'gtbabel-plugin')]
         ]);
         echo '</div>';
         echo '</li>';
