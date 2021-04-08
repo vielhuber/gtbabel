@@ -218,7 +218,6 @@ class Settings
             }
             $default_settings['log_folder'] = $this->utils->getWordPressPluginFileStorePathRelative() . '/logs';
             $default_settings['localize_js_strings'] = [];
-            $default_settings['detect_dom_changes_include'] = [];
             $default_settings['translate_json_include'] = [
                 [
                     'url' => '?wc-ajax=*',

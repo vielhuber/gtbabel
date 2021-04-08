@@ -1915,16 +1915,6 @@ class GtbabelWordPress
 
         echo '<h2 class="gtbabel__subtitle">' . __('Advanced settings', 'gtbabel-plugin') . '</h2>';
         echo '<ul class="gtbabel__fields">';
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_debug_translations" class="gtbabel__label">';
-        echo __('Enable debug mode', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_debug_translations" name="gtbabel[debug_translations]" value="1"' .
-            ($settings['debug_translations'] == '1' ? ' checked="checked"' : '') .
-            ' />';
-        echo '</div>';
-        echo '</li>';
 
         echo '<li class="gtbabel__field">';
         echo '<label for="gtbabel_html_lang_attribute" class="gtbabel__label">';
@@ -1956,70 +1946,6 @@ class GtbabelWordPress
         echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_xml_hreflang_tags" name="gtbabel[xml_hreflang_tags]" value="1"' .
             ($settings['xml_hreflang_tags'] == '1' ? ' checked="checked"' : '') .
             ' />';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label class="gtbabel__label">';
-        echo __('Translation service', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        $this->renderRepeater('auto_translation_service', [
-            [
-                'key' => 'provider',
-                'type' => 'string',
-                'placeholder' => 'google|microsoft|deepl|custom'
-            ],
-            [
-                'key' => 'api_keys',
-                'type' => 'array',
-                'placeholder' => __('API keys (comma separated)', 'gtbabel-plugin')
-            ],
-            [
-                'key' => 'throttle_chars_per_month',
-                'type' => 'string',
-                'placeholder' => __('Throttle chars per month', 'gtbabel-plugin')
-            ],
-            [
-                'key' => 'lng',
-                'type' => 'array',
-                'placeholder' => __('Language codes (comma separated)', 'gtbabel-plugin')
-            ],
-            ['key' => 'label', 'type' => 'string', 'placeholder' => __('Custom label', 'gtbabel-plugin')],
-            ['key' => 'api_url', 'type' => 'string', 'placeholder' => __('Custom API url', 'gtbabel-plugin')],
-            [
-                'key' => 'disabled',
-                'type' => 'select',
-                'options' => [0 => __('active', 'gtbabel-plugin'), 1 => __('inactive', 'gtbabel-plugin')]
-            ]
-        ]);
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        $this->showBasicAuthInfo();
-        echo '<label for="gtbabel_basic_auth" class="gtbabel__label">';
-        echo __('Basic auth', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input placeholder="' .
-            __('Username:Password', 'gtbabel-plugin') .
-            '" class="gtbabel__input" type="text" id="gtbabel_basic_auth" name="gtbabel[basic_auth]" value="' .
-            $settings['basic_auth'] .
-            '" />';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_log_folder" class="gtbabel__label">';
-        echo __('Log folder', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input placeholder="' .
-            __('Path', 'gtbabel-plugin') .
-            '" class="gtbabel__input" type="text" id="gtbabel_log_folder" name="gtbabel[log_folder]" value="' .
-            $settings['log_folder'] .
-            '" />';
         echo '</div>';
         echo '</li>';
 
@@ -2075,6 +2001,154 @@ class GtbabelWordPress
         echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_detect_dom_changes" name="gtbabel[detect_dom_changes]" value="1"' .
             ($settings['detect_dom_changes'] == '1' ? ' checked="checked"' : '') .
             ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_localize_js" class="gtbabel__label">';
+        echo __('Provide strings in JavaScript', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_localize_js" name="gtbabel[localize_js]" value="1"' .
+            ($settings['localize_js'] == '1' ? ' checked="checked"' : '') .
+            ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_debug_translations" class="gtbabel__label">';
+        echo __('Enable debug mode', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_debug_translations" name="gtbabel[debug_translations]" value="1"' .
+            ($settings['debug_translations'] == '1' ? ' checked="checked"' : '') .
+            ' />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_log_folder" class="gtbabel__label">';
+        echo __('Log folder', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input placeholder="' .
+            __('Path', 'gtbabel-plugin') .
+            '" class="gtbabel__input" type="text" id="gtbabel_log_folder" name="gtbabel[log_folder]" value="' .
+            $settings['log_folder'] .
+            '" />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        $this->showBasicAuthInfo();
+        echo '<label for="gtbabel_basic_auth" class="gtbabel__label">';
+        echo __('Basic auth', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input placeholder="' .
+            __('Username:Password', 'gtbabel-plugin') .
+            '" class="gtbabel__input" type="text" id="gtbabel_basic_auth" name="gtbabel[basic_auth]" value="' .
+            $settings['basic_auth'] .
+            '" />';
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label class="gtbabel__label">';
+        echo __('Translation service', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        $this->renderRepeater('auto_translation_service', [
+            [
+                'key' => 'provider',
+                'type' => 'string',
+                'placeholder' => 'google|microsoft|deepl|custom'
+            ],
+            [
+                'key' => 'api_keys',
+                'type' => 'array',
+                'placeholder' => __('API keys (comma separated)', 'gtbabel-plugin')
+            ],
+            [
+                'key' => 'throttle_chars_per_month',
+                'type' => 'string',
+                'placeholder' => __('Throttle chars per month', 'gtbabel-plugin')
+            ],
+            [
+                'key' => 'lng',
+                'type' => 'array',
+                'placeholder' => __('Language codes (comma separated)', 'gtbabel-plugin')
+            ],
+            ['key' => 'label', 'type' => 'string', 'placeholder' => __('Custom label', 'gtbabel-plugin')],
+            ['key' => 'api_url', 'type' => 'string', 'placeholder' => __('Custom API url', 'gtbabel-plugin')],
+            [
+                'key' => 'disabled',
+                'type' => 'select',
+                'options' => [0 => __('active', 'gtbabel-plugin'), 1 => __('inactive', 'gtbabel-plugin')]
+            ]
+        ]);
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label class="gtbabel__label">';
+        echo __('Language specific base urls and prefixes', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        $url_settings = [];
+        foreach ($this->gtbabel->settings->getSelectedLanguages() as $languages__value) {
+            if (!empty(get_option('gtbabel_url_settings'))) {
+                foreach (get_option('gtbabel_url_settings') as $settings__value) {
+                    if ($settings__value['code'] === $languages__value['code']) {
+                        $url_settings[] = $settings__value;
+                        break;
+                    }
+                }
+            }
+        }
+        $this->renderRepeater(
+            'url_settings',
+            [
+                [
+                    'key' => 'code',
+                    'type' => 'string',
+                    'placeholder' => __('Language code', 'gtbabel-plugin')
+                ],
+                [
+                    'key' => 'url_base',
+                    'type' => 'string',
+                    'placeholder' => __('Base URL (only if different from host)', 'gtbabel-plugin')
+                ],
+                [
+                    'key' => 'url_prefix',
+                    'type' => 'string',
+                    'placeholder' => __('Prefix (leave empty if no prefix)', 'gtbabel-plugin')
+                ]
+            ],
+            $url_settings
+        );
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label class="gtbabel__label">';
+        echo __('Exclude stopwords from translation', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        $this->renderRepeater('exclude_stopwords', [
+            ['type' => 'string', 'placeholder' => __('Word', 'gtbabel-plugin')]
+        ]);
+        echo '</div>';
+        echo '</li>';
+
+        echo '<li class="gtbabel__field">';
+        echo '<label class="gtbabel__label">';
+        echo __('Strings in JavaScript', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        $this->renderRepeater('localize_js_strings', [
+            ['type' => 'string', 'placeholder' => __('String', 'gtbabel-plugin')]
+        ]);
         echo '</div>';
         echo '</li>';
 
@@ -2218,79 +2292,6 @@ class GtbabelWordPress
             ['key' => 'attribute', 'type' => 'dummy'],
             ['key' => 'context', 'type' => 'dummy'],
             ['key' => 'comment', 'type' => 'string', 'placeholder' => __('Comment', 'gtbabel-plugin')]
-        ]);
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label class="gtbabel__label">';
-        echo __('Language specific base urls and prefixes', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        $url_settings = [];
-        foreach ($this->gtbabel->settings->getSelectedLanguages() as $languages__value) {
-            if (!empty(get_option('gtbabel_url_settings'))) {
-                foreach (get_option('gtbabel_url_settings') as $settings__value) {
-                    if ($settings__value['code'] === $languages__value['code']) {
-                        $url_settings[] = $settings__value;
-                        break;
-                    }
-                }
-            }
-        }
-        $this->renderRepeater(
-            'url_settings',
-            [
-                [
-                    'key' => 'code',
-                    'type' => 'string',
-                    'placeholder' => __('Language code', 'gtbabel-plugin')
-                ],
-                [
-                    'key' => 'url_base',
-                    'type' => 'string',
-                    'placeholder' => __('Base URL (only if different from host)', 'gtbabel-plugin')
-                ],
-                [
-                    'key' => 'url_prefix',
-                    'type' => 'string',
-                    'placeholder' => __('Prefix (leave empty if no prefix)', 'gtbabel-plugin')
-                ]
-            ],
-            $url_settings
-        );
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label class="gtbabel__label">';
-        echo __('Exclude stopwords from translation', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        $this->renderRepeater('exclude_stopwords', [
-            ['type' => 'string', 'placeholder' => __('Word', 'gtbabel-plugin')]
-        ]);
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label for="gtbabel_localize_js" class="gtbabel__label">';
-        echo __('Provide strings in JavaScript', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        echo '<input class="gtbabel__input gtbabel__input--checkbox" type="checkbox" id="gtbabel_localize_js" name="gtbabel[localize_js]" value="1"' .
-            ($settings['localize_js'] == '1' ? ' checked="checked"' : '') .
-            ' />';
-        echo '</div>';
-        echo '</li>';
-
-        echo '<li class="gtbabel__field">';
-        echo '<label class="gtbabel__label">';
-        echo __('Strings in JavaScript', 'gtbabel-plugin');
-        echo '</label>';
-        echo '<div class="gtbabel__inputbox">';
-        $this->renderRepeater('localize_js_strings', [
-            ['type' => 'string', 'placeholder' => __('String', 'gtbabel-plugin')]
         ]);
         echo '</div>';
         echo '</li>';
