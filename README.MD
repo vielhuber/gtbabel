@@ -1291,7 +1291,7 @@ The default configuration is:
         ['selector' => '.example1', 'attribute' => 'data-text', 'comment' => 'Example'],
         ['selector' => '.example2', 'attribute' => 'data-*', 'comment' => 'Example']
     ],
-    'translate_html_force_tokenize' => ['.force-tokenize'],
+    'translate_html_force_tokenize' => [['selector' => '.force-tokenize', 'comment' => 'Default class']],
     'localize_js' => false,
     'localize_js_strings' => ['Schließen', '/blog'],
     'detect_dom_changes' => false,

@@ -89,7 +89,7 @@ class Settings
                 ],
                 ['selector' => '.example2', 'attribute' => 'data-*', 'comment' => 'Example']
             ],
-            'translate_html_force_tokenize' => ['.force-tokenize'],
+            'translate_html_force_tokenize' => [['selector' => '.force-tokenize', 'comment' => 'Default class']],
             'localize_js' => false,
             'localize_js_strings' => ['Schließen', '/blog'],
             'detect_dom_changes' => false,
@@ -253,7 +253,10 @@ class Settings
             ];
             $default_settings['translate_html_force_tokenize'] = array_merge(
                 $default_settings['translate_html_force_tokenize'],
-                ['.page-title .search-term', '.screen-reader-text']
+                [
+                    ['selector' => '.page-title .search-term', 'comment' => 'WordPress'],
+                    ['selector' => '.screen-reader-text', 'comment' => 'WordPress']
+                ]
             );
             $default_settings['auto_translation'] = null; // undefined
             $default_settings['auto_translation_service'] = [];

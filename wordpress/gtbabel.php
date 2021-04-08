@@ -1274,12 +1274,7 @@ class GtbabelWordPress
                     }
 
                     foreach (
-                        [
-                            'exclude_stopwords',
-                            'translate_html_force_tokenize',
-                            'detect_dom_changes_include',
-                            'localize_js_strings'
-                        ]
+                        ['exclude_stopwords', 'detect_dom_changes_include', 'localize_js_strings']
                         as $repeater__value
                     ) {
                         $post_data = $settings[$repeater__value];
@@ -1369,6 +1364,23 @@ class GtbabelWordPress
                             }
                             $settings['exclude_urls_slugs'][] = [
                                 'url' => $post_data['url'][$post_data__key],
+                                'comment' => $post_data['comment'][$post_data__key]
+                            ];
+                        }
+                    }
+
+                    $post_data = $settings['translate_html_force_tokenize'];
+                    $settings['translate_html_force_tokenize'] = [];
+                    if (!empty(@$post_data['selector'])) {
+                        foreach ($post_data['selector'] as $post_data__key => $post_data__value) {
+                            if (
+                                @$post_data['selector'][$post_data__key] == '' &&
+                                @$post_data['comment'][$post_data__key] == ''
+                            ) {
+                                continue;
+                            }
+                            $settings['translate_html_force_tokenize'][] = [
+                                'selector' => $post_data['selector'][$post_data__key],
                                 'comment' => $post_data['comment'][$post_data__key]
                             ];
                         }
@@ -2159,7 +2171,10 @@ class GtbabelWordPress
         echo '</label>';
         echo '<div class="gtbabel__inputbox">';
         $this->renderRepeater('translate_html_force_tokenize', [
-            ['type' => 'string', 'placeholder' => __('Selector', 'gtbabel-plugin')]
+            ['key' => 'selector', 'type' => 'string', 'placeholder' => __('Selector', 'gtbabel-plugin')],
+            ['key' => 'attribute', 'type' => 'dummy'],
+            ['key' => 'context', 'type' => 'dummy'],
+            ['key' => 'comment', 'type' => 'string', 'placeholder' => __('Comment', 'gtbabel-plugin')]
         ]);
         echo '</div>';
         echo '</li>';
