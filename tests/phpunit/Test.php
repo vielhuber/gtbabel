@@ -2148,7 +2148,7 @@ EOD;
         $this->assertEquals($translations[1]['str'], 'Der Inhalt');
         $this->assertEquals($path, '/haus');
 
-        $settings['exclude_urls_content'] = ['house'];
+        $settings['exclude_urls_content'] = [['url' => 'house']];
         $settings['exclude_urls_slugs'] = [];
         $this->setHostTo('/haus/');
         ob_start();

@@ -128,7 +128,7 @@ class Settings
                     'selector' => 'nonce'
                 ]
             ],
-            'exclude_urls_content' => ['backend'],
+            'exclude_urls_content' => [['url' => 'backend', 'comment' => 'Backend']],
             'exclude_urls_slugs' => ['api/v1.0'],
             'exclude_stopwords' => ['Some specific string to exclude'],
             'html_lang_attribute' => true,
@@ -229,13 +229,13 @@ class Settings
                 ['selector' => 'wc_*.cart_url', 'comment' => 'WooCommerce']
             ];
             $default_settings['exclude_urls_content'] = [
-                'wp-admin',
-                'feed',
-                'embed',
-                'wp-login.php',
-                'wp-register.php',
-                'wp-cron.php',
-                'wp-comments-post.php'
+                ['url' => 'wp-admin', 'comment' => 'WordPress'],
+                ['url' => 'feed', 'comment' => 'WordPress'],
+                ['url' => 'embed', 'comment' => 'WordPress'],
+                ['url' => 'wp-login.php', 'comment' => 'WordPress'],
+                ['url' => 'wp-register.php', 'comment' => 'WordPress'],
+                ['url' => 'wp-cron.php', 'comment' => 'WordPress'],
+                ['url' => 'wp-comments-post.php', 'comment' => 'WordPress']
             ];
             $default_settings['exclude_urls_slugs'] = ['wp-json'];
             $default_settings['exclude_stopwords'] = [];

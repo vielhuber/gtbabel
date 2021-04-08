@@ -1337,7 +1337,7 @@ The default configuration is:
         ]
         */
     ],
-    'exclude_urls_content' => ['backend'],
+    'exclude_urls_content' => [['url' => 'backend', 'comment' => 'Backend']],
     'exclude_urls_slugs' => ['api/v1.0'],
     'exclude_stopwords' => ['Some specific string to exclude'],
     'html_lang_attribute' => true,
