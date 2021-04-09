@@ -272,6 +272,21 @@ class Settings
     function valuesAreEqual($a1, $a2)
     {
         if (is_array($a1)) {
+            // filter out comments (they should change more often)
+            $a1 = array_filter(
+                $a1,
+                function ($key) {
+                    return $key !== 'comment';
+                },
+                ARRAY_FILTER_USE_KEY
+            );
+            $a2 = array_filter(
+                $a2,
+                function ($key) {
+                    return $key !== 'comment';
+                },
+                ARRAY_FILTER_USE_KEY
+            );
             if (
                 json_encode(
                     array_filter(
