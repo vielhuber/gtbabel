@@ -28,6 +28,7 @@ class GtbabelWordPress
         $this->gtbabel = $gtbabel;
         $this->installHook();
         $this->localizePlugin();
+        $this->checkForProUpdates();
         $this->initBackend();
         $this->handleAltLng();
         $this->handlePreventLngs();
@@ -452,6 +453,170 @@ class GtbabelWordPress
         add_action('plugins_loaded', function () {
             load_plugin_textdomain('gtbabel-plugin', false, dirname(plugin_basename(__FILE__)) . '/languages');
         });
+    }
+
+    private function checkForProUpdates()
+    {
+        /* code inspired from https://rudrastyh.com/wordpress/self-hosted-plugin-update.html */
+
+        global $custom_options;
+        $custom_options = [
+            'plugin_slug' => 'gtbabel',
+            'update_url' => 'http://gtbabel-web.local.vielhuber.de/wp-json/v1/update',
+            'license_key' => get_option('gtbabel_license_key'),
+            'cache_time' => 3 // debug
+        ];
+
+        // check license key
+        if ($custom_options['license_key'] == '') {
+            return;
+        }
+
+        // allow http without ssl in download url
+        add_filter(
+            'http_request_args',
+            function ($args) {
+                $args['reject_unsafe_urls'] = false;
+                return $args;
+            },
+            999
+        );
+
+        // check for plugin updates
+        add_filter('site_transient_update_plugins', function ($transient) {
+            global $custom_options;
+            if (empty($transient->checked)) {
+                return $transient;
+            }
+            $remote = get_transient('custom_upgrade_' . $custom_options['plugin_slug']);
+            if ($remote == false) {
+                $remote = wp_remote_post($custom_options['update_url'], [
+                    'body' => wp_json_encode([
+                        'key' => $custom_options['license_key'],
+                        'domain' => $_SERVER['HTTP_HOST']
+                    ]),
+                    'headers' => [
+                        'Content-Type' => 'application/json'
+                    ],
+                    'timeout' => 10
+                ]);
+                if (
+                    !is_wp_error($remote) &&
+                    isset($remote['response']['code']) &&
+                    $remote['response']['code'] == 200 &&
+                    !empty($remote['body'])
+                ) {
+                    set_transient(
+                        'custom_upgrade_' . $custom_options['plugin_slug'],
+                        $remote,
+                        $custom_options['cache_time']
+                    );
+                }
+            }
+            if (
+                !is_wp_error($remote) &&
+                isset($remote['response']['code']) &&
+                $remote['response']['code'] == 200 &&
+                !empty($remote['body'])
+            ) {
+                $remote = json_decode($remote['body']);
+                if (
+                    $remote &&
+                    version_compare(
+                        get_file_data(__FILE__, ['Version' => 'Version'], false)['Version'],
+                        $remote->version,
+                        '<'
+                    ) &&
+                    version_compare($remote->requires, get_bloginfo('version'), '<')
+                ) {
+                    $res = new stdClass();
+                    $res->slug = $custom_options['plugin_slug'];
+                    $res->plugin = $custom_options['plugin_slug'] . '/' . $custom_options['plugin_slug'] . '.php';
+                    $res->new_version = $remote->version;
+                    $res->tested = $remote->tested;
+                    $res->package = $remote->download_url;
+                    $res->icons = [
+                        '1x' => $remote->icon,
+                        '2x' => $remote->icon
+                    ];
+                    $transient->response[$res->plugin] = $res;
+                }
+            }
+            return $transient;
+        });
+
+        // provide detail infos
+        add_filter(
+            'plugins_api',
+            function ($res, $action, $args) {
+                global $custom_options;
+                if ($action !== 'plugin_information') {
+                    return false;
+                }
+                if ($args->slug !== $custom_options['plugin_slug']) {
+                    return false;
+                }
+                $remote = get_transient('custom_update_' . $custom_options['plugin_slug']);
+                if ($remote == false) {
+                    $remote = wp_remote_post($custom_options['update_url'], [
+                        'body' => wp_json_encode([
+                            'key' => $custom_options['license_key'],
+                            'domain' => $_SERVER['HTTP_HOST']
+                        ]),
+                        'headers' => [
+                            'Content-Type' => 'application/json'
+                        ],
+                        'timeout' => 10
+                    ]);
+                    if (
+                        !is_wp_error($remote) &&
+                        isset($remote['response']['code']) &&
+                        $remote['response']['code'] == 200 &&
+                        !empty($remote['body'])
+                    ) {
+                        set_transient(
+                            'custom_update_' . $custom_options['plugin_slug'],
+                            $remote,
+                            $custom_options['cache_time']
+                        );
+                    }
+                }
+                if (
+                    !is_wp_error($remote) &&
+                    isset($remote['response']['code']) &&
+                    $remote['response']['code'] == 200 &&
+                    !empty($remote['body'])
+                ) {
+                    $remote = json_decode($remote['body']);
+                    $res = new stdClass();
+
+                    $res->name = $remote->name;
+                    $res->slug = $custom_options['plugin_slug'];
+                    $res->version = $remote->version;
+                    $res->tested = $remote->tested;
+                    $res->download_link = $remote->download_url;
+                    $res->trunk = $remote->download_url;
+                    $res->sections = [];
+                    return $res;
+                }
+                return false;
+            },
+            20,
+            3
+        );
+
+        // clean cache after plugin update
+        add_action(
+            'upgrader_process_complete',
+            function ($upgrader_object, $options) {
+                global $custom_options;
+                if ($options['action'] == 'update' && $options['type'] === 'plugin') {
+                    delete_transient('custom_upgrade_' . $custom_options['plugin_slug']);
+                }
+            },
+            10,
+            2
+        );
     }
 
     private function getPluginFileStorePathAbsolute()
@@ -1151,6 +1316,18 @@ class GtbabelWordPress
                 'gtbabel-wizard',
                 function () {
                     $this->initBackendWizard();
+                }
+            );
+            $menus[] = $submenu;
+
+            $submenu = add_submenu_page(
+                'gtbabel-trans',
+                __('License key', 'gtbabel-plugin'),
+                __('License key', 'gtbabel-plugin'),
+                'gtbabel__edit_settings',
+                'gtbabel-license',
+                function () {
+                    $this->initBackendLicense();
                 }
             );
             $menus[] = $submenu;
@@ -3429,6 +3606,55 @@ class GtbabelWordPress
         echo '</table>';
 
         echo '<input class="gtbabel__submit button button-primary" name="save_permissions" value="' .
+            __('Save', 'gtbabel-plugin') .
+            '" type="submit" />';
+
+        echo '</form>';
+        echo '</div>';
+    }
+
+    private function initBackendLicense()
+    {
+        $this->checkToken();
+
+        $message = '';
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (isset($_POST['save_license_key'])) {
+                check_admin_referer('gtbabel-license');
+                if (!empty($_POST['gtbabel_license_key']) && $_POST['gtbabel_license_key'] != '') {
+                    update_option('gtbabel_license_key', sanitize_text_field($_POST['gtbabel_license_key']));
+                } else {
+                    delete_option('gtbabel_license_key');
+                }
+            }
+            $message =
+                '<div class="gtbabel__notice notice notice-success is-dismissible"><p>' .
+                __('Successfully edited', 'gtbabel-plugin') .
+                '</p></div>';
+        }
+
+        echo '<div class="gtbabel gtbabel--license wrap">';
+        echo '<form class="gtbabel__form" method="post" action="' . admin_url('admin.php?page=gtbabel-license') . '">';
+        wp_nonce_field('gtbabel-license');
+        echo '<h1 class="gtbabel__title">🌐 ' . $this->getPluginTitle() . ' 🌐</h1>';
+        echo $message;
+        echo '<h2 class="gtbabel__subtitle">' . __('License key', 'gtbabel-plugin') . '</h2>';
+
+        echo '<ul class="gtbabel__fields">';
+        echo '<li class="gtbabel__field">';
+        echo '<label for="gtbabel_license_key" class="gtbabel__label">';
+        echo __('Key', 'gtbabel-plugin');
+        echo '</label>';
+        echo '<div class="gtbabel__inputbox">';
+        echo '<input class="gtbabel__input" id="gtbabel_license_key" name="gtbabel_license_key" type="text" value="' .
+            get_option('gtbabel_license_key') .
+            '" placeholder="XXXXXX-XXXXXX-XXXXXX-XXXXXX" />';
+        echo '</div>';
+        echo '</li>';
+        echo '</ul>';
+
+        echo '<input class="gtbabel__submit button button-primary" name="save_license_key" value="' .
             __('Save', 'gtbabel-plugin') .
             '" type="submit" />';
 
